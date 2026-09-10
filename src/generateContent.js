@@ -30,7 +30,7 @@ Escribe un relato sobre: ${tema}
 Responde SOLO con el texto final del post, sin comillas ni explicaciones adicionales.`;
 
   const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
+    model: "gemini-3.6-flash",
     contents: prompt,
   });
 
@@ -48,7 +48,7 @@ Historia:
 ${storyText}`;
 
   const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
+    model: "gemini-3.6-flash",
     contents: prompt,
   });
 
