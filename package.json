@@ -1,0 +1,13 @@
+{
+  "name": "jessito-fb-agent",
+  "version": "1.0.0",
+  "description": "Agente que genera contenido de entretenimiento (historias, memes, noticias) con Gemini y lo publica en una Pagina de Facebook",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "@google/genai": "^0.3.0"
+  }
+}

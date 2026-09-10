@@ -1,0 +1,29 @@
+name: Publicar en Facebook
+
+on:
+  schedule:
+    # Horas en UTC (Mexico = UTC-6, sin horario de verano)
+    - cron: "0 15 * * *"  # 9:00 am hora de Mexico
+    - cron: "0 21 * * *"  # 3:00 pm hora de Mexico
+    - cron: "0 3 * * *"   # 9:00 pm hora de Mexico
+  workflow_dispatch: {}
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Instalar dependencias
+        run: npm install
+
+      - name: Generar y publicar contenido
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+          FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
+        run: npm start
