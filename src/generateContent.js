@@ -32,7 +32,9 @@ async function resolveModel() {
   // Solo confia en familias de modelos de chat/texto conocidas (lista blanca),
   // en vez de intentar excluir todo lo que no sirve (audio, moderacion, modelos
   // con terminos pendientes de aceptar, etc.), que es una lista sin fin.
-  const chatFamilyPattern = /llama|gemma|mixtral|qwen|deepseek|mistral|gpt-oss/i;
+  // Se evitan qwen/deepseek a proposito: sus variantes en Groq suelen ser
+  // modelos "razonadores" que devuelven su cadena de pensamiento como texto.
+  const chatFamilyPattern = /llama|gemma|mixtral|mistral/i;
   const chatCandidates = allIds.filter((id) => chatFamilyPattern.test(id));
 
   cachedModel =
@@ -141,6 +143,8 @@ async function askGroq(prompt) {
       model,
       messages: [{ role: "user", content: prompt }],
       temperature: 1.0,
+      max_tokens: 900,
+      reasoning_format: "hidden",
     }),
   });
 
