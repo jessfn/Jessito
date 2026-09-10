@@ -2,15 +2,16 @@ import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
 
-const HF_MODEL = "black-forest-labs/FLUX.1-schnell";
+// Modelos gratuitos de generacion de imagenes en Hugging Face, en orden de preferencia.
+// Si uno deja de estar disponible, se prueba el siguiente automaticamente.
+const HF_MODELS = [
+  "stabilityai/stable-diffusion-xl-base-1.0",
+  "black-forest-labs/FLUX.1-dev",
+  "runwayml/stable-diffusion-v1-5",
+];
 
-// Genera una imagen gratis con la API de inferencia de Hugging Face (sin marca de agua)
-// y la guarda en un archivo temporal, devolviendo la ruta local.
-export async function generateImage(sceneDescription) {
-  const prompt = `digital illustration, cartoon/animated art style, not photorealistic, mysterious and
-intriguing mood, no readable text in the image, no recognizable real faces: ${sceneDescription}`;
-
-  const res = await fetch(`https://router.huggingface.co/hf-inference/models/${HF_MODEL}`, {
+async function requestImage(model, prompt) {
+  const res = await fetch(`https://router.huggingface.co/hf-inference/models/${model}`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${process.env.HF_TOKEN}`,
@@ -21,12 +22,30 @@ intriguing mood, no readable text in the image, no recognizable real faces: ${sc
 
   if (!res.ok) {
     const errorText = await res.text();
-    throw new Error(`Hugging Face no genero la imagen: ${res.status} ${errorText}`);
+    throw new Error(`${model} fallo: ${res.status} ${errorText}`);
   }
 
-  const buffer = Buffer.from(await res.arrayBuffer());
-  const filePath = path.join(os.tmpdir(), `post-image-${Date.now()}.png`);
-  fs.writeFileSync(filePath, buffer);
+  return Buffer.from(await res.arrayBuffer());
+}
 
-  return filePath;
+// Genera una imagen gratis con la API de inferencia de Hugging Face (sin marca de agua)
+// y la guarda en un archivo temporal, devolviendo la ruta local.
+export async function generateImage(sceneDescription) {
+  const prompt = `digital illustration, cartoon/animated art style, not photorealistic, mysterious and
+intriguing mood, no readable text in the image, no recognizable real faces: ${sceneDescription}`;
+
+  let lastError;
+  for (const model of HF_MODELS) {
+    try {
+      const buffer = await requestImage(model, prompt);
+      const filePath = path.join(os.tmpdir(), `post-image-${Date.now()}.png`);
+      fs.writeFileSync(filePath, buffer);
+      return filePath;
+    } catch (err) {
+      lastError = err;
+      console.warn(String(err));
+    }
+  }
+
+  throw new Error(`Ningun modelo de Hugging Face pudo generar la imagen. Ultimo error: ${lastError}`);
 }
