@@ -1,4 +1,5 @@
 import { CONFESSION_PROMPTS, TURBIO_PROMPTS, pickRandom } from "./topics.js";
+import { isRepeated, isTemaUsed } from "./history.js";
 
 // Modelos preferidos en orden, por si alguno deja de estar disponible en Groq.
 const PREFERRED_MODELS = [
@@ -42,12 +43,15 @@ async function resolveModel() {
 
 const STYLE_GUIDE = `Eres un redactor de contenido de entretenimiento para una pagina de Facebook mexicana.
 Escribes relatos anonimos de suspenso/morbo estilo "confesion" o "historia que me contaron",
-en primera persona, como si alguien lo estuviera contando de verdad.
+en primera persona, como si alguien lo estuviera contando de verdad. El objetivo es generar
+morbo e intriga genuinos: revelaciones fuertes, giros inesperados, secretos incomodos.
 
 Estilo de escritura:
 - Espanol neutro/narrativo, cuidado y bien redactado. Nada de modismos o jerga coloquial
   (nada de "naco", "wey", "no manches", groserias, ni muletillas de habla informal).
 - Puede sonar cercano y conversacional, pero correcto gramaticalmente, como una buena narracion.
+- Que el gancho y el desenlace generen ganas de comentar y compartir por el morbo, sin caer en
+  contenido explicito ni de mal gusto.
 
 Formato de salida (usa EXACTAMENTE estas dos etiquetas, cada una en su propia linea):
 GANCHO: una frase muy corta (6-10 palabras) tipo titular impactante que resuma el morbo/suspenso
@@ -62,7 +66,9 @@ generar comentarios (ej. "¿ustedes que hubieran hecho?").
 Reglas obligatorias:
 - Nada de violencia grafica, contenido sexual explicito, odio, menores en situaciones sensibles,
   ni nombres reales de personas identificables.
-- No incluyas hashtags ni emojis en exceso (maximo 2-3 emojis).`;
+- No incluyas hashtags ni emojis en exceso (maximo 2-3 emojis).
+- No repitas ideas, personajes ni giros que ya se hayan usado antes (se te daran temas ya usados
+  para que evites parecerte a ellos).`;
 
 // Convierte texto normal a "negritas" usando caracteres Unicode matematicos,
 // ya que Facebook no soporta Markdown en las publicaciones.
@@ -103,9 +109,7 @@ function parseStoryResponse(raw) {
   const gancho = ganchoMatch ? ganchoMatch[1].trim() : "";
   const cuerpo = cuerpoMatch ? cuerpoMatch[1].trim() : raw.trim();
 
-  if (!gancho) return cuerpo;
-
-  return `${toBoldUnicode(gancho)}\n\n${cuerpo}`;
+  return { gancho, cuerpo };
 }
 
 // Reintenta con backoff simple ante errores temporales (429/503) de la API de Groq.
@@ -134,6 +138,7 @@ async function askGroq(prompt) {
     body: JSON.stringify({
       model,
       messages: [{ role: "user", content: prompt }],
+      temperature: 1.0,
     }),
   });
 
@@ -146,20 +151,49 @@ async function askGroq(prompt) {
   return data.choices[0].message.content.trim();
 }
 
-export async function generateStory(contentType) {
-  const tema =
-    contentType === "confesion_anonima"
-      ? pickRandom(CONFESSION_PROMPTS)
-      : pickRandom(TURBIO_PROMPTS);
+// Elige un tema del banco que no se haya usado antes segun el historial. Si ya
+// se usaron todos, se reutiliza el banco completo (se agotaron las variantes).
+function pickUnusedTema(pool, history) {
+  const unused = pool.filter((t) => !isTemaUsed(history, t));
+  return pickRandom(unused.length > 0 ? unused : pool);
+}
+
+// Genera la historia (texto + gancho) evitando repetir temas o ganchos ya
+// publicados, usando hasta 3 intentos si el resultado se parece a uno previo.
+export async function generateStory(contentType, { history, trends = [] } = {}) {
+  let tema;
+  let trendUsed = null;
+
+  if (contentType === "tendencia_del_dia" && trends.length > 0) {
+    const unusedTrends = trends.filter((t) => !isTemaUsed(history, t));
+    trendUsed = pickRandom(unusedTrends.length > 0 ? unusedTrends : trends);
+    tema = `un relato de suspenso/morbo inspirado libremente en el tema del momento "${trendUsed}" (ficcion, sin presentarlo como hecho real relacionado a ese tema)`;
+  } else if (contentType === "confesion_anonima") {
+    tema = pickUnusedTema(CONFESSION_PROMPTS, history);
+  } else {
+    tema = pickUnusedTema(TURBIO_PROMPTS, history);
+  }
+
+  const yaUsados = history?.hooks?.slice(-15).join(" | ") || "ninguno";
 
   const prompt = `${STYLE_GUIDE}
 
 Escribe un relato sobre: ${tema}
 
+Ganchos ya usados recientemente (NO los repitas ni te parezcas a ellos): ${yaUsados}
+
 Responde SOLO con las dos lineas GANCHO: y CUERPO:, sin comillas ni explicaciones adicionales.`;
 
-  const text = await withRetry(() => askGroq(prompt));
-  return parseStoryResponse(text);
+  let gancho, cuerpo;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const text = await withRetry(() => askGroq(prompt));
+    ({ gancho, cuerpo } = parseStoryResponse(text));
+    if (!history || !isRepeated(history, gancho)) break;
+  }
+
+  const fullText = gancho ? `${toBoldUnicode(gancho)}\n\n${cuerpo}` : cuerpo;
+
+  return { text: fullText, hook: gancho, tema: trendUsed ?? tema };
 }
 
 // Genera una descripcion corta (en ingles) para pedir la imagen ilustrativa del post.

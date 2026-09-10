@@ -3,12 +3,20 @@ import { pickContentType } from "./topics.js";
 import { generateStory, generateImagePrompt } from "./generateContent.js";
 import { generateImage } from "./generateImage.js";
 import { postPhoto } from "./postToFacebook.js";
+import { loadHistory, recordUsage } from "./history.js";
+import { fetchTrendingTopicsMX } from "./trends.js";
 
 async function main() {
+  const history = loadHistory();
   const contentType = pickContentType();
   console.log(`Tipo de contenido: ${contentType}`);
 
-  const story = await generateStory(contentType);
+  const trends = contentType === "tendencia_del_dia" ? await fetchTrendingTopicsMX() : [];
+  if (contentType === "tendencia_del_dia") {
+    console.log("Tendencias obtenidas:", trends.slice(0, 5));
+  }
+
+  const { text: story, hook, tema } = await generateStory(contentType, { history, trends });
   console.log("Historia generada:\n", story);
 
   const scene = await generateImagePrompt(story);
@@ -21,6 +29,8 @@ async function main() {
   console.log("Publicado en Facebook:", result);
 
   fs.unlinkSync(imagePath);
+
+  recordUsage(history, { hook, tema });
 }
 
 main().catch((err) => {
