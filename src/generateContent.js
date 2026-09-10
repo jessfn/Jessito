@@ -12,16 +12,57 @@ Estilo de escritura:
   (nada de "naco", "wey", "no manches", groserias, ni muletillas de habla informal).
 - Puede sonar cercano y conversacional, pero correcto gramaticalmente, como una buena narracion.
 
+Formato de salida (usa EXACTAMENTE estas dos etiquetas, cada una en su propia linea):
+GANCHO: una frase muy corta (6-10 palabras) tipo titular impactante que resuma el morbo/suspenso
+del relato, en primera persona (ejemplo de estilo: "Mi hermano me engaño con mi novio").
+CUERPO: el relato completo (sin repetir el gancho), entre 1200 y 1800 caracteres, con desarrollo
+completo (inicio, nudo y desenlace/giro). Al FINAL del cuerpo (no al inicio) agrega una linea breve
+dejando claro que es un relato anonimo/de ficcion enviado por un seguidor de la pagina (ejemplo:
+"Historia anonima enviada por un seguidor de la pagina, nombres cambiados por privacidad.").
+NUNCA lo presentes como noticia verificada o hecho confirmado. Termina con una pregunta corta para
+generar comentarios (ej. "¿ustedes que hubieran hecho?").
+
 Reglas obligatorias:
-- SIEMPRE deja claro, al inicio o al final del texto, que es un relato anonimo/de ficcion enviado a la pagina
-  (ejemplo: "Historia anonima que nos compartieron..." o "Relato enviado por un seguidor (nombres cambiados)").
-  NUNCA lo presentes como noticia verificada o hecho confirmado.
 - Nada de violencia grafica, contenido sexual explicito, odio, menores en situaciones sensibles,
   ni nombres reales de personas identificables.
-- Entre 1200 y 1800 caracteres, con desarrollo completo (inicio, nudo y desenlace/giro), no solo un fragmento corto.
-  Gancho fuerte en la primera linea para generar intriga.
-- Termina con una pregunta corta para generar comentarios (ej. "¿ustedes que hubieran hecho?").
 - No incluyas hashtags ni emojis en exceso (maximo 2-3 emojis).`;
+
+// Convierte texto normal a "negritas" usando caracteres Unicode matematicos,
+// ya que Facebook no soporta Markdown en las publicaciones.
+function toBoldUnicode(text) {
+  const boldMap = {};
+  const upperStart = "A".charCodeAt(0);
+  const lowerStart = "a".charCodeAt(0);
+  const digitStart = "0".charCodeAt(0);
+  const boldUpper = 0x1d400;
+  const boldLower = 0x1d41a;
+  const boldDigit = 0x1d7ce;
+
+  for (let i = 0; i < 26; i++) {
+    boldMap[String.fromCharCode(upperStart + i)] = String.fromCodePoint(boldUpper + i);
+    boldMap[String.fromCharCode(lowerStart + i)] = String.fromCodePoint(boldLower + i);
+  }
+  for (let i = 0; i < 10; i++) {
+    boldMap[String.fromCharCode(digitStart + i)] = String.fromCodePoint(boldDigit + i);
+  }
+
+  return text
+    .split("")
+    .map((ch) => boldMap[ch] ?? ch)
+    .join("");
+}
+
+function parseStoryResponse(raw) {
+  const ganchoMatch = raw.match(/GANCHO:\s*(.+)/i);
+  const cuerpoMatch = raw.match(/CUERPO:\s*([\s\S]+)/i);
+
+  const gancho = ganchoMatch ? ganchoMatch[1].trim() : "";
+  const cuerpo = cuerpoMatch ? cuerpoMatch[1].trim() : raw.trim();
+
+  if (!gancho) return cuerpo;
+
+  return `${toBoldUnicode(gancho)}\n\n${cuerpo}`;
+}
 
 export async function generateStory(contentType) {
   const tema =
@@ -33,14 +74,14 @@ export async function generateStory(contentType) {
 
 Escribe un relato sobre: ${tema}
 
-Responde SOLO con el texto final del post, sin comillas ni explicaciones adicionales.`;
+Responde SOLO con las dos lineas GANCHO: y CUERPO:, sin comillas ni explicaciones adicionales.`;
 
   const response = await ai.models.generateContent({
     model: "gemini-3.6-flash",
     contents: prompt,
   });
 
-  return response.text.trim();
+  return parseStoryResponse(response.text.trim());
 }
 
 // Genera una descripcion corta (en ingles) para pedir la imagen ilustrativa del post.

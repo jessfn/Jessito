@@ -9,7 +9,7 @@ export async function generateImage(sceneDescription) {
 intriguing mood, no readable text in the image, no recognizable real faces: ${sceneDescription}`;
 
   const seed = Math.floor(Math.random() * 1_000_000);
-  const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=2048&height=2048&seed=${seed}&nologo=true&model=flux`;
+  const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=2048&height=2048&seed=${seed}&nologo=true&nofeed=true&model=turbo`;
 
   const res = await fetch(url);
   if (!res.ok) {
