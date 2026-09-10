@@ -29,9 +29,11 @@ async function resolveModel() {
   const allIds = (data.data ?? []).map((m) => m.id);
   const availableIds = new Set(allIds);
 
-  // Excluye modelos que no son de chat/texto (audio, moderacion, etc.).
-  const excludedPattern = /whisper|guard|tts|moderation|embed/i;
-  const chatCandidates = allIds.filter((id) => !excludedPattern.test(id));
+  // Solo confia en familias de modelos de chat/texto conocidas (lista blanca),
+  // en vez de intentar excluir todo lo que no sirve (audio, moderacion, modelos
+  // con terminos pendientes de aceptar, etc.), que es una lista sin fin.
+  const chatFamilyPattern = /llama|gemma|mixtral|qwen|deepseek|mistral|gpt-oss/i;
+  const chatCandidates = allIds.filter((id) => chatFamilyPattern.test(id));
 
   cachedModel =
     PREFERRED_MODELS.find((m) => availableIds.has(m)) ??
