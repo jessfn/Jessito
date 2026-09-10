@@ -67,6 +67,13 @@ Reglas obligatorias:
 // Convierte texto normal a "negritas" usando caracteres Unicode matematicos,
 // ya que Facebook no soporta Markdown en las publicaciones.
 function toBoldUnicode(text) {
+  // Los caracteres Unicode "negrita" solo existen para A-Z/a-z/0-9 (sin acentos),
+  // asi que quitamos tildes/diéresis antes de mapear para que no queden letras
+  // sueltas sin negrita dentro del gancho.
+  const normalized = text
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "");
+
   const boldMap = {};
   const upperStart = "A".charCodeAt(0);
   const lowerStart = "a".charCodeAt(0);
@@ -83,7 +90,7 @@ function toBoldUnicode(text) {
     boldMap[String.fromCharCode(digitStart + i)] = String.fromCodePoint(boldDigit + i);
   }
 
-  return text
+  return normalized
     .split("")
     .map((ch) => boldMap[ch] ?? ch)
     .join("");
