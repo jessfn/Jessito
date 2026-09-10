@@ -1,7 +1,6 @@
-import { GoogleGenAI } from "@google/genai";
 import { CONFESSION_PROMPTS, TURBIO_PROMPTS, pickRandom } from "./topics.js";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const GROQ_MODEL = "llama-3.3-70b-versatile";
 
 const STYLE_GUIDE = `Eres un redactor de contenido de entretenimiento para una pagina de Facebook mexicana.
 Escribes relatos anonimos de suspenso/morbo estilo "confesion" o "historia que me contaron",
@@ -64,18 +63,40 @@ function parseStoryResponse(raw) {
   return `${toBoldUnicode(gancho)}\n\n${cuerpo}`;
 }
 
-// Reintenta con backoff simple ante errores temporales (503/429) de la API de Gemini.
+// Reintenta con backoff simple ante errores temporales (429/503) de la API de Groq.
 async function withRetry(fn, attempts = 3) {
   for (let i = 0; i < attempts; i++) {
     try {
       return await fn();
     } catch (err) {
       const isLastAttempt = i === attempts - 1;
-      const isRetryable = /503|429|UNAVAILABLE|RESOURCE_EXHAUSTED/.test(String(err));
+      const isRetryable = /429|503|rate_limit/i.test(String(err));
       if (isLastAttempt || !isRetryable) throw err;
       await new Promise((resolve) => setTimeout(resolve, 2000 * (i + 1)));
     }
   }
+}
+
+async function askGroq(prompt) {
+  const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: GROQ_MODEL,
+      messages: [{ role: "user", content: prompt }],
+    }),
+  });
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(`Groq fallo: ${res.status} ${errorText}`);
+  }
+
+  const data = await res.json();
+  return data.choices[0].message.content.trim();
 }
 
 export async function generateStory(contentType) {
@@ -90,11 +111,8 @@ Escribe un relato sobre: ${tema}
 
 Responde SOLO con las dos lineas GANCHO: y CUERPO:, sin comillas ni explicaciones adicionales.`;
 
-  const response = await withRetry(() =>
-    ai.models.generateContent({ model: "gemini-3.6-flash", contents: prompt })
-  );
-
-  return parseStoryResponse(response.text.trim());
+  const text = await withRetry(() => askGroq(prompt));
+  return parseStoryResponse(text);
 }
 
 // Genera una descripcion corta (en ingles) para pedir la imagen ilustrativa del post.
@@ -107,9 +125,5 @@ Responde solo con la descripcion de la escena, una sola linea, maximo 40 palabra
 Historia:
 ${storyText}`;
 
-  const response = await withRetry(() =>
-    ai.models.generateContent({ model: "gemini-3.6-flash", contents: prompt })
-  );
-
-  return response.text.trim();
+  return withRetry(() => askGroq(prompt));
 }
