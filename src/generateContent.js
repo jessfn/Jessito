@@ -64,6 +64,20 @@ function parseStoryResponse(raw) {
   return `${toBoldUnicode(gancho)}\n\n${cuerpo}`;
 }
 
+// Reintenta con backoff simple ante errores temporales (503/429) de la API de Gemini.
+async function withRetry(fn, attempts = 3) {
+  for (let i = 0; i < attempts; i++) {
+    try {
+      return await fn();
+    } catch (err) {
+      const isLastAttempt = i === attempts - 1;
+      const isRetryable = /503|429|UNAVAILABLE|RESOURCE_EXHAUSTED/.test(String(err));
+      if (isLastAttempt || !isRetryable) throw err;
+      await new Promise((resolve) => setTimeout(resolve, 2000 * (i + 1)));
+    }
+  }
+}
+
 export async function generateStory(contentType) {
   const tema =
     contentType === "confesion_anonima"
@@ -76,10 +90,9 @@ Escribe un relato sobre: ${tema}
 
 Responde SOLO con las dos lineas GANCHO: y CUERPO:, sin comillas ni explicaciones adicionales.`;
 
-  const response = await ai.models.generateContent({
-    model: "gemini-3.6-flash",
-    contents: prompt,
-  });
+  const response = await withRetry(() =>
+    ai.models.generateContent({ model: "gemini-3.6-flash", contents: prompt })
+  );
 
   return parseStoryResponse(response.text.trim());
 }
@@ -94,10 +107,9 @@ Responde solo con la descripcion de la escena, una sola linea, maximo 40 palabra
 Historia:
 ${storyText}`;
 
-  const response = await ai.models.generateContent({
-    model: "gemini-3.6-flash",
-    contents: prompt,
-  });
+  const response = await withRetry(() =>
+    ai.models.generateContent({ model: "gemini-3.6-flash", contents: prompt })
+  );
 
   return response.text.trim();
 }
