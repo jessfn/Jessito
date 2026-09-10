@@ -34,9 +34,9 @@ function toBoldUnicode(text) {
   const upperStart = "A".charCodeAt(0);
   const lowerStart = "a".charCodeAt(0);
   const digitStart = "0".charCodeAt(0);
-  const boldUpper = 0x1d400;
-  const boldLower = 0x1d41a;
-  const boldDigit = 0x1d7ce;
+  const boldUpper = 0x1d5d4; // Mathematical Sans-Serif Bold (coincide con la tipografia de Facebook)
+  const boldLower = 0x1d5ee;
+  const boldDigit = 0x1d7ec;
 
   for (let i = 0; i < 26; i++) {
     boldMap[String.fromCharCode(upperStart + i)] = String.fromCodePoint(boldUpper + i);
