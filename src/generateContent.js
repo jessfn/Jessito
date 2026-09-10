@@ -1,6 +1,39 @@
 import { CONFESSION_PROMPTS, TURBIO_PROMPTS, pickRandom } from "./topics.js";
 
-const GROQ_MODEL = "llama-3.3-70b-versatile";
+// Modelos preferidos en orden, por si alguno deja de estar disponible en Groq.
+const PREFERRED_MODELS = [
+  "llama-3.3-70b-versatile",
+  "llama-3.1-70b-versatile",
+  "llama-3.1-8b-instant",
+  "gemma2-9b-it",
+];
+
+let cachedModel = null;
+
+// Pregunta a Groq que modelos estan disponibles y elige el mejor de la lista de
+// preferencia (o el primero disponible si ninguno coincide), para no romperse
+// cuando Groq renombra o retira un modelo.
+async function resolveModel() {
+  if (cachedModel) return cachedModel;
+
+  const res = await fetch("https://api.groq.com/openai/v1/models", {
+    headers: { Authorization: `Bearer ${process.env.GROQ_API_KEY}` },
+  });
+  if (!res.ok) {
+    cachedModel = PREFERRED_MODELS[0];
+    return cachedModel;
+  }
+
+  const data = await res.json();
+  const availableIds = new Set((data.data ?? []).map((m) => m.id));
+
+  cachedModel =
+    PREFERRED_MODELS.find((m) => availableIds.has(m)) ??
+    [...availableIds][0] ??
+    PREFERRED_MODELS[0];
+
+  return cachedModel;
+}
 
 const STYLE_GUIDE = `Eres un redactor de contenido de entretenimiento para una pagina de Facebook mexicana.
 Escribes relatos anonimos de suspenso/morbo estilo "confesion" o "historia que me contaron",
@@ -78,6 +111,8 @@ async function withRetry(fn, attempts = 3) {
 }
 
 async function askGroq(prompt) {
+  const model = await resolveModel();
+
   const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -85,7 +120,7 @@ async function askGroq(prompt) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: GROQ_MODEL,
+      model,
       messages: [{ role: "user", content: prompt }],
     }),
   });
