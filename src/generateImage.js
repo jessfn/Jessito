@@ -55,7 +55,9 @@ async function requestImage(model, prompt) {
 // y la guarda en un archivo temporal, devolviendo la ruta local.
 export async function generateImage(sceneDescription) {
   const prompt = `digital illustration, cartoon/animated art style, not photorealistic, mysterious and
-intriguing mood, no readable text in the image, no recognizable real faces: ${sceneDescription}`;
+intriguing mood, no recognizable real faces: ${sceneDescription}. Absolutely no text, letters,
+words, numbers, logos, watermarks, signatures, or captions anywhere in the image, including in the
+corners or edges. Clean image with zero written content of any kind.`;
 
   const candidates = await getCandidateModels();
 
