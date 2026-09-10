@@ -25,11 +25,16 @@ async function resolveModel() {
   }
 
   const data = await res.json();
-  const availableIds = new Set((data.data ?? []).map((m) => m.id));
+  const allIds = (data.data ?? []).map((m) => m.id);
+  const availableIds = new Set(allIds);
+
+  // Excluye modelos que no son de chat/texto (audio, moderacion, etc.).
+  const excludedPattern = /whisper|guard|tts|moderation|embed/i;
+  const chatCandidates = allIds.filter((id) => !excludedPattern.test(id));
 
   cachedModel =
     PREFERRED_MODELS.find((m) => availableIds.has(m)) ??
-    [...availableIds][0] ??
+    chatCandidates[0] ??
     PREFERRED_MODELS[0];
 
   return cachedModel;
