@@ -1,49 +1,10 @@
 import { CONFESSION_PROMPTS, TURBIO_PROMPTS, pickRandom } from "./topics.js";
 import { isRepeated, isTemaUsed } from "./history.js";
 
-// Modelos preferidos en orden, por si alguno deja de estar disponible en Groq.
-const PREFERRED_MODELS = [
-  "llama-3.3-70b-versatile",
-  "llama-3.1-70b-versatile",
-  "llama-3.1-8b-instant",
-  "gemma2-9b-it",
-];
-
-let cachedModel = null;
-
-// Pregunta a Groq que modelos estan disponibles y elige el mejor de la lista de
-// preferencia (o el primero disponible si ninguno coincide), para no romperse
-// cuando Groq renombra o retira un modelo.
-async function resolveModel() {
-  if (cachedModel) return cachedModel;
-
-  const res = await fetch("https://api.groq.com/openai/v1/models", {
-    headers: { Authorization: `Bearer ${process.env.GROQ_API_KEY}` },
-  });
-  if (!res.ok) {
-    cachedModel = PREFERRED_MODELS[0];
-    return cachedModel;
-  }
-
-  const data = await res.json();
-  const allIds = (data.data ?? []).map((m) => m.id);
-  const availableIds = new Set(allIds);
-
-  // Solo confia en familias de modelos de chat/texto conocidas (lista blanca),
-  // en vez de intentar excluir todo lo que no sirve (audio, moderacion, modelos
-  // con terminos pendientes de aceptar, etc.), que es una lista sin fin.
-  // Se evitan qwen/deepseek a proposito: sus variantes en Groq suelen ser
-  // modelos "razonadores" que devuelven su cadena de pensamiento como texto.
-  const chatFamilyPattern = /llama|gemma|mixtral|mistral/i;
-  const chatCandidates = allIds.filter((id) => chatFamilyPattern.test(id));
-
-  cachedModel =
-    PREFERRED_MODELS.find((m) => availableIds.has(m)) ??
-    chatCandidates[0] ??
-    PREFERRED_MODELS[0];
-
-  return cachedModel;
-}
+// Modelos fijos y conocidos de Groq, en orden. Nada de descubrimiento dinamico:
+// eso terminaba eligiendo modelos de voz/razonamiento con reglas distintas.
+// Si Groq retira alguno, simplemente se prueba el siguiente de la lista.
+const MODELS = ["llama-3.1-8b-instant", "llama-3.3-70b-versatile", "gemma2-9b-it"];
 
 const STYLE_GUIDE = `Eres un redactor de contenido de entretenimiento para una pagina de Facebook mexicana.
 Escribes relatos anonimos de suspenso/morbo estilo "confesion" o "historia que me contaron",
@@ -130,9 +91,7 @@ async function withRetry(fn, attempts = 3) {
   }
 }
 
-async function askGroq(prompt) {
-  const model = await resolveModel();
-
+async function callGroq(model, prompt) {
   const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -143,18 +102,31 @@ async function askGroq(prompt) {
       model,
       messages: [{ role: "user", content: prompt }],
       temperature: 1.0,
-      max_tokens: 900,
-      reasoning_format: "hidden",
+      max_tokens: 700,
     }),
   });
 
   if (!res.ok) {
     const errorText = await res.text();
-    throw new Error(`Groq fallo: ${res.status} ${errorText}`);
+    throw new Error(`${model} fallo: ${res.status} ${errorText}`);
   }
 
   const data = await res.json();
   return data.choices[0].message.content.trim();
+}
+
+// Prueba los modelos conocidos en orden hasta que uno responda.
+async function askGroq(prompt) {
+  let lastError;
+  for (const model of MODELS) {
+    try {
+      return await withRetry(() => callGroq(model, prompt));
+    } catch (err) {
+      lastError = err;
+      console.warn(String(err));
+    }
+  }
+  throw lastError;
 }
 
 // Elige un tema del banco que no se haya usado antes segun el historial. Si ya
@@ -192,7 +164,7 @@ Responde SOLO con las dos lineas GANCHO: y CUERPO:, sin comillas ni explicacione
 
   let gancho, cuerpo;
   for (let attempt = 0; attempt < 3; attempt++) {
-    const text = await withRetry(() => askGroq(prompt));
+    const text = await askGroq(prompt);
     ({ gancho, cuerpo } = parseStoryResponse(text));
     if (!history || !isRepeated(history, gancho)) break;
   }
@@ -212,5 +184,5 @@ Responde solo con la descripcion de la escena, una sola linea, maximo 40 palabra
 Historia:
 ${storyText}`;
 
-  return withRetry(() => askGroq(prompt));
+  return askGroq(prompt);
 }
