@@ -1,10 +1,39 @@
 import { CONFESSION_PROMPTS, TURBIO_PROMPTS, pickRandom } from "./topics.js";
 import { isRepeated, isTemaUsed } from "./history.js";
 
-// Modelos fijos y conocidos de Groq, en orden. Nada de descubrimiento dinamico:
-// eso terminaba eligiendo modelos de voz/razonamiento con reglas distintas.
-// Si Groq retira alguno, simplemente se prueba el siguiente de la lista.
-const MODELS = ["llama-3.1-8b-instant", "llama-3.3-70b-versatile", "gemma2-9b-it"];
+// Modelos de respaldo por si la consulta en vivo a Groq fallara por completo.
+const FALLBACK_MODELS = ["llama-3.1-8b-instant"];
+
+let cachedModelList = null;
+
+// Pregunta a Groq (en el momento de correr, no con nombres fijos que se vencen)
+// que modelos de chat/texto simples estan disponibles ahora mismo. Se excluyen
+// voz/moderacion (patron conocido) y modelos "razonadores" (qwen/deepseek, que
+// exponen su cadena de pensamiento como texto) para no toparse con esos casos.
+async function getModelList() {
+  if (cachedModelList) return cachedModelList;
+
+  try {
+    const res = await fetch("https://api.groq.com/openai/v1/models", {
+      headers: { Authorization: `Bearer ${process.env.GROQ_API_KEY}` },
+    });
+    if (res.ok) {
+      const data = await res.json();
+      const allIds = (data.data ?? []).map((m) => m.id);
+      const excluded = /whisper|guard|tts|moderation|embed|qwen|deepseek|orpheus|reasoning/i;
+      const candidates = allIds.filter((id) => !excluded.test(id));
+      if (candidates.length > 0) {
+        cachedModelList = [...candidates, ...FALLBACK_MODELS];
+        return cachedModelList;
+      }
+    }
+  } catch {
+    // sigue al fallback de abajo
+  }
+
+  cachedModelList = FALLBACK_MODELS;
+  return cachedModelList;
+}
 
 const STYLE_GUIDE = `Eres un redactor de contenido de entretenimiento para una pagina de Facebook mexicana.
 Escribes relatos anonimos de suspenso/morbo estilo "confesion" o "historia que me contaron",
@@ -115,10 +144,12 @@ async function callGroq(model, prompt) {
   return data.choices[0].message.content.trim();
 }
 
-// Prueba los modelos conocidos en orden hasta que uno responda.
+// Prueba los modelos disponibles en orden hasta que uno responda.
 async function askGroq(prompt) {
+  const models = await getModelList();
+
   let lastError;
-  for (const model of MODELS) {
+  for (const model of models) {
     try {
       return await withRetry(() => callGroq(model, prompt));
     } catch (err) {
@@ -166,6 +197,9 @@ Responde SOLO con las dos lineas GANCHO: y CUERPO:, sin comillas ni explicacione
   for (let attempt = 0; attempt < 3; attempt++) {
     const text = await askGroq(prompt);
     ({ gancho, cuerpo } = parseStoryResponse(text));
+
+    const isWellFormed = gancho.length > 0 && gancho.length < 120 && cuerpo.length > 300;
+    if (!isWellFormed) continue;
     if (!history || !isRepeated(history, gancho)) break;
   }
 
