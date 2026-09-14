@@ -2,57 +2,9 @@ import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
 
-// Modelos de respaldo por si la busqueda dinamica en Hugging Face fallara.
-const FALLBACK_MODELS = ["stabilityai/stable-diffusion-xl-base-1.0"];
-
-let cachedCandidates = null;
-
-// Pregunta al Hub de Hugging Face que modelos de texto-a-imagen estan
-// actualmente disponibles en el proveedor gratuito "hf-inference", en vez de
-// tener nombres fijos que Hugging Face puede retirar o migrar de proveedor.
-async function getCandidateModels() {
-  if (cachedCandidates) return cachedCandidates;
-
-  try {
-    const res = await fetch(
-      "https://huggingface.co/api/models?pipeline_tag=text-to-image&inference_provider=hf-inference&sort=likes&direction=-1&limit=15"
-    );
-    if (res.ok) {
-      const data = await res.json();
-      const ids = data.map((m) => m.id).filter(Boolean);
-      if (ids.length > 0) {
-        cachedCandidates = [...ids, ...FALLBACK_MODELS];
-        return cachedCandidates;
-      }
-    }
-  } catch {
-    // sigue al fallback de abajo
-  }
-
-  cachedCandidates = FALLBACK_MODELS;
-  return cachedCandidates;
-}
-
-async function requestImage(model, prompt) {
-  const res = await fetch(`https://router.huggingface.co/hf-inference/models/${model}`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${process.env.HF_TOKEN}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ inputs: prompt }),
-  });
-
-  if (!res.ok) {
-    const errorText = await res.text();
-    throw new Error(`${model} fallo: ${res.status} ${errorText}`);
-  }
-
-  return Buffer.from(await res.arrayBuffer());
-}
-
-// Genera una imagen gratis con la API de inferencia de Hugging Face (sin marca de agua)
-// y la guarda en un archivo temporal, devolviendo la ruta local.
+// Genera una imagen gratis e ilimitada con Pollinations.ai. La marca de agua
+// solo se quita de forma confiable con una cuenta registrada (token gratis en
+// auth.pollinations.ai) enviado como Bearer token, no solo con nologo=true.
 export async function generateImage(sceneDescription) {
   const prompt = `photorealistic cinematic photograph, dramatic moody lighting, mysterious and
 intriguing atmosphere, shot like a real news/documentary photo (not a cartoon, not an illustration,
@@ -61,20 +13,22 @@ backlit, or blurred) and not resemble any real identifiable person. Absolutely n
 words, numbers, logos, watermarks, signatures, or captions anywhere in the image, including in the
 corners or edges. Clean image with zero written content of any kind.`;
 
-  const candidates = await getCandidateModels();
+  const seed = Math.floor(Math.random() * 1_000_000);
+  const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=1080&height=1920&seed=${seed}&nologo=true&model=flux`;
 
-  let lastError;
-  for (const model of candidates) {
-    try {
-      const buffer = await requestImage(model, prompt);
-      const filePath = path.join(os.tmpdir(), `post-image-${Date.now()}.png`);
-      fs.writeFileSync(filePath, buffer);
-      return filePath;
-    } catch (err) {
-      lastError = err;
-      console.warn(String(err));
-    }
+  const res = await fetch(url, {
+    headers: process.env.POLLINATIONS_TOKEN
+      ? { Authorization: `Bearer ${process.env.POLLINATIONS_TOKEN}` }
+      : {},
+  });
+
+  if (!res.ok) {
+    throw new Error(`Pollinations no genero la imagen: ${res.status} ${res.statusText}`);
   }
 
-  throw new Error(`Ningun modelo de Hugging Face pudo generar la imagen. Ultimo error: ${lastError}`);
+  const buffer = Buffer.from(await res.arrayBuffer());
+  const filePath = path.join(os.tmpdir(), `post-image-${Date.now()}.png`);
+  fs.writeFileSync(filePath, buffer);
+
+  return filePath;
 }
