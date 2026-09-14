@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 
 const run = promisify(execFile);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const HORROR_FONT = path.join(__dirname, "..", "assets", "fonts", "Creepster-Regular.ttf");
+const TITLE_FONT = path.join(__dirname, "..", "assets", "fonts", "Anton-Regular.ttf");
 
 async function getAudioDuration(filePath) {
   const { stdout } = await run("ffprobe", [
@@ -35,7 +35,7 @@ async function concatAudio(chunkPaths, tmpDir) {
 }
 
 function findFont() {
-  if (fs.existsSync(HORROR_FONT)) return HORROR_FONT;
+  if (fs.existsSync(TITLE_FONT)) return TITLE_FONT;
   const fallbacks = [
     "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
     "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
@@ -44,9 +44,8 @@ function findFont() {
 }
 
 // Parte el gancho en varias lineas para que quepa dentro del ancho del video
-// vertical (1080px), en vez de desbordarse o quedar demasiado chico. La
-// tipografia de terror es mas ancha, asi que usa menos caracteres por linea.
-function wrapText(text, maxCharsPerLine = 16) {
+// vertical (1080px), en vez de desbordarse o quedar demasiado chico.
+function wrapText(text, maxCharsPerLine = 18) {
   const words = text.split(/\s+/);
   const lines = [];
   let current = "";
@@ -123,7 +122,10 @@ export async function buildVideo({ imagePaths, chunkPaths, tmpDir, hookText }) {
     // segmento), para que se sienta continuo y cinematografico en vez de
     // apresurado, sin importar cuantas imagenes haya.
     filterParts.push(
-      `[${i}:v]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,` +
+      // Recorta el 10% inferior de la imagen original primero (ahi es donde
+      // Pollinations a veces deja su marca de agua), y luego escala/recorta
+      // al formato vertical final.
+      `[${i}:v]crop=iw:ih*0.90:0:0,scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,` +
       `zoompan=z='zoom+0.0006':d=${segFrames}:s=1080x1920:fps=${fps},setsar=1[v${i}]`
     );
   });
@@ -139,9 +141,9 @@ export async function buildVideo({ imagePaths, chunkPaths, tmpDir, hookText }) {
   }
 
   filterParts.push(
-    `[${lastLabel}]drawtext=${fontOption}textfile='${hookPath}':fontcolor=white:fontsize=64:` +
-    `box=1:boxcolor=black@0.6:boxborderw=26:x=(w-text_w)/2:y=110:` +
-    `enable='lt(t,4)':line_spacing=16[vfinal]`
+    `[${lastLabel}]drawtext=${fontOption}textfile='${hookPath}':fontcolor=white:fontsize=76:` +
+    `borderw=6:bordercolor=black@0.85:shadowcolor=black@0.6:shadowx=2:shadowy=2:` +
+    `x=(w-text_w)/2:y=(h-text_h)/2:enable='lt(t,4)':line_spacing=18[vfinal]`
   );
 
   // Mezcla la narracion (volumen normal) con el ambiente de terror (audible
