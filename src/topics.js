@@ -12,6 +12,10 @@ export const CONFESSION_PROMPTS = [
   "una boda que se cancelo por algo aterrador que nadie esperaba",
   "un objeto heredado que empezo a traer sucesos que no tienen explicacion",
   "una llamada telefonica de alguien que ya habia muerto",
+  "llevar a una persona mayor a su casa esa noche, y despues descubrir que ya habia fallecido antes de esa noche",
+  "dar aventon a alguien en la carretera que desaparece sin explicacion al llegar al destino",
+  "una conversacion larga con un desconocido en un velorio que resulto ser alguien que no deberia estar ahi",
+  "cuidar a un vecino anciano varias noches, y despues enterarse de que llevaba tiempo muerto",
 ];
 
 export const TURBIO_PROMPTS = [

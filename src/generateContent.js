@@ -39,13 +39,17 @@ const STYLE_GUIDE = `Eres un redactor de contenido de TERROR/misterio turbio par
 mexicana. Escribes relatos anonimos de terror o suceso profundamente turbio, estilo "confesion" o
 "historia que me contaron", en primera persona, como si alguien lo estuviera contando de verdad.
 SIEMPRE debe sentirse como una historia de terror o algo genuinamente inquietante/paranormal o
-criminal turbio, nunca solo un drama romantico sin elemento oscuro/aterrador. El objetivo es generar
-miedo, morbo e intriga genuinos: revelaciones fuertes, giros inesperados, algo que inquiete al leerlo.
+criminal turbio, nunca solo un drama romantico sin elemento oscuro/aterrador. El objetivo es que el
+lector se quede con la boca abierta: un final que golpee fuerte y sea dificil de olvidar.
 
 Estilo de escritura:
 - Espanol neutro/narrativo, cuidado y bien redactado. Nada de modismos o jerga coloquial
   (nada de "naco", "wey", "no manches", groserias, ni muletillas de habla informal).
 - Puede sonar cercano y conversacional, pero correcto gramaticalmente, como una buena narracion.
+- El desenlace/giro debe ser FUERTE y perturbador (ejemplos del tipo de impacto que buscamos: alguien
+  descubre que la persona con la que convivio o a quien ayudo ya estaba muerta desde antes; algo que
+  parecia normal resulta ser una entidad/persona que no deberia estar ahi; un patron macabro que se
+  revela de golpe). Evita finales tibios o que se queden en anecdota sin consecuencia.
 - Que el gancho y el desenlace generen ganas de comentar y compartir por el morbo, sin caer en
   contenido explicito ni de mal gusto.
 
@@ -79,6 +83,7 @@ Estilo de escritura:
 - Espanol neutro, tono de nota de ultima hora: directo, con gancho fuerte, que genere morbo y
   urgencia por leer/comentar. Nada de modismos o jerga coloquial, ni groserias.
 - Correcto gramaticalmente, como una buena nota de entretenimiento viral.
+- El cierre debe golpear fuerte, dejando al lector con la boca abierta, no una anecdota tibia.
 
 Formato de salida (usa EXACTAMENTE estas dos etiquetas, cada una en su propia linea):
 GANCHO: una frase muy corta (6-10 palabras) tipo titular de ultimo momento/tendencia, impactante.
@@ -255,7 +260,7 @@ Responde SOLO con las dos lineas GANCHO: y CUERPO:, sin comillas ni explicacione
   return { text: fullText, hook: gancho, tema: trendUsed ?? tema, narration };
 }
 
-const SCENE_COUNT = 5;
+const SCENE_COUNT = 8;
 
 // Genera varias descripciones cortas (en ingles) de escenas del relato -en
 // orden narrativo, del inicio al desenlace- para armar un video con varias
