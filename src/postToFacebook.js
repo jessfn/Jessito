@@ -26,3 +26,26 @@ export async function postPhoto(imagePath, caption) {
 
   return data;
 }
+
+// Publica un video (Reel) con descripcion en la Pagina de Facebook.
+export async function postVideo(videoPath, description) {
+  if (!PAGE_ID || !PAGE_TOKEN) {
+    throw new Error("Faltan FB_PAGE_ID o FB_PAGE_ACCESS_TOKEN en las variables de entorno.");
+  }
+
+  const url = `https://graph.facebook.com/${GRAPH_VERSION}/${PAGE_ID}/videos`;
+
+  const form = new FormData();
+  form.append("description", description);
+  form.append("access_token", PAGE_TOKEN);
+  form.append("source", new Blob([fs.readFileSync(videoPath)]), "post.mp4");
+
+  const res = await fetch(url, { method: "POST", body: form });
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(`Error al publicar el video en Facebook: ${JSON.stringify(data)}`);
+  }
+
+  return data;
+}

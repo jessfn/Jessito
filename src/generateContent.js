@@ -242,7 +242,14 @@ Responde SOLO con las dos lineas GANCHO: y CUERPO:, sin comillas ni explicacione
 
   const fullText = gancho ? `${toBoldUnicode(gancho)}\n\n${cuerpo}` : cuerpo;
 
-  return { text: fullText, hook: gancho, tema: trendUsed ?? tema };
+  // Version para narrar en voz: sin negritas Unicode ni emojis, que la
+  // sintesis de voz no sabe leer bien.
+  const narration = `${gancho}. ${cuerpo}`.replace(
+    /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu,
+    ""
+  );
+
+  return { text: fullText, hook: gancho, tema: trendUsed ?? tema, narration };
 }
 
 // Genera una descripcion corta (en ingles) para pedir la imagen ilustrativa del post.
