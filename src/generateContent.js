@@ -255,27 +255,31 @@ Responde SOLO con las dos lineas GANCHO: y CUERPO:, sin comillas ni explicacione
   return { text: fullText, hook: gancho, tema: trendUsed ?? tema, narration };
 }
 
-// Genera 3 descripciones cortas (en ingles) de escenas del relato -inicio, nudo
-// y clímax- para armar un video con varias imagenes en vez de una sola.
+const SCENE_COUNT = 5;
+
+// Genera varias descripciones cortas (en ingles) de escenas del relato -en
+// orden narrativo, del inicio al desenlace- para armar un video con varias
+// imagenes distintas en vez de una sola.
 export async function generateImagePrompts(storyText) {
-  const prompt = `Basado en esta historia de terror/misterio, describe en ingles 3 escenas
-ilustrativas distintas que representen el INICIO, el NUDO y el CLIMAX/GIRO del relato, para generar
+  const labels = Array.from({ length: SCENE_COUNT }, (_, i) => `ESCENA${i + 1}`);
+
+  const prompt = `Basado en esta historia de terror/misterio, describe en ingles ${SCENE_COUNT} escenas
+ilustrativas distintas, EN ORDEN, que sigan la progresion narrativa del relato de principio a fin
+(introduccion, desarrollo, tension creciente, clímax/giro, y desenlace/secuela), para generar
 imagenes FOTORREALISTAS (no caricatura, no dibujo animado, como fotografias reales tipo
 reportaje/cinematografico de terror), con rostros no reconocibles/identificables (de espaldas, en
 sombra, a contraluz, o borrosos), sin texto en la imagen, ambiente de terror/misterio,
 iluminacion dramatica u oscura. Cada escena debe ser visualmente distinta entre si (diferente
-encuadre, lugar o momento).
+encuadre, lugar o momento) para que se sienta como una progresion, no repeticiones de la misma toma.
 
-Responde EXACTAMENTE en este formato, una escena por linea, sin numerarlas ni agregar nada mas:
-ESCENA1: descripcion corta (maximo 30 palabras)
-ESCENA2: descripcion corta (maximo 30 palabras)
-ESCENA3: descripcion corta (maximo 30 palabras)
+Responde EXACTAMENTE en este formato, una escena por linea, sin agregar nada mas:
+${labels.map((l) => `${l}: descripcion corta (maximo 30 palabras)`).join("\n")}
 
 Historia:
 ${storyText}`;
 
   const text = await askGroq(prompt);
-  const scenes = [...text.matchAll(/ESCENA\d:\s*(.+)/gi)].map((m) => m[1].trim());
+  const scenes = [...text.matchAll(/ESCENA\d+:\s*(.+)/gi)].map((m) => m[1].trim());
 
-  return scenes.length === 3 ? scenes : [text.trim(), text.trim(), text.trim()];
+  return scenes.length === SCENE_COUNT ? scenes : Array(SCENE_COUNT).fill(text.trim());
 }

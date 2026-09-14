@@ -15,14 +15,17 @@ export const CONFESSION_PROMPTS = [
 ];
 
 export const TURBIO_PROMPTS = [
-  "un pueblo pequeño donde la gente evita hablar de algo que pasó hace años",
-  "una carretera con fama de rara entre los choferes de la zona",
-  "un rumor local sobre una casa abandonada y quién vivía ahí",
-  "una tradición de un pueblo que nadie de fuera entiende bien",
-  "una historia que se cuenta de boca en boca en un mercado o feria",
-  "un negocio familiar con una reputacion extraña en su comunidad",
-  "una fiesta patronal con una costumbre que nadie de afuera entiende",
-  "un edificio o rancho con mala fama entre los locales",
+  "un pueblo pequeño donde la gente evita hablar de algo aterrador que paso hace años",
+  "una carretera con fama siniestra entre los choferes de la zona, por lo que le pasa a quien se detiene ahi",
+  "un rumor local sobre una casa abandonada y la persona que vivia ahi antes de desaparecer",
+  "una tradicion de un pueblo con un origen macabro que nadie de fuera entiende",
+  "una anciana del pueblo que cuidaba niños y de la que nunca se volvio a saber de varios de ellos",
+  "un negocio familiar con una reputacion siniestra por lo que le paso a sus antiguos empleados",
+  "una fiesta patronal con una costumbre que esconde un pacto oscuro del pueblo",
+  "un edificio o rancho donde han desaparecido varias personas a lo largo de los años",
+  "un orfanato o casa hogar cerrado hace años por algo que nunca se explico bien",
+  "un cuidador de ancianos o niños del que la gente empezo a sospechar",
+  "una serie de desapariciones en un mismo pueblo que nadie logro conectar hasta ahora",
 ];
 
 export function pickRandom(arr) {
