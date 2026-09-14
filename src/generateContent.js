@@ -62,7 +62,37 @@ Reglas obligatorias:
   ni nombres reales de personas identificables.
 - No incluyas hashtags ni emojis en exceso (maximo 2-3 emojis).
 - No repitas ideas, personajes ni giros que ya se hayan usado antes (se te daran temas ya usados
-  para que evites parecerte a ellos).`;
+  para que evites parecerte a ellos).
+- IMPORTANTE: el CUERPO debe quedar completo, terminando en una oracion cerrada (punto final,
+  signo de interrogacion o exclamacion), nunca cortado a la mitad de una idea o palabra.`;
+
+const NEWS_STYLE_GUIDE = `Eres un redactor de contenido de entretenimiento de "ultimo momento" para una
+pagina de Facebook mexicana. Escribes con tono de nota urgente/viral (como una alerta de tendencia),
+inspirado LIBREMENTE en un tema que esta sonando hoy, pero contando una historia/anecdota ficticia
+y anonima alrededor de ese tema, nunca presentandola como informacion verificada o un hecho real
+confirmado sobre alguien identificable.
+
+Estilo de escritura:
+- Espanol neutro, tono de nota de ultima hora: directo, con gancho fuerte, que genere morbo y
+  urgencia por leer/comentar. Nada de modismos o jerga coloquial, ni groserias.
+- Correcto gramaticalmente, como una buena nota de entretenimiento viral.
+
+Formato de salida (usa EXACTAMENTE estas dos etiquetas, cada una en su propia linea):
+GANCHO: una frase muy corta (6-10 palabras) tipo titular de ultimo momento/tendencia, impactante.
+CUERPO: el relato completo (sin repetir el gancho), entre 1200 y 1800 caracteres, con desarrollo
+completo (contexto, revelacion/giro, cierre). Al FINAL del cuerpo agrega una linea breve dejando
+claro que es contenido de entretenimiento/ficcion inspirado en la tendencia, no una nota verificada
+(ejemplo: "Contenido de entretenimiento inspirado en el tema del momento, no representa un hecho
+confirmado."). Termina con una pregunta corta para generar comentarios.
+
+Reglas obligatorias:
+- Nada de violencia grafica, contenido sexual explicito, odio, menores en situaciones sensibles,
+  ni acusar o inventar hechos reales sobre personas identificables (celebridades, politicos, etc.)
+  aunque el tema en tendencia mencione a alguien; mantente en el terreno de la ficcion/anecdota.
+- No incluyas hashtags ni emojis en exceso (maximo 2-3 emojis).
+- No repitas ideas ni ganchos ya usados antes.
+- IMPORTANTE: el CUERPO debe quedar completo, terminando en una oracion cerrada, nunca cortado a
+  la mitad de una idea o palabra.`;
 
 // Convierte texto normal a "negritas" usando caracteres Unicode matematicos,
 // ya que Facebook no soporta Markdown en las publicaciones.
@@ -131,7 +161,7 @@ async function callGroq(model, prompt) {
       model,
       messages: [{ role: "user", content: prompt }],
       temperature: 1.0,
-      max_tokens: 700,
+      max_tokens: 1300,
     }),
   });
 
@@ -172,11 +202,12 @@ function pickUnusedTema(pool, history) {
 export async function generateStory(contentType, { history, trends = [] } = {}) {
   let tema;
   let trendUsed = null;
+  const isTrend = contentType === "tendencia_del_dia" && trends.length > 0;
 
-  if (contentType === "tendencia_del_dia" && trends.length > 0) {
+  if (isTrend) {
     const unusedTrends = trends.filter((t) => !isTemaUsed(history, t));
     trendUsed = pickRandom(unusedTrends.length > 0 ? unusedTrends : trends);
-    tema = `un relato de suspenso/morbo inspirado libremente en el tema del momento "${trendUsed}" (ficcion, sin presentarlo como hecho real relacionado a ese tema)`;
+    tema = trendUsed;
   } else if (contentType === "confesion_anonima") {
     tema = pickUnusedTema(CONFESSION_PROMPTS, history);
   } else {
@@ -184,21 +215,27 @@ export async function generateStory(contentType, { history, trends = [] } = {}) 
   }
 
   const yaUsados = history?.hooks?.slice(-15).join(" | ") || "ninguno";
+  const styleGuide = isTrend ? NEWS_STYLE_GUIDE : STYLE_GUIDE;
+  const temaLine = isTrend
+    ? `Tema del momento que esta sonando hoy: "${tema}"`
+    : `Escribe un relato sobre: ${tema}`;
 
-  const prompt = `${STYLE_GUIDE}
+  const prompt = `${styleGuide}
 
-Escribe un relato sobre: ${tema}
+${temaLine}
 
 Ganchos ya usados recientemente (NO los repitas ni te parezcas a ellos): ${yaUsados}
 
 Responde SOLO con las dos lineas GANCHO: y CUERPO:, sin comillas ni explicaciones adicionales.`;
 
   let gancho, cuerpo;
-  for (let attempt = 0; attempt < 3; attempt++) {
+  for (let attempt = 0; attempt < 4; attempt++) {
     const text = await askGroq(prompt);
     ({ gancho, cuerpo } = parseStoryResponse(text));
 
-    const isWellFormed = gancho.length > 0 && gancho.length < 120 && cuerpo.length > 300;
+    const endsProperly = /[.!?"'”]\s*$/.test(cuerpo);
+    const isWellFormed =
+      gancho.length > 0 && gancho.length < 120 && cuerpo.length > 900 && endsProperly;
     if (!isWellFormed) continue;
     if (!history || !isRepeated(history, gancho)) break;
   }
@@ -211,8 +248,10 @@ Responde SOLO con las dos lineas GANCHO: y CUERPO:, sin comillas ni explicacione
 // Genera una descripcion corta (en ingles) para pedir la imagen ilustrativa del post.
 export async function generateImagePrompt(storyText) {
   const prompt = `Basado en esta historia de suspenso/misterio, describe en ingles UNA escena ilustrativa
-para generar una imagen estilo dibujo animado/ilustracion (NO fotorrealista, NO rostros reconocibles,
-sin texto en la imagen, ambiente misterioso/intrigante, colores oscuros o atardecer).
+para generar una imagen FOTORREALISTA (no caricatura, no dibujo animado, como una fotografia real
+tipo reportaje/cinematografica), con rostros no reconocibles/identificables (de espaldas, en sombra,
+a contraluz, o borrosos), sin texto en la imagen, ambiente misterioso/intrigante, iluminacion
+dramatica u oscura.
 Responde solo con la descripcion de la escena, una sola linea, maximo 40 palabras.
 
 Historia:

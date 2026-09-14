@@ -27,11 +27,11 @@ export function pickRandom(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-// Una de las 3 publicaciones diarias (la de las 9am hora de Mexico, cron a las
-// 15:00 UTC) se basa en tendencias del dia; las otras rotan entre confesion y
-// suceso turbio.
+// 2 de las 3 publicaciones diarias (9am y 3pm hora de Mexico, cron a las 15:00
+// y 21:00 UTC) se basan en tendencias/ultimo momento; la de las 9pm rota entre
+// confesion y suceso turbio para variar el tono.
 export function pickContentType(now = new Date()) {
-  const isTrendSlot = now.getUTCHours() === 15;
+  const isTrendSlot = now.getUTCHours() === 15 || now.getUTCHours() === 21;
   if (isTrendSlot) return "tendencia_del_dia";
   return pickRandom(["confesion_anonima", "suceso_turbio_mexico"]);
 }

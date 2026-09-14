@@ -54,8 +54,10 @@ async function requestImage(model, prompt) {
 // Genera una imagen gratis con la API de inferencia de Hugging Face (sin marca de agua)
 // y la guarda en un archivo temporal, devolviendo la ruta local.
 export async function generateImage(sceneDescription) {
-  const prompt = `digital illustration, cartoon/animated art style, not photorealistic, mysterious and
-intriguing mood, no recognizable real faces: ${sceneDescription}. Absolutely no text, letters,
+  const prompt = `photorealistic cinematic photograph, dramatic moody lighting, mysterious and
+intriguing atmosphere, shot like a real news/documentary photo (not a cartoon, not an illustration,
+not a painting): ${sceneDescription}. Faces must be unrecognizable (turned away, in shadow,
+backlit, or blurred) and not resemble any real identifiable person. Absolutely no text, letters,
 words, numbers, logos, watermarks, signatures, or captions anywhere in the image, including in the
 corners or edges. Clean image with zero written content of any kind.`;
 
