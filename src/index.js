@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import { pickContentType } from "./topics.js";
-import { generateStory, generateImagePrompt } from "./generateContent.js";
+import { generateStory, generateImagePrompts } from "./generateContent.js";
 import { generateImage } from "./generateImage.js";
 import { generateVoice } from "./generateVoice.js";
 import { buildVideo } from "./buildVideo.js";
@@ -24,24 +24,28 @@ async function main() {
   });
   console.log("Historia generada:\n", story);
 
-  const scene = await generateImagePrompt(story);
-  console.log("Prompt de imagen:", scene);
+  const scenes = await generateImagePrompts(story);
+  console.log("Escenas para las imagenes:", scenes);
 
-  const imagePath = await generateImage(scene);
-  console.log("Imagen guardada en:", imagePath);
+  console.log("Generando imagenes...");
+  const imagePaths = [];
+  for (const scene of scenes) {
+    imagePaths.push(await generateImage(scene));
+  }
+  console.log("Imagenes guardadas:", imagePaths);
 
   console.log("Generando narracion de voz...");
   const { chunkPaths, tmpDir } = await generateVoice(narration);
   console.log(`Narracion generada en ${chunkPaths.length} fragmentos.`);
 
   console.log("Armando el video...");
-  const videoPath = await buildVideo({ imagePath, chunkPaths, tmpDir, hookText: hook });
+  const videoPath = await buildVideo({ imagePaths, chunkPaths, tmpDir, hookText: hook });
   console.log("Video guardado en:", videoPath);
 
   const result = await postVideo(videoPath, story);
   console.log("Publicado en Facebook:", result);
 
-  fs.unlinkSync(imagePath);
+  for (const p of imagePaths) fs.unlinkSync(p);
   fs.rmSync(tmpDir, { recursive: true, force: true });
 
   recordUsage(history, { hook, tema });

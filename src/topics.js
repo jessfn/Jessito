@@ -1,15 +1,17 @@
 // Banco de temas/estilos para rotar el contenido y no repetir siempre lo mismo.
 export const CONFESSION_PROMPTS = [
-  "una persona descubre a su pareja engañándola con un familiar cercano",
-  "alguien vive una noche rara en una fiesta de un pueblo chico y nunca entendió qué pasó",
-  "un mensaje de texto que llegó de un número desconocido y cambió una relación",
-  "una mudanza a una casa con un vecino que se comporta muy extraño",
-  "un secreto familiar que salió a la luz en una comida navideña",
-  "un viaje en autobús nocturno donde algo no cuadraba",
-  "una amistad de años que terminó por una traición inesperada",
-  "una herencia familiar que revelo un secreto que nadie queria contar",
-  "un compañero de trabajo que resulto ser alguien completamente distinto",
-  "una boda que se cancelo por algo que nadie esperaba",
+  "una persona descubre que su pareja la engañaba con un familiar, y algo mas oscuro detras de eso",
+  "alguien vive una noche de terror en una fiesta de un pueblo chico y nunca entendio que paso",
+  "un mensaje de un numero desconocido que sabia cosas que nadie mas podia saber",
+  "una mudanza a una casa con un vecino que resulta ser aterrador",
+  "un secreto familiar oscuro que salio a la luz en una comida navideña",
+  "un viaje en autobus nocturno donde algo profundamente inquietante ocurrio",
+  "una amistad de años que termino al descubrir algo siniestro sobre esa persona",
+  "una herencia familiar que revelo un secreto macabro que nadie queria contar",
+  "un compañero de trabajo que resulto ser alguien completamente distinto y peligroso",
+  "una boda que se cancelo por algo aterrador que nadie esperaba",
+  "un objeto heredado que empezo a traer sucesos que no tienen explicacion",
+  "una llamada telefonica de alguien que ya habia muerto",
 ];
 
 export const TURBIO_PROMPTS = [

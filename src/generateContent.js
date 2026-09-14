@@ -35,10 +35,12 @@ async function getModelList() {
   return cachedModelList;
 }
 
-const STYLE_GUIDE = `Eres un redactor de contenido de entretenimiento para una pagina de Facebook mexicana.
-Escribes relatos anonimos de suspenso/morbo estilo "confesion" o "historia que me contaron",
-en primera persona, como si alguien lo estuviera contando de verdad. El objetivo es generar
-morbo e intriga genuinos: revelaciones fuertes, giros inesperados, secretos incomodos.
+const STYLE_GUIDE = `Eres un redactor de contenido de TERROR/misterio turbio para una pagina de Facebook
+mexicana. Escribes relatos anonimos de terror o suceso profundamente turbio, estilo "confesion" o
+"historia que me contaron", en primera persona, como si alguien lo estuviera contando de verdad.
+SIEMPRE debe sentirse como una historia de terror o algo genuinamente inquietante/paranormal o
+criminal turbio, nunca solo un drama romantico sin elemento oscuro/aterrador. El objetivo es generar
+miedo, morbo e intriga genuinos: revelaciones fuertes, giros inesperados, algo que inquiete al leerlo.
 
 Estilo de escritura:
 - Espanol neutro/narrativo, cuidado y bien redactado. Nada de modismos o jerga coloquial
@@ -66,10 +68,11 @@ Reglas obligatorias:
 - IMPORTANTE: el CUERPO debe quedar completo, terminando en una oracion cerrada (punto final,
   signo de interrogacion o exclamacion), nunca cortado a la mitad de una idea o palabra.`;
 
-const NEWS_STYLE_GUIDE = `Eres un redactor de contenido de entretenimiento de "ultimo momento" para una
-pagina de Facebook mexicana. Escribes con tono de nota urgente/viral (como una alerta de tendencia),
-inspirado LIBREMENTE en un tema que esta sonando hoy, pero contando una historia/anecdota ficticia
-y anonima alrededor de ese tema, nunca presentandola como informacion verificada o un hecho real
+const NEWS_STYLE_GUIDE = `Eres un redactor de contenido de TERROR/misterio turbio de "ultimo momento"
+para una pagina de Facebook mexicana. Escribes con tono de nota urgente/viral (como una alerta de
+tendencia), inspirado LIBREMENTE en un tema que esta sonando hoy, pero contando una historia/anecdota
+ficticia y anonima de terror o suceso turbio alrededor de ese tema (nunca un simple chisme sin
+elemento oscuro/inquietante), y nunca presentandola como informacion verificada o un hecho real
 confirmado sobre alguien identificable.
 
 Estilo de escritura:
@@ -252,17 +255,27 @@ Responde SOLO con las dos lineas GANCHO: y CUERPO:, sin comillas ni explicacione
   return { text: fullText, hook: gancho, tema: trendUsed ?? tema, narration };
 }
 
-// Genera una descripcion corta (en ingles) para pedir la imagen ilustrativa del post.
-export async function generateImagePrompt(storyText) {
-  const prompt = `Basado en esta historia de suspenso/misterio, describe en ingles UNA escena ilustrativa
-para generar una imagen FOTORREALISTA (no caricatura, no dibujo animado, como una fotografia real
-tipo reportaje/cinematografica), con rostros no reconocibles/identificables (de espaldas, en sombra,
-a contraluz, o borrosos), sin texto en la imagen, ambiente misterioso/intrigante, iluminacion
-dramatica u oscura.
-Responde solo con la descripcion de la escena, una sola linea, maximo 40 palabras.
+// Genera 3 descripciones cortas (en ingles) de escenas del relato -inicio, nudo
+// y clímax- para armar un video con varias imagenes en vez de una sola.
+export async function generateImagePrompts(storyText) {
+  const prompt = `Basado en esta historia de terror/misterio, describe en ingles 3 escenas
+ilustrativas distintas que representen el INICIO, el NUDO y el CLIMAX/GIRO del relato, para generar
+imagenes FOTORREALISTAS (no caricatura, no dibujo animado, como fotografias reales tipo
+reportaje/cinematografico de terror), con rostros no reconocibles/identificables (de espaldas, en
+sombra, a contraluz, o borrosos), sin texto en la imagen, ambiente de terror/misterio,
+iluminacion dramatica u oscura. Cada escena debe ser visualmente distinta entre si (diferente
+encuadre, lugar o momento).
+
+Responde EXACTAMENTE en este formato, una escena por linea, sin numerarlas ni agregar nada mas:
+ESCENA1: descripcion corta (maximo 30 palabras)
+ESCENA2: descripcion corta (maximo 30 palabras)
+ESCENA3: descripcion corta (maximo 30 palabras)
 
 Historia:
 ${storyText}`;
 
-  return askGroq(prompt);
+  const text = await askGroq(prompt);
+  const scenes = [...text.matchAll(/ESCENA\d:\s*(.+)/gi)].map((m) => m[1].trim());
+
+  return scenes.length === 3 ? scenes : [text.trim(), text.trim(), text.trim()];
 }
