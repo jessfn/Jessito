@@ -1,12 +1,13 @@
 import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
+import { MsEdgeTTS, OUTPUT_FORMAT } from "msedge-tts";
 
-const TTS_MODEL = "facebook/mms-tts-spa";
+const VOICE = "es-MX-DaliaNeural";
 
-// Divide el texto en fragmentos cortos (por oracion) para no exceder los
-// limites del modelo de texto-a-voz en una sola llamada.
-function splitIntoChunks(text, maxLen = 280) {
+// Divide el texto en fragmentos cortos (por oracion) para pedidos mas
+// confiables al servicio de voz.
+function splitIntoChunks(text, maxLen = 500) {
   const sentences = text.split(/(?<=[.!?])\s+/);
   const chunks = [];
   let current = "";
@@ -24,36 +25,22 @@ function splitIntoChunks(text, maxLen = 280) {
   return chunks;
 }
 
-async function synthesizeChunk(text) {
-  const res = await fetch(`https://router.huggingface.co/hf-inference/models/${TTS_MODEL}`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${process.env.HF_TOKEN}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ inputs: text }),
-  });
-
-  if (!res.ok) {
-    const errorText = await res.text();
-    throw new Error(`TTS fallo: ${res.status} ${errorText}`);
-  }
-
-  return Buffer.from(await res.arrayBuffer());
-}
-
 // Genera la narracion en voz de la historia completa (texto plano, sin los
-// caracteres Unicode de negrita) y devuelve la ruta del archivo de audio.
+// caracteres Unicode de negrita ni emojis) usando la voz gratuita de Microsoft
+// Edge (Read Aloud), y devuelve la ruta de los fragmentos de audio generados.
 export async function generateVoice(plainText) {
   const chunks = splitIntoChunks(plainText);
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "voice-"));
   const chunkPaths = [];
 
   for (let i = 0; i < chunks.length; i++) {
-    const buffer = await synthesizeChunk(chunks[i]);
-    const chunkPath = path.join(tmpDir, `chunk-${i}.wav`);
-    fs.writeFileSync(chunkPath, buffer);
-    chunkPaths.push(chunkPath);
+    const tts = new MsEdgeTTS();
+    await tts.setMetadata(VOICE, OUTPUT_FORMAT.AUDIO_24KHZ_96KBITRATE_MONO_MP3);
+    const { audioFilePath } = await tts.toFile(tmpDir, chunks[i]);
+
+    const renamedPath = path.join(tmpDir, `chunk-${i}.mp3`);
+    fs.renameSync(audioFilePath, renamedPath);
+    chunkPaths.push(renamedPath);
   }
 
   return { chunkPaths, tmpDir };

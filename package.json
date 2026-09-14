@@ -1,11 +1,13 @@
 {
   "name": "jessito-fb-agent",
   "version": "1.0.0",
-  "description": "Agente que genera contenido de entretenimiento (historias, memes, noticias) con Groq + OpenAI y lo publica en una Pagina de Facebook",
+  "description": "Agente que genera contenido de entretenimiento (historias, memes, noticias) con Groq + Hugging Face y lo publica como video en una Pagina de Facebook",
   "type": "module",
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js"
   },
-  "dependencies": {}
+  "dependencies": {
+    "msedge-tts": "^2.0.7"
+  }
 }

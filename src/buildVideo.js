@@ -22,7 +22,7 @@ async function concatAudio(chunkPaths, tmpDir) {
   const listContent = chunkPaths.map((p) => `file '${p.replace(/'/g, "'\\''")}'`).join("\n");
   fs.writeFileSync(listPath, listContent);
 
-  const combinedPath = path.join(tmpDir, "narration.wav");
+  const combinedPath = path.join(tmpDir, "narration.mp3");
   await run("ffmpeg", [
     "-y", "-f", "concat", "-safe", "0",
     "-i", listPath,
@@ -44,10 +44,17 @@ export async function buildVideo({ imagePath, chunkPaths, tmpDir, hookText }) {
   const outputPath = path.join(tmpDir, "output.mp4");
   const safeHook = hookText.replace(/'/g, "\\'").replace(/:/g, "\\:");
 
+  const fontCandidates = [
+    "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+    "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
+  ];
+  const fontFile = fontCandidates.find((f) => fs.existsSync(f));
+  const fontOption = fontFile ? `fontfile='${fontFile}':` : "";
+
   const zoompan =
     `zoompan=z='min(zoom+0.0007,1.25)':d=${totalFrames}:s=1080x1920:fps=${fps}`;
   const titleCard =
-    `drawtext=text='${safeHook}':fontcolor=white:fontsize=64:` +
+    `drawtext=${fontOption}text='${safeHook}':fontcolor=white:fontsize=64:` +
     `box=1:boxcolor=black@0.55:boxborderw=20:x=(w-text_w)/2:y=120:` +
     `enable='lt(t,4)':line_spacing=10`;
 
