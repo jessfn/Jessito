@@ -260,31 +260,77 @@ Responde SOLO con las dos lineas GANCHO: y CUERPO:, sin comillas ni explicacione
   return { text: fullText, hook: gancho, tema: trendUsed ?? tema, narration };
 }
 
-const SCENE_COUNT = 8;
+const TARGET_SEGMENTS = 12;
 
-// Genera varias descripciones cortas (en ingles) de escenas del relato -en
-// orden narrativo, del inicio al desenlace- para armar un video con varias
-// imagenes distintas en vez de una sola.
-export async function generateImagePrompts(storyText) {
-  const labels = Array.from({ length: SCENE_COUNT }, (_, i) => `ESCENA${i + 1}`);
+// Divide la narracion en oraciones.
+function splitSentences(text) {
+  const matches = text.replace(/\s+/g, " ").trim().match(/[^.!?]+[.!?]+|\S[^.!?]*$/g);
+  return (matches ?? [text]).map((s) => s.trim()).filter(Boolean);
+}
 
-  const prompt = `Basado en esta historia de terror/misterio, describe en ingles ${SCENE_COUNT} escenas
-ilustrativas distintas, EN ORDEN, que sigan la progresion narrativa del relato de principio a fin
-(introduccion, desarrollo, tension creciente, clímax/giro, y desenlace/secuela), para generar
-imagenes FOTORREALISTAS (no caricatura, no dibujo animado, como fotografias reales tipo
-reportaje/cinematografico de terror), con rostros no reconocibles/identificables (de espaldas, en
-sombra, a contraluz, o borrosos), sin texto en la imagen, ambiente de terror/misterio,
-iluminacion dramatica u oscura. Cada escena debe ser visualmente distinta entre si (diferente
-encuadre, lugar o momento) para que se sienta como una progresion, no repeticiones de la misma toma.
+// Parte la narracion en ~TARGET_SEGMENTS beats consecutivos (1-2 oraciones cada
+// uno) que cubren TODO el texto en orden, sin alterar una sola palabra. Cada
+// beat es una unidad de edicion: tendra su propia imagen y su propia voz.
+export function buildSegments(narration) {
+  const sentences = splitSentences(narration);
+  const perSeg = Math.max(1, Math.ceil(sentences.length / TARGET_SEGMENTS));
+  const segments = [];
+  for (let i = 0; i < sentences.length; i += perSeg) {
+    const chunk = sentences.slice(i, i + perSeg).join(" ").trim();
+    if (chunk) segments.push(chunk);
+  }
+  return segments;
+}
 
-Responde EXACTAMENTE en este formato, una escena por linea, sin agregar nada mas:
-${labels.map((l) => `${l}: descripcion corta (maximo 30 palabras)`).join("\n")}
+// Extrae el primer arreglo JSON de strings que aparezca en el texto del modelo.
+function parseJsonArray(text) {
+  const start = text.indexOf("[");
+  const end = text.lastIndexOf("]");
+  if (start === -1 || end === -1 || end <= start) return null;
+  try {
+    const arr = JSON.parse(text.slice(start, end + 1));
+    return Array.isArray(arr) ? arr.map((x) => String(x)) : null;
+  } catch {
+    return null;
+  }
+}
 
-Historia:
-${storyText}`;
+const IMAGE_STYLE_SUFFIX =
+  "photorealistic cinematic film still, dramatic moody lighting, dark horror/mystery atmosphere, " +
+  "faces unrecognizable (turned away, in shadow, backlit or blurred), no real identifiable person, " +
+  "absolutely no text/letters/logos/watermarks anywhere";
 
-  const text = await askGroq(prompt);
-  const scenes = [...text.matchAll(/ESCENA\d+:\s*(.+)/gi)].map((m) => m[1].trim());
+// Dado el guion segmentado (los beats de narracion en español), pide UN prompt
+// de imagen en ingles por beat, alineado 1:1 y en orden, de modo que la imagen
+// ilustre exactamente lo que se narra en ese momento, manteniendo coherencia de
+// escenario/personajes a lo largo del video.
+export async function generateSegmentImagePrompts(segments) {
+  const numbered = segments.map((s, i) => `${i + 1}. ${s}`).join("\n");
 
-  return scenes.length === SCENE_COUNT ? scenes : Array(SCENE_COUNT).fill(text.trim());
+  const prompt = `Eres un director de fotografia de un video de terror. Abajo hay ${segments.length}
+segmentos consecutivos (el guion narrado, en español) de una misma historia. Para CADA segmento,
+escribe UN prompt de imagen EN INGLES que ilustre EXACTAMENTE lo que se narra en ese segmento,
+manteniendo coherencia visual entre todos (mismo lugar/personajes cuando aplique) y una progresion
+cinematografica. Cada prompt: maximo 30 palabras, concreto y visual.
+
+Responde UNICAMENTE con un arreglo JSON de ${segments.length} strings, en el mismo orden, sin
+ninguna otra palabra fuera del JSON.
+
+Segmentos:
+${numbered}`;
+
+  let prompts = null;
+  for (let attempt = 0; attempt < 2 && !prompts; attempt++) {
+    const text = await askGroq(prompt);
+    const arr = parseJsonArray(text);
+    if (arr && arr.length === segments.length) prompts = arr;
+  }
+
+  // Respaldo: si el modelo no devolvio un arreglo valido, usa el texto del
+  // propio segmento como base del prompt.
+  if (!prompts) {
+    prompts = segments.map((s) => `a dark scene depicting: ${s}`);
+  }
+
+  return prompts.map((p) => `${p.trim()}. ${IMAGE_STYLE_SUFFIX}`);
 }

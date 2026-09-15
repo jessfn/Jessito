@@ -25,18 +25,12 @@ async function requestImage(url) {
   return Buffer.from(await res.arrayBuffer());
 }
 
-// Genera una imagen gratis e ilimitada con Pollinations.ai. La marca de agua
-// solo se quita de forma confiable con una cuenta registrada (token gratis en
-// auth.pollinations.ai) enviado como Bearer token, no solo con nologo=true.
-// Reintenta con distintos modelos/pausas ante errores temporales del servicio.
-export async function generateImage(sceneDescription) {
-  const prompt = `photorealistic cinematic photograph, dramatic moody lighting, mysterious and
-intriguing atmosphere, shot like a real news/documentary photo (not a cartoon, not an illustration,
-not a painting): ${sceneDescription}. Faces must be unrecognizable (turned away, in shadow,
-backlit, or blurred) and not resemble any real identifiable person. Absolutely no text, letters,
-words, numbers, logos, watermarks, signatures, or captions anywhere in the image, including in the
-corners or edges. Clean image with zero written content of any kind.`;
-
+// Genera una imagen gratis e ilimitada con Pollinations.ai a partir de un prompt
+// ya formado. La marca de agua solo se quita de forma confiable con una cuenta
+// registrada (token gratis en auth.pollinations.ai) enviado como Bearer token,
+// no solo con nologo=true. Reintenta con distintos modelos/pausas ante errores
+// temporales del servicio.
+export async function generateImage(prompt) {
   let lastError;
   for (const model of MODELS) {
     for (let attempt = 0; attempt < 2; attempt++) {

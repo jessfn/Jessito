@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import { pickContentType } from "./topics.js";
-import { generateStory, generateImagePrompts } from "./generateContent.js";
+import { generateStory, buildSegments, generateSegmentImagePrompts } from "./generateContent.js";
 import { generateImage } from "./generateImage.js";
 import { generateVoice } from "./generateVoice.js";
 import { buildVideo } from "./buildVideo.js";
@@ -18,31 +18,37 @@ async function main() {
     console.log("Tendencias obtenidas:", trends.slice(0, 5));
   }
 
-  const { text: story, hook, tema, narration } = await generateStory(contentType, {
+  const { text: caption, hook, tema, narration } = await generateStory(contentType, {
     history,
     trends,
   });
-  console.log("Historia generada:\n", story);
+  console.log("Historia generada:\n", caption);
 
-  const scenes = await generateImagePrompts(story);
-  console.log("Escenas para las imagenes:", scenes);
+  // Guion segmentado: cada beat tendra su propia imagen y su propia voz.
+  const segmentTexts = buildSegments(narration);
+  console.log(`Guion en ${segmentTexts.length} segmentos.`);
 
-  console.log("Generando imagenes...");
+  const imagePrompts = await generateSegmentImagePrompts(segmentTexts);
+
+  console.log("Generando imagenes por segmento...");
   const imagePaths = [];
-  for (const scene of scenes) {
-    imagePaths.push(await generateImage(scene));
+  for (const prompt of imagePrompts) {
+    imagePaths.push(await generateImage(prompt));
   }
-  console.log("Imagenes guardadas:", imagePaths);
 
-  console.log("Generando narracion de voz...");
-  const { chunkPaths, tmpDir } = await generateVoice(narration);
-  console.log(`Narracion generada en ${chunkPaths.length} fragmentos.`);
+  console.log("Narrando cada segmento...");
+  const { audioPaths, tmpDir } = await generateVoice(segmentTexts);
 
-  console.log("Armando el video...");
-  const videoPath = await buildVideo({ imagePaths, chunkPaths, tmpDir, hookText: hook });
-  console.log("Video guardado en:", videoPath);
+  const segments = segmentTexts.map((_, i) => ({
+    imagePath: imagePaths[i],
+    audioPath: audioPaths[i],
+  }));
 
-  const result = await postVideo(videoPath, story);
+  console.log("Editando el video...");
+  const videoPath = await buildVideo({ segments, tmpDir, hookText: hook });
+  console.log("Video listo:", videoPath);
+
+  const result = await postVideo(videoPath, caption);
   console.log("Publicado en Facebook:", result);
 
   for (const p of imagePaths) fs.unlinkSync(p);

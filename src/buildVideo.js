@@ -18,19 +18,14 @@ async function getAudioDuration(filePath) {
   return parseFloat(stdout.trim());
 }
 
-// Concatena los fragmentos de audio de la narracion en un solo archivo.
-async function concatAudio(chunkPaths, tmpDir) {
+// Concatena los audios de cada segmento (en orden) en la pista de narracion.
+async function concatAudio(audioPaths, tmpDir) {
   const listPath = path.join(tmpDir, "concat.txt");
-  const listContent = chunkPaths.map((p) => `file '${p.replace(/'/g, "'\\''")}'`).join("\n");
+  const listContent = audioPaths.map((p) => `file '${p.replace(/'/g, "'\\''")}'`).join("\n");
   fs.writeFileSync(listPath, listContent);
 
   const combinedPath = path.join(tmpDir, "narration.mp3");
-  await run("ffmpeg", [
-    "-y", "-f", "concat", "-safe", "0",
-    "-i", listPath,
-    "-c", "copy",
-    combinedPath,
-  ]);
+  await run("ffmpeg", ["-y", "-f", "concat", "-safe", "0", "-i", listPath, "-c", "copy", combinedPath]);
   return combinedPath;
 }
 
@@ -43,13 +38,11 @@ function findFont() {
   return fallbacks.find((f) => fs.existsSync(f));
 }
 
-// Parte el gancho en varias lineas para que quepa dentro del ancho del video
-// vertical (1080px), en vez de desbordarse o quedar demasiado chico.
+// Parte el gancho en varias lineas para que quepa en el ancho del video vertical.
 function wrapText(text, maxCharsPerLine = 18) {
   const words = text.split(/\s+/);
   const lines = [];
   let current = "";
-
   for (const word of words) {
     const candidate = current ? `${current} ${word}` : word;
     if (candidate.length > maxCharsPerLine && current) {
@@ -60,84 +53,89 @@ function wrapText(text, maxCharsPerLine = 18) {
     }
   }
   if (current) lines.push(current);
-
   return lines.join("\n");
 }
 
-// Genera una pista de sonido ambiente tipo "terror" (ruido grave + drone
-// tenebroso), sintetizada con ffmpeg, sin depender de ningun archivo externo
-// ni derechos de autor de terceros.
+// Cama sonora de tension (sin derechos de autor): drone grave con batido +
+// latido tipo corazon + viento, todo sintetizado con ffmpeg.
 async function buildAmbience(duration, tmpDir) {
   const ambiencePath = path.join(tmpDir, "ambience.wav");
   await run("ffmpeg", [
     "-y",
-    "-f", "lavfi", "-i", `anoisesrc=color=brown:amplitude=0.35:duration=${duration}`,
-    "-f", "lavfi", "-i", `sine=frequency=48:duration=${duration}`,
+    "-f", "lavfi", "-i", `sine=frequency=55:duration=${duration}`,
+    "-f", "lavfi", "-i", `sine=frequency=58:duration=${duration}`,
+    "-f", "lavfi", "-i", `anoisesrc=color=brown:amplitude=0.28:duration=${duration}`,
     "-filter_complex",
-    "[0:a]lowpass=f=500,volume=0.9[n];[1:a]volume=0.7[d];[n][d]amix=inputs=2:duration=first[amb]",
+    "[0:a][1:a]amix=inputs=2[drone];" +
+    "[drone]tremolo=f=1.1:d=0.7,volume=0.9[dr];" +
+    "[2:a]lowpass=f=450,volume=0.8[wind];" +
+    "[dr][wind]amix=inputs=2:duration=first[amb]",
     "-map", "[amb]",
     ambiencePath,
   ]);
   return ambiencePath;
 }
 
-// Arma un video vertical (formato Reel) a partir de varias imagenes fijas en
-// movimiento continuo tipo "Ken Burns" (zoom lento y constante, sin pausas
-// estaticas), conectadas con transiciones de cruce (crossfade) siguiendo el
-// orden narrativo de la historia, con narracion de voz + un fondo ambiental
-// de terror, y el gancho (con tipografia de terror, ajustado al ancho de
-// pantalla) como titulo quemado al inicio.
-export async function buildVideo({ imagePaths, chunkPaths, tmpDir, hookText }) {
-  const narrationPath = await concatAudio(chunkPaths, tmpDir);
-  const duration = await getAudioDuration(narrationPath);
-  const ambiencePath = await buildAmbience(duration, tmpDir);
-
+// Arma un video vertical (Reel) donde CADA imagen dura exactamente lo que dura
+// la narracion de su segmento, con movimiento continuo tipo Ken Burns y
+// transiciones de cruce que caen justo en cada cambio de frase, mas la cama
+// sonora de tension bajo la voz y el gancho centrado como titulo al inicio.
+export async function buildVideo({ segments, tmpDir, hookText }) {
+  const n = segments.length;
   const fps = 25;
-  const transitionDur = 0.6;
-  const n = imagePaths.length;
+  const T = 0.6; // duracion de la transicion de cruce
 
-  // Duracion de cada clip individual (con solape) para que la suma, quitando
-  // los traslapes de las transiciones, de exactamente la duracion del audio.
-  const segDur = (duration + (n - 1) * transitionDur) / n;
-  const segFrames = Math.ceil(segDur * fps);
+  const durations = [];
+  for (const s of segments) durations.push(await getAudioDuration(s.audioPath));
+
+  const narrationPath = await concatAudio(segments.map((s) => s.audioPath), tmpDir);
+  const total = await getAudioDuration(narrationPath);
+  const ambiencePath = await buildAmbience(total, tmpDir);
 
   const outputPath = path.join(tmpDir, "output.mp4");
-
   const hookPath = path.join(tmpDir, "hook.txt");
   fs.writeFileSync(hookPath, wrapText(hookText));
   const fontFile = findFont();
   const fontOption = fontFile ? `fontfile='${fontFile}':` : "";
 
+  // Entradas: una imagen por segmento (con material extra para el crossfade),
+  // luego la narracion y la cama sonora.
   const inputArgs = [];
-  imagePaths.forEach((img) => {
-    inputArgs.push("-loop", "1", "-t", String(segDur), "-r", String(fps), "-i", img);
+  segments.forEach((s, i) => {
+    const clipDur = durations[i] + T;
+    inputArgs.push("-loop", "1", "-t", String(clipDur), "-r", String(fps), "-i", s.imagePath);
   });
-  const narrationInputIndex = n;
-  const ambienceInputIndex = n + 1;
+  const narrationIdx = n;
+  const ambienceIdx = n + 1;
   inputArgs.push("-i", narrationPath, "-i", ambiencePath);
 
   const filterParts = [];
-  imagePaths.forEach((_, i) => {
-    // Velocidad de zoom CONSTANTE y lenta (no completa un rango fijo por
-    // segmento), para que se sienta continuo y cinematografico en vez de
-    // apresurado, sin importar cuantas imagenes haya.
+  segments.forEach((_, i) => {
+    const clipFrames = Math.ceil((durations[i] + T) * fps);
+    // Recorta el 10% inferior (posible marca de agua), escala a vertical y
+    // aplica un zoom lento y CONSTANTE (nunca queda una imagen estatica).
     filterParts.push(
-      // Recorta el 10% inferior de la imagen original primero (ahi es donde
-      // Pollinations a veces deja su marca de agua), y luego escala/recorta
-      // al formato vertical final.
-      `[${i}:v]crop=iw:ih*0.90:0:0,scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,` +
-      `zoompan=z='zoom+0.0006':d=${segFrames}:s=1080x1920:fps=${fps},setsar=1[v${i}]`
+      `[${i}:v]crop=iw:ih*0.90:0:0,scale=1080:1920:force_original_aspect_ratio=increase,` +
+      `crop=1080:1920,zoompan=z='zoom+0.0006':d=${clipFrames}:s=1080x1920:fps=${fps},` +
+      `format=yuv420p,setsar=1[v${i}]`
     );
   });
 
+  // Encadena las transiciones: cada cruce arranca justo al terminar la
+  // narracion del segmento anterior (offset = suma de sus duraciones).
   let lastLabel = "v0";
+  let acc = 0;
   for (let i = 1; i < n; i++) {
-    const offset = i * (segDur - transitionDur);
-    const outLabel = `vx${i}`;
+    acc += durations[i - 1];
+    const outLabel = i === n - 1 ? "vxfade" : `vx${i}`;
     filterParts.push(
-      `[${lastLabel}][v${i}]xfade=transition=fade:duration=${transitionDur}:offset=${offset.toFixed(3)}[${outLabel}]`
+      `[${lastLabel}][v${i}]xfade=transition=fade:duration=${T}:offset=${acc.toFixed(3)}[${outLabel}]`
     );
     lastLabel = outLabel;
+  }
+  if (n === 1) {
+    filterParts.push(`[v0]null[vxfade]`);
+    lastLabel = "vxfade";
   }
 
   filterParts.push(
@@ -146,11 +144,9 @@ export async function buildVideo({ imagePaths, chunkPaths, tmpDir, hookText }) {
     `x=(w-text_w)/2:y=(h-text_h)/2:enable='lt(t,4)':line_spacing=18[vfinal]`
   );
 
-  // Mezcla la narracion (volumen normal) con el ambiente de terror (audible
-  // pero de fondo, sin taparla).
   filterParts.push(
-    `[${narrationInputIndex}:a]volume=1.0[narr];` +
-    `[${ambienceInputIndex}:a]volume=0.7[amb2];` +
+    `[${narrationIdx}:a]volume=1.0[narr];` +
+    `[${ambienceIdx}:a]volume=0.45[amb2];` +
     `[narr][amb2]amix=inputs=2:duration=first:dropout_transition=0[aout]`
   );
 
@@ -162,7 +158,7 @@ export async function buildVideo({ imagePaths, chunkPaths, tmpDir, hookText }) {
     "-map", "[aout]",
     "-c:v", "libx264", "-pix_fmt", "yuv420p",
     "-c:a", "aac", "-b:a", "128k",
-    "-t", String(duration),
+    "-t", String(total),
     outputPath,
   ]);
 
