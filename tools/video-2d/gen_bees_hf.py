@@ -13,19 +13,19 @@ def text_el(id_,y,txt,size,color,weight=900,stroke=0,h=None,extra=''):
     h=h or int(size*1.5)
     els.append(row(id_,y,h)+f'<span class="tx" style="font-size:{size}px;color:{color};font-weight:{weight};{extra}">{esc(txt)}</span></div></div>')
 def pop(id_,t,dur=.45,ease='back.out(1.7)',s0=.2):
-    js.append(f"tl.fromTo('#{id_}_i',{{opacity:0,scale:{s0}}},{{opacity:1,scale:1,duration:{dur},ease:'{ease}'}},{t:.3f});")
+    js.append(f"tl.fromTo('#{id_}_i',{{opacity:0,scale:{s0},y:40,filter:'blur(16px)'}},{{opacity:1,scale:1,y:0,filter:'blur(0px)',duration:{dur+.15},ease:'expo.out'}},{t:.3f});")
 def fade(id_,t,dur=.4):
     js.append(f"tl.fromTo('#{id_}_i',{{opacity:0}},{{opacity:1,duration:{dur},ease:'power1.out'}},{t:.3f});")
 def hide(id_,t,dur=.15): js.append(f"tl.to('#{id_}_i',{{opacity:0,duration:{dur}}},{t:.3f});")
 def stamp(id_,y,txt,color,size,rot,t,t_hide):
     els.append(row(id_,y,int(size*1.6))+f'<span class="tx stamp" style="font-size:{size}px;color:{color};text-shadow:0 0 34px {color},0 0 10px {color}">{esc(txt)}</span></div></div>')
     js.append(f"gsap.set('#{id_}_i',{{rotation:{rot},opacity:0}});")
-    js.append(f"tl.fromTo('#{id_}_i',{{opacity:0,scale:.4}},{{opacity:1,scale:1,duration:.28,ease:'back.out(2.6)'}},{t:.3f});")
+    js.append(f"tl.fromTo('#{id_}_i',{{opacity:0,scale:.5,filter:'blur(18px)'}},{{opacity:1,scale:1,filter:'blur(0px)',duration:.42,ease:'back.out(2.2)'}},{t:.3f});")
     hide(id_,t_hide)
 
 # ---- chip + progress
 from PIL import ImageFont
-FB=ImageFont.truetype('/usr/share/fonts/opentype/inter/Inter-Black.otf',72)
+FB=ImageFont.truetype('bees/assets/fonts/Outfit-900.ttf',72)
 els.append('<div id="prog_bg"></div><div id="prog"></div>')
 js.append(f"tl.fromTo('#prog',{{scaleX:0}},{{scaleX:1,duration:{TOTAL:.3f},ease:'none'}},0);")
 text_el('chip',196,'LAS ABEJAS',40,'#ffe29a',800,extra='text-shadow:0 3px 0 rgba(0,0,0,.5);')
@@ -79,7 +79,7 @@ for i,sg in enumerate(SEGS):
         if n==1 and chunks and chunks[-1]['si']==i and len(chunks[-1]['ws'])<4: chunks[-1]['ws'].append(ws[j]);j+=1;continue
         chunks.append({'si':i,'s0':ST[i],'ws':list(ws[j:j+n])});j+=n
 from PIL import ImageFont
-FNT=ImageFont.truetype('/usr/share/fonts/opentype/inter/Inter-Black.otf',88)
+FNT=ImageFont.truetype('bees/assets/fonts/Outfit-900.ttf',88)
 sub=[]
 for ci,c in enumerate(chunks):
     a=c['s0']+c['ws'][0][1];nx=chunks[ci+1] if ci+1<len(chunks) else None
@@ -87,7 +87,7 @@ for ci,c in enumerate(chunks):
     ww=[FNT.getlength(w[0].upper()) for w in c['ws']];tot=sum(ww)+44*(len(ww)-1);scl=min(1.0,900/tot)
     words=''.join(f'<span class="w" data-layout-allow-overlap><span class="b">{esc(w[0].upper())}</span><span class="h" id="h{ci}_{wi}">{esc(w[0].upper())}</span></span>' for wi,w in enumerate(c['ws']))
     sub.append(f'<div class="chunk" id="ck{ci}">{words}</div>')
-    js.append(f"tl.fromTo('#ck{ci}',{{opacity:0,scale:{.88*scl:.3f}}},{{opacity:1,scale:{scl:.3f},duration:.16,ease:'back.out(2)'}},{max(0,a-.02):.3f});")
+    js.append(f"tl.fromTo('#ck{ci}',{{opacity:0,scale:{.9*scl:.3f},y:26,filter:'blur(10px)'}},{{opacity:1,scale:{scl:.3f},y:0,filter:'blur(0px)',duration:.26,ease:'expo.out'}},{max(0,a-.02):.3f});")
     js.append(f"tl.set('#ck{ci}',{{opacity:0}},{b-.03:.3f});")
     for wi,w in enumerate(c['ws']):
         ws_=c['s0']+w[1]-.02;we=c['s0']+w[2]+.05
@@ -96,15 +96,18 @@ for ci,c in enumerate(chunks):
 els.append('<div id="subs" style="position:absolute;left:0;top:1650px;width:1080px;height:0">'+''.join(sub)+'</div>')
 
 css='''
+@font-face{font-family:'Outfit';font-weight:800;src:url(assets/fonts/outfit-latin-800-normal.woff2) format('woff2')}
+@font-face{font-family:'Outfit';font-weight:900;src:url(assets/fonts/outfit-latin-900-normal.woff2) format('woff2')}
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#000}
-#root{position:relative;width:1080px;height:1920px;overflow:hidden;font-family:Inter,'Helvetica Neue',Arial,sans-serif}
+#root{position:relative;width:1080px;height:1920px;overflow:hidden;font-family:'Outfit','Helvetica Neue',Arial,sans-serif}
 #bg{position:absolute;left:0;top:0;width:1080px;height:1920px;object-fit:cover}
 #fx{position:absolute;left:0;top:0;width:1080px;height:1920px}
 .row{position:absolute;left:0;width:1080px;display:flex;align-items:center;justify-content:center}
 .in{display:flex;align-items:center;justify-content:center;opacity:0;transform-origin:50% 50%}
 .tx{display:block;white-space:nowrap;text-align:center;line-height:1;-webkit-text-stroke:0;text-shadow:0 6px 0 rgba(0,0,0,.55)}
-.stamp{letter-spacing:.01em}
+.stamp{letter-spacing:.02em}
+.tx{letter-spacing:-.01em}
 #prog_bg{position:absolute;left:60px;top:112px;width:960px;height:10px;border-radius:5px;background:rgba(255,255,255,.2)}
 #prog{position:absolute;left:60px;top:112px;width:960px;height:10px;border-radius:5px;background:#ff9a2e;transform-origin:0 50%;transform:scaleX(0)}
 .btn{width:520px;height:130px;border-radius:65px;background:#ff2a5a;display:flex;align-items:center;justify-content:center}

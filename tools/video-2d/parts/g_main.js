@@ -49,7 +49,7 @@ function frame(t){
   if(si===5)drawMythCard(g,t);
   if(si===6)drawGrains(g,t);
   // ---- character ----
-  const emo=emoAt(t,KFE),face=faceFor(t,emo),ta=talkAmt(t);
+  const emo=emoAt(t,KFE),face=faceFor(t,emo),ta=0;
   let pun=0;for(const p of PUNCH){const a=t-p;if(a>=0&&a<.7)pun+=Math.exp(-a*8)*Math.sin(Math.min(a*18,Math.PI));}
   const e={tilt:Math.sin(t*.9)*.012+Math.sin(t*5.2)*.012*ta,hx:0,hy:-ta*4*Math.abs(Math.sin(t*9)),bx:CHARX[si],by:Math.sin(t*2.3)*3,lean:Math.sin(t*.7)*.006,sq:Math.sin(t*2.3)*.004+pun*.02};
   if(emo==='fear'||emo==='hectic'){e.hx+=Math.sin(t*47)*3;e.hy+=Math.cos(t*41)*2;}

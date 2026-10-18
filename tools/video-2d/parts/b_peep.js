@@ -5,7 +5,7 @@ async function loadPeeps(){const jobs=[];for(const k in PEEP.bodies)jobs.push(sv
   for(const k in PEEP.hair)jobs.push(svgImg(PEEP.hair[k]).then(i=>PIMG.hair[k]=i));for(const k in PEEP.faces)jobs.push(svgImg(PEEP.faces[k]).then(i=>PIMG.face[k]=i));await Promise.all(jobs);}
 const LW=940,LH=1131,PIV=[470,1131],NECK=[450,505];
 // emotion -> [closed mouth face, open mouth face]
-const FACE={calm:['Calm','Explaining'],curious:['Suspicious','Concerned'],shock:['Awe','ConcernedFear'],fear:['Fear','ConcernedFear'],hectic:['Hectic','Fear'],
+const FACE={calm:['Calm','Explaining'],curious:['Suspicious','Concerned'],shock:['ConcernedFear','Awe'],fear:['Fear','ConcernedFear'],hectic:['Hectic','Fear'],
  strain:['Tired','Hectic'],resign:['Solemn','Tired'],happy:['Smile','SmileTeeth'],wink:['Cheeky','SmileLOL'],confident:['Driven','SmileTeeth'],laugh:['SmileLOL','BigSmile'],blank:['Blank','Calm']};
 
 function beeHat(g,veilAlpha=1){
@@ -43,6 +43,6 @@ function emoAt(t,KFE){let i=0;while(i<KFE.length-1&&t>=KFE[i+1][0])i++;return KF
 let TALK=[];function initTalk(){TALK=[];for(let si=0;si<SEGS.length;si++)for(const w of SEGS[si].words)TALK.push([ST[si]+w[1],ST[si]+w[2]]);}
 function talkAmt(t){for(const [a,b] of TALK){if(t>=a-.03&&t<=b+.05){return Math.sin(Math.PI*clamp((t-a)/(b-a)))}}return 0;}
 function faceFor(t,emo){const pair=FACE[emo]||FACE.calm;const ta=talkAmt(t);
-  const open=ta>.28&&Math.sin(t*26+ta*3)>-.15;
+  const open=(emo==='fear'||emo==='hectic'||emo==='laugh'||emo==='strain')&&Math.sin(t*7)>.35;
   const ph=t%3.6,blink=ph<.14&&!open&&(emo==='calm'||emo==='curious'||emo==='happy'||emo==='confident');
   if(blink)return 'EyesClosed';return open?pair[1]:pair[0];}
