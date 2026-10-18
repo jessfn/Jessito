@@ -29,3 +29,12 @@ Voz usada hasta ahora: `es-MX-JorgeNeural` (edge-tts, con `certifi.where` apunta
 - Rapidez: renderizar el fondo 3D a 0,4 de resolución y reutilizarlo cada 2 fotogramas; render en 4 procesos en paralelo.
 
 Herramientas del proceso en `tools/video-3d/` (los modelos `.glb` no se guardan en el repositorio).
+
+## Reglas permanentes de calidad (pedidas por el usuario, aplican a todos los videos)
+
+- **Movimientos realistas del personaje**: usar animaciones tipo captura de movimiento (caminar, correr, caer, reaccionar) en lugar de poses con senos; peso, inercia y transiciones suaves entre acciones.
+- **Edición realista y fluida**: cámara con movimiento continuo, desenfoque de movimiento, profundidad de campo, cortes con ritmo, curvas de aceleración naturales, sin saltos bruscos.
+- **Fondos realistas y fluidos en cada detalle**: iluminación coherente con la escena, partículas, atmósfera y movimiento constante; nada estático.
+- **Vestuario distinto y acorde al tema de cada video**; nunca repetir el mismo atuendo entre videos.
+- **Temas variados**, no solo espacio.
+- **No ejecutar trabajos pesados (renders, publicaciones, commits o push) sin que el usuario lo indique primero**: proponer y esperar su visto bueno.
