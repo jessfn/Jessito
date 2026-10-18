@@ -6,13 +6,19 @@ def wt(seg,key):
         if key in w[0].lower(): return ST[seg]+w[1]
     return ST[seg]+.5
 ND=len(ST);END=ST[1:]+[TOTAL]
-els=[];js=[]
+els=[];js=[];TITLES=set()
 def esc(s): return html.escape(s,quote=False)
 def row(id_,y,h=160,cls=''): return f'<div class="row {cls}" id="{id_}" style="top:{y}px;height:{h}px;margin-top:-{h//2}px"><div class="in" id="{id_}_i">'
 def text_el(id_,y,txt,size,color,weight=900,stroke=0,h=None,extra=''):
     h=h or int(size*1.5)
-    els.append(row(id_,y,h)+f'<span class="tx" style="font-size:{size}px;color:{color};font-weight:{weight};{extra}">{esc(txt)}</span></div></div>')
+    inner=''.join(f'<span class="ch">{esc(c) if c!=" " else "&nbsp;"}</span>' for c in txt) if size>=72 else esc(txt)
+    if size>=72: TITLES.add(id_)
+    els.append(row(id_,y,h)+f'<span class="tx" style="font-size:{size}px;color:{color};font-weight:{weight};{extra}">{inner}</span></div></div>')
 def pop(id_,t,dur=.45,ease='back.out(1.7)',s0=.2):
+    if id_ in TITLES:
+        js.append(f"tl.fromTo('#{id_}_i',{{opacity:0}},{{opacity:1,duration:.05}},{t:.3f});")
+        js.append(f"tl.fromTo('#{id_}_i .ch',{{opacity:0,y:70,rotationX:-80,filter:'blur(10px)'}},{{opacity:1,y:0,rotationX:0,filter:'blur(0px)',duration:.6,ease:'expo.out',stagger:.03}},{t:.3f});")
+        return
     js.append(f"tl.fromTo('#{id_}_i',{{opacity:0,scale:{s0},y:40,filter:'blur(16px)'}},{{opacity:1,scale:1,y:0,filter:'blur(0px)',duration:{dur+.15},ease:'expo.out'}},{t:.3f});")
 def fade(id_,t,dur=.4):
     js.append(f"tl.fromTo('#{id_}_i',{{opacity:0}},{{opacity:1,duration:{dur},ease:'power1.out'}},{t:.3f});")
@@ -92,6 +98,7 @@ for ci,c in enumerate(chunks):
     for wi,w in enumerate(c['ws']):
         ws_=c['s0']+w[1]-.02;we=c['s0']+w[2]+.05
         js.append(f"tl.set('#h{ci}_{wi}',{{opacity:1}},{max(0,ws_):.3f});")
+        js.append(f"tl.fromTo('#h{ci}_{wi}',{{scale:1.2}},{{scale:1,duration:.2,ease:'back.out(3)'}},{max(0,ws_):.3f});")
         if wi<len(c['ws'])-1: js.append(f"tl.set('#h{ci}_{wi}',{{opacity:0}},{we:.3f});")
 els.append('<div id="subs" style="position:absolute;left:0;top:1650px;width:1080px;height:0">'+''.join(sub)+'</div>')
 
@@ -107,6 +114,7 @@ html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#000}
 .in{display:flex;align-items:center;justify-content:center;opacity:0;transform-origin:50% 50%}
 .tx{display:block;white-space:nowrap;text-align:center;line-height:1;-webkit-text-stroke:0;text-shadow:0 6px 0 rgba(0,0,0,.55)}
 .stamp{letter-spacing:.02em}
+.ch{display:inline-block;transform-origin:50% 80%}
 .tx{letter-spacing:-.01em}
 #prog_bg{position:absolute;left:60px;top:112px;width:960px;height:10px;border-radius:5px;background:rgba(255,255,255,.2)}
 #prog{position:absolute;left:60px;top:112px;width:960px;height:10px;border-radius:5px;background:#ff9a2e;transform-origin:0 50%;transform:scaleX(0)}

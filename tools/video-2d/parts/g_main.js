@@ -1,11 +1,11 @@
 // ===================== main frame =====================
-let KFE=[];const PUNCH=[];let CV,G,POST,POSTG,GRAIN=[];
+let CH,CHG,FULL,FULLG;let KFE=[];const PUNCH=[];let CV,G,POST,POSTG,GRAIN=[];
 function initMain(){TUFTB.wheat=TUFTB.wheat||TUFTB.day;
   KFE=[[0,'calm'],[2.5,'curious'],[vac-.12,'curious'],[vac+.1,'shock'],[ST[1]+.6,'fear'],[ST[2]+.2,'curious'],[wA+.05,'shock'],[wB+.5,'strain'],[ST[3]+.2,'fear'],[wF+.1,'shock'],[wPr+.1,'hectic'],[ST[4]+.3,'resign'],[wAlc-.2,'curious'],[wAlc+.6,'strain'],
    [ST[5]+.2,'curious'],[wMito-.1,'confident'],[wEin+.3,'wink'],[ST[5]+4.6,'confident'],[ST[6]+.1,'calm'],[wTri-.2,'happy'],[wFru-.05,'resign'],[ST[7]+.1,'happy'],[ST[7]+3.2,'wink'],[ST[7]+5.6,'laugh']];
   PUNCH.push(vac,ST[1],wTer,ST[2],wA,wM,wB,ST[3],wF,wPr,ST[4],ST[5],wMito,ST[6],wTri,wFru,ST[7]);
   CV=document.getElementById('c');G=CV.getContext('2d');
-  POST=offscreen(W/6,H/6);POSTG=POST.getContext('2d');
+  POST=offscreen(W/6,H/6);POSTG=POST.getContext('2d');CH=offscreen(W,H);CHG=CH.getContext('2d');FULL=offscreen(W,H);FULLG=FULL.getContext('2d');
   for(let i=0;i<6;i++){const c=offscreen(256,256),g=c.getContext('2d'),d=g.createImageData(256,256);for(let k=0;k<d.data.length;k+=4){const v=128+(rng(k*.37+i*911)-.5)*140;d.data[k]=d.data[k+1]=d.data[k+2]=v;d.data[k+3]=255;}g.putImageData(d,0,0);GRAIN.push(c);}
 }
 const BODIES=['ButtonShirt','ButtonShirt','Hoodie','ButtonShirt','Hoodie','ButtonShirt','Hoodie','Coffee'];
@@ -23,7 +23,8 @@ function frame(t){
   const si=sceneAt(t),u=t-ST[si],dur=ENDS[si]-ST[si],uk=u/dur;
   // ---- camera (shake / push-in) ----
   let shake=0;for(const p of PUNCH){const a=t-p;if(a>=0&&a<.5)shake+=Math.exp(-a*9)*(si===0&&p===vac?1.6:1);}
-  const Z=1+.04*uk+(si===0?.02*ss(vac-.2,vac+.25,t)*Math.exp(-(t-vac)*.3):0);
+  let tz=0;for(let b=1;b<NS;b++){const d=t-ST[b];if(d<0&&d>-.4)tz+=.16*ss(-.4,0,d)*ss(-.4,0,d);else if(d>=0&&d<.5)tz+=.16*Math.pow(1-ss(0,.5,d),2);}
+  const Z=1+tz+.04*uk+(si===0?.02*ss(vac-.2,vac+.25,t)*Math.exp(-(t-vac)*.3):0);
   const sx=Math.sin(t*61)*5*shake,sy=Math.cos(t*53)*4*shake;
   g.save();g.translate(540+sx,1100+sy);g.scale(Z,Z);g.translate(-540,-1100);
   CAMS.x=Math.sin(t*.35)*40+u*(si%2?8:-8);
@@ -39,7 +40,7 @@ function frame(t){
     else if(si===6){env={base:'wheat',over:null,mix:0,rays:.9,warm:true,cloudSet:'wheat',windmill:true};set='wheat';wind=1.6;pollen=.5;}
     else {const m=1-ss(ST[7],ST[7]+3,t);env={base:'day',over:'dry',mix:m*.7,rays:1,cloudSet:'day',hives:true,windmill:true};Wd=m*1.2;mixW=m*.7;pollen=1;}
     drawBackdrop(g,t,env);
-    if(si===2){g.save();g.translate(0,-240);drawOrchardTable(g,t);g.restore();}
+    if(si===2){g.save();g.translate(-70,-330);g.translate(770,1160);g.scale(1.5,1.5);g.translate(-770,-1160);drawOrchardTable(g,t);g.restore();}
     drawTufts(g,t,set,mixW,wind,1020,1720);drawFlowers(g,t,Wd,wind,1040,1740,set);
     if(si===0)drawBees(g,t,false,'hook');if(si===7)drawBees(g,t,false,'cta');
     window.__meadow=[set,Wd,wind,mixW];
@@ -61,7 +62,16 @@ function frame(t){
   const hp=headScreen(cx,bs,e.by);
   if(si===0)burstLines(g,hp[0],hp[1]-30,t,vac+.05,.55,20,210,430,'#fff7c2');
   if(si===1)burstLines(g,hp[0],hp[1]-30,t,ST[1]+.02,.45,16,230,420,'#ffffff');
-  drawPeep(g,cx,1990,bs,{body:BODIES[si],face,tilt:e.tilt,hx:e.hx,hy:e.hy,bx:e.bx-CHARX[si],by:e.by,lean:e.lean,sq:e.sq});
+  CHG.setTransform(1,0,0,1,0,0);CHG.clearRect(0,0,W,H);
+  drawPeep(CHG,cx,1990,bs,{body:BODIES[si],face,tilt:e.tilt,hx:e.hx,hy:e.hy,bx:e.bx-CHARX[si],by:e.by,lean:e.lean,sq:e.sq});
+  const TINT=[null,'rgba(150,150,110,.06)','rgba(160,150,100,.06)','rgba(190,200,215,.05)','rgba(170,150,100,.07)','rgba(255,150,90,.12)','rgba(255,200,110,.08)','rgba(255,225,160,.05)'][si];
+  CHG.save();CHG.globalCompositeOperation='source-atop';
+  if(TINT){CHG.fillStyle=TINT;CHG.fillRect(0,0,W,H);}
+  CHG.fillStyle=lin(CHG,cx+330,900,cx-60,1500,[[0,'rgba(255,230,180,.30)'],[.45,'rgba(255,226,170,0)']]);CHG.fillRect(0,0,W,H);
+  CHG.fillStyle=lin(CHG,cx-330,1300,cx+200,1900,[[0,'rgba(40,30,90,.13)'],[1,'rgba(40,30,90,0)']]);CHG.fillRect(0,0,W,H);
+  CHG.fillStyle=lin(CHG,0,1500,0,1990,[[0,'rgba(20,20,40,0)'],[1,'rgba(20,20,40,.14)']]);CHG.fillRect(0,0,W,H);
+  CHG.restore();
+  g.save();g.shadowColor='rgba(15,10,40,.42)';g.shadowBlur=46;g.shadowOffsetX=-22;g.shadowOffsetY=20;g.drawImage(CH,0,0);g.restore();
   drawSweat(g,hp[0]+150*bs,hp[1]-70,(emo==='fear'||emo==='hectic'||emo==='strain')?1:0,t);
   if(emo==='shock'&&t-ST[si]<2.4||t-vac<1.1&&t>vac){const k=clamp(1-(t-(si===0?vac:ST[si]))/1.0);drawMark(g,hp[0]+210*bs,hp[1]-300*bs,k,'!','#ffd23f',.2);}
   if(si===4&&emo==='curious')drawMark(g,hp[0]+220*bs,hp[1]-300*bs,1,'?','#9fe0ff',-.15);
@@ -80,8 +90,15 @@ function frame(t){
   g.save();g.globalCompositeOperation='screen';g.globalAlpha=.22;g.filter='blur(6px)';g.drawImage(POST,-20,-20,W+40,H+40);g.filter='none';g.restore();
   g.save();g.fillStyle=rad(g,540,1000,500,1300,[[0,'#000',0],[1,'#0a0214',.5]]);g.fillRect(0,0,W,H);g.restore();
   g.save();g.globalAlpha=.055;g.globalCompositeOperation='overlay';const gi=Math.floor(t*24)%6;g.fillStyle=g.createPattern(GRAIN[gi],'repeat');g.translate((gi*53)%256,(gi*97)%256);g.fillRect(-256,-256,W+256,H+256);g.restore();
-  // ---- honeycomb transitions at scene boundaries ----
-  for(let b=1;b<NS;b++){const d=t-ST[b];let k=0;if(d<0)k=ss(-.34,-.02,d);else k=1-ss(0,.4,d);if(k>0)drawHoneycomb(g,k,540,960);}
+  // ---- transitions: honeycomb / light-leak wipe, with zoom ghosting ----
+  for(let b=1;b<NS;b++){const d=t-ST[b];if(d<-.4||d>.45)continue;
+    if(Math.abs(d)<.4){FULLG.globalCompositeOperation='copy';FULLG.drawImage(CV,0,0);const m=1-Math.abs(d)/.4;
+      g.save();g.globalCompositeOperation='lighter';for(const [sc,al] of [[1.035,.22],[1.07,.14],[1.11,.08]]){g.globalAlpha=al*m;g.translate(540,960);g.scale(sc,sc);g.translate(-540,-960);g.drawImage(FULL,0,0);g.setTransform(1,0,0,1,0,0);}g.restore();}
+    if(b%2){let k=0;if(d<0)k=ss(-.34,-.02,d);else k=1-ss(0,.4,d);if(k>0){drawHoneycomb(g,k,540,960);g.save();g.globalCompositeOperation='lighter';g.fillStyle=`rgba(255,226,150,${.38*Math.max(0,1-Math.abs(d)/.25)})`;g.fillRect(0,0,W,H);g.restore();}}
+    else{const p=ss(-.34,.34,d),cxp=-900+p*(W+1800);g.save();g.translate(cxp,960);g.rotate(.32);
+      g.fillStyle=lin(g,-1300,0,1300,0,[[0,'rgba(255,246,214,0)'],[.3,'rgba(255,240,190,.96)'],[.5,'rgba(255,255,255,1)'],[.7,'rgba(255,240,190,.96)'],[1,'rgba(255,246,214,0)']]);g.fillRect(-1300,-2400,2600,4800);
+      g.globalCompositeOperation='lighter';g.fillStyle=lin(g,-1000,0,1000,0,[[0,'rgba(255,170,80,0)'],[.5,'rgba(255,170,80,.45)'],[1,'rgba(255,170,80,0)']]);g.fillRect(-1000,-2400,2000,4800);g.restore();}
+  }
 }
 // ----- S5 myth card, S6 grains -----
 function drawMythCard(g,t){const u=t-ST[5];const k=eob(clamp(u/.7),1.1);if(k<=.01)return;
