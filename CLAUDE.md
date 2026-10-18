@@ -48,3 +48,8 @@ Herramientas del proceso en `tools/video-3d/` (los modelos `.glb` no se guardan 
 - **HyperFrames**: usarlo para texto, subtítulos y audio. Su gradación con grano (`media-treatment`) es demasiado lenta aquí (más de 30 min sin terminar); el acabado de color y grano se aplica después con FFmpeg.
 - **Peso**: la hierba y el trigo hacen el video muy pesado; para la página publicar MP4 a 864x1536 con crf 34 y WebM VP9 a 720x1280 con bitrate objetivo de ~2,3 Mbps (límite de 15 MB por archivo).
 - **Render paralelo**: repartir los fotogramas en procesos por tramos; los tramos con trigo y primeros planos son los más lentos, así que conviene dividirlos en más procesos.
+
+## Estilo 2D profesional (abejas v2, preferido por el usuario)
+- Personaje: Open Peeps (@opeepsfun/open-peeps, MIT) por capas SVG (cuerpo/pelo/cara) + sombrero/velo propio; caras intercambiadas para emociones y labio-sync; ropa distinta por video.
+- Pipeline: tools/video-2d (Canvas2D frame(t), 4 workers Playwright, 30fps) -> HyperFrames (texto+audio) -> ffmpeg. Sin GPU.
+- Subtítulos abajo (y≈1650) para no tapar la cara; sellos sobre la cabeza (y≈890).
