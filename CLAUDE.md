@@ -38,3 +38,13 @@ Herramientas del proceso en `tools/video-3d/` (los modelos `.glb` no se guardan 
 - **Vestuario distinto y acorde al tema de cada video**; nunca repetir el mismo atuendo entre videos.
 - **Temas variados**, no solo espacio.
 - **No ejecutar trabajos pesados (renders, publicaciones, commits o push) sin que el usuario lo indique primero**: proponer y esperar su visto bueno.
+
+## Video "Qué pasa sin abejas" (3D con captura de movimiento)
+
+- **Movimiento realista**: animaciones de captura de movimiento de Ready Player Me (`readyplayerme/animation-library`, esqueleto `masculine`). Los FBX están en Git LFS: bajarlos de `https://media.githubusercontent.com/media/readyplayerme/animation-library/master/masculine/fbx/<carpeta>/<nombre>.fbx` (no de raw.githubusercontent). Los huesos se llaman igual que los del avatar, así que se aplican directo; quitar las pistas `.scale`, pasar la cadera de cm a m y quitar la deriva de las caminatas para controlar el desplazamiento.
+- **Vestuario por video**: se cambia con colores y piezas procedurales sobre el avatar (aquí traje y sombrero de apicultor). Cada video nuevo debe llevar un atuendo distinto y acorde al tema.
+- **Cámara**: planos amplios con travelling suave y primeros planos de la cara que siguen hacia dónde mira; en gestos con la cabeza gacha (facepalm) usar plano medio.
+- **Escenas**: prado con hierba y flores instanciadas, abejas con alas, huerto, supermercado y campo de trigo, todo con viento y marchitamiento progresivo.
+- **HyperFrames**: usarlo para texto, subtítulos y audio. Su gradación con grano (`media-treatment`) es demasiado lenta aquí (más de 30 min sin terminar); el acabado de color y grano se aplica después con FFmpeg.
+- **Peso**: la hierba y el trigo hacen el video muy pesado; para la página publicar MP4 a 864x1536 con crf 34 y WebM VP9 a 720x1280 con bitrate objetivo de ~2,3 Mbps (límite de 15 MB por archivo).
+- **Render paralelo**: repartir los fotogramas en procesos por tramos; los tramos con trigo y primeros planos son los más lentos, así que conviene dividirlos en más procesos.
