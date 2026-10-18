@@ -53,3 +53,9 @@ Herramientas del proceso en `tools/video-3d/` (los modelos `.glb` no se guardan 
 - Personaje: Open Peeps (@opeepsfun/open-peeps, MIT) por capas SVG (cuerpo/pelo/cara) + sombrero/velo propio; caras intercambiadas para emociones y labio-sync; ropa distinta por video.
 - Pipeline: tools/video-2d (Canvas2D frame(t), 4 workers Playwright, 30fps) -> HyperFrames (texto+audio) -> ffmpeg. Sin GPU.
 - Subtítulos abajo (y≈1650) para no tapar la cara; sellos sobre la cabeza (y≈890).
+
+## Parte 3 "Sin dormir" (estilo ilustración con tinta)
+- Estilo unificado: contorno de tinta oscuro + relleno plano + sombreado con trama; nada de iconos brillantes tipo emoji. Utilidades en tools/video-2d/sleep/parts/c_ink.js.
+- Tipografía: Outfit 900 (títulos/sellos/subtítulos, letras que entran una a una), Playfair Display (periódico), Space Mono (relojes/contadores); fuentes vía @fontsource.
+- Personaje Open Peeps con pijama azul / sudadera gris, ojeras y ojos rojos según cansancio; transiciones distintas por corte (reloj radial, glitch, párpados, página, iris, flash).
+- Texto: títulos y sellos ocultos 0.3 s antes de cada corte; subtítulos y=1650.
