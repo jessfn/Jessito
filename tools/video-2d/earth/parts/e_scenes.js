@@ -75,8 +75,8 @@ function bgS6(g,t){const u=t-ST[6];const die=ss(T.vida-.3,T.sobre+.8,t);
   // card: speed per latitude
   const k=eob(clamp(u/.6),1.2);g.save();card(g,540,730,820,380,k);
   g.fillStyle='#9fb0e8';g.font=`700 28px ${FONT_M}`;g.textAlign='left';g.textBaseline='middle';g.fillText('VELOCIDAD DE GIRO SEGÚN DÓNDE ESTÉS',-380,-150);
-  const rows=[['ECUADOR',1670,'#ffd166'],['45°',1180,'#ffb36a'],['POLO',0,'#7ae0ff']];rows.forEach(([n,v,c],i)=>{const y=-70+i*82,bw=clamp((t-T.polos+.2-i*.35)/.8);g.fillStyle='#fff';g.font=`800 34px ${FONT_D}`;g.fillText(n,-380,y);g.fillStyle='rgba(255,255,255,.12)';g.beginPath();g.roundRect(-150,y-18,420,36,18);g.fill();
-    const w=Math.max(8,420*(v/1670)*eo(bw));g.fillStyle=c;g.beginPath();g.roundRect(-150,y-18,w,36,18);g.fill();g.lineWidth=4;g.strokeStyle=INK;g.stroke();g.fillStyle='#eaf1ff';g.font=`700 30px ${FONT_M}`;g.fillText(`${Math.round(v*eo(bw))} km/h`,290,y);});
+  const rows=[['ECUADOR',1670,'#ffd166'],['45°',1180,'#ffb36a'],['POLO',0,'#7ae0ff']];rows.forEach(([n,v,c],i)=>{const y=-70+i*82,bw=clamp((t-T.polos+.2-i*.35)/.8);g.fillStyle='#fff';g.font=`800 34px ${FONT_D}`;g.fillText(n,-380,y);g.fillStyle='rgba(255,255,255,.12)';g.beginPath();g.roundRect(-160,y-18,330,36,18);g.fill();
+    const w=Math.max(8,330*(v/1670)*eo(bw));g.fillStyle=c;g.beginPath();g.roundRect(-160,y-18,w,36,18);g.fill();g.lineWidth=4;g.strokeStyle=INK;g.stroke();g.fillStyle='#eaf1ff';g.font=`700 30px ${FONT_M}`;g.fillText(`${Math.round(v*eo(bw))} km/h`,190,y);});
   g.restore();
   g.fillStyle=`rgba(40,52,70,${.55*die})`;g.fillRect(-100,-100,W+200,H+200);}
 function bgS7(g,t){const u=t-ST[7];const gone=ss(T.desap-.1,T.desap+.5,t);
