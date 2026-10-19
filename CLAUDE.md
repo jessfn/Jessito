@@ -59,3 +59,7 @@ Herramientas del proceso en `tools/video-3d/` (los modelos `.glb` no se guardan 
 - Tipografía: Outfit 900 (títulos/sellos/subtítulos, letras que entran una a una), Playfair Display (periódico), Space Mono (relojes/contadores); fuentes vía @fontsource.
 - Personaje Open Peeps con pijama azul / sudadera gris, ojeras y ojos rojos según cansancio; transiciones distintas por corte (reloj radial, glitch, párpados, página, iris, flash).
 - Texto: títulos y sellos ocultos 0.3 s antes de cada corte; subtítulos y=1650.
+
+## Parte 4 "Enterrado vivo"
+- Mismo estilo de tinta; corte transversal de la tierra (estratos con piedras, raíces, gusanos), tarjetas con medidores (O₂, ECG, CO₂), sepia para el siglo XIX, cartel de 1915. Atuendo: chaqueta oscura con camisa blanca; jersey cuello alto; sudadera con taza.
+- Transiciones: tierra que sube, iris, glitch, grieta, página, destello. Título del cierre en y≈325 para no chocar con la etiqueta superior (y≈196).
