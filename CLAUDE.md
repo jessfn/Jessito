@@ -68,3 +68,10 @@ Herramientas del proceso en `tools/video-3d/` (los modelos `.glb` no se guardan 
 - La escena debe ser **lógica con el tema**: si el tema es estar dentro de algo (ataúd, etc.), el personaje está dentro de ese espacio, en corte transversal, con el entorno real (tierra, tapa, aire) y la cámara acercándose a su cara. Nada de personaje "narrador" delante de un fondo que no tiene que ver; los gráficos informativos van como anotaciones dentro de la escena.
 - Parte 4 v2: persona acostada (busto rotado -90°) dentro del ataúd en corte lateral, manta que tapa el corte; cámara con planos amplio/cerrado (d_coffin.js, e2_scenes.js). Fuera del ataúd: médico con bata blanca y estetoscopio (hospital), teatro (Houdini), espacio (cierre).
 - Open Peeps: en `Jacket`, `jacketColor` solo pinta el cuello; el cuerpo usa `outlineColor` (negro). Para prendas blancas usar `ButtonShirt` con `topColor`.
+
+## Zona segura de TikTok y textos (pedido por el usuario, aplica desde ahora)
+- Investigado (ninguna cifra es oficial de TikTok; TikTok solo dice que la zona segura se achica con subtítulos/descripciones largas): en 1080x1920 dejar libres **arriba ≈130 px** (pestañas Siguiendo/Para ti, búsqueda), **abajo ≈484 px** (usuario, descripción, sonido, barra de progreso; hay guías que usan hasta ~700 px), **derecha ≈140 px** (perfil, me gusta, comentarios, guardar, compartir) e **izquierda ≈44 px**. Ventana segura ≈ x 44–940, y 130–1436; el centro horizontal seguro es x≈492.
+- **Subtítulos**: pequeños (≈52–58 px, no 88), en el tercio superior (y≈230–300), sin pasar de x 60–930, negrita sans-serif blanca con contorno oscuro. Nada de subtítulos, sellos ni botones por debajo de y≈1400 ni a la derecha de x≈930. Quitar la barra de progreso de y=112 (bajarla a y≈150).
+- **Llamada a la acción**: no poner "Sígueme/Comenta" como botón abajo; ponerlo dentro de la ventana segura (y≈1250–1350) y siempre al final.
+- **No numerar partes** ("PARTE 2/3/4"): usar "SIGUIENTE" + la pregunta del próximo video.
+- Probar el export con una máscara de zona segura antes de entregar.
