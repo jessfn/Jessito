@@ -76,3 +76,8 @@ Herramientas del proceso en `tools/video-3d/` (los modelos `.glb` no se guardan 
 - **Llamada a la acción**: no poner "Sígueme/Comenta" como botón abajo; ponerlo dentro de la ventana segura (y≈1230, encima de los subtítulos) y siempre al final.
 - **No numerar partes** ("PARTE 2/3/4"): usar "SIGUIENTE" + la pregunta del próximo video.
 - Probar el export con una máscara de zona segura antes de entregar.
+
+## Más reglas del usuario (aplican siempre)
+- **Nunca decir ni escribir el número de parte**, ni en la voz ni en pantalla ("parte cuatro", "PARTE 4"...). El cierre dice "¿Quieres ver lo siguiente? ¿Qué pasa si …? Sígueme y comenta." y en pantalla "SIGUIENTE".
+- **Los subtítulos no pueden tapar la cara.** En escenas con el personaje de pie, la cara debe quedar por encima de y≈1290 (barbilla) y los subtítulos (y≈1350) caen sobre cuello/hombros. Para lograrlo el busto va más pequeño (≈.72) con pivote bajo y un elemento en primer plano (mostrador, escenario, consola) que oculta el corte del busto.
+- **Cuidar cada detalle**: nada de elementos que se solapen o se corten (sellos detrás de tarjetas, texto cortado), contraste legible (fondo oscuro tras sellos), ropa legible sobre el fondo, objetos con sentido (el médico verifica pulso/respiración/pupilas y sella el certificado).
