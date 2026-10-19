@@ -81,3 +81,8 @@ Herramientas del proceso en `tools/video-3d/` (los modelos `.glb` no se guardan 
 - **Nunca decir ni escribir el número de parte**, ni en la voz ni en pantalla ("parte cuatro", "PARTE 4"...). El cierre dice "¿Quieres ver lo siguiente? ¿Qué pasa si …? Sígueme y comenta." y en pantalla "SIGUIENTE".
 - **Los subtítulos no pueden tapar la cara.** En escenas con el personaje de pie, la cara debe quedar por encima de y≈1290 (barbilla) y los subtítulos (y≈1350) caen sobre cuello/hombros. Para lograrlo el busto va más pequeño (≈.72) con pivote bajo y un elemento en primer plano (mostrador, escenario, consola) que oculta el corte del busto.
 - **Cuidar cada detalle**: nada de elementos que se solapen o se corten (sellos detrás de tarjetas, texto cortado), contraste legible (fondo oscuro tras sellos), ropa legible sobre el fondo, objetos con sentido (el médico verifica pulso/respiración/pupilas y sella el certificado).
+
+## Video "La Tierra deja de girar" (ciudad costera)
+- Panorama de ciudad costera en tinta (rascacielos de colores, palmeras, mar, paseo) con el personaje (sudadera naranja, pelo FlatTop) detrás de una barandilla en primer plano; cada escena transforma ese mismo lugar: frenazo (edificios inclinados y desplazados al este), viento supersónico (ciudad arrasada), tsunami, mundo partido día/noche, polos, luna que desaparece.
+- Estampas y textos: en escenas con personaje de pie TODOS los sellos van arriba (y≈440) porque la cara ocupa hasta y≈1290; el botón "SÍGUEME" va bajo el título (y≈790), no sobre la cara.
+- Cuidar los tiempos de los sellos: la palabra clave debe ser única en su segmento (p. ej. "gira" aparecía antes en "giras") o el sello se queda pegado.
