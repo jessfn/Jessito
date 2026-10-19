@@ -63,3 +63,8 @@ Herramientas del proceso en `tools/video-3d/` (los modelos `.glb` no se guardan 
 ## Parte 4 "Enterrado vivo"
 - Mismo estilo de tinta; corte transversal de la tierra (estratos con piedras, raíces, gusanos), tarjetas con medidores (O₂, ECG, CO₂), sepia para el siglo XIX, cartel de 1915. Atuendo: chaqueta oscura con camisa blanca; jersey cuello alto; sudadera con taza.
 - Transiciones: tierra que sube, iris, glitch, grieta, página, destello. Título del cierre en y≈325 para no chocar con la etiqueta superior (y≈196).
+
+## Regla de lógica de escenas (pedida por el usuario, aplica a todos los videos)
+- La escena debe ser **lógica con el tema**: si el tema es estar dentro de algo (ataúd, etc.), el personaje está dentro de ese espacio, en corte transversal, con el entorno real (tierra, tapa, aire) y la cámara acercándose a su cara. Nada de personaje "narrador" delante de un fondo que no tiene que ver; los gráficos informativos van como anotaciones dentro de la escena.
+- Parte 4 v2: persona acostada (busto rotado -90°) dentro del ataúd en corte lateral, manta que tapa el corte; cámara con planos amplio/cerrado (d_coffin.js, e2_scenes.js). Fuera del ataúd: médico con bata blanca y estetoscopio (hospital), teatro (Houdini), espacio (cierre).
+- Open Peeps: en `Jacket`, `jacketColor` solo pinta el cuello; el cuerpo usa `outlineColor` (negro). Para prendas blancas usar `ButtonShirt` con `topColor`.

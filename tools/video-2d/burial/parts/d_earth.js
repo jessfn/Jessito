@@ -1,5 +1,5 @@
 // ===================== earth cross-section =====================
-const PW=W+400,SURF=560;let EARTH,SKYL;
+const PW=W+920,SURF=560;let EARTH,SKYL;
 function buildEarth(){const c=offscreen(PW,2300),g=c.getContext('2d');
   const bands=[[0,150,'#5a3a26','#4a2e1e'],[150,560,'#7a5236','#6a4630'],[560,1050,'#9a6a40','#8a5c38'],[1050,1560,'#8a7466','#6e6058'],[1560,2300,'#5e5c78','#44425e']];
   for(const [a,b,c1,c2] of bands){g.fillStyle=lin(g,0,a,0,b,[[0,c1],[1,c2]]);g.fillRect(0,a,PW,b-a+2);}
@@ -20,11 +20,11 @@ function buildEarth(){const c=offscreen(PW,2300),g=c.getContext('2d');
   for(const [x,sc] of [[330,1],[820,.9],[1190,1.1],[1500,.8]]){k.save();k.translate(x,SURF-6);k.scale(sc,sc);k.beginPath();k.moveTo(-34,0);k.lineTo(-34,-58);k.quadraticCurveTo(0,-98,34,-58);k.lineTo(34,0);k.closePath();inkS(k,'#6a6a8c',6);k.strokeStyle='rgba(255,255,255,.3)';k.lineWidth=4;k.beginPath();k.moveTo(-12,-48);k.lineTo(12,-48);k.moveTo(0,-62);k.lineTo(0,-30);k.stroke();k.restore();}
   SKYL=s;}
 function drawEarth(g,t,o){ // o: {scroll, hole, fill}
-  const px=-200-CAMS.x*.3,sc=o.scroll||0;
+  const px=-460-CAMS.x*.3,sc=o.scroll||0;
   if(sc<SURF+40){g.drawImage(SKYL,px,-sc);}
   g.drawImage(EARTH,px,SURF-sc);
   // grass line
-  if(sc<SURF+60){g.save();g.translate(0,SURF-sc);g.fillStyle=lin(g,0,-14,0,40,[[0,'#6bd14a'],[1,'#2f8a30']]);g.beginPath();g.moveTo(0,10);for(let x=0;x<=W+40;x+=18){g.lineTo(x,-4-8*Math.abs(Math.sin(x*.37)));g.lineTo(x+9,14);}g.lineTo(W,60);g.lineTo(0,60);g.closePath();g.fill();g.strokeStyle=INK;g.lineWidth=5;g.stroke();g.restore();}
+  if(sc<SURF+60){g.save();g.translate(0,SURF-sc);g.fillStyle=lin(g,0,-14,0,40,[[0,'#6bd14a'],[1,'#2f8a30']]);g.beginPath();g.moveTo(-500,10);for(let x=-500;x<=W+520;x+=18){g.lineTo(x,-4-8*Math.abs(Math.sin(x*.37)));g.lineTo(x+9,14);}g.lineTo(W+520,60);g.lineTo(-500,60);g.closePath();g.fill();g.strokeStyle=INK;g.lineWidth=5;g.stroke();g.restore();}
 }
 function drawGrave(g,t,open,sc){ // open grave hole between x 330..750
   const y0=SURF-sc;if(open<=0)return;const hx=330,hw=420,hd=470*open;g.save();g.beginPath();g.rect(hx,y0,hw,hd);g.fillStyle=lin(g,0,y0,0,y0+hd,[[0,'#2b1a12'],[1,'#140b08']]);g.fill();g.lineWidth=6;g.strokeStyle=INK;g.stroke();

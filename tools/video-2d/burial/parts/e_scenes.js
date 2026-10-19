@@ -108,7 +108,7 @@ function drawS7(g,t){const u=t-ST[7];
   g.fillStyle=lin(g,0,0,0,H,[[0,'#050722'],[.55,'#101a55'],[1,'#0a0630']]);g.fillRect(0,0,W,H);
   g.fillStyle='#fff';for(let i=0;i<90;i++){g.globalAlpha=.3+.7*Math.abs(Math.sin(t*1.2+i));g.beginPath();g.arc(rng(i)*W,rng(i+9)*1000,1+rng(i+4)*1.8,0,7);g.fill();}g.globalAlpha=1;
   const stop=t>=T.golpe;const spin=stop?0:(t-ST[7])*(1.6+ss(T.tierra,T.girar,t)*3.2);const lastSpin=(T.golpe-ST[7])*(1.6+3.2);const ang=stop?lastSpin:spin;
-  const k=eob(clamp(u/.7),1.2),cx=540,cy=760,R=180*k;
+  const k=eob(clamp(u/.7),1.2),cx=540,cy=790,R=160*k;
   glow(g,cx,cy,R*2.2,'#4aa8ff',.5);
   g.save();g.beginPath();g.arc(cx,cy,R,0,7);g.save();g.clip();g.fillStyle=lin(g,cx-R,cy-R,cx+R,cy+R,[[0,'#4fc0ff'],[1,'#1b5ad0']]);g.fillRect(cx-R,cy-R,R*2,R*2);
   g.fillStyle='#4fd070';for(const [lx,ly,lr] of [[-.2,-.25,.42],[.5,.1,.36],[-.5,.45,.3],[.15,.6,.25],[.9,-.3,.3]]){for(const off of [0,Math.PI*2]){const x=cx+Math.sin(ang*.5+lx*3+off*.0)*R*1.1;g.save();g.beginPath();g.ellipse(cx+((lx*R*2+ang*60)%(R*3.2))-R*1.1,cy+ly*R,lr*R*.8,lr*R*.55,lx,0,7);g.fill();g.restore();break;}}

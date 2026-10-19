@@ -1,6 +1,6 @@
 const React=require('react');const {renderToStaticMarkup}=require('react-dom/server');const fs=require('fs');
 const {Effigy,Faces}=require('./cjs/index.js');
-const bodyOpts={topColor:'#f3efe6',jacketColor:'#1f2030',skinColor:'#9a6040',cupColor:'#e9a23a',paperColor:'#fffdf2'};const bodyOpts2={...bodyOpts,topColor:'#2b2b3a'};
+const bodyOpts={topColor:'#f3efe6',jacketColor:'#363a58',skinColor:'#9a6040',cupColor:'#e9a23a',paperColor:'#fffdf2'};const bodyOpts2={...bodyOpts,topColor:'#2b2b3a'};
 const faceList=['Calm','Explaining','Concerned','ConcernedFear','Fear','Hectic','Awe','BigSmile','Smile','SmileTeeth','SmileLOL','EyesClosed','Suspicious','Serious','Tired','Contempt','Driven','Cheeky','Solemn','Rage','Angry','EatingHappy','Cute','Blank','Old'];
 function render(body,head,face,o){
  return renderToStaticMarkup(React.createElement(Effigy,{body:{type:body,options:o||bodyOpts},head:{type:head,options:{}},face:{type:face,options:{}}})).replace(/ style=""/,'');
@@ -18,7 +18,7 @@ function split(s){
 }
 const wrapB=p=>open+'<g id="Bust">'+p+'</g></svg>';
 const wrapH=(tag,p)=>open+'<g id="Bust">'+tag+p+'</g></g></svg>';
-for(const b of ['Jacket','Turtleneck']){const p=split(render(b,'ShortThree','Calm'));out.bodies[b]=wrapB(p.body);}{const p=split(render('Coffee','ShortThree','Calm',bodyOpts2));out.bodies.Coffee=wrapB(p.body);}
+for(const b of ['Jacket','Turtleneck']){const p=split(render(b,'ShortThree','Calm'));out.bodies[b]=wrapB(p.body);}{const p=split(render('Coffee','ShortThree','Calm',bodyOpts2));out.bodies.Coffee=wrapB(p.body);}{const bw={...bodyOpts,jacketColor:'#f4f6fa',topColor:'#7fc8d8'};const p=split(render('ButtonShirt','ShortThree','Calm',{...bodyOpts,topColor:'#f4f6fa'}));out.bodies.JacketW=wrapB(p.body);}
 {const p=split(base);out.hair.ShortThree=wrapH(p.iHeadTag,p.hair);}
 for(const f of faceList){const p=split(render('Jacket','ShortThree',f));out.faces[f]=wrapH(p.iHeadTag,p.face);}
 fs.writeFileSync('../b2k/assets_peeps.js','window.PEEP='+JSON.stringify(out)+';');

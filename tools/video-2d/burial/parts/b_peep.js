@@ -32,7 +32,7 @@ function beeHat(g,veilAlpha=1){
 // st: {body,face,hat,tilt,hx,hy,lean,sq,bx,by,veil}
 function drawPeep(g,x,y,s,st){
   const B=PIMG.body[st.body||'ButtonShirt'],Hh=PIMG.hair[Object.keys(PIMG.hair)[0]],F=PIMG.face[st.face||'Calm'];
-  g.save();g.translate(x+(st.bx||0),y+(st.by||0));g.rotate(st.lean||0);g.scale(s*(1+(st.sq||0)*-.5),s*(1+(st.sq||0)));g.translate(-PIV[0],-PIV[1]);
+  g.save();g.translate(x+(st.bx||0),y+(st.by||0));g.rotate((st.rot||0)+(st.lean||0));g.scale(s*(1+(st.sq||0)*-.5),s*(1+(st.sq||0)));g.translate(-PIV[0],-PIV[1]);
   g.drawImage(B,0,0,LW,LH);
   g.save();g.translate(NECK[0]+(st.hx||0),NECK[1]+(st.hy||0));g.rotate(st.tilt||0);g.translate(-NECK[0],-NECK[1]);
   g.drawImage(Hh,0,0,LW,LH);g.drawImage(F,0,0,LW,LH);
