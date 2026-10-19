@@ -24,7 +24,7 @@ def fade(id_,t,dur=.4):
     js.append(f"tl.fromTo('#{id_}_i',{{opacity:0}},{{opacity:1,duration:{dur},ease:'power1.out'}},{t:.3f});")
 def hide(id_,t,dur=.15): js.append(f"tl.to('#{id_}_i',{{opacity:0,duration:{dur}}},{t:.3f});")
 def stamp(id_,y,txt,color,size,rot,t,t_hide):
-    els.append(row(id_,y,int(size*1.6))+f'<span class="tx stamp" style="font-size:{size}px;color:{color};text-shadow:0 0 34px {color},0 0 10px {color}">{esc(txt)}</span></div></div>')
+    els.append(row(id_,y,int(size*1.6))+f'<span class="tx stamp" style="font-size:{size}px;color:{color};text-shadow:0 0 34px {color},0 0 10px {color};{'background:rgba(12,8,28,.66);padding:8px 28px;border-radius:34px;' if size<=66 else ''}">{esc(txt)}</span></div></div>')
     js.append(f"gsap.set('#{id_}_i',{{rotation:{rot},opacity:0}});")
     js.append(f"tl.fromTo('#{id_}_i',{{opacity:0,scale:.5,filter:'blur(18px)'}},{{opacity:1,scale:1,filter:'blur(0px)',duration:.42,ease:'back.out(2.2)'}},{t:.3f});")
     hide(id_,t_hide)
@@ -34,33 +34,33 @@ from PIL import ImageFont
 FB=ImageFont.truetype('bees/assets/fonts/Outfit-900.ttf',72)
 els.append('<div id="prog_bg"></div><div id="prog"></div>')
 js.append(f"tl.fromTo('#prog',{{scaleX:0}},{{scaleX:1,duration:{TOTAL:.3f},ease:'none'}},0);")
-text_el('chip',196,'ENTERRADO VIVO',40,'#ffe29a',800,extra='text-shadow:0 3px 0 rgba(0,0,0,.5);')
+text_el('chip',215,'ENTERRADO VIVO',40,'#ffe29a',800,extra='text-shadow:0 3px 0 rgba(0,0,0,.5);')
 fade('chip',.1)
 pan0=wt(0,'pánico');horas=wt(1,'horas');panic=wt(2,'pánico');dio=wt(3,'dióxido');mareo=wt(3,'mareo');dos=wt(4,'dos');peso=wt(4,'peso')
 s19=wt(5,'diecinueve');camp=wt(5,'campanas');hoy=wt(6,'hoy');pero=wt(6,'pero');hou=wt(6,'houdini');sale=wt(6,'sale');tierra=wt(7,'tierra');golpe=wt(7,'golpe');sig=wt(7,'sígueme')
 E_=lambda i:ST[i]-.30
-text_el('t0a',290,'¿QUÉ PASA SI',84,'#fff');text_el('t0b',385,'TE ENTIERRAN',100,'#ffd23f');text_el('t0c',475,'VIVO?',110,'#ff7a3c')
+text_el('t0a',400,'¿QUÉ PASA SI',84,'#fff');text_el('t0b',495,'TE ENTIERRAN',100,'#ffd23f');text_el('t0c',595,'VIVO?',110,'#ff7a3c')
 pop('t0a',.05);pop('t0b',.20);pop('t0c',.35)
 for i in 'abc': hide('t0'+i,E_(1))
-stamp('s0',1500,'TU PEOR ENEMIGO: EL PÁNICO','#ff7a8a',52,-3,pan0,E_(1))
-text_el('s1a',340,'¿CUÁNTO AIRE?',110,'#9fe0ff',extra='text-shadow:0 8px 0 rgba(0,0,0,.55);');pop('s1a',ST[1]+.1,.5);hide('s1a',E_(2))
-stamp('s1b',1500,'UNAS POCAS HORAS','#ffd166',64,-3,horas-.3,E_(2))
-stamp('s2a',350,'PÁNICO','#ff4a5e',160,-3,panic,E_(3))
-stamp('s2b',1500,'MÁS RÁPIDO SE ACABA','#ffb347',58,3,wt(2,'rápido'),E_(3))
-stamp('s3a',350,'CO₂','#d8e3a8',160,-3,dio,E_(4))
-stamp('s3b',1500,'MAREO · CONFUSIÓN · DESMAYO','#ff9bb8',44,3,mareo,E_(4))
-stamp('s4a',340,'CASI 2 METROS','#ffd9a8',104,-3,dos-.2,E_(5))
-stamp('s4b',1500,'TODO ESE PESO','#ff4a5e',80,3,peso-.2,E_(5))
-stamp('s5a',340,'SIGLO XIX','#ffd9a8',130,-3,s19,E_(6))
-stamp('s5b',1500,'ATAÚDES CON CAMPANAS','#ffe08a',56,3,camp,E_(6))
-stamp('s6a',340,'HOY: CASI IMPOSIBLE','#46f0a0',92,-3,hoy,pero-.2)
-stamp('s6b',340,'HOUDINI · 1915','#ffe228',100,3,hou-.2,E_(7))
-stamp('s6c',1500,'CASI NO SALE','#ff4a5e',84,-3,sale-.1,E_(7))
+stamp('s0',1230,'TU PEOR ENEMIGO: EL PÁNICO','#ff7a8a',52,-3,pan0,E_(1))
+text_el('s1a',440,'¿CUÁNTO AIRE?',110,'#9fe0ff',extra='text-shadow:0 8px 0 rgba(0,0,0,.55);');pop('s1a',ST[1]+.1,.5);hide('s1a',E_(2))
+stamp('s1b',1230,'UNAS POCAS HORAS','#ffd166',64,-3,horas-.3,E_(2))
+stamp('s2a',440,'PÁNICO','#ff4a5e',160,-3,panic,E_(3))
+stamp('s2b',1230,'MÁS RÁPIDO SE ACABA','#ffb347',58,3,wt(2,'rápido'),E_(3))
+stamp('s3a',440,'CO₂','#d8e3a8',160,-3,dio,E_(4))
+stamp('s3b',1230,'MAREO · CONFUSIÓN · DESMAYO','#ff9bb8',44,3,mareo,E_(4))
+stamp('s4a',440,'CASI 2 METROS','#ffd9a8',104,-3,dos-.2,E_(5))
+stamp('s4b',1230,'TODO ESE PESO','#ff4a5e',80,3,peso-.2,E_(5))
+stamp('s5a',440,'SIGLO XIX','#ffd9a8',130,-3,s19,E_(6))
+stamp('s5b',1230,'ATAÚDES CON CAMPANAS','#ffe08a',56,3,camp,E_(6))
+stamp('s6a',440,'HOY: CASI IMPOSIBLE','#46f0a0',92,-3,hoy,pero-.2)
+stamp('s6b',440,'HOUDINI · 1915','#ffe228',100,3,hou-.2,E_(7))
+stamp('s6c',1230,'CASI NO SALE','#ff4a5e',84,-3,sale-.1,E_(7))
 u=ST[7]
-text_el('c7a',325,'PARTE 4',180,'#ffe228',extra='text-shadow:0 8px 0 rgba(0,0,0,.55);');pop('c7a',u,.5)
-text_el('c7b',440,'¿Y SI LA TIERRA',58,'#fff');fade('c7b',u+.6)
-text_el('c7c',520,'DEJA DE GIRAR?',84,'#ff7a3c');pop('c7c',golpe-.9,.5)
-els.append('<div class="row" id="btn" style="top:1470px;height:130px;margin-top:-65px"><div class="in" id="btn_i"><div class="btn"><span class="tx" style="font-size:60px;color:#fff;font-weight:900">SÍGUEME ▶</span></div></div></div>')
+text_el('c7a',440,'SIGUIENTE',150,'#ffe228',extra='text-shadow:0 8px 0 rgba(0,0,0,.55);');pop('c7a',u,.5)
+text_el('c7b',545,'¿Y SI LA TIERRA',58,'#fff');fade('c7b',u+.6)
+text_el('c7c',625,'DEJA DE GIRAR?',84,'#ff7a3c');pop('c7c',golpe-.9,.5)
+els.append('<div class="row" id="btn" style="top:1230px;height:130px;margin-top:-65px"><div class="in" id="btn_i"><div class="btn"><span class="tx" style="font-size:60px;color:#fff;font-weight:900">SÍGUEME ▶</span></div></div></div>')
 js.append("gsap.set('#btn_i',{opacity:0});")
 js.append(f"tl.fromTo('#btn_i',{{opacity:0,scale:.6}},{{opacity:1,scale:1,duration:.3,ease:'back.out(2)'}},{sig-.1:.3f});")
 tp=sig+.3
@@ -75,12 +75,12 @@ for i,sg in enumerate(SEGS):
         if n==1 and chunks and chunks[-1]['si']==i and len(chunks[-1]['ws'])<4: chunks[-1]['ws'].append(ws[j]);j+=1;continue
         chunks.append({'si':i,'s0':ST[i],'ws':list(ws[j:j+n])});j+=n
 from PIL import ImageFont
-FNT=ImageFont.truetype('bees/assets/fonts/Outfit-900.ttf',88)
+FNT=ImageFont.truetype('bees/assets/fonts/Outfit-900.ttf',56)
 sub=[]
 for ci,c in enumerate(chunks):
     a=c['s0']+c['ws'][0][1];nx=chunks[ci+1] if ci+1<len(chunks) else None
     b=(nx['s0']+nx['ws'][0][1]) if nx and nx['si']==c['si'] else c['s0']+c['ws'][-1][2]+.25
-    ww=[FNT.getlength(w[0].upper()) for w in c['ws']];tot=sum(ww)+44*(len(ww)-1);scl=min(1.0,900/tot)
+    ww=[FNT.getlength(w[0].upper()) for w in c['ws']];tot=sum(ww)+28*(len(ww)-1);scl=min(1.0,820/tot)
     words=''.join(f'<span class="w" data-layout-allow-overlap><span class="b">{esc(w[0].upper())}</span><span class="h" id="h{ci}_{wi}">{esc(w[0].upper())}</span></span>' for wi,w in enumerate(c['ws']))
     sub.append(f'<div class="chunk" id="ck{ci}">{words}</div>')
     js.append(f"tl.fromTo('#ck{ci}',{{opacity:0,scale:{.9*scl:.3f},y:26,filter:'blur(10px)'}},{{opacity:1,scale:{scl:.3f},y:0,filter:'blur(0px)',duration:.26,ease:'expo.out'}},{max(0,a-.02):.3f});")
@@ -90,7 +90,7 @@ for ci,c in enumerate(chunks):
         js.append(f"tl.set('#h{ci}_{wi}',{{opacity:1}},{max(0,ws_):.3f});")
         js.append(f"tl.fromTo('#h{ci}_{wi}',{{scale:1.2}},{{scale:1,duration:.2,ease:'back.out(3)'}},{max(0,ws_):.3f});")
         if wi<len(c['ws'])-1: js.append(f"tl.set('#h{ci}_{wi}',{{opacity:0}},{we:.3f});")
-els.append('<div id="subs" style="position:absolute;left:0;top:1730px;width:1080px;height:0">'+''.join(sub)+'</div>')
+els.append('<div id="subs" style="position:absolute;left:0;top:1350px;width:1080px;height:0">'+''.join(sub)+'</div>')
 
 css='''
 @font-face{font-family:'Outfit';font-weight:800;src:url(assets/fonts/outfit-latin-800-normal.woff2) format('woff2')}
@@ -99,19 +99,19 @@ css='''
 html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#000}
 #root{position:relative;width:1080px;height:1920px;overflow:hidden;font-family:'Outfit','Helvetica Neue',Arial,sans-serif}
 #bg{position:absolute;left:0;top:0;width:1080px;height:1920px;object-fit:cover}
-#fx{position:absolute;left:0;top:0;width:1080px;height:1920px}
+#fx{position:absolute;left:-45px;top:0;width:1080px;height:1920px}
 .row{position:absolute;left:0;width:1080px;display:flex;align-items:center;justify-content:center}
 .in{display:flex;align-items:center;justify-content:center;opacity:0;transform-origin:50% 50%}
 .tx{display:block;white-space:nowrap;text-align:center;line-height:1;-webkit-text-stroke:0;text-shadow:0 6px 0 rgba(0,0,0,.55)}
 .stamp{letter-spacing:.02em}
 .ch{display:inline-block;transform-origin:50% 80%}
 .tx{letter-spacing:-.01em}
-#prog_bg{position:absolute;left:60px;top:112px;width:960px;height:10px;border-radius:5px;background:rgba(255,255,255,.2)}
-#prog{position:absolute;left:60px;top:112px;width:960px;height:10px;border-radius:5px;background:#ff9a2e;transform-origin:0 50%;transform:scaleX(0)}
+#prog_bg{position:absolute;left:75px;top:150px;width:840px;height:10px;border-radius:5px;background:rgba(255,255,255,.2)}
+#prog{position:absolute;left:75px;top:150px;width:840px;height:10px;border-radius:5px;background:#ff9a2e;transform-origin:0 50%;transform:scaleX(0)}
 .btn{width:520px;height:130px;border-radius:65px;background:#ff2a5a;display:flex;align-items:center;justify-content:center}
-.chunk{position:absolute;left:0;top:-60px;width:1080px;height:120px;display:flex;align-items:center;justify-content:center;gap:44px;opacity:0;transform-origin:50% 50%}
-.w{position:relative;display:inline-block;font-size:88px;font-weight:900;line-height:1;white-space:nowrap}
-.w .b,.w .h{display:block;-webkit-text-stroke:20px #000;paint-order:stroke fill;text-shadow:0 7px 0 rgba(0,0,0,.55)}
+.chunk{position:absolute;left:0;top:-40px;width:1080px;height:80px;display:flex;align-items:center;justify-content:center;gap:28px;opacity:0;transform-origin:50% 50%}
+.w{position:relative;display:inline-block;font-size:56px;font-weight:900;line-height:1;white-space:nowrap}
+.w .b,.w .h{display:block;-webkit-text-stroke:12px #000;paint-order:stroke fill;text-shadow:0 7px 0 rgba(0,0,0,.55)}
 .w .b{color:#fff}
 .w .h{position:absolute;left:0;top:0;color:#ffe228;opacity:0}
 '''

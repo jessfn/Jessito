@@ -71,7 +71,8 @@ Herramientas del proceso en `tools/video-3d/` (los modelos `.glb` no se guardan 
 
 ## Zona segura de TikTok y textos (pedido por el usuario, aplica desde ahora)
 - Investigado (ninguna cifra es oficial de TikTok; TikTok solo dice que la zona segura se achica con subtítulos/descripciones largas): en 1080x1920 dejar libres **arriba ≈130 px** (pestañas Siguiendo/Para ti, búsqueda), **abajo ≈484 px** (usuario, descripción, sonido, barra de progreso; hay guías que usan hasta ~700 px), **derecha ≈140 px** (perfil, me gusta, comentarios, guardar, compartir) e **izquierda ≈44 px**. Ventana segura ≈ x 44–940, y 130–1436; el centro horizontal seguro es x≈492.
-- **Subtítulos**: pequeños (≈52–58 px, no 88), en el tercio superior (y≈230–300), sin pasar de x 60–930, negrita sans-serif blanca con contorno oscuro. Nada de subtítulos, sellos ni botones por debajo de y≈1400 ni a la derecha de x≈930. Quitar la barra de progreso de y=112 (bajarla a y≈150).
-- **Llamada a la acción**: no poner "Sígueme/Comenta" como botón abajo; ponerlo dentro de la ventana segura (y≈1250–1350) y siempre al final.
+- **Subtítulos (regla del usuario, para siempre)**: van ABAJO, pequeños (≈52–58 px, no 88), pero **por encima de la interfaz de TikTok**: centro en y≈1350 (texto entre y≈1300 y 1400, nunca más abajo de y≈1400) y dentro de x 60–930. Negrita sans-serif blanca con contorno oscuro. El usuario NO quiere los subtítulos arriba. Quitar la barra de progreso de y=112 (bajarla a y≈150).
+- Sellos/botones: los de arriba en y≈440; los que iban abajo, en y≈1230 (encima de los subtítulos). Nada por debajo de y≈1400 ni a la derecha de x≈930.
+- **Llamada a la acción**: no poner "Sígueme/Comenta" como botón abajo; ponerlo dentro de la ventana segura (y≈1230, encima de los subtítulos) y siempre al final.
 - **No numerar partes** ("PARTE 2/3/4"): usar "SIGUIENTE" + la pregunta del próximo video.
 - Probar el export con una máscara de zona segura antes de entregar.
