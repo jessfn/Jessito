@@ -80,7 +80,7 @@ sub=[]
 for ci,c in enumerate(chunks):
     a=c['s0']+c['ws'][0][1];nx=chunks[ci+1] if ci+1<len(chunks) else None
     b=(nx['s0']+nx['ws'][0][1]) if nx and nx['si']==c['si'] else c['s0']+c['ws'][-1][2]+.25
-    ww=[FNT.getlength(w[0].upper()) for w in c['ws']];tot=sum(ww)+28*(len(ww)-1);scl=min(1.0,820/tot)
+    ww=[FNT.getlength(w[0].upper()) for w in c['ws']];tot=sum(ww)+28*(len(ww)-1);scl=min(1.0,780/tot)
     words=''.join(f'<span class="w" data-layout-allow-overlap><span class="b">{esc(w[0].upper())}</span><span class="h" id="h{ci}_{wi}">{esc(w[0].upper())}</span></span>' for wi,w in enumerate(c['ws']))
     sub.append(f'<div class="chunk" id="ck{ci}">{words}</div>')
     js.append(f"tl.fromTo('#ck{ci}',{{opacity:0,scale:{.9*scl:.3f},y:26,filter:'blur(10px)'}},{{opacity:1,scale:{scl:.3f},y:0,filter:'blur(0px)',duration:.26,ease:'expo.out'}},{max(0,a-.02):.3f});")
@@ -99,15 +99,15 @@ css='''
 html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#000}
 #root{position:relative;width:1080px;height:1920px;overflow:hidden;font-family:'Outfit','Helvetica Neue',Arial,sans-serif}
 #bg{position:absolute;left:0;top:0;width:1080px;height:1920px;object-fit:cover}
-#fx{position:absolute;left:-45px;top:0;width:1080px;height:1920px}
+#fx{position:absolute;left:0;top:0;width:1080px;height:1920px}
 .row{position:absolute;left:0;width:1080px;display:flex;align-items:center;justify-content:center}
 .in{display:flex;align-items:center;justify-content:center;opacity:0;transform-origin:50% 50%}
 .tx{display:block;white-space:nowrap;text-align:center;line-height:1;-webkit-text-stroke:0;text-shadow:0 6px 0 rgba(0,0,0,.55)}
 .stamp{letter-spacing:.02em}
 .ch{display:inline-block;transform-origin:50% 80%}
 .tx{letter-spacing:-.01em}
-#prog_bg{position:absolute;left:75px;top:150px;width:840px;height:10px;border-radius:5px;background:rgba(255,255,255,.2)}
-#prog{position:absolute;left:75px;top:150px;width:840px;height:10px;border-radius:5px;background:#ff9a2e;transform-origin:0 50%;transform:scaleX(0)}
+#prog_bg{position:absolute;left:90px;top:150px;width:900px;height:10px;border-radius:5px;background:rgba(255,255,255,.2)}
+#prog{position:absolute;left:90px;top:150px;width:900px;height:10px;border-radius:5px;background:#ff9a2e;transform-origin:0 50%;transform:scaleX(0)}
 .btn{width:520px;height:130px;border-radius:65px;background:#ff2a5a;display:flex;align-items:center;justify-content:center}
 .chunk{position:absolute;left:0;top:-40px;width:1080px;height:80px;display:flex;align-items:center;justify-content:center;gap:28px;opacity:0;transform-origin:50% 50%}
 .w{position:relative;display:inline-block;font-size:56px;font-weight:900;line-height:1;white-space:nowrap}
