@@ -94,3 +94,11 @@ Herramientas del proceso en `tools/video-3d/` (los modelos `.glb` no se guardan 
 - **Textos que no caben**: nunca dimensionar a ojo. Los textos de HyperFrames pasan por `fit()` (mide con la fuente real y reduce el tamaño para que quepa en 900 px incluido el relleno del sello); en canvas, medir con `measureText` y reducir fuente o ensanchar la caja. Espaciar líneas de título ≥ 1.15× el tamaño de fuente.
 - Palabras clave de los sellos deben ser únicas en su segmento (ej. "gira" aparece antes en "giras"); el generador exige `t_hide > t+0.5`.
 - Antes de entregar, mirar fotogramas reales (inicio, cada escena, cierre) con recortes ampliados de los subtítulos.
+
+## Reglas nuevas del usuario (aplican a TODOS los videos desde ahora)
+- **Intro**: siempre "¿Qué pasaría si…?" (nunca "¿Qué pasa si…?").
+- **Sin barra de progreso superior ni etiqueta/título arriba** (chip tipo "ENTERRADO VIVO"): quitados para siempre.
+- **Calidad 4K siempre**: lienzo Canvas2D con escala `?s=2` (3840x2160 vertical = 2160x3840), 60 fps, capa de texto de HyperFrames en `portrait-4k` (contenido escalado ×2 con `transform` en `#fx`, WebM con alfa) superpuesta con ffmpeg. Maestro MP4 H.264 crf 18 + AAC 320k; versión web 1080x1920 60 fps (~1,9 Mbps) y WebM 720x1280 para el Artifact (≤15 MB).
+- **Audio**: 48 kHz, masters en WAV 24 bits y FLAC, MP3 320k, loudnorm -14 LUFS. Voz masculina nueva `es-ES-AlvaroNeural` (edge-tts, fuente 24 kHz mono; no hay voz más real sin GPU/otros servicios). Música/SFX a 48 kHz.
+- **Flujo**: cámara continua, transiciones con curvas, sin pantallas muertas (en un corte a negro dibujar algo con sentido, p. ej. electrocardiograma plano).
+- Render 4K: usar 3 procesos en paralelo con tramos de ~200 fotogramas (`tools/video-2d/fall/parts/run.sh`); con 4 procesos Chromium se queda sin memoria. En el worker, ffmpeg necesita `-f mp4` si el archivo temporal no termina en .mp4. No usar `pkill -f` con un patrón que aparezca en el propio comando (mata la shell).
