@@ -11,7 +11,8 @@ mix=np.zeros(n)
 # voice file
 v=np.zeros(n)
 for i,s in enumerate(starts):
-    w=wave.open(f'{S}/w_fall/s{i}.wav'); x=np.frombuffer(w.readframes(w.getnframes()),dtype=np.int16)/32768.0
+    w=wave.open(f'{S}/w_fall/s{i}.wav'); raw=np.frombuffer(w.readframes(w.getnframes()),dtype=np.uint8); assert w.getsampwidth()==3 and w.getnchannels()==1
+    r3=raw.reshape(-1,3).astype(np.int32); x=((r3[:,0]|(r3[:,1]<<8)|(r3[:,2]<<16))<<8>>8)/8388608.0
     a=int(s*SR); dd=int(segs[i]['dur']*SR); x=x[:dd].copy(); x[-int(0.05*SR):]*=np.linspace(1,0,int(0.05*SR)); v[a:a+len(x)]+=x[:n-a]
 # music
 def note(f): return 440*2**((f-69)/12)
