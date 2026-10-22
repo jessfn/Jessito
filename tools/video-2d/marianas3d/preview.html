@@ -1,0 +1,16 @@
+<!doctype html><meta charset=utf-8><body style="margin:0;background:#789"><canvas id=out></canvas><canvas id=glc style="display:none"></canvas>
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+<script type="module">
+import {loadChar,loadClips,THREE} from '/char3d.js';
+const Q=new URLSearchParams(location.search);const names=(Q.get('c')||'').split(',').filter(Boolean);const tt=Number(Q.get('t')||1);
+const CW=200,CH=360,cols=Math.min(names.length,10),rows=Math.ceil(names.length/cols);
+const out=document.getElementById('out');out.width=CW*cols;out.height=CH*rows;const og=out.getContext('2d');og.fillStyle='#789';og.fillRect(0,0,out.width,out.height);
+const glc=document.getElementById('glc');const r=new THREE.WebGLRenderer({canvas:glc,antialias:true,preserveDrawingBuffer:true,alpha:true});r.setSize(CW,CH,false);r.outputColorSpace=THREE.SRGBColorSpace;
+const scene=new THREE.Scene();const cam=new THREE.OrthographicCamera(-1.1*CW/CH*1.0,1.1*CW/CH*1.0,1.1,-1.1,.1,50);cam.position.set(0,.9,5);cam.lookAt(0,.9,0);
+scene.add(new THREE.HemisphereLight(0xffffff,0x888899,1.6));const dl=new THREE.DirectionalLight(0xffffff,2.2);dl.position.set(2,4,5);scene.add(dl);
+const ch=await loadChar();scene.add(ch.holder);
+const mixer=new THREE.AnimationMixer(ch.fig);const {ANIM,ACT}=await loadClips(ch,names,mixer);
+let i=0;for(const n of names){for(const k in ACT)ACT[k].setEffectiveWeight(0);const a=ACT[n],d=ANIM[n].duration;a.setEffectiveWeight(1);a.time=(tt*d)%d;mixer.update(0);
+  ch.holder.position.set(0,0,0);r.render(scene,cam);og.drawImage(glc,(i%cols)*CW,Math.floor(i/cols)*CH);og.fillStyle='#fff';og.font='13px sans-serif';og.fillText(n.replace('M_','').replace('Standing_','').replace('Variations_','V'),(i%cols)*CW+4,Math.floor(i/cols)*CH+14);i++;}
+window.done=1;
+</script>

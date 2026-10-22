@@ -1,0 +1,22 @@
+<!doctype html><meta charset=utf-8><body style="margin:0;background:#2a7fb8"><canvas id=out></canvas><canvas id=glc style="display:none"></canvas>
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+<script type="module">
+import {createRT,poseRT} from '/rt3d.js';import {THREE} from '/char3d.js';
+const CW=260,CH=470;const out=document.getElementById('out');const N=8;out.width=CW*N;out.height=CH;const og=out.getContext('2d');
+const glc=document.getElementById('glc');const r=new THREE.WebGLRenderer({canvas:glc,antialias:true,preserveDrawingBuffer:true,alpha:true});r.setSize(CW,CH,false);r.outputColorSpace=THREE.SRGBColorSpace;
+const scene=new THREE.Scene();const cam=new THREE.OrthographicCamera(-1.05*CW/CH,1.05*CW/CH,1.05,-1.05,.1,50);cam.position.set(2.2,.85,4);cam.lookAt(0,.85,0);
+scene.add(new THREE.HemisphereLight(0xdfeaff,0x667799,1.5));const dl=new THREE.DirectionalLight(0xffffff,2.4);dl.position.set(2,4,5);scene.add(dl);
+const ch=await createRT({});scene.add(ch.holder);
+const base={mix:[{n:'M_Standing_Idle_001',time:.5,w:1}],rot:[0,.7,0],spine:[0,0,0],neck:[0,0,0],face:{},ppm:1,anchor:[0,.95,0],swimPh:0,kickPh:0};
+const poses=[
+ {...base},
+ {...base,mix:[{n:'M_Falling_Idle_002',time:.5,w:1}],face:{jaw:1,wide:1,browIn:1,brow:1,stretch:.4}},
+ {...base,armLeft:{ear:1},armRight:{ear:1},spine:[.5,0,0],face:{squint:1,browD:1,sneer:.6,stretch:.7,jaw:.2}},
+ {...base,armLeft:{chest:1},armRight:{chest:1},spine:[.4,0,0],curlLeft:.9,curlRight:.9,face:{wide:.8,browIn:.7,jaw:.5}},
+ {...base,armRight:{face:1},armLeft:{float:.8,fx:.3,fy:.25},face:{wide:.6,browIn:.5,jaw:.15}},
+ {...base,armLeft:{swim:1},armRight:{swim:1},legLeft:{kick:1},legRight:{kick:1},swimPh:.5,kickPh:.4,face:{squint:.8,puff:1,browD:.6}},
+ {...base,mix:[{n:'M_Falling_Idle_002',time:.5,w:.6},{n:'M_Standing_Idle_001',time:1,w:.4}],rot:[-.25,.7,.1],spine:[.2,0,0],neck:[.35,0,.15],face:{blink:1,jaw:.1},armLeft:{float:.7,fx:.25,fy:.45},armRight:{float:.7,fx:.3,fy:.5}},
+ {...base,rot:[-1.45,1.2,0],mix:[{n:'M_Falling_Idle_002',time:.5,w:.5},{n:'M_Standing_Idle_001',time:1,w:.5}],face:{blink:1}}];
+poses.forEach((P,i)=>{poseRT(ch,P);ch.holder.updateMatrixWorld(true);r.render(scene,cam);og.drawImage(glc,i*CW,0);});
+window.done=1;
+</script>
