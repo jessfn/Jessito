@@ -1,0 +1,5 @@
+bun/*.png
+bun/meta_*.json
+test*.png
+audio*.wav
+frames/

@@ -95,11 +95,8 @@ const SIM=[];
    a.x=clamp(a.x,-14000,14000);a.y=clamp(a.y,-14000,14000);af.x+=(a.x-af.x)*.25;af.y+=(a.y-af.y)*.25;
    const vy=clamp(v.y,-1500,1500);
    E.forEach((e,si)=>{const sd=si?1:-1;for(let j=0;j<3;j++){
-    const drv=-(af.x/L[j])*2.2+sd*(-(af.y/L[j])*1.6-vy*.0012*(j+1))*1.0;
-    e.v[j]+=(-K[j]*e.a[j]-Cd[j]*e.v[j]+drv)*dt;e.a[j]=clamp(e.a[j]+e.v[j]*dt,-1.3,1.3)}});
-   htv+=(-110*ht-7*htv-af.x*.00035)*dt;ht=clamp(ht+htv*dt,-.25,.25);amv+=(-150*am-6*amv+af.y*.0007)*dt;am=clamp(am+amv*dt,-.7,.7);
-   if(q==0&&[66,274,438,600].includes(f)){E[0].v[2]+=14;E[0].v[1]+=6}
-   const wg=((((t-3)%4)>3.1&&t<19)||t>=19||t<3)?1:0;tail.vx+=Math.sin(t*22)*900*wg*dt;
+    const wj=[.5,.8,1][j],ob=clamp(-af.y*.00008-vy*.0004,-.12,.9)*wj,lat=clamp(-af.x*.00006,-.4,.4)*(j+1)*.6,T=sd*ob+lat;
+    e.v[j]+=(-K[j]*(e.a[j]-T)-Cd[j]*e.v[j])*dt;e.a[j]=clamp(e.a[j]+e.v[j]*dt,-.8,.8)}});
    tail.vx+=(-90*tail.x-6*tail.vx-af.x*.02)*dt;tail.vy+=(-90*tail.y-6*tail.vy-af.y*.02)*dt;tail.x=clamp(tail.x+tail.vx*dt,-40,40);tail.y=clamp(tail.y+tail.vy*dt,-40,40);
    bv+=(-140*bow-5*bv+af.x*.0006)*dt;bow=clamp(bow+bv*dt,-.5,.5);
    belv+=(-160*bel-5*belv-af.y*.0006)*dt;bel=clamp(bel+belv*dt,-.25,.25);
