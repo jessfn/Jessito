@@ -34,8 +34,8 @@ colores para niños, aprender los colores, los colores en español, video educat
 ## Consejos para viralizar
 - Publica a diario a la misma hora (mejor 7–9 am o 5–8 pm de tu zona).
 - Primeros 2 segundos con movimiento y color (ya incluido).
-- Haz una serie: "Jessito aprende los números / animales / formas".
-- Sube también versión en inglés ("Learn Colors with Jessito").
+- Haz una serie: "Aprende los números / animales / formas".
+- Sube también versión en inglés ("Learn Colors with the Bunny").
 - Fija un comentario… (en "Hecho para niños" los comentarios están desactivados, así que usa la descripción).
 
 ## Ideas de nombre para el canal (fáciles de decir y recordar para niños)
