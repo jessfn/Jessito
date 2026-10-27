@@ -38,14 +38,23 @@ for bar in range(12):
         put(M,t0+e*.5+(0.25 if e%2 else 0),marimba(hz(m)),.9,-.3+.2*e/3)
     for e in range(8):put(M,t0+e*.25,lp(hp(noise(.07),.3),.6)*np.exp(-tt(.07)*60)*.5*(1 if e%2 else .6),.5,.4 if e%2 else -.4)
 M*=.55
-# ---- voz
-def vo(name,t,g=1.0):
+# ---- voz: conejito (b_*) con sincronia labial y narradora (n_*)
+VB=np.zeros((n,2));VN=np.zeros((n,2))
+def vo(buf,name,t,g=1.0):
     a=np.load('voz/%s.npy'%name);a=np.interp(np.arange(int(len(a)*sr/22050))*22050/sr,np.arange(len(a)),a)
-    a=a/np.max(np.abs(a))*g;put(V,t,a,1,0)
-vo('hola',.05,.9)
+    a=a/np.max(np.abs(a))*g;put(buf,t,a,1,0)
+vo(VB,'b_hola',.45,1.0);vo(VN,'n_vamos',1.55,.95)
 for k,c in enumerate(['rojo','azul','amarillo','verde']):
-    s=3+4*k;vo('oh',s+.35,.7);vo(c,s+2.42,1.0)
-vo('sub',19.5,.95);vo('chao',22.55,.9)
+    s0=3+4*k;vo(VB,'b_oh%d'%k,s0+.5,1.0);vo(VB,'b_hup',s0+1.72,.9);vo(VB,'b_ay',s0+2.33,.95);vo(VN,'n_'+c,s0+2.48,.95)
+vo(VN,'n_sub',19.4,.95);vo(VB,'b_chao',22.3,1.0)
+V=VB+VN
+# envolvente de la boca (30 fps)
+mono=VB.mean(1);fr=sr//30;lip=[]
+for f in range(D*30):
+    seg=mono[max(0,f*fr-fr//2):f*fr+fr//2+1];lip.append(float(np.sqrt(np.mean(seg**2))) if len(seg) else 0.0)
+lip=np.array(lip);lip/=max(1e-9,np.percentile(lip[lip>1e-4],90));lip=np.clip(lip,0,1);sm=[];c=0.0
+for x in lip:c=c+(x-c)*(.7 if x>c else .4);sm.append(round(float(c),3))
+open('lip.js','w').write('const LIP='+str(sm)+';')
 # ---- efectos
 def whoosh(d,up=True,pan=0,g=.5):
     x=noise(d);t=tt(d);e=np.sin(np.pi*t/d)**2;f=np.linspace(.03,.35,len(x)) if up else np.linspace(.35,.03,len(x))

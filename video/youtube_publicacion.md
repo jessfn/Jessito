@@ -57,5 +57,5 @@ Consejos: 2–3 sílabas por palabra, que se pueda pronunciar rápido, sin tilde
 ## Licencias de los recursos usados (todas permiten uso comercial)
 - Personaje, animación, música y efectos de sonido: originales, creados para este proyecto (no hay copyright de terceros).
 - Tipografías Baloo 2 y Fredoka: SIL Open Font License 1.1 (licencias en `fonts/`).
-- Voz en español: modelo Piper "es_MX-claude-high", licencia Apache-2.0.
+- Voces: modelo Piper "es_MX-claude-high" (licencia Apache-2.0), procesado en dos timbres: uno agudo para el conejito (con sincronía labial) y otro más cálido para la narradora.
 - Aviso: confirma las licencias en las páginas oficiales antes de monetizar. Una voz sintética es válida, pero grabar tu propia voz le da identidad al canal.

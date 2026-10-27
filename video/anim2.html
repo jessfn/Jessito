@@ -1,4 +1,5 @@
 <!doctype html><html><style>@font-face{font-family:'Baloo 2';font-weight:800;src:url(fonts/baloo2-800.woff2) format('woff2')}@font-face{font-family:'Fredoka';font-weight:700;src:url(fonts/fredoka-700.woff2) format('woff2')}</style><body style="margin:0;background:#000"><div id="s" style="width:1080px;height:1920px"></div>
+<script src="lip.js"></script>
 <script>
 const W=1080,H=1920,gy=1470,HS=130,OUT='#4b3a6b';
 const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
@@ -15,7 +16,8 @@ const SEG0=3,SEGL=4,OUT0=19;
 function basePose(){return {hx:540,fx:540,hy:gy-HS,lean:0,tilt:0,sx:1,sy:1,air:0,perk:0,lookX:0,lookY:0,eye:1,joy:0,winkL:0,brow:0,browTilt:0,
  mouth:'smile',blush:.55,aL:[.3,.3],aR:[.3,.3],legSpread:1,tuck:0,cheer:0}}
 function wave(P,t,side){const r=side<0?P.aL:P.aR;r[0]=2.35;r[1]=Math.sin(t*11)*.55+.3}
-function pose(t){
+function pose(t){const P=pose0(t);P.talk=LIP[Math.min(LIP.length-1,Math.max(0,Math.round(t*30)))]||0;return P}
+function pose0(t){
  const P=basePose(), br=Math.sin(t*2.6);
  P.hy=gy-HS+br*3;
  if(t<SEG0){ /* intro: entra saltando, saluda */
@@ -124,7 +126,8 @@ function eyes(P,sp){let o='';const lx=P.lookX+Math.sin(P.t*1.9)*.07,ly=P.lookY+M
   o+=`<path d="M-24 ${by-2} Q0 ${by-12} 24 ${by-2}" fill="none" stroke="${OUT}" stroke-width="8" stroke-linecap="round" transform="rotate(${(P.browTilt*sd*-24 + (P.brow<0?sd*-8:0)*(-P.brow)).toFixed(1)} 0 ${by})"/>`;
   o+=`</g>`}
  return o}
-function mouth(P){switch(P.mouth){
+function mouth(P){if(P.talk>.07){const h=8+80*P.talk,w=28+24*Math.min(1,P.talk*1.2);return `<path d="M${-w} 50 Q0 54 ${w} 50 Q${w*.9} ${50+h} 0 ${52+h} Q${-w*.9} ${50+h} ${-w} 50Z" fill="#7d1838" stroke="${OUT}" stroke-width="6" stroke-linejoin="round"/>${P.talk>.3?`<ellipse cx="0" cy="${46+h}" rx="${w*.5}" ry="${h*.28}" fill="#ff7a9a"/>`:''}${P.talk>.2?`<path d="M${-w+7} 55 Q0 62 ${w-7} 55 L${w-10} 64 Q0 70 ${-w+10} 64Z" fill="#fff"/>`:''}`}
+ switch(P.mouth){
  case'open':case'grin':{const w=P.mouth=='grin'?46:32,h=P.mouth=='grin'?56:50;return `<path d="M${-w} 50 Q0 58 ${w} 50 Q${w*.9} ${50+h} 0 ${52+h} Q${-w*.9} ${50+h} ${-w} 50Z" fill="#7d1838" stroke="${OUT}" stroke-width="6" stroke-linejoin="round"/><ellipse cx="0" cy="${46+h}" rx="${w*.5}" ry="${h*.28}" fill="#ff7a9a"/><path d="M${-w+6} 54 Q0 62 ${w-6} 54 L${w-9} 64 Q0 70 ${-w+9} 64Z" fill="#fff"/>`}
  case'o':return `<ellipse cx="0" cy="68" rx="15" ry="21" fill="#7d1838" stroke="${OUT}" stroke-width="6"/><ellipse cx="0" cy="76" rx="8" ry="7" fill="#ff7a9a"/>`;
  case'ouch':return `<path d="M-30 64 q10 -14 20 0 t20 0 t20 0" fill="none" stroke="${OUT}" stroke-width="7" stroke-linecap="round"/>`;
