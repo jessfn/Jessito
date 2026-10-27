@@ -15,9 +15,11 @@ for i in range(int(D/b)):
     add(t,np.random.randn(int(.03*sr))*np.exp(-np.arange(int(.03*sr))/300)*.05*(i%2==0))
 for k in range(4):
     s=3+4*k
-    t=np.arange(int(.35*sr))/sr;add(s+1.4,np.sin(2*np.pi*(200+400*t/.35)*t)*np.exp(-t*8)*.4)   # boing
-    t=np.arange(int(.25*sr))/sr;add(s+2.35,np.random.randn(len(t))*np.exp(-t*25)*.6+np.sin(2*np.pi*120*t)*np.exp(-t*20)*.5) # pop
-    for j,f in enumerate([523,659,784,1047]):add(s+2.45+j*.08,tone(f,.5,'bell',.3))
+    t=np.arange(int(.35*sr))/sr;add(s+1.7,np.sin(2*np.pi*(200+400*t/.35)*t)*np.exp(-t*8)*.4)   # boing
+    t=np.arange(int(.25*sr))/sr;add(s+2.3,np.random.randn(len(t))*np.exp(-t*25)*.6+np.sin(2*np.pi*120*t)*np.exp(-t*20)*.5) # pop
+    for j,f in enumerate([523,659,784,1047]):add(s+2.4+j*.08,tone(f,.5,'bell',.3))
+    t=np.arange(int(.18*sr))/sr;add(s+.4,np.sin(2*np.pi*(300+500*t/.18)*t)*np.exp(-t*10)*.3)  # sorpresa
+    t=np.arange(int(.2*sr))/sr;add(s+2.85,np.sin(2*np.pi*90*t)*np.exp(-t*18)*.7)  # aterrizaje
 for j,f in enumerate([523,659,784,1047,1319]):add(19+j*.12,tone(f,.6,'bell',.3))
 a=np.tanh(a*1.5);a*=.8
 a[:int(.05*sr)]*=np.linspace(0,1,int(.05*sr));a[-sr:]*=np.linspace(1,0,sr)

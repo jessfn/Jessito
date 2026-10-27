@@ -1,0 +1,222 @@
+<!doctype html><html><body style="margin:0;background:#000"><div id="s" style="width:1080px;height:1920px"></div>
+<script>
+const W=1080,H=1920,gy=1470,HS=130,OUT='#4b3a6b';
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const lerp=(a,b,u)=>a+(b-a)*u;
+const eo=x=>1-Math.pow(1-clamp(x),3), ei=x=>{x=clamp(x);return x*x*x};
+const sst=(a,b,x)=>{const u=clamp((x-a)/(b-a));return u*u*(3-2*u)};
+const eb=x=>{x=clamp(x);const c=2.7;return 1+(c+1)*Math.pow(x-1,3)+c*Math.pow(x-1,2)};
+const rnd=i=>{const v=Math.sin(i*127.1+311.7)*43758.5453;return v-Math.floor(v)};
+const f1=n=>n.toFixed(1);
+const COL=[{n:'ROJO',c:'#ff3b4e',d:'#b3162a',e:'🍎'},{n:'AZUL',c:'#2f8bff',d:'#1759c7',e:'🐳'},{n:'AMARILLO',c:'#ffd21f',d:'#c98f00',e:'⭐'},{n:'VERDE',c:'#38d66b',d:'#16923f',e:'🐸'}];
+const SEG0=3,SEGL=4,OUT0=19;
+
+/* ================= POSE (animación de alto nivel) ================= */
+function basePose(){return {hx:540,fx:540,hy:gy-HS,lean:0,tilt:0,sx:1,sy:1,air:0,perk:0,lookX:0,lookY:0,eye:1,joy:0,winkL:0,brow:0,browTilt:0,
+ mouth:'smile',blush:.55,aL:[.3,.3],aR:[.3,.3],legSpread:1,tuck:0,cheer:0}}
+function wave(P,t,side){const r=side<0?P.aL:P.aR;r[0]=2.35;r[1]=Math.sin(t*11)*.55+.3}
+function pose(t){
+ const P=basePose(), br=Math.sin(t*2.6);
+ P.hy=gy-HS+br*3;
+ if(t<SEG0){ /* intro: entra saltando, saluda */
+  if(t<1.8){const u=t/1.8;P.hx=lerp(-170,540,eo(u));P.fx=P.hx;const hu=(t%.6)/.6,h=95*4*hu*(1-hu);
+   P.hy=gy-HS-h*(1)+(hu<.12?18*(1-hu/.12):0);P.air=sst(.07,.2,hu)*(1-sst(.82,.96,hu));P.sy=1+.12*Math.sin(hu*Math.PI);P.sx=1-.06*Math.sin(hu*Math.PI);
+   P.joy=1;P.mouth='open';P.aL=[1.1,.4];P.aR=[1.1,.4];P.lean=.12;P.tilt=-.05;P.perk=.15;}
+  else{const s=t-1.8;P.fx=P.hx=540;const g=Math.exp(-7*s)*Math.cos(16*s);P.hy=gy-HS+(1-g)*0-40*g;P.sy=1-.1*g;P.sx=1+.08*g;
+   wave(P,t,1);P.mouth='grin';P.joy=s<.5?1:0;P.lookY=-.2;P.winkL=sst(.9,.95,s)*(1-sst(1.0,1.05,s));P.tilt=.1;P.blush=.9;P.brow=-.3;P.perk=.1;P.aL=[.3,.35];}
+  return P;}
+ if(t>=OUT0){return outroPose(P,t-OUT0,t)}
+ const k=Math.floor((t-SEG0)/SEGL),s=t-SEG0-k*SEGL,C=k;
+ const HC=gy-1060, hipFor=h=>gy-h;
+ let h=HS+br*3, air=0;
+ if(s<1.25){ /* sorpresa y reacción */
+  const rs=sst(.25,.55,s);P.perk=.55*rs;P.eye=1.15;P.lookX=rs*(k%2?-.6:.6)*(1-sst(.9,1.4,s));P.lookY=-.8*rs;P.brow=-.9*rs;P.tilt=rs*.1;P.mouth=s>.3&&s<.9?'o':'smile';
+  h+=eo(clamp((s-.25)/.15))*(1-sst(.4,.6,s))*14;P.sy=1+.07*Math.sin(clamp((s-.25)/.3)*Math.PI);P.sx=1-.04*Math.sin(clamp((s-.25)/.3)*Math.PI);
+  P.aR=[lerp(.3,1.55,sst(.5,.85,s)),.12];P.lookY=-.8;P.lookX=(k%2?-.5:.5);
+  if(s>.95){P.mouth='grin';P.brow=.7;P.aR=[lerp(1.55,.9,sst(.95,1.2,s)),-.5];P.aL=[.9,-.5]}
+ }
+ if(s>=1.25&&s<1.7){const u=sst(1.25,1.62,s);h=lerp(HS,62,u);P.lean=-.12*u;P.sy=1-.14*u;P.sx=1+.14*u;P.aL=[-.1-.9*u,.5];P.aR=[-.1-.9*u,.5];P.perk=-.2*u;
+  P.brow=.9*u;P.browTilt=.5*u;P.mouth='smile';P.eye=1-.25*u;P.lookY=-.7;P.tilt=-.08*u;P.tuck=0;}
+ if(s>=1.7&&s<1.8){const u=eo((s-1.7)/.1);h=lerp(62,168,u);P.sy=1+.2*u;P.sx=1-.1*u;P.aL=[lerp(-1,2.6,u),0];P.aR=[lerp(-1,2.6,u),0];P.mouth='grin';P.lean=lerp(-.12,0,u);P.joy=0;P.brow=.5;}
+ if(s>=1.8&&s<2.3){const u=(s-1.8)/.5;h=lerp(168,410,1-Math.pow(1-u,2));air=1;P.sy=1.12;P.sx=.94;P.aL=[2.7,.15];P.aR=[2.7,.15];P.mouth='grin';P.lookY=-1;P.eye=1.1;P.brow=-.4;P.tuck=sst(.3,1,u)*.6;}
+ if(s>=2.3&&s<2.85){const u=(s-2.3)/.55;h=lerp(410,168,u*u);air=1;
+  const fl=1-sst(.0,.18,s-2.3); /* susto: ojos cerrados, cabeza hacia atrás, boca "ouch" */
+  P.eye=1-.95*fl;P.mouth=fl>.3?'ouch':'grin';P.lean=-.18*fl;P.tilt=-.12*fl;P.sy=1+.1*(1-fl);P.perk=-.6*fl;P.brow=.9*fl;P.browTilt=-.8*fl;
+  const jy=sst(.15,.3,s-2.3);P.joy=jy;P.eye=lerp(P.eye,1,jy*0);P.aL=[2.5-1*u+Math.sin(t*20)*.1,.4];P.aR=[2.5-1*u-Math.sin(t*20)*.1,.4];
+  P.tuck=lerp(.6,.0,u);P.mouth=jy>.5?'grin':P.mouth;P.lookY=-.2;}
+ if(s>=2.85){const w=s-2.85;const g=Math.exp(-7*w)*Math.cos(17*w);h=HS+(1-g)*0-72*g+br*3*(1-g);P.sy=1-.17*g;P.sx=1+.17*g;P.air=0;
+  P.aL=[lerp(1.6,.4,sst(.0,.4,w)),.5];P.aR=P.aL.slice();P.joy=1-sst(.7,1.05,s-2.85)*(s>3.6?1:0);P.mouth='grin';P.lookY=-.9;P.brow=-.5;P.perk=.4*g+.2;P.blush=.95;
+  /* celebración por color */
+  const cs=s-3.0;
+  if(cs>0&&cs<1.0){
+   if(C==0){const ph=cs*9;P.aL=[2.5+Math.sin(ph)*.3,.2-Math.max(0,Math.sin(ph))*.4];P.aR=[2.5-Math.sin(ph)*.3,.2+Math.max(0,Math.sin(ph))*.4];P.lean=Math.sin(ph)*.08;h+=Math.max(0,Math.sin(ph*1))*22;P.tilt=Math.sin(ph)*.1}
+   if(C==1){const ph=cs*11;P.hx=540+Math.sin(ph)*38;P.lean=Math.sin(ph)*.14;P.tilt=-Math.sin(ph)*.12;h+=Math.abs(Math.sin(ph))*14;P.aL=[1.5+Math.sin(ph)*.6,.6];P.aR=[1.5-Math.sin(ph)*.6,.6];P.legSpread=1.15}
+   if(C==2){wave(P,t,1);P.tilt=.14;P.joy=1;P.winkL=sst(.5,.55,cs)*(1-sst(.7,.75,cs));P.aL=[.5,.4]}
+   if(C==3){const hu=(cs*2)%1,hh=70*4*hu*(1-hu);if(cs<1.0){h+=hh;P.air=sst(.08,.2,hu)*(1-sst(.82,.95,hu));P.sy=1+.1*Math.sin(hu*Math.PI);P.legSpread=1.4;P.aL=[1.2,.2];P.aR=[1.2,.2];P.mouth='grin'}}
+  }
+ }
+ P.hy=gy-h;P.air=Math.max(P.air,air?(s<2.82?1:0):0);if(s>=1.8&&s<2.82)P.air=1;if(s>=1.8&&s<1.9)P.air=sst(1.8,1.9,s);if(s>=2.74&&s<2.84)P.air=1-sst(2.74,2.84,s);
+ return P}
+function outroPose(P,s,t){
+ const hu=(s*1.6)%1;
+ if(s<1.6){P.hy=gy-HS-95*4*hu*(1-hu);P.air=sst(.07,.2,hu)*(1-sst(.82,.96,hu));P.sy=1+.1*Math.sin(hu*Math.PI);P.aL=[2.7,Math.sin(t*14)*.3];P.aR=[2.7,-Math.sin(t*14)*.3];P.mouth='grin';P.joy=1;P.lookY=-.4;P.perk=.3;}
+ else{const e=s-1.6;P.hx=540+Math.sin(e*3)*20;P.fx=540;P.hy=gy-HS+Math.sin(e*6)*4;
+  P.aR=[lerp(1.1,.7,sst(.3,.6,e)),-.1];P.aR=[lerp(.3,.55,sst(.2,.5,e)),0.2+Math.sin(e*16)*.1];P.aL=[.3,.3];P.lookY=.9;P.lookX=.5;P.mouth='grin';P.joy=0;P.brow=-.5;P.tilt=-.08;P.lean=.1;P.blush=.9;
+  if(e>1.2){wave(P,t,-1);P.lookY=-.3;P.lookX=0;P.joy=1}}
+ return P}
+
+/* ================= ESQUELETO (cinemática directa/inversa) ================= */
+function ik(a,tg,L1,L2,dir){let dx=tg.x-a.x,dy=tg.y-a.y,d=Math.hypot(dx,dy);const dm=Math.min(Math.max(d,25),L1+L2-.5),ang=Math.atan2(dy,dx);
+ const A=Math.acos(clamp((L1*L1+dm*dm-L2*L2)/(2*L1*dm),-1,1)),ka=ang+dir*A;
+ const knee={x:a.x+Math.cos(ka)*L1,y:a.y+Math.sin(ka)*L1};return {knee,foot:{x:a.x+Math.cos(ang)*dm,y:a.y+Math.sin(ang)*dm}}}
+function rig(P){
+ const sl=128*P.sy,hip={x:P.hx,y:P.hy},ca=Math.cos(P.lean),sa=Math.sin(P.lean);
+ const chest={x:hip.x+sa*sl,y:hip.y-ca*sl};
+ const head={x:chest.x+Math.sin(P.lean*.5+P.tilt*.3)*108*P.sy,y:chest.y-Math.cos(P.lean*.5+P.tilt*.3)*108*P.sy};
+ const legs=[-1,1].map(sd=>{const a={x:hip.x+sd*52*P.sx,y:hip.y+14};
+  const grounded={x:P.fx+sd*58*P.legSpread,y:gy-28};
+  const dang={x:hip.x+sd*(48+30*P.tuck),y:hip.y+110-60*P.tuck},ta=lerp(0,1,P.air);
+  const tg={x:lerp(grounded.x,dang.x,ta),y:lerp(grounded.y,dang.y,ta)};
+  const r=ik(a,tg,70,72,sd);return {a,knee:r.knee,foot:r.foot}});
+ const arms=[-1,1].map((sd,i)=>{const sh={x:chest.x+sd*80*P.sx*ca,y:chest.y+22+sd*sa*80},ar=sd<0?P.aL:P.aR;
+  const a1=ar[0],a2=a1+ar[1];const el={x:sh.x+sd*Math.sin(a1)*74,y:sh.y+Math.cos(a1)*74},hd={x:el.x+sd*Math.sin(a2)*68,y:el.y+Math.cos(a2)*68};return {sh,el,hd}});
+ return {hip,chest,head,legs,arms}}
+
+/* ================= FÍSICA SECUNDARIA (resortes) ================= */
+const SIM=[];
+(function(){
+ const E=[0,1].map(()=>({a:[0,0,0],v:[0,0,0]}));let tail={x:0,y:0,vx:0,vy:0},bow=0,bv=0,bel=0,belv=0,wh=0,whv=0;
+ let pH=null,pV=null,af={x:0,y:0};const sub=4,dt=1/30/sub,K=[120,90,70],Cd=[7,6,5],L=[100,170,250];
+ for(let f=0;f<=720;f++){
+  for(let q=0;q<sub;q++){const t=(f+q/sub)/30,P=pose(t),J=rig(P),Hh=J.head;
+   const v=pH?{x:(Hh.x-pH.x)/dt,y:(Hh.y-pH.y)/dt}:{x:0,y:0},a=pV?{x:(v.x-pV.x)/dt,y:(v.y-pV.y)/dt}:{x:0,y:0};pH=Hh;pV=v;
+   a.x=clamp(a.x,-14000,14000);a.y=clamp(a.y,-14000,14000);af.x+=(a.x-af.x)*.25;af.y+=(a.y-af.y)*.25;
+   const vy=clamp(v.y,-1500,1500);
+   E.forEach((e,si)=>{const sd=si?1:-1;for(let j=0;j<3;j++){
+    const drv=-(af.x/L[j])*2.2+sd*(-(af.y/L[j])*1.6-vy*.0012*(j+1))*1.0;
+    e.v[j]+=(-K[j]*e.a[j]-Cd[j]*e.v[j]+drv)*dt;e.a[j]=clamp(e.a[j]+e.v[j]*dt,-1.3,1.3)}});
+   tail.vx+=(-90*tail.x-6*tail.vx-af.x*.02)*dt;tail.vy+=(-90*tail.y-6*tail.vy-af.y*.02)*dt;tail.x=clamp(tail.x+tail.vx*dt,-40,40);tail.y=clamp(tail.y+tail.vy*dt,-40,40);
+   bv+=(-140*bow-5*bv+af.x*.0006)*dt;bow=clamp(bow+bv*dt,-.5,.5);
+   belv+=(-160*bel-5*belv-af.y*.0006)*dt;bel=clamp(bel+belv*dt,-.25,.25);
+   whv+=(-120*wh-6*whv-af.y*.0004*1)*dt;wh=clamp(wh+whv*dt,-.5,.5);}
+  SIM.push({ear:E.map(e=>e.a.slice()),tail:{x:tail.x,y:tail.y},bow,bel,wh})}})();
+
+/* ================= DIBUJO ================= */
+const blob=pts=>{const n=pts.length,m=(a,b)=>({x:(a.x+b.x)/2,y:(a.y+b.y)/2});let m0=m(pts[n-1],pts[0]),d=`M${f1(m0.x)} ${f1(m0.y)}`;
+ for(let i=0;i<n;i++){const p=pts[i],q=m(p,pts[(i+1)%n]);d+=`Q${f1(p.x)} ${f1(p.y)} ${f1(q.x)} ${f1(q.y)}`}return d+'Z'};
+function taper(c,w){const n=c.length,l=[],r=[];for(let i=0;i<n;i++){const p=c[Math.max(0,i-1)],q=c[Math.min(n-1,i+1)];let dx=q.x-p.x,dy=q.y-p.y;const d=Math.hypot(dx,dy)||1;dx/=d;dy/=d;
+  l.push({x:c[i].x-dy*w[i],y:c[i].y+dx*w[i]});r.push({x:c[i].x+dy*w[i],y:c[i].y-dx*w[i]})}
+ const e=c[n-1],pp=c[n-2],dx=e.x-pp.x,dy=e.y-pp.y,d=Math.hypot(dx,dy)||1;return blob([...l,{x:e.x+dx/d*14,y:e.y+dy/d*14},...r.reverse()])}
+const limb=(pts,w,fill='#fbf8ff')=>{const d='M'+pts.map(p=>f1(p.x)+' '+f1(p.y)).join('L');return `<path d="${d}" fill="none" stroke="${OUT}" stroke-width="${w+13}" stroke-linecap="round" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="${fill}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`};
+
+function eyes(P,sp){let o='';
+ for(const sd of[-1,1]){const wink=sd<0&&P.winkL>.5,jo=P.joy>.5||wink,ey=P.eye;
+  o+=`<g transform="translate(${sd*58} -2)">`;
+  if(jo){o+=`<path d="M-30 12 Q0 -34 30 12" fill="none" stroke="#2b1a3f" stroke-width="11" stroke-linecap="round"/>`}
+  else{const bl=(P.t%3.4)<.11?.08:1;const sy=Math.max(.06,ey*bl);
+   o+=`<g transform="scale(1 ${sy.toFixed(2)})"><ellipse rx="34" ry="43" fill="#2b1a3f"/><ellipse rx="26" ry="35" fill="#45296b" opacity=".6" cx="${P.lookX*5}" cy="${P.lookY*5+6}"/>
+   <g transform="translate(${P.lookX*9} ${P.lookY*9})"><circle cx="-9" cy="-14" r="13" fill="#fff"/><circle cx="10" cy="14" r="6" fill="#fff"/></g></g>`}
+  const bt=P.browTilt*sd*-1, by=-58+P.brow*-12-(ey>1?6:0);
+  o+=`<path d="M-26 ${by+40} Q0 ${by+30+P.brow*-3} 26 ${by+40}" fill="none" stroke="${OUT}" stroke-width="7" stroke-linecap="round" transform="rotate(${(bt*20+P.brow*sd*-6).toFixed(1)} 0 ${by+40})" style="display:none"/>`;
+  o+=`<path d="M-24 ${by-2} Q0 ${by-12} 24 ${by-2}" fill="none" stroke="${OUT}" stroke-width="8" stroke-linecap="round" transform="rotate(${(P.browTilt*sd*-24 + (P.brow<0?sd*-8:0)*(-P.brow)).toFixed(1)} 0 ${by})"/>`;
+  o+=`</g>`}
+ return o}
+function mouth(P){switch(P.mouth){
+ case'open':case'grin':{const w=P.mouth=='grin'?46:32,h=P.mouth=='grin'?56:50;return `<path d="M${-w} 50 Q0 58 ${w} 50 Q${w*.9} ${50+h} 0 ${52+h} Q${-w*.9} ${50+h} ${-w} 50Z" fill="#7d1838" stroke="${OUT}" stroke-width="6" stroke-linejoin="round"/><ellipse cx="0" cy="${46+h}" rx="${w*.5}" ry="${h*.28}" fill="#ff7a9a"/><path d="M${-w+6} 54 Q0 62 ${w-6} 54 L${w-9} 64 Q0 70 ${-w+9} 64Z" fill="#fff"/>`}
+ case'o':return `<ellipse cx="0" cy="68" rx="15" ry="21" fill="#7d1838" stroke="${OUT}" stroke-width="6"/><ellipse cx="0" cy="76" rx="8" ry="7" fill="#ff7a9a"/>`;
+ case'ouch':return `<path d="M-30 64 q10 -14 20 0 t20 0 t20 0" fill="none" stroke="${OUT}" stroke-width="7" stroke-linecap="round"/>`;
+ default:return `<path d="M-30 50 Q-15 70 0 52 Q15 70 30 50" fill="none" stroke="${OUT}" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>`}}
+
+function bunny(P,f){
+ const J=rig(P),S=SIM[Math.min(f,SIM.length-1)],ca=Math.cos(P.lean),sa=Math.sin(P.lean);let o='';
+ const {hip,chest,head,legs,arms}=J;
+ // sombra
+ const hgt=gy-30-Math.min(legs[0].foot.y,legs[1].foot.y),sh=clamp(1-(gy-hip.y-HS)/700,.35,1);
+ o+=`<ellipse cx="${f1(P.air?hip.x:P.fx)}" cy="${gy+22}" rx="${f1(165*sh)}" ry="${f1(28*sh)}" fill="#0b4d1f" opacity="${(.3*sh).toFixed(2)}"/>`;
+ // cola (resorte)
+ o+=`<g transform="translate(${f1(hip.x+88*P.sx+S.tail.x)} ${f1(hip.y+28+S.tail.y)})"><circle r="46" fill="#fbf8ff" stroke="${OUT}" stroke-width="6"/><circle r="26" cx="-8" cy="-8" fill="#fff" opacity=".9"/><path d="M-30 14 q8 -8 16 0 M2 22 q8 -8 16 0" stroke="#e1d6ef" stroke-width="5" fill="none" stroke-linecap="round"/></g>`;
+ // piernas (IK)
+ legs.forEach((lg,i)=>{const sd=i?1:-1;o+=limb([lg.a,lg.knee,lg.foot],66,'url(#fur)');
+  const ang=Math.atan2(lg.foot.y-lg.knee.y,lg.foot.x-lg.knee.x)*180/Math.PI-90;
+  o+=`<g transform="translate(${f1(lg.foot.x+sd*10)} ${f1(lg.foot.y+(P.air?10:8))}) rotate(${f1(P.air?ang*.4+sd*10:sd*4)})"><ellipse rx="${P.air?50:62}" ry="${P.air?36:32}" fill="url(#fur)" stroke="${OUT}" stroke-width="6"/><ellipse cy="6" rx="${P.air?22:28}" ry="${P.air?18:14}" fill="#ffb0cf"/><circle cx="-20" cy="${P.air?-4:-2}" r="7" fill="#ff8fba"/><circle cx="0" cy="-8" r="7" fill="#ff8fba"/><circle cx="20" cy="${P.air?-4:-2}" r="7" fill="#ff8fba"/></g>`});
+ // orejas (3 segmentos + resorte)
+ const ears=[-1,1].map((sd,i)=>{const base={x:head.x+sd*52*Math.cos(P.tilt)-(-90)*Math.sin(P.tilt)*0,y:head.y-92*Math.cos(P.tilt)+sd*52*Math.sin(P.tilt)};
+  let th=P.tilt+sd*(.2+P.perk*.5)-(P.perk>0?sd*P.perk*.35:-sd*(-P.perk)*.9*-1)*0;const pts=[base];let ang=P.tilt+sd*(.2-P.perk*.1)+(P.perk<0?sd*-P.perk*.9:0);
+  for(let j=0;j<3;j++){ang+=S.ear[i][j]*(j==0?1:.9)+(j?sd*.05:0);const len=[78,84,84][j],p=pts[j];pts.push({x:p.x+Math.sin(ang)*len,y:p.y-Math.cos(ang)*len})}return pts});
+ ears.forEach(pts=>{o+=`<path d="${taper(pts,[50,52,46,28])}" fill="url(#fur)" stroke="${OUT}" stroke-width="6" stroke-linejoin="round"/>`;
+  const inn=pts.map((p,j)=>({x:lerp(p.x,pts[Math.min(3,j+1)].x,.15),y:lerp(p.y,pts[Math.min(3,j+1)].y,.15)})).slice(1);o+=`<path d="${taper(inn,[27,26,18])}" fill="url(#pinkE)"/>`});
+ // torso
+ const mid={x:(hip.x+chest.x)/2,y:(hip.y+chest.y)/2},rx=116*P.sx*(1+S.bel),ry=64*P.sy+ (Math.hypot(chest.x-hip.x,chest.y-hip.y))/2+26;
+ o+=`<g transform="translate(${f1(mid.x)} ${f1(mid.y+8)}) rotate(${f1(P.lean*180/Math.PI)})"><ellipse rx="${f1(rx)}" ry="${f1(ry)}" fill="url(#fur)" stroke="${OUT}" stroke-width="6.5"/><ellipse cy="${f1(ry*.12)}" rx="${f1(rx*.64)}" ry="${f1(ry*.7)}" fill="#ffe7f1"/><path d="M-26 ${f1(ry*.45)} q8 10 16 0 M8 ${f1(ry*.52)} q8 10 16 0" stroke="#f3c3d8" stroke-width="5" fill="none" stroke-linecap="round"/></g>`;
+ // brazos
+ arms.forEach((ar,i)=>{const sd=i?1:-1;o+=limb([ar.sh,ar.el,ar.hd],42,'url(#fur)');const a2=Math.atan2(ar.hd.y-ar.el.y,ar.hd.x-ar.el.x)*180/Math.PI-90;
+  o+=`<g transform="translate(${f1(ar.hd.x)} ${f1(ar.hd.y)}) rotate(${f1(a2)})"><ellipse ry="34" rx="32" cy="8" fill="url(#fur)" stroke="${OUT}" stroke-width="6"/><circle cx="-12" cy="22" r="6" fill="#ff8fba"/><circle cx="0" cy="26" r="6" fill="#ff8fba"/><circle cx="12" cy="22" r="6" fill="#ff8fba"/></g>`});
+ // moño
+ o+=`<g transform="translate(${f1(chest.x)} ${f1(chest.y+8)}) rotate(${f1(S.bow*57)})"><path d="M0 0 L-58 -30 Q-68 0 -58 30Z" fill="#ff4f8b" stroke="${OUT}" stroke-width="5" stroke-linejoin="round"/><path d="M0 0 L58 -30 Q68 0 58 30Z" fill="#ff4f8b" stroke="${OUT}" stroke-width="5" stroke-linejoin="round"/><circle r="17" fill="#d62a6c" stroke="${OUT}" stroke-width="5"/><path d="M-40 -8 l12 4 M-42 10 l14 2 M40 -8 l-12 4 M42 10 l-14 2" stroke="#ff9ec4" stroke-width="4" stroke-linecap="round"/></g>`;
+ // cabeza
+ o+=`<g transform="translate(${f1(head.x)} ${f1(head.y)}) rotate(${f1((P.tilt+P.lean*.4)*180/Math.PI)}) scale(${f1(1/Math.sqrt(P.sy)*100)/100*1} ${f1(Math.sqrt(P.sy)*100)/100})">
+ <ellipse rx="152" ry="120" fill="url(#fur)" stroke="${OUT}" stroke-width="6.5"/>
+ <path d="M-148 10 l-26 8 l22 10 l-20 14 l32 2 M148 10 l26 8 l-22 10 l20 14 l-32 2" fill="url(#fur)" stroke="${OUT}" stroke-width="5" stroke-linejoin="round"/>
+ <path d="M-100 -78 Q-60 -108 -20 -104 M100 -78 Q60 -108 20 -104" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" opacity=".8"/>
+ <ellipse cx="-96" cy="38" rx="30" ry="19" fill="#ff8fba" opacity="${P.blush}"/><ellipse cx="96" cy="38" rx="30" ry="19" fill="#ff8fba" opacity="${P.blush}"/>
+ <ellipse cy="52" rx="62" ry="42" fill="#fff" opacity=".85"/>
+ ${eyes(P,S)}
+ <path d="M-12 26 Q0 18 12 26 Q10 40 0 42 Q-10 40 -12 26Z" fill="#ff6f9f" stroke="${OUT}" stroke-width="4"/><ellipse cx="-3" cy="26" rx="4" ry="2.5" fill="#fff" opacity=".8"/>
+ <path d="M0 42 L0 50" stroke="${OUT}" stroke-width="5" stroke-linecap="round"/>
+ ${mouth(P)}
+ <g stroke="${OUT}" stroke-width="3.5" stroke-linecap="round" opacity=".7">${[-1,1].map(sd=>[-14,0,14].map(a=>`<path d="M${sd*88} 52 L${sd*(150+Math.cos(a/20)*20)} ${(52+a*1.1+S.wh*sd*-60).toFixed(0)}"/>`).join('')).join('')}</g>
+ </g>`;
+ return {svg:o,J}}
+
+/* ================= ESCENA ================= */
+function bg(t){
+ let o=`<defs><linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4fc3ff"/><stop offset=".6" stop-color="#bfeaff"/><stop offset="1" stop-color="#fff6d6"/></linearGradient><radialGradient id="sun"><stop offset="0" stop-color="#fffbd0"/><stop offset="1" stop-color="#ffd54a"/></radialGradient><linearGradient id="gr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6fe07a"/><stop offset="1" stop-color="#2fae52"/></linearGradient>
+ <radialGradient id="fur" cx=".38" cy=".3" r=".85"><stop offset="0" stop-color="#ffffff"/><stop offset=".65" stop-color="#f6effc"/><stop offset="1" stop-color="#d9cbee"/></radialGradient><linearGradient id="pinkE" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffc2da"/><stop offset="1" stop-color="#ff8fba"/></linearGradient></defs>
+ <rect x="-60" y="-60" width="${W+120}" height="${H+120}" fill="url(#sk)"/><g transform="translate(860 330)">`;
+ for(let i=0;i<14;i++)o+=`<polygon points="0,0 -40,-700 40,-700" fill="#fff7b0" opacity=".2" transform="rotate(${i*360/14+t*6})"/>`;
+ o+=`<circle r="${135+Math.sin(t*3)*6}" fill="url(#sun)"/><circle r="105" fill="#fff9c9" opacity=".7"/><circle cx="-35" cy="-8" r="9" fill="#e8861c"/><circle cx="35" cy="-8" r="9" fill="#e8861c"/><path d="M-30 30 Q0 62 30 30" stroke="#e8861c" stroke-width="9" fill="none" stroke-linecap="round"/></g>`;
+ for(let i=0;i<5;i++){const x=((i*330+t*(18+i*5))%1600)-250,y=200+i*190+Math.sin(t+i)*14,s=.8+rnd(i)*.7;o+=`<g transform="translate(${x} ${y}) scale(${s})" fill="#fff" opacity=".95"><ellipse rx="130" ry="48"/><circle cx="-50" cy="-30" r="55"/><circle cx="25" cy="-48" r="68"/><circle cx="85" cy="-14" r="42"/><ellipse cx="-30" cy="22" rx="110" ry="18" fill="#e4f4ff"/></g>`}
+ o+=`<path d="M-60 1180 Q250 980 520 1130 T1140 1060 V1980 H-60Z" fill="#8be58f"/><path d="M-60 1260 Q300 1100 640 1230 T1140 1180 V1980 H-60Z" fill="#52c866"/><rect x="-60" y="1360" width="${W+120}" height="640" fill="url(#gr)"/>`;
+ for(let i=0;i<16;i++){const x=40+i*68+rnd(i)*20,y=1450+rnd(i+9)*400,sw=Math.sin(t*2.2+i)*7,s=.7+y/1920*.7,fc=['#ff6fb5','#fff','#ffb3e1','#ff9a3c'][i%4];
+  o+=`<g transform="translate(${x} ${y}) scale(${s})"><path d="M0 0 Q${sw} -40 ${sw*1.6} -75" stroke="#1f8a3d" stroke-width="7" fill="none"/><g transform="translate(${sw*1.6} -80)">`;for(let k=0;k<5;k++)o+=`<ellipse cy="-17" rx="12" ry="19" fill="${fc}" transform="rotate(${k*72})"/>`;o+=`<circle r="11" fill="#ffd21f"/></g></g>`}
+ for(let i=0;i<3;i++){const x=540+Math.sin(t*.7+i*2)*420,y=900+i*140+Math.cos(t*1.1+i)*70,fl=Math.abs(Math.sin(t*14+i));o+=`<g transform="translate(${x} ${y})"><ellipse rx="${34*fl+4}" ry="26" cx="-${20*fl+4}" fill="#ff7ad9"/><ellipse rx="${34*fl+4}" ry="26" cx="${20*fl+4}" fill="#ff9be6"/><rect x="-3" y="-20" width="6" height="40" rx="3" fill="#4a2a5a"/></g>`}
+ return o}
+function balloon(x,y,c,d,rot,sx,sy){return `<g transform="translate(${f1(x)} ${f1(y)}) rotate(${f1(rot)}) scale(${sx} ${sy})"><path d="M0 150 Q-30 260 10 340 T0 470" stroke="#fff" stroke-width="5" fill="none" opacity=".9"/><path d="M0 148 l-20 30 h40z" fill="${d}"/><ellipse rx="118" ry="150" fill="${c}" stroke="${d}" stroke-width="6"/><ellipse cx="-45" cy="-60" rx="22" ry="45" fill="#fff" opacity=".55" transform="rotate(20 -45 -60)"/></g>`}
+function fx(ts,x,y,c,d){let o='';if(ts<0||ts>2.4)return o;const cols=[c,d,'#fff','#ffd21f','#ff6fb5','#4fc3ff'];
+ for(let i=0;i<54;i++){const a=rnd(i)*6.283,v=300+rnd(i+50)*700,px=x+Math.cos(a)*v*ts,py=y+Math.sin(a)*v*ts+900*ts*ts*.6;o+=`<rect x="-9" y="-5" width="18" height="10" rx="2" fill="${cols[i%6]}" opacity="${clamp(1-ts/2.4)}" transform="translate(${f1(px)} ${f1(py)}) rotate(${f1(ts*(300+i*20))})"/>`}
+ for(let i=0;i<9;i++){const a=i*.7+rnd(i)*.4,v=520+rnd(i+7)*380,px=x+Math.cos(a)*v*ts,py=y+Math.sin(a)*v*ts+700*ts*ts;o+=`<path d="M-30 0 Q0 -22 30 0 Q0 -8 -30 0Z" fill="${c}" stroke="${d}" stroke-width="4" opacity="${clamp(1-ts/1.3)}" transform="translate(${f1(px)} ${f1(py)}) rotate(${f1(a*57+ts*500)})"/>`}
+ const r=eo(ts/.5)*520;o+=`<circle cx="${x}" cy="${y}" r="${f1(r)}" fill="none" stroke="${c}" stroke-width="${f1(40*(1-clamp(ts/.5)))}" opacity="${1-clamp(ts/.5)}"/>`;
+ if(ts<.45){const sc=eb(ts/.2)*(1-clamp((ts-.3)/.15));let sp='';for(let i=0;i<16;i++){const a=i*Math.PI/8,r1=i%2?95:160;sp+=(i?'L':'M')+f1(Math.cos(a)*r1)+' '+f1(Math.sin(a)*r1)}
+  o+=`<g transform="translate(${x} ${y}) rotate(-8) scale(${f1(sc)})"><path d="${sp}Z" fill="#fff35c" stroke="#ff3b4e" stroke-width="10" stroke-linejoin="round"/><text text-anchor="middle" y="22" font-size="64" font-weight="900" font-family="Comic Sans MS,Arial Rounded MT Bold,Verdana,sans-serif" fill="#ff3b4e">¡POP!</text></g>`}
+ return o}
+function dust(ts,x){let o='';if(ts<0||ts>.6)return o;for(let i=0;i<7;i++){const sd=i%2?1:-1,d=(1+i>>1)*40*eo(ts/.6),r=(20+i*4)*(1+ts*1.5);o+=`<circle cx="${f1(x+sd*(60+d*1.4))}" cy="${f1(gy+10-ts*60-(i>>1)*6)}" r="${f1(r)}" fill="#fff" opacity="${(.7*(1-ts/.6)).toFixed(2)}"/>`}return o}
+function txt(str,x,y,size,sc,fill,stroke,rot=0){const ff='Fredoka One,Comic Sans MS,Arial Rounded MT Bold,Verdana,sans-serif';return `<g transform="translate(${x} ${y}) rotate(${rot}) scale(${f1(Math.max(sc,0))})"><text text-anchor="middle" font-family="${ff}" font-weight="900" font-size="${size}" fill="${stroke}" stroke="${stroke}" stroke-width="30" stroke-linejoin="round" y="8">${str}</text><text text-anchor="middle" font-family="${ff}" font-weight="900" font-size="${size}" fill="${fill}" y="0">${str}</text></g>`}
+
+function frame(f){
+ const t=f/30,P=pose(t);P.t=t;const B=bunny(P,f);let world='',ui='',zoom=1.06,shake=0,pop=-9,cy=0;
+ const k=Math.floor((t-SEG0)/SEGL),s=t-SEG0-k*SEGL,inSeg=t>=SEG0&&t<OUT0;
+ world+=bg(t);
+ if(inSeg){const c=COL[k];
+  const bxp=540+(1-eo(s/1.5))*(k%2?-700:700)+Math.sin(t*2)*10,byp=360+Math.sin(t*2.5)*18-(1-eo(s/1.5))*160,pr=sst(2.2,2.3,s);
+  if(s<2.3)world+=balloon(bxp,byp,c.c,c.d,Math.sin(t*2.5)*5,1+.07*pr,1-.09*pr);
+  if(s>=1.7&&s<1.8||s>=2.85&&s<3.45)world+=dust(s<2?s-1.7:s-2.85,540);
+  pop=s-2.3;
+  if(s>=1.8&&s<2.3||(s>=2.4&&s<2.85)){let sl='';for(let i=0;i<9;i++){const x=70+i*115+rnd(i)*40,y=((t*2400+i*377)%1800);sl+=`<rect x="${f1(x)}" y="${f1(y)}" width="7" height="${f1(110+rnd(i+3)*80)}" rx="3.5" fill="#fff" opacity=".45"/>`}world+=sl}
+  if(pop>=0){world+=fx(pop,540,420,c.c,c.d);if(pop<.14)ui+=`<rect width="${W}" height="${H}" fill="#fff" opacity="${(.6*(1-pop/.14)).toFixed(2)}"/>`;
+   ui+=txt(c.n,540,330,c.n.length>6?200:260,eb(pop/.45),c.c,'#fff',Math.sin(pop*6)*3);
+   ui+=`<text x="540" y="${f1(560+Math.sin(t*6)*12)}" font-size="${f1(190*Math.max(eb((pop-.1)/.5),0))}" text-anchor="middle" transform="rotate(${f1(Math.sin(t*5)*6)} 540 640)">${c.e}</text>`;
+   if(k==2)for(let i=0;i<6;i++){const a=t*2+i*1.05,rr=260+Math.sin(t*5+i)*30;ui+=`<text x="${f1(540+Math.cos(a)*rr)}" y="${f1(1000+Math.sin(a)*rr*.5)}" font-size="${f1(40+20*Math.sin(t*8+i))}" text-anchor="middle">✨</text>`}
+  }
+  shake=pop>=0&&pop<.5?14*Math.exp(-pop*9)*Math.sin(pop*90):0;
+  const punch=pop>=0?.07*Math.exp(-pop*8):0;zoom+=punch;
+  const landing=s>=2.85?.03*Math.exp(-(s-2.85)*8):0;zoom+=landing;
+ }
+ if(t<SEG0){const p=t/SEG0;ui+=txt('JESSITO',540,360+Math.sin(t*3)*8,230,eb((p-.1)/.35),'#ff5fa8','#fff',-4+Math.sin(t*2)*2)+txt('aprende los',540,520,100,eb((p-.25)/.35),'#2f8bff','#fff')+txt('COLORES',540,670,190,eb((p-.4)/.35),'#ffb800','#fff',3)}
+ if(t>=OUT0){const e=t-OUT0;for(let i=0;i<8;i++){const hx=140+i*115+Math.sin(t*3+i)*20,hy=1000-((t*140+i*210)%900);ui+=`<text x="${f1(hx)}" y="${f1(hy)}" font-size="70" text-anchor="middle" opacity=".9">${['💖','⭐','🎈','💛'][i%4]}</text>`}
+  ui+=txt('¡SUSCRÍBETE!',540,330,135,eb(e/.5),'#ff3b4e','#fff',-3)+txt('y dale 🔔',540,500,120,eb((e-.3)/.5),'#2f8bff','#fff',2)+txt('Nuevo video cada día',540,640,72,eb((e-.6)/.5),'#7a3cff','#fff');
+  if(e>1.6){const u=eb((e-1.6)/.4),pr=e>2.4&&e<2.6?.9:1;ui+=`<g transform="translate(540 1740) scale(${f1(u*pr)})"><rect x="-230" y="-60" width="460" height="120" rx="60" fill="#ff0033" stroke="#fff" stroke-width="10"/><path d="M-170 -32 l50 32 l-50 32z" fill="#fff"/><text x="50" y="16" text-anchor="middle" font-size="46" font-weight="900" fill="#fff" font-family="Comic Sans MS,Verdana,sans-serif">SUSCRIBIRME</text><g transform="translate(330 -10) rotate(${f1(Math.sin(t*14)*22)} 0 -50)"><path d="M0 -60 q-45 0 -45 50 v30 h-15 v14 h120 v-14 h-15 v-30 q0 -50 -45 -50z" transform="translate(-0 0) scale(.9)" fill="#ffd21f" stroke="#fff" stroke-width="8"/><circle cy="40" r="14" fill="#c98f00"/></g></g>`}}
+ const cyp=clamp((gy-HS-B.J.hip.y)*.1,0,40);
+ const cam=`translate(540 1000) translate(${f1(shake)} ${f1(cyp+shake*.5)}) scale(${f1(zoom*1000)/1000}) translate(-540 -1000)`;
+ document.getElementById('s').innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><g transform="${cam}">${world}${B.svg}</g>${ui}</svg>`}
+window.frame=frame;frame(0);
+</script></body></html>
