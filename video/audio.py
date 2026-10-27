@@ -37,7 +37,7 @@ for bar in range(12):
         m=min([c+12*k for c in ch for k in (1,2)],key=lambda x:abs(x-m))
         put(M,t0+e*.5+(0.25 if e%2 else 0),marimba(hz(m)),.9,-.3+.2*e/3)
     for e in range(8):put(M,t0+e*.25,lp(hp(noise(.07),.3),.6)*np.exp(-tt(.07)*60)*.5*(1 if e%2 else .6),.5,.4 if e%2 else -.4)
-M*=.55
+M*=.32
 # ---- voz: conejito (b_*) con sincronia labial y narradora (n_*)
 VB=np.zeros((n,2));VN=np.zeros((n,2))
 def vo(buf,name,t,g=1.0):
@@ -91,8 +91,10 @@ for j in range(3):put(X,22.1+j*.18,marimba(hz(88+j*0),.4,.5),1,0)
 # ---- ducking de la musica bajo la voz
 env=np.abs(V).mean(1);k=int(.05*sr);env=np.convolve(env,np.ones(k)/k,'same');env=np.convolve(np.minimum(1,env*8),np.ones(int(.15*sr))/int(.15*sr),'same')
 duck=1-.55*np.clip(env,0,1);M*=duck[:,None]
-mix=M*.9+V*1.5+X*.85
+k=np.ones(8)/8
+for ch in (0,1):X[:,ch]=np.convolve(X[:,ch],k,'same')  # suaviza los golpes agudos de los efectos
+mix=M*.9+V*1.5+X*.32
 mix[:int(.03*sr)]*=np.linspace(0,1,int(.03*sr))[:,None];mix[-sr:]*=np.linspace(1,0,sr)[:,None]
 mix/=max(1e-9,np.max(np.abs(mix)))*1.02
 with wave.open('audio_raw.wav','wb') as w:w.setnchannels(2);w.setsampwidth(2);w.setframerate(sr);w.writeframes((mix*32767).astype('<i2').tobytes())
-subprocess.run(['ffmpeg','-y','-loglevel','error','-i','audio_raw.wav','-af','loudnorm=I=-14:TP=-1.5:LRA=9','-ar','48000','audio.wav'],check=True)
+subprocess.run(['ffmpeg','-y','-loglevel','error','-i','audio_raw.wav','-af','loudnorm=I=-18:TP=-3:LRA=7','-ar','48000','audio.wav'],check=True)
