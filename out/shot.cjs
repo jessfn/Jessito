@@ -1,0 +1,1 @@
+const {chromium}=require('playwright');(async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:1080,height:1920}});await p.goto('file:///home/user/Jessito/out/story.html');await p.waitForTimeout(500);await p.screenshot({path:'/home/user/Jessito/out/story_fiesta_fin_de_anio.jpg',type:'jpeg',quality:95});await b.close()})()

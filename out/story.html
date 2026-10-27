@@ -1,0 +1,36 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{width:1080px;height:1920px;position:relative;overflow:hidden;font-family:'Inter','DejaVu Sans',sans-serif;color:#fff;
+background:radial-gradient(ellipse at 50% 18%,#1f6a46 0%,#0f3d2a 40%,#07241a 100%)}
+.snow{position:absolute;inset:0}
+.snow i{position:absolute;border-radius:50%;background:rgba(255,235,170,.55)}
+.logo{position:absolute;top:40px;left:50%;transform:translateX(-50%);width:700px}
+.date{position:absolute;top:740px;width:100%;text-align:center}
+.pill{display:inline-block;padding:16px 46px;border:2px solid #e8c15a;border-radius:60px;background:rgba(0,0,0,.25);color:#f6d77a;font-size:34px;font-weight:700;letter-spacing:3px}
+h1{margin-top:26px;font-size:62px;line-height:1.1;font-weight:800;letter-spacing:1px}
+h1 span{color:#f6d77a}
+.loc{margin-top:16px;font-size:34px;color:#dfeee5}
+.card{position:absolute;top:1090px;left:90px;right:90px;border-radius:36px;padding:10px 0;background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,.06));border:2px solid rgba(232,193,90,.7);box-shadow:0 20px 60px rgba(0,0,0,.45)}
+.head{display:flex;justify-content:space-between;padding:20px 50px 16px;font-size:26px;letter-spacing:4px;color:#f6d77a;font-weight:700;border-bottom:2px solid rgba(232,193,90,.5)}
+.row{display:flex;justify-content:space-between;align-items:center;padding:17px 50px;font-size:36px;font-weight:500}
+.row:nth-child(odd){background:rgba(0,0,0,.18)}
+.row b{font-size:40px;font-weight:800;color:#f6d77a}
+.row small{font-size:26px;color:#cfe3d7;font-weight:500}
+.foot{position:absolute;bottom:55px;width:100%;text-align:center;font-size:30px;color:#dfeee5;letter-spacing:1px}
+</style></head><body>
+<div class="snow" id="s"></div>
+<img class="logo" src="logo.png">
+<div class="date"><div class="pill">4 DE DICIEMBRE</div>
+<h1>Cooperación para la<br><span>Comida de Fin de Año</span></h1>
+<div class="loc">📍 CENSODEP</div></div>
+<div class="card"><div class="head"><span>PUESTO</span><span>APORTACIÓN</span></div>
+<div class="row"><span>Director General</span><b>$4,500</b></div>
+<div class="row"><span>Director Nivel 1</span><b>$3,500</b></div>
+<div class="row"><span>Director Nivel 2</span><b>$2,500</b></div>
+<div class="row"><span>Subdirectores</span><b>$2,000</b></div>
+<div class="row"><span>Jefe de Departamento</span><b>$600</b></div>
+<div class="row"><span>Enlaces</span><b>$250</b></div>
+<div class="row"><span>Proveedores</span><b>$500</b></div></div>
+<div class="foot">¡Te esperamos! 🎄</div>
+<script>let h='';for(let i=0;i<70;i++){const z=3+Math.random()*7;h+=`<i style="left:${Math.random()*100}%;top:${Math.random()*100}%;width:${z}px;height:${z}px;opacity:${.3+Math.random()*.6}"></i>`}document.getElementById('s').innerHTML=h</script>
+</body></html>
