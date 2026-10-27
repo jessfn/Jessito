@@ -1,4 +1,4 @@
-<!doctype html><html><body style="margin:0;background:#000"><div id="s" style="width:1080px;height:1920px"></div>
+<!doctype html><html><style>@font-face{font-family:'Baloo 2';font-weight:800;src:url(fonts/baloo2-800.woff2) format('woff2')}@font-face{font-family:'Fredoka';font-weight:700;src:url(fonts/fredoka-700.woff2) format('woff2')}</style><body style="margin:0;background:#000"><div id="s" style="width:1080px;height:1920px"></div>
 <script>
 const W=1080,H=1920,gy=1470,HS=130,OUT='#4b3a6b';
 const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
@@ -8,7 +8,7 @@ const sst=(a,b,x)=>{const u=clamp((x-a)/(b-a));return u*u*(3-2*u)};
 const eb=x=>{x=clamp(x);const c=2.7;return 1+(c+1)*Math.pow(x-1,3)+c*Math.pow(x-1,2)};
 const rnd=i=>{const v=Math.sin(i*127.1+311.7)*43758.5453;return v-Math.floor(v)};
 const f1=n=>n.toFixed(1);
-const COL=[{n:'ROJO',c:'#ff3b4e',d:'#b3162a',e:'🍎'},{n:'AZUL',c:'#2f8bff',d:'#1759c7',e:'🐳'},{n:'AMARILLO',c:'#ffd21f',d:'#c98f00',e:'⭐'},{n:'VERDE',c:'#38d66b',d:'#16923f',e:'🐸'}];
+const FF='Baloo 2';const COL=[{n:'ROJO',c:'#ff3b4e',d:'#b3162a',e:'🍎'},{n:'AZUL',c:'#2f8bff',d:'#1759c7',e:'🐳'},{n:'AMARILLO',c:'#ffd21f',d:'#c98f00',e:'⭐'},{n:'VERDE',c:'#38d66b',d:'#16923f',e:'🐸'}];
 const SEG0=3,SEGL=4,OUT0=19;
 
 /* ================= POSE (animación de alto nivel) ================= */
@@ -179,7 +179,7 @@ function trees(t){let o='';for(const [x,y,sc] of [[140,1115,1],[760,1085,1.25],[
  for(let i=0;i<18;i++){const px=(rnd(i)*1200+Math.sin(t*.8+i)*40)%1080,py=(1500-((t*40+rnd(i+4)*1500)%1500)),r=3+rnd(i+8)*4;o+=`<circle cx="${px.toFixed(0)}" cy="${py.toFixed(0)}" r="${r.toFixed(1)}" fill="#fff9b0" opacity=".7"/>`}return o}
 function bg(t){
  let o=`<defs><linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4fc3ff"/><stop offset=".6" stop-color="#bfeaff"/><stop offset="1" stop-color="#fff6d6"/></linearGradient><radialGradient id="sun"><stop offset="0" stop-color="#fffbd0"/><stop offset="1" stop-color="#ffd54a"/></radialGradient><linearGradient id="gr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6fe07a"/><stop offset="1" stop-color="#2fae52"/></linearGradient>
- <radialGradient id="fur" cx=".38" cy=".3" r=".85"><stop offset="0" stop-color="#ffffff"/><stop offset=".65" stop-color="#f6effc"/><stop offset="1" stop-color="#d9cbee"/></radialGradient><linearGradient id="pinkE" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffc2da"/><stop offset="1" stop-color="#ff8fba"/></linearGradient></defs>
+ <filter id="bl" x="-20%" y="-20%" width="140%" height="150%"><feGaussianBlur stdDeviation="9"/></filter><radialGradient id="vig" cx=".5" cy=".5" r=".75"><stop offset=".6" stop-color="#2a1060" stop-opacity="0"/><stop offset="1" stop-color="#2a1060" stop-opacity=".32"/></radialGradient><linearGradient id="btn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff5a5a"/><stop offset=".5" stop-color="#ff1f3d"/><stop offset="1" stop-color="#c4002b"/></linearGradient><radialGradient id="fur" cx=".38" cy=".3" r=".85"><stop offset="0" stop-color="#ffffff"/><stop offset=".65" stop-color="#f6effc"/><stop offset="1" stop-color="#d9cbee"/></radialGradient><linearGradient id="pinkE" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffc2da"/><stop offset="1" stop-color="#ff8fba"/></linearGradient></defs>
  <rect x="-60" y="-60" width="${W+120}" height="${H+120}" fill="url(#sk)"/><g transform="translate(860 330)">`;
  for(let i=0;i<14;i++)o+=`<polygon points="0,0 -40,-700 40,-700" fill="#fff7b0" opacity=".2" transform="rotate(${i*360/14+t*6})"/>`;
  o+=`<circle r="${135+Math.sin(t*3)*6}" fill="url(#sun)"/><circle r="105" fill="#fff9c9" opacity=".7"/><circle cx="-35" cy="-8" r="9" fill="#e8861c"/><circle cx="35" cy="-8" r="9" fill="#e8861c"/><path d="M-30 30 Q0 62 30 30" stroke="#e8861c" stroke-width="9" fill="none" stroke-linecap="round"/></g>`;
@@ -193,18 +193,34 @@ function balloon(x,y,c,d,rot,sx,sy){return `<g transform="translate(${f1(x)} ${f
 function fx(ts,x,y,c,d){let o='';if(ts<0||ts>2.4)return o;const cols=[c,d,'#fff','#ffd21f','#ff6fb5','#4fc3ff'];
  for(let i=0;i<54;i++){const a=rnd(i)*6.283,v=300+rnd(i+50)*700,px=x+Math.cos(a)*v*ts,py=y+Math.sin(a)*v*ts+900*ts*ts*.6;o+=`<rect x="-9" y="-5" width="18" height="10" rx="2" fill="${cols[i%6]}" opacity="${clamp(1-ts/2.4)}" transform="translate(${f1(px)} ${f1(py)}) rotate(${f1(ts*(300+i*20))})"/>`}
  for(let i=0;i<9;i++){const a=i*.7+rnd(i)*.4,v=520+rnd(i+7)*380,px=x+Math.cos(a)*v*ts,py=y+Math.sin(a)*v*ts+700*ts*ts;o+=`<path d="M-30 0 Q0 -22 30 0 Q0 -8 -30 0Z" fill="${c}" stroke="${d}" stroke-width="4" opacity="${clamp(1-ts/1.3)}" transform="translate(${f1(px)} ${f1(py)}) rotate(${f1(a*57+ts*500)})"/>`}
+ for(let i=0;i<14;i++){const a=rnd(i+90)*6.283,v=250+rnd(i+70)*700,px=x+Math.cos(a)*v*ts,py=y+Math.sin(a)*v*ts+800*ts*ts*.6;o+=star4(px,py,16+14*rnd(i),ts*300+i*40,cols[(i+3)%6],clamp(1.3-ts/1.8))}
  const r=eo(ts/.5)*520;o+=`<circle cx="${x}" cy="${y}" r="${f1(r)}" fill="none" stroke="${c}" stroke-width="${f1(40*(1-clamp(ts/.5)))}" opacity="${1-clamp(ts/.5)}"/>`;
  if(ts<.45){const sc=eb(ts/.2)*(1-clamp((ts-.3)/.15));let sp='';for(let i=0;i<16;i++){const a=i*Math.PI/8,r1=i%2?95:160;sp+=(i?'L':'M')+f1(Math.cos(a)*r1)+' '+f1(Math.sin(a)*r1)}
   o+=`<g transform="translate(${x} ${y}) rotate(-8) scale(${f1(sc)})"><path d="${sp}Z" fill="#fff35c" stroke="#ff3b4e" stroke-width="10" stroke-linejoin="round"/><text text-anchor="middle" y="22" font-size="64" font-weight="900" font-family="Comic Sans MS,Arial Rounded MT Bold,Verdana,sans-serif" fill="#ff3b4e">¡POP!</text></g>`}
  return o}
 function dust(ts,x){let o='';if(ts<0||ts>.6)return o;for(let i=0;i<7;i++){const sd=i%2?1:-1,d=(1+i>>1)*40*eo(ts/.6),r=(20+i*4)*(1+ts*1.5);o+=`<circle cx="${f1(x+sd*(60+d*1.4))}" cy="${f1(gy+10-ts*60-(i>>1)*6)}" r="${f1(r)}" fill="#fff" opacity="${(.7*(1-ts/.6)).toFixed(2)}"/>`}return o}
-function txt(str,x,y,size,sc,fill,stroke,rot=0){const ff='Fredoka One,Comic Sans MS,Arial Rounded MT Bold,Verdana,sans-serif';return `<g transform="translate(${x} ${y}) rotate(${rot}) scale(${f1(Math.max(sc,0))})"><text text-anchor="middle" font-family="${ff}" font-weight="900" font-size="${size}" fill="${stroke}" stroke="${stroke}" stroke-width="30" stroke-linejoin="round" y="8">${str}</text><text text-anchor="middle" font-family="${ff}" font-weight="900" font-size="${size}" fill="${fill}" y="0">${str}</text></g>`}
+let UID=0,GT=0;
+const mixc=(h,m,t)=>{const p=v=>parseInt(h.slice(v,v+2),16);return '#'+[p(1),p(3),p(5)].map(c=>Math.round(c+(m-c)*t).toString(16).padStart(2,'0')).join('')};
+function core(ts,x,y,size,sc,fill,rot,tt,fam,fw){
+ const k=Math.max(.38,Math.min(1,size/200)),id=++UID,dark=mixc(fill,0,.5),light=mixc(fill,255,.62);
+ const T=(a,dy=0)=>`<text text-anchor="middle" font-family="${fam}" font-weight="${fw}" font-size="${size}" y="${8+dy}" ${a}>${ts}</text>`;
+ let o=`<defs><linearGradient id="tg${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${light}"/><stop offset=".45" stop-color="${fill}"/><stop offset="1" stop-color="${mixc(fill,0,.22)}"/></linearGradient><clipPath id="cp${id}">${T('')}</clipPath></defs><g transform="translate(${x} ${y}) rotate(${rot}) scale(${f1(Math.max(sc,0))})">`;
+ o+=`<g opacity=".32" filter="url(#bl)">${T(`fill="#1b1050" stroke="#1b1050" stroke-width="${f1(38*k)}" stroke-linejoin="round"`,34*k)}</g>`;
+ for(const d of[0,9,18])o+=T(`fill="#fff" stroke="#fff" stroke-width="${f1(40*k)}" stroke-linejoin="round"`,d*k);
+ for(let d=18;d>=3;d-=3)o+=T(`fill="${dark}" stroke="${dark}" stroke-width="${f1(10*k)}" stroke-linejoin="round"`,d*k);
+ o+=T(`fill="url(#tg${id})" stroke="${dark}" stroke-width="${f1(6*k)}" stroke-linejoin="round" paint-order="stroke"`);
+ const u=(tt*.8)%2.4;
+ o+=`<g clip-path="url(#cp${id})"><rect x="-700" y="${-size}" width="1400" height="${f1(size*.5)}" fill="#fff" opacity=".2"/><rect transform="skewX(-20)" x="${f1(-700+u*700)}" y="${-size}" width="80" height="${f1(size*1.7)}" fill="#fff" opacity=".6"/></g></g>`;
+ return o}
+function txt(str,x,y,size,sc,fill,stroke,rot=0){return core(str,x,y,size,sc,fill,rot,GT,size>130?'Baloo 2':'Fredoka',size>130?800:700)}
+const star4=(x,y,r,rot,fill,op=1)=>`<path d="M0 ${-r} Q${r*.14} ${-r*.14} ${r} 0 Q${r*.14} ${r*.14} 0 ${r} Q${-r*.14} ${r*.14} ${-r} 0 Q${-r*.14} ${-r*.14} 0 ${-r}Z" fill="${fill}" opacity="${op}" transform="translate(${f1(x)} ${f1(y)}) rotate(${f1(rot)})"/>`;
+function sunburst(x,y,ts,c,op=.3){let o=`<g transform="translate(${x} ${y}) rotate(${f1(ts*18)})" opacity="${(op*eo(ts/.25)*(1-clamp((ts-1.7)/.9))).toFixed(3)}">`;for(let i=0;i<14;i++)o+=`<polygon points="0,0 ${f1(-90)},${-900} ${f1(90)},${-900}" fill="${c}" transform="rotate(${i*360/14})"/>`;return o+`</g>`}
+function sparks(x,y,t,n,R,cols){let o='';for(let i=0;i<n;i++){const a=i*6.283/n+Math.sin(t*.7)*.3,r=R*(.8+.4*rnd(i)),tw=.5+.5*Math.sin(t*6+i*1.7);o+=star4(x+Math.cos(a)*r*1.3,y+Math.sin(a)*r*.55,18+22*rnd(i+3)*tw,t*40+i*20,cols[i%cols.length],.4+.6*tw)}return o}
 
-function word(str,x,y,size,sc,fill,stroke,rot,tt){const ff='Fredoka One,Comic Sans MS,Arial Rounded MT Bold,Verdana,sans-serif';let ts='',pv=0;[...str].forEach((ch,i)=>{const o=-60*Math.sin(clamp((tt-.25-i*.07)/.35)*Math.PI)+Math.sin(tt*5-i*.6)*4*clamp((tt-.8)/.4);ts+=`<tspan dy="${f1(o-pv)}">${ch}</tspan>`;pv=o});
- return `<g transform="translate(${x} ${y}) rotate(${rot}) scale(${f1(Math.max(sc,0))})"><text text-anchor="middle" font-family="${ff}" font-weight="900" font-size="${size}" fill="${stroke}" stroke="${stroke}" stroke-width="30" stroke-linejoin="round" y="8">${ts}</text><text text-anchor="middle" font-family="${ff}" font-weight="900" font-size="${size}" fill="${fill}">${ts}</text></g>`}
+function word(str,x,y,size,sc,fill,stroke,rot,tt){let ts='',pv=0;[...str].forEach((ch,i)=>{const o=-60*Math.sin(clamp((tt-.25-i*.07)/.35)*Math.PI)+Math.sin(tt*5-i*.6)*4*clamp((tt-.8)/.4);ts+=`<tspan dy="${f1(o-pv)}">${ch}</tspan>`;pv=o});return core(ts,x,y,size,sc,fill,rot,tt,'Baloo 2',800)}
 function grass(t){let o='';for(let i=0;i<44;i++){const x=i*26+rnd(i)*14-10,h=44+rnd(i+3)*46,sw=Math.sin(t*2.4+i*.7)*10,by=gy+44+rnd(i+6)*14;o+=`<path d="M${f1(x)} ${f1(by)} Q${f1(x+sw*.5)} ${f1(by-h*.5)} ${f1(x+sw)} ${f1(by-h)}" stroke="${i%3?'#2d9e4e':'#58c96d'}" stroke-width="9" stroke-linecap="round" fill="none"/>`}return o}
 function frame(f){
- const t=f/30,P=pose(t);P.t=t;const B=bunny(P,f);let world='',ui='',zoom=1.06,shake=0,pop=-9,cy=0;
+ UID=0;const t=f/30,P=pose(t);GT=t;P.t=t;const B=bunny(P,f);let world='',ui='',zoom=1.06,shake=0,pop=-9,cy=0;
  const k=Math.floor((t-SEG0)/SEGL),s=t-SEG0-k*SEGL,inSeg=t>=SEG0&&t<OUT0;
  world+=bg(t);
  if(inSeg){const c=COL[k];
@@ -214,21 +230,22 @@ function frame(f){
   pop=s-2.3;
   if(s>=1.8&&s<2.3||(s>=2.4&&s<2.85)){let sl='';for(let i=0;i<9;i++){const x=70+i*115+rnd(i)*40,y=((t*2400+i*377)%1800);sl+=`<rect x="${f1(x)}" y="${f1(y)}" width="7" height="${f1(110+rnd(i+3)*80)}" rx="3.5" fill="#fff" opacity=".45"/>`}world+=sl}
   if(pop>=0&&pop<1.6)world+=`<g transform="translate(${f1(540+Math.sin(pop*5)*30)} ${f1(520+pop*pop*420)}) rotate(${f1(pop*110)})"><path d="M0 0 Q-30 110 10 190 T0 320" stroke="#fff" stroke-width="5" fill="none" opacity="${(1-pop/1.6).toFixed(2)}"/><path d="M0 -6 l-20 30 h40z" fill="${c.d}" opacity="${(1-pop/1.6).toFixed(2)}"/></g>`;
-  if(pop>=0){world+=fx(pop,540,420,c.c,c.d);if(pop<.14)ui+=`<rect width="${W}" height="${H}" fill="#fff" opacity="${(.6*(1-pop/.14)).toFixed(2)}"/>`;
+  if(pop>=0){world+=`<circle cx="540" cy="420" r="900" fill="${c.c}" opacity="${(.1*(1-clamp(pop/1.2))).toFixed(3)}"/>`+sunburst(540,330,pop,c.c,.3);world+=fx(pop,540,420,c.c,c.d);if(pop<.14)ui+=`<rect width="${W}" height="${H}" fill="#fff" opacity="${(.6*(1-pop/.14)).toFixed(2)}"/>`;
    ui+=word(c.n,540,330,c.n.length>6?200:260,eb(pop/.45),c.c,'#fff',Math.sin(pop*6)*3,pop);
-   ui+=`<text x="540" y="${f1(560+Math.sin(t*6)*12)}" font-size="${f1(190*Math.max(eb((pop-.1)/.5),0))}" text-anchor="middle" transform="rotate(${f1(Math.sin(t*5)*6)} 540 640)">${c.e}</text>`;
+   {const sp=eb((pop-.1)/.5);ui+=`<g transform="translate(540 ${f1(590+Math.sin(t*6)*10)}) rotate(${f1(Math.sin(t*5)*7)}) scale(${f1(Math.max(sp,0))})"><ellipse cy="150" rx="105" ry="22" fill="#1b1050" opacity=".22"/><circle r="132" fill="#1b1050" opacity=".2" cy="12"/><circle r="132" fill="#fff" stroke="${c.c}" stroke-width="14"/><circle r="104" fill="${mixc(c.c,255,.82)}"/><text y="52" font-size="150" text-anchor="middle">${c.e}</text></g>`}
+   ui+=sparks(540,330,t,8,300,['#fff','#fff35c',c.c]);
    if(k==2)for(let i=0;i<6;i++){const a=t*2+i*1.05,rr=260+Math.sin(t*5+i)*30;ui+=`<text x="${f1(540+Math.cos(a)*rr)}" y="${f1(1000+Math.sin(a)*rr*.5)}" font-size="${f1(40+20*Math.sin(t*8+i))}" text-anchor="middle">✨</text>`}
   }
   shake=pop>=0&&pop<.5?14*Math.exp(-pop*9)*Math.sin(pop*90):0;
   const punch=pop>=0?.07*Math.exp(-pop*8):0;zoom+=punch;
   const landing=s>=2.85?.03*Math.exp(-(s-2.85)*8):0;zoom+=landing;
  }
- if(t<SEG0){const p=t/SEG0;ui+=txt('¡APRENDE',540,360+Math.sin(t*3)*8,165,eb((p-.1)/.35),'#ff5fa8','#fff',-4+Math.sin(t*2)*2)+txt('los',540,520,110,eb((p-.25)/.35),'#2f8bff','#fff')+txt('COLORES',540,670,190,eb((p-.4)/.35),'#ffb800','#fff',3)}
- if(t>=OUT0){const e=t-OUT0;for(let i=0;i<8;i++){const hx=140+i*115+Math.sin(t*3+i)*20,hy=1000-((t*140+i*210)%900);ui+=`<text x="${f1(hx)}" y="${f1(hy)}" font-size="70" text-anchor="middle" opacity=".9">${['💖','⭐','🎈','💛'][i%4]}</text>`}
-  ui+=txt('¡SUSCRÍBETE!',540,330,135,eb(e/.5),'#ff3b4e','#fff',-3)+txt('y dale 🔔',540,500,120,eb((e-.3)/.5),'#2f8bff','#fff',2)+txt('Nuevo video cada día',540,640,72,eb((e-.6)/.5),'#7a3cff','#fff');
-  if(e>1.6){const u=eb((e-1.6)/.4),pr=e>2.4&&e<2.6?.9:1;ui+=`<g transform="translate(540 1740) scale(${f1(u*pr)})"><rect x="-230" y="-60" width="460" height="120" rx="60" fill="#ff0033" stroke="#fff" stroke-width="10"/><path d="M-170 -32 l50 32 l-50 32z" fill="#fff"/><text x="50" y="16" text-anchor="middle" font-size="46" font-weight="900" fill="#fff" font-family="Comic Sans MS,Verdana,sans-serif">SUSCRIBIRME</text><g transform="translate(330 -10) rotate(${f1(Math.sin(t*14)*22)} 0 -50)"><path d="M0 -60 q-45 0 -45 50 v30 h-15 v14 h120 v-14 h-15 v-30 q0 -50 -45 -50z" transform="translate(-0 0) scale(.9)" fill="#ffd21f" stroke="#fff" stroke-width="8"/><circle cy="40" r="14" fill="#c98f00"/></g></g>`}}
+ if(t<SEG0){const p=t/SEG0;world+=sunburst(540,470,t,'#ff9ad0',.34)+sparks(540,470,t,9,330,['#fff','#fff35c','#ff9ad0']);ui+=txt('¡APRENDE',540,360+Math.sin(t*3)*8,165,eb((p-.1)/.35),'#ff5fa8','#fff',-4+Math.sin(t*2)*2)+txt('los',540,520,110,eb((p-.25)/.35),'#2f8bff','#fff')+txt('COLORES',540,670,190,eb((p-.4)/.35),'#ffb800','#fff',3)}
+ if(t>=OUT0){const e=t-OUT0;world+=sunburst(540,520,e,'#ffd54a',.32)+sparks(540,520,t,10,360,['#fff','#ffd21f','#ff6fb5']);for(let i=0;i<8;i++){const hx=140+i*115+Math.sin(t*3+i)*20,hy=1000-((t*140+i*210)%900);ui+=`<text x="${f1(hx)}" y="${f1(hy)}" font-size="70" text-anchor="middle" opacity=".9">${['💖','⭐','🎈','💛'][i%4]}</text>`}
+  ui+=txt('¡SUSCRÍBETE!',540,330,135,eb(e/.5),'#ff3b4e','#fff',-3)+txt('y activa la campanita',540,505,92,eb((e-.3)/.5),'#2f8bff','#fff',2)+txt('¡Un video nuevo cada día!',540,650,70,eb((e-.6)/.5),'#7a3cff','#fff');
+  if(e>1.6){const u=eb((e-1.6)/.4),pr=e>2.4&&e<2.6?.9:1;ui+=`<g transform="translate(540 1740) scale(${f1(u*pr)})"><rect x="-224" y="-46" width="460" height="120" rx="60" fill="#1b1050" opacity=".3"/><rect x="-230" y="-60" width="460" height="120" rx="60" fill="url(#btn)" stroke="#fff" stroke-width="10"/><rect x="-200" y="-52" width="400" height="34" rx="17" fill="#fff" opacity=".25"/><path d="M-170 -32 l50 32 l-50 32z" fill="#fff"/><text x="50" y="16" text-anchor="middle" font-size="46" font-weight="900" fill="#fff" font-family="Comic Sans MS,Verdana,sans-serif">SUSCRIBIRME</text><g transform="translate(330 -10) rotate(${f1(Math.sin(t*14)*22)} 0 -50)"><path d="M0 -60 q-45 0 -45 50 v30 h-15 v14 h120 v-14 h-15 v-30 q0 -50 -45 -50z" transform="translate(-0 0) scale(.9)" fill="#ffd21f" stroke="#fff" stroke-width="8"/><circle cy="40" r="14" fill="#c98f00"/></g></g>`}}
  const cyp=clamp((gy-HS-B.J.hip.y)*.1,0,40);
  const cam=`translate(540 1000) translate(${f1(shake+Math.sin(t*1.3)*2.5)} ${f1(cyp+shake*.5+Math.cos(t*1.7)*2)}) scale(${f1(zoom*1000)/1000}) translate(-540 -1000)`;
- document.getElementById('s').innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><g transform="${cam}">${world}${B.svg}${grass(t)}</g>${ui}</svg>`}
+ document.getElementById('s').innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><g transform="${cam}">${world}${B.svg}${grass(t)}</g><rect width="${W}" height="${H}" fill="url(#vig)"/>${ui}</svg>`}
 window.frame=frame;frame(0);
 </script></body></html>

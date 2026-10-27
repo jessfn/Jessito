@@ -53,3 +53,9 @@ colores para niños, aprender los colores, los colores en español, video educat
 - Pequeños Exploradores
 
 Consejos: 2–3 sílabas por palabra, que se pueda pronunciar rápido, sin tildes ni "ñ" si piensas ir al inglés, y revisa en YouTube que el nombre y el @usuario estén libres.
+
+## Licencias de los recursos usados (todas permiten uso comercial)
+- Personaje, animación, música y efectos de sonido: originales, creados para este proyecto (no hay copyright de terceros).
+- Tipografías Baloo 2 y Fredoka: SIL Open Font License 1.1 (licencias en `fonts/`).
+- Voz en español: modelo Piper "es_MX-claude-high", licencia Apache-2.0.
+- Aviso: confirma las licencias en las páginas oficiales antes de monetizar. Una voz sintética es válida, pero grabar tu propia voz le da identidad al canal.

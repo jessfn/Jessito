@@ -1,26 +1,89 @@
-import numpy as np, wave
-sr=44100;D=24;n=sr*D;a=np.zeros(n)
-def add(t,sig,g=1):
-    i=int(t*sr);j=min(n,i+len(sig));a[i:j]+=sig[:j-i]*g
-def tone(f,d,kind='sine',v=.3):
-    t=np.arange(int(d*sr))/sr;e=np.minimum(1,t*80)*np.exp(-t*4/d*1.2)
-    w=np.sin(2*np.pi*f*t)+(.3*np.sin(4*np.pi*f*t) if kind=='bell' else 0)
-    return w*e*v
-P=[261.6,293.7,329.6,392,440,523.3,587.3,659.3]
-mel=[0,2,4,2,5,4,2,1,0,2,4,7,5,4,2,0]
-b=0.25
-for i in range(int(D/b)):
-    t=i*b;add(t,tone(P[mel[i%16]],.4,'bell',.22))
-    if i%2==0:add(t,tone(P[[0,3,4,3][(i//2)%4]]/2,.45,'sine',.2))
-    add(t,np.random.randn(int(.03*sr))*np.exp(-np.arange(int(.03*sr))/300)*.05*(i%2==0))
+import numpy as np, wave, subprocess
+sr=48000;D=24;n=sr*D;rng=np.random.default_rng(7)
+M=np.zeros((n,2));V=np.zeros((n,2));X=np.zeros((n,2))
+def put(buf,t,sig,g=1,pan=0):
+    i=int(t*sr);
+    if i>=n:return
+    j=min(n,i+len(sig));s=sig[:j-i]*g
+    buf[i:j,0]+=s*np.sqrt((1-pan)/2);buf[i:j,1]+=s*np.sqrt((1+pan)/2)
+def tt(d):return np.arange(int(d*sr))/sr
+def hz(m):return 440*2**((m-69)/12)
+def marimba(f,d=.45,v=.5):
+    t=tt(d);e=np.exp(-t*9);w=np.sin(2*np.pi*f*t)+.35*np.sin(2*np.pi*f*4*t)*np.exp(-t*30)+.12*np.sin(2*np.pi*f*10*t)*np.exp(-t*60)
+    return w*e*v*np.minimum(1,t*600)
+def pluck(f,d=.3,v=.3):
+    t=tt(d);e=np.exp(-t*14);w=np.sin(2*np.pi*f*t)+.5*np.sin(2*np.pi*f*2*t)+.25*np.sin(2*np.pi*f*3*t);return w*e*v*np.minimum(1,t*800)
+def bass(f,d=.4,v=.55):
+    t=tt(d);e=np.exp(-t*6);return (np.sin(2*np.pi*f*t)+.3*np.sin(2*np.pi*2*f*t))*e*v*np.minimum(1,t*400)
+def noise(d):return rng.standard_normal(int(d*sr))
+def lp(x,a):  # filtro simple
+    y=np.zeros_like(x);s=0
+    for i in range(len(x)):s+=a*(x[i]-s);y[i]=s
+    return y
+def hp(x,a):return x-lp(x,a)
+# ---- musica: 12 compases de 2 s, C-Am-F-G
+chords=[(60,64,67),(57,60,64),(53,57,60),(55,59,62)]
+roots=[36,33,29,31]
+pent=[72,74,76,79,81,84]
+pat=[0,2,4,2,3,2,1,0, 2,4,5,4,3,2,4,2]
+for bar in range(12):
+    t0=bar*2.0;ch=chords[bar%4];vol=1.0
+    for b in (0,2):put(M,t0+b*.5,bass(hz(roots[bar%4]),.45),.9,-.15)
+    for b in (1,3):
+        for m in ch:put(M,t0+b*.5,pluck(hz(m)),.5,.2)
+    for e in range(4):
+        m=pent[pat[(bar*4+e)%16]%6]
+        # elige notas del acorde para que suene consonante
+        m=min([c+12*k for c in ch for k in (1,2)],key=lambda x:abs(x-m))
+        put(M,t0+e*.5+(0.25 if e%2 else 0),marimba(hz(m)),.9,-.3+.2*e/3)
+    for e in range(8):put(M,t0+e*.25,lp(hp(noise(.07),.3),.6)*np.exp(-tt(.07)*60)*.5*(1 if e%2 else .6),.5,.4 if e%2 else -.4)
+M*=.55
+# ---- voz
+def vo(name,t,g=1.0):
+    a=np.load('voz/%s.npy'%name);a=np.interp(np.arange(int(len(a)*sr/22050))*22050/sr,np.arange(len(a)),a)
+    a=a/np.max(np.abs(a))*g;put(V,t,a,1,0)
+vo('hola',.05,.9)
+for k,c in enumerate(['rojo','azul','amarillo','verde']):
+    s=3+4*k;vo('oh',s+.35,.7);vo(c,s+2.42,1.0)
+vo('sub',19.5,.95);vo('chao',22.55,.9)
+# ---- efectos
+def whoosh(d,up=True,pan=0,g=.5):
+    x=noise(d);t=tt(d);e=np.sin(np.pi*t/d)**2;f=np.linspace(.03,.35,len(x)) if up else np.linspace(.35,.03,len(x))
+    y=np.zeros_like(x);s=0
+    for i in range(len(x)):s+=f[i]*(x[i]-s);y[i]=s
+    return y*e*g*3
+def boing(g=.45):
+    t=tt(.5);f=180+520*np.exp(-t*7);ph=2*np.pi*np.cumsum(f)/sr+.6*np.sin(2*np.pi*14*t);return (np.sin(ph)+.3*np.sin(2*ph))*np.exp(-t*6)*g*np.minimum(1,t*300)
+def pop(g=.9):
+    t=tt(.3);n_=lp(hp(noise(.3),.2),.8)*np.exp(-t*28)*1.3;th=np.sin(2*np.pi*(150-90*t/.3)*t)*np.exp(-t*20);return (n_+th*.9)*g
+def thump(g=.8):
+    t=tt(.25);return np.sin(2*np.pi*(95-50*t/.25)*t)*np.exp(-t*16)*g+lp(noise(.25),.15)*np.exp(-t*40)*.3
+def sparkle(root=84,g=.35):
+    o=np.zeros(int(.9*sr))
+    for j,m in enumerate([0,4,7,12,16,19]):
+        sg=marimba(hz(root+m),.35,1)*1.0;i=int(j*.07*sr);o[i:i+len(sg)]+=sg[:len(o)-i]
+    return o*g
+def shimmer(d=1.2,g=.25):
+    t=tt(d);return hp(noise(d),.5)*np.exp(-t*2.5)*(.5+.5*np.sin(2*np.pi*22*t))*g
+def squeak(g=.25):
+    t=tt(.3);f=500+300*t/.3;return np.sin(2*np.pi*np.cumsum(f)/sr)*np.exp(-t*8)*g
 for k in range(4):
-    s=3+4*k
-    t=np.arange(int(.35*sr))/sr;add(s+1.7,np.sin(2*np.pi*(200+400*t/.35)*t)*np.exp(-t*8)*.4)   # boing
-    t=np.arange(int(.25*sr))/sr;add(s+2.3,np.random.randn(len(t))*np.exp(-t*25)*.6+np.sin(2*np.pi*120*t)*np.exp(-t*20)*.5) # pop
-    for j,f in enumerate([523,659,784,1047]):add(s+2.4+j*.08,tone(f,.5,'bell',.3))
-    t=np.arange(int(.18*sr))/sr;add(s+.4,np.sin(2*np.pi*(300+500*t/.18)*t)*np.exp(-t*10)*.3)  # sorpresa
-    t=np.arange(int(.2*sr))/sr;add(s+2.85,np.sin(2*np.pi*90*t)*np.exp(-t*18)*.7)  # aterrizaje
-for j,f in enumerate([523,659,784,1047,1319]):add(19+j*.12,tone(f,.6,'bell',.3))
-a=np.tanh(a*1.5);a*=.8
-a[:int(.05*sr)]*=np.linspace(0,1,int(.05*sr));a[-sr:]*=np.linspace(1,0,sr)
-with wave.open('audio.wav','wb') as w:w.setnchannels(1);w.setsampwidth(2);w.setframerate(sr);w.writeframes((a*32767).astype('<i2').tobytes())
+    s=3+4*k;sd=-1 if k%2 else 1
+    put(X,s+.05,whoosh(1.3,False,sd*.7,.5),1,sd*.6)
+    put(X,s+1.28,squeak(),1,-.2);put(X,s+1.5,squeak(.2),1,.2)
+    put(X,s+1.7,boing(),1,0);put(X,s+1.78,whoosh(.55,True,0,.55),1,0)
+    put(X,s+2.3,pop(),1,0);put(X,s+2.36,sparkle(84+[0,2,4,7][k]),1,0);put(X,s+2.4,shimmer(),1,0)
+    put(X,s+2.62,whoosh(.4,False,0,.4),1,0);put(X,s+2.85,thump(),1,0)
+    put(X,s+3.05,marimba(hz(72+[0,2,4,7][k]),.5,.5),1,0)
+for j in range(5):put(X,.0+[.2,.5,.9,1.2,1.5][j],pluck(hz(72+j*3),.3,.3),1,0)
+put(X,1.8,thump(.5),1,0);put(X,2.0,sparkle(79,.3),1,0)
+put(X,19.0,sparkle(84,.4),1,0);put(X,21.0,pop(.4),1,0);put(X,21.55,marimba(hz(84),.6,.6),1,0)
+for j in range(3):put(X,22.1+j*.18,marimba(hz(88+j*0),.4,.5),1,0)
+# ---- ducking de la musica bajo la voz
+env=np.abs(V).mean(1);k=int(.05*sr);env=np.convolve(env,np.ones(k)/k,'same');env=np.convolve(np.minimum(1,env*8),np.ones(int(.15*sr))/int(.15*sr),'same')
+duck=1-.55*np.clip(env,0,1);M*=duck[:,None]
+mix=M*.9+V*1.5+X*.85
+mix[:int(.03*sr)]*=np.linspace(0,1,int(.03*sr))[:,None];mix[-sr:]*=np.linspace(1,0,sr)[:,None]
+mix/=max(1e-9,np.max(np.abs(mix)))*1.02
+with wave.open('audio_raw.wav','wb') as w:w.setnchannels(2);w.setsampwidth(2);w.setframerate(sr);w.writeframes((mix*32767).astype('<i2').tobytes())
+subprocess.run(['ffmpeg','-y','-loglevel','error','-i','audio_raw.wav','-af','loudnorm=I=-14:TP=-1.5:LRA=9','-ar','48000','audio.wav'],check=True)
