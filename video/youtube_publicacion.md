@@ -1,15 +1,15 @@
-# Publicación YouTube — "Jessito aprende los colores"
+# Publicación YouTube — "Aprende los colores"
 
-Archivo: `jessito_colores_short.mp4` (1080x1920, 24 s, 30 fps, vertical = Short)
+Archivo: `colores_short.mp4` (1080x1920, 24 s, 30 fps, vertical = Short)
 Miniatura: `miniatura.png`
 
 ## Título (elige uno, máx. 100 caracteres)
-1. 🎈 ¡Aprende los COLORES con Jessito! 🐰 Rojo, Azul, Amarillo y Verde #Shorts
-2. Jessito el conejito explota globos de colores 🎈🐰 Aprende jugando #Shorts
-3. COLORES para niños 🌈 Canción y animación con Jessito #Shorts
+1. 🎈 ¡Aprende los COLORES con el conejito! 🐰 Rojo, Azul, Amarillo y Verde #Shorts
+2. El conejito explota globos de colores 🎈🐰 Aprende jugando #Shorts
+3. COLORES para niños 🌈 Canción y animación divertida #Shorts
 
 ## Descripción
-¡Ven a aprender los colores con Jessito el conejito! 🐰🎈
+¡Ven a aprender los colores con el conejito! 🐰🎈
 Salta, explota los globos y descubre: ROJO 🍎, AZUL 🐳, AMARILLO ⭐ y VERDE 🐸.
 
 🔔 ¡Suscríbete y activa la campanita para un video nuevo cada día!
@@ -17,13 +17,13 @@ Salta, explota los globos y descubre: ROJO 🍎, AZUL 🐳, AMARILLO ⭐ y VERDE
 
 💬 Pregunta para los papás: ¿qué color es tu favorito? Pídele a tu peque que señale cosas de cada color en casa.
 
-#Shorts #ColoresParaNiños #AprenderLosColores #JessitoElConejito #VideosInfantiles #AnimaciónInfantil #AprenderJugando #CaricaturasParaNiños #EducaciónInfantil #Preescolar
+#Shorts #ColoresParaNiños #AprenderLosColores #ConejitoSaltarin #VideosInfantiles #AnimaciónInfantil #AprenderJugando #CaricaturasParaNiños #EducaciónInfantil #Preescolar
 
 ## Hashtags (usa 3–5 en el título/descripción; YouTube ignora si pones demasiados)
-#Shorts #ColoresParaNiños #AprenderLosColores #JessitoElConejito #VideosInfantiles #AnimaciónInfantil #AprenderJugando #Preescolar #CanciónesInfantiles #KidsLearning
+#Shorts #ColoresParaNiños #AprenderLosColores #ConejitoSaltarin #VideosInfantiles #AnimaciónInfantil #AprenderJugando #Preescolar #CanciónesInfantiles #KidsLearning
 
 ## Etiquetas (campo "Etiquetas", separadas por coma)
-colores para niños, aprender los colores, los colores en español, video educativo niños, animación infantil, dibujos animados para niños, conejito animado, globos de colores, aprender jugando, videos para bebés, shorts para niños, canciones infantiles, colores bebés, preescolar, learn colors spanish, colors for kids, kids learning, Jessito
+colores para niños, aprender los colores, los colores en español, video educativo niños, animación infantil, dibujos animados para niños, conejito animado, globos de colores, aprender jugando, videos para bebés, shorts para niños, canciones infantiles, colores bebés, preescolar, learn colors spanish, colors for kids, kids learning
 
 ## Configuración obligatoria al subir
 - Audiencia: **Sí, es contenido para niños** (Hecho para niños).
@@ -37,3 +37,19 @@ colores para niños, aprender los colores, los colores en español, video educat
 - Haz una serie: "Jessito aprende los números / animales / formas".
 - Sube también versión en inglés ("Learn Colors with Jessito").
 - Fija un comentario… (en "Hecho para niños" los comentarios están desactivados, así que usa la descripción).
+
+## Ideas de nombre para el canal (fáciles de decir y recordar para niños)
+- Pompitas TV
+- Mundo Saltarín
+- Chiquitines Felices
+- Dibujitos Mágicos
+- Colorines
+- Bichitos Alegres
+- Saltitos y Colores
+- Piruleta Kids
+- Nubecita Animada
+- Cuentos de Colores
+- Tutti Frutti Kids
+- Pequeños Exploradores
+
+Consejos: 2–3 sílabas por palabra, que se pueda pronunciar rápido, sin tildes ni "ñ" si piensas ir al inglés, y revisa en YouTube que el nombre y el @usuario estén libres.
