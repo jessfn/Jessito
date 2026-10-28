@@ -45,7 +45,7 @@ def vo(name,t,g=1.0):
     a=a/np.max(np.abs(a))*g;put(V,t,a,1,0)
 vo('n_hola',.5,.95)
 for k,c in enumerate(['rojo','azul','amarillo','verde']):
-    vo('n_'+c,3+4*k+1.85,.95)
+    vo('n_'+c,3+4*k+1.78,.95)
 vo('n_sub',19.4,.95);vo('n_chao',22.3,.95)
 # ---- efectos
 def whoosh(d,up=True,pan=0,g=.5):
