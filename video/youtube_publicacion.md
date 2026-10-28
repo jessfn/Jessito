@@ -56,12 +56,12 @@ Consejos: 2–3 sílabas por palabra, que se pueda pronunciar rápido, sin tilde
 
 ## Créditos (pégalos al final de la descripción en YouTube)
 Personaje: "Interactive Bunny Character" por raivu (Rive Community), licencia CC BY 4.0 — https://rive.app/marketplace/24876-46460-interactive-bunny-character/
-Voz: Kokoro-82M (Apache-2.0). Tipografías: Baloo 2 y Fredoka (SIL OFL 1.1).
+Voz: Chatterbox Multilingual (MIT) y Kokoro-82M (Apache-2.0). Tipografías: Baloo 2 y Fredoka (SIL OFL 1.1).
 
 ## Licencias de los recursos usados (todas permiten uso comercial)
 - Conejo: CC BY 4.0, **obliga a dar crédito al autor** (ya aparece al final del video y en el texto de arriba). Licencia en `rive/LICENSE-bunny.txt`.
 - Animación y movimiento, escena, música y efectos de sonido: originales de este proyecto.
 - Reproductor Rive: licencia MIT.
 - Tipografías Baloo 2 y Fredoka: SIL Open Font License 1.1 (en `fonts/`).
-- Voz: modelo Kokoro-82M, licencia Apache-2.0. Es sintética; grabar tu propia voz le da más identidad al canal.
+- Voz: Chatterbox Multilingual (Resemble AI), licencia MIT, usando como referencia de timbre una voz sintética de Kokoro-82M (Apache-2.0); no se clonó a ninguna persona real. Es sintética: grabar tu propia voz le da más identidad al canal.
 - Confirma las licencias en las páginas oficiales antes de monetizar.
