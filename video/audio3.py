@@ -77,7 +77,7 @@ vo('v_otra', 6*BAR3 + .05)
 for i in range(5): vo('c_%d' % (i+1), 6*BAR3 + (1+i)*B3)
 vo('v_bien', 7*BAR3 + 2*B3); vo('v_juntas', 8*BAR3 + .05)
 for i in range(5): vo('c_%d' % (i+1), 8*BAR3 + (2+i)*B3)
-vo('v_sub', 25.3); vo('v_noches', 27.6)
+vo('v_sub', 24.6); vo('v_noches', 26.9)
 
 # ----- efectos suaves sincronizados -----
 put(X, 0.1, whoosh(1.4, False, .25), 1, -.3); put(X, 1.6, sparkle(88, .3), 1, 0)

@@ -29,8 +29,8 @@ Personaje: "Rive App Mascot – Cloud Character" por AnggaMotion (Rive Community
 Voz: Chatterbox Multilingual (MIT) con timbre de referencia de Kokoro-82M (Apache-2.0). Tipografías: Baloo 2 y Fredoka (SIL OFL 1.1). Música y efectos originales.
 
 ## Opciones de voz (carpeta `muestras_voz2/`, misma frase en las 5)
-1. Angelical suave — **la que lleva el video**
-2. Dulce y brillante
+1. Angelical suave
+2. Dulce y brillante — **la que lleva el video (elegida)**
 3. Susurro de hada (más etérea, con más eco)
 4. Cálida (la que elegiste en el video 1)
 5. Cantarina alegre
