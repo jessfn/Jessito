@@ -38,23 +38,15 @@ for bar in range(12):
         put(M,t0+e*.5+(0.25 if e%2 else 0),marimba(hz(m)),.9,-.3+.2*e/3)
     for e in range(8):put(M,t0+e*.25,lp(hp(noise(.07),.3),.6)*np.exp(-tt(.07)*60)*.5*(1 if e%2 else .6),.5,.4 if e%2 else -.4)
 M*=.32
-# ---- voz: conejito (b_*) con sincronia labial y narradora (n_*)
-VB=np.zeros((n,2));VN=np.zeros((n,2))
-def vo(buf,name,t,g=1.0):
+# ---- voz: narradora (Kokoro, voz en espanol)
+V=np.zeros((n,2))
+def vo(name,t,g=1.0):
     a=np.load('voz/%s.npy'%name);a=np.interp(np.arange(int(len(a)*sr/22050))*22050/sr,np.arange(len(a)),a)
-    a=a/np.max(np.abs(a))*g;put(buf,t,a,1,0)
-vo(VB,'b_hola',.45,1.0);vo(VN,'n_vamos',1.55,.95)
+    a=a/np.max(np.abs(a))*g;put(V,t,a,1,0)
+vo('n_hola',.5,.95)
 for k,c in enumerate(['rojo','azul','amarillo','verde']):
-    s0=3+4*k;vo(VB,'b_oh%d'%k,s0+.5,1.0);vo(VB,'b_hup',s0+1.72,.9);vo(VB,'b_ay',s0+2.33,.95);vo(VN,'n_'+c,s0+2.48,.95)
-vo(VN,'n_sub',19.4,.95);vo(VB,'b_chao',22.3,1.0)
-V=VB+VN
-# envolvente de la boca (30 fps)
-mono=VB.mean(1);fr=sr//30;lip=[]
-for f in range(D*30):
-    seg=mono[max(0,f*fr-fr//2):f*fr+fr//2+1];lip.append(float(np.sqrt(np.mean(seg**2))) if len(seg) else 0.0)
-lip=np.array(lip);lip/=max(1e-9,np.percentile(lip[lip>1e-4],90));lip=np.clip(lip,0,1);sm=[];c=0.0
-for x in lip:c=c+(x-c)*(.7 if x>c else .4);sm.append(round(float(c),3))
-open('lip.js','w').write('const LIP='+str(sm)+';')
+    vo('n_'+c,3+4*k+1.85,.95)
+vo('n_sub',19.4,.95);vo('n_chao',22.3,.95)
 # ---- efectos
 def whoosh(d,up=True,pan=0,g=.5):
     x=noise(d);t=tt(d);e=np.sin(np.pi*t/d)**2;f=np.linspace(.03,.35,len(x)) if up else np.linspace(.35,.03,len(x))
@@ -78,16 +70,15 @@ def squeak(g=.25):
     t=tt(.3);f=500+300*t/.3;return np.sin(2*np.pi*np.cumsum(f)/sr)*np.exp(-t*8)*g
 for k in range(4):
     s=3+4*k;sd=-1 if k%2 else 1
-    put(X,s+.05,whoosh(1.3,False,sd*.7,.5),1,sd*.6)
-    put(X,s+1.28,squeak(),1,-.2);put(X,s+1.5,squeak(.2),1,.2)
-    put(X,s+1.7,boing(),1,0);put(X,s+1.78,whoosh(.55,True,0,.55),1,0)
-    put(X,s+2.3,pop(),1,0);put(X,s+2.36,sparkle(84+[0,2,4,7][k]),1,0);put(X,s+2.4,shimmer(),1,0)
-    put(X,s+2.62,whoosh(.4,False,0,.4),1,0);put(X,s+2.85,thump(),1,0)
-    put(X,s+3.05,marimba(hz(72+[0,2,4,7][k]),.5,.5),1,0)
-for j in range(5):put(X,.0+[.2,.5,.9,1.2,1.5][j],pluck(hz(72+j*3),.3,.3),1,0)
-put(X,1.8,thump(.5),1,0);put(X,2.0,sparkle(79,.3),1,0)
+    put(X,s+.05,whoosh(1.0,False,sd*.7,.5),1,sd*.6)
+    put(X,s+.95,squeak(),1,-.2);put(X,s+1.1,squeak(.2),1,.2)
+    put(X,s+1.25,boing(),1,0);put(X,s+1.3,whoosh(.45,True,0,.55),1,0)
+    put(X,s+1.75,pop(),1,0);put(X,s+1.8,sparkle(84+[0,2,4,7][k]),1,0);put(X,s+1.85,shimmer(),1,0)
+    put(X,s+1.95,whoosh(.3,False,0,.4),1,0);put(X,s+2.2,thump(),1,0)
+    put(X,s+2.35,marimba(hz(72+[0,2,4,7][k]),.5,.5),1,0)
+for j in range(5):put(X,[.2,.5,.9,1.3,1.7][j],pluck(hz(72+j*3),.3,.3),1,0)
+put(X,1.9,sparkle(79,.3),1,0)
 put(X,19.0,sparkle(84,.4),1,0);put(X,21.0,pop(.4),1,0);put(X,21.55,marimba(hz(84),.6,.6),1,0)
-for j in range(3):put(X,22.1+j*.18,marimba(hz(88+j*0),.4,.5),1,0)
 # ---- ducking de la musica bajo la voz
 env=np.abs(V).mean(1);k=int(.05*sr);env=np.convolve(env,np.ones(k)/k,'same');env=np.convolve(np.minimum(1,env*8),np.ones(int(.15*sr))/int(.15*sr),'same')
 duck=1-.55*np.clip(env,0,1);M*=duck[:,None]

@@ -3,3 +3,5 @@ bun/meta_*.json
 test*.png
 audio*.wav
 frames/
+rive/spr/
+frames/

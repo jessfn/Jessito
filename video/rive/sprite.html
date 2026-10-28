@@ -1,0 +1,36 @@
+<!doctype html><html><body style="margin:0;background:#fff"><canvas id="c" width="2400" height="1800"></canvas><canvas id="k"></canvas>
+<script src="rive.js"></script><script src="timeline.js"></script>
+<script>
+// region de recorte en unidades del artboard (sin los botones de la derecha)
+const CROP={x:300,y:70,w:834,h:1030},RS=1.5,OUTS=.82;
+window.READY=false;
+rive.RuntimeLoader.getInstance(async rc=>{
+ window.rc=rc;const buf=await (await fetch('bunny.riv')).arrayBuffer();const file=await rc.load(new Uint8Array(buf));
+ const art=file.defaultArtboard(),canvas=document.getElementById('c'),renderer=rc.makeRenderer(canvas);
+ const insts={};for(let i=0;i<art.animationCount();i++){const a=art.animationByIndex(i);insts[a.name]={a,i:new rc.LinearAnimationInstance(a,art)}}
+ window.drawAnim=(list)=>{
+  // base determinista: reposo y fin de cada pose en orden fijo, luego el plan del cuadro
+  for(const n of ['01 Wave 1','Idle Loop'])insts[n].i.time=n==='01 Wave 1'?0:150/60,insts[n].i.apply(1);
+  for(const [n,t,m] of list){insts[n].i.time=t;insts[n].i.apply(m)}
+  art.advance(0);renderer.clear();renderer.save();
+  renderer.align(rc.Fit.contain,rc.Alignment.center,{minX:0,minY:0,maxX:canvas.width,maxY:canvas.height},art.bounds);
+  art.draw(renderer);renderer.restore();renderer.flush()};
+ window.READY=true});
+// recorta, quita el fondo blanco (relleno desde los bordes) y reduce con suavizado
+window.extract=()=>{
+ const src=document.getElementById('c'),sx=CROP.x*RS+(2400-1600*RS)/2,sy=CROP.y*RS+(1800-1200*RS)/2,sw=Math.round(CROP.w*RS),sh=Math.round(CROP.h*RS);
+ const t=document.createElement('canvas');t.width=sw;t.height=sh;const x=t.getContext('2d',{willReadFrequently:true});x.drawImage(src,Math.round(sx),Math.round(sy),sw,sh,0,0,sw,sh);
+ const im=x.getImageData(0,0,sw,sh),d=im.data,n=sw*sh,m=new Uint8Array(n);
+ const bg=i=>{const r=d[i*4],g=d[i*4+1],b=d[i*4+2],mn=Math.min(r,g,b),mx=Math.max(r,g,b);return mn>=205&&mx-mn<=48};
+ const q=new Int32Array(n);let h=0,tl=0;
+ const push=i=>{if(!m[i]&&bg(i)){m[i]=1;q[tl++]=i}};
+ for(let i=0;i<sw;i++){push(i);push((sh-1)*sw+i)}for(let j=0;j<sh;j++){push(j*sw);push(j*sw+sw-1)}
+ while(h<tl){const i=q[h++],cx=i%sw,cy=(i/sw)|0;if(cx>0)push(i-1);if(cx<sw-1)push(i+1);if(cy>0)push(i-sw);if(cy<sh-1)push(i+sw)}
+ // borra 2 px del borde (halo claro) y deja transparente el fondo
+ const m2=new Uint8Array(m);
+ for(let pass=0;pass<2;pass++){const mm=new Uint8Array(m2);for(let j=1;j<sh-1;j++)for(let i=1;i<sw-1;i++){const k=j*sw+i;if(!m2[k]&&(m2[k-1]||m2[k+1]||m2[k-sw]||m2[k+sw]))mm[k]=1}m2.set(mm)}
+ for(let i=0;i<n;i++)if(m2[i])d[i*4+3]=0;
+ x.putImageData(im,0,0);
+ const ow=Math.round(CROP.w*OUTS),oh=Math.round(CROP.h*OUTS),o=document.getElementById('k');o.width=ow;o.height=oh;const ox=o.getContext('2d');ox.imageSmoothingQuality='high';ox.drawImage(t,0,0,ow,oh);
+ return o.toDataURL('image/png')};
+</script></body></html>

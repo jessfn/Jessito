@@ -1,0 +1,4 @@
+Personaje: "Interactive Bunny Character" por raivu (Rive Community)
+https://rive.app/marketplace/24876-46460-interactive-bunny-character/
+Licencia: Creative Commons Attribution 4.0 (CC BY 4.0). Se debe dar credito al autor.
+Reproductor Rive (rive.js / rive.wasm): licencia MIT.
