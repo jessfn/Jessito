@@ -1,0 +1,13 @@
+<!doctype html><html><body style="margin:0;background:#fff"><canvas id="c" width="500" height="926"></canvas>
+<script src="rive.js"></script><script src="timeline4.js"></script>
+<script>
+window.READY=false;
+rive.RuntimeLoader.getInstance(async rc=>{
+ window.rc=rc;const buf=await (await fetch('robot/robot.riv')).arrayBuffer();const file=await rc.load(new Uint8Array(buf));
+ const art=file.defaultArtboard(),canvas=document.getElementById('c'),renderer=rc.makeRenderer(canvas),ins={};
+ for(let i=0;i<art.animationCount();i++){const a=art.animationByIndex(i);ins[a.name]=new rc.LinearAnimationInstance(a,art)}
+ window.drawPlan=(pl)=>{ins['Idle'].time=30/60;ins['Idle'].apply(1);for(const [n,t,m] of pl.A){ins[n].time=t;ins[n].apply(m)}art.advance(0);
+  renderer.clear();renderer.save();renderer.align(rc.Fit.contain,rc.Alignment.center,{minX:0,minY:0,maxX:canvas.width,maxY:canvas.height},art.bounds);art.draw(renderer);renderer.restore();renderer.flush()};
+ window.READY=true});
+window.extract=()=>document.getElementById('c').toDataURL('image/png');
+</script></body></html>

@@ -1,0 +1,128 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:'Baloo 2';font-weight:800;src:url(fonts/baloo2-800.woff2) format('woff2')}
+@font-face{font-family:'Fredoka';font-weight:700;src:url(fonts/fredoka-700.woff2) format('woff2')}
+</style></head><body style="margin:0;background:#000"><div id="s" style="width:1080px;height:1920px"></div>
+<script src="rive/timeline4.js"></script>
+<script>
+const W=1080,H=1920,GY=1470,clamp=c4,eo=x=>1-Math.pow(1-c4(x),3),sst=s4;
+const eb=x=>{x=clamp(x);const c=2.2;return 1+(c+1)*Math.pow(x-1,3)+c*Math.pow(x-1,2)};
+const rnd=i=>{const v=Math.sin(i*127.1+311.7)*43758.5453;return v-Math.floor(v)};
+const f1=n=>n.toFixed(1);
+const mixc=(h,m,t)=>{const p=v=>parseInt(h.slice(v,v+2),16);return '#'+[p(1),p(3),p(5)].map(c=>Math.round(c+(m-c)*t).toString(16).padStart(2,'0')).join('')};
+const FF="'Baloo 2','Fredoka','Arial Rounded MT Bold',Verdana,sans-serif";
+/* ---------- elementos ---------- */
+function balloon(x,y,c,d,rot,sx,sy){return `<g transform="translate(${f1(x)} ${f1(y)}) rotate(${f1(rot)}) scale(${f1(sx*100)/100} ${f1(sy*100)/100})"><path d="M0 150 Q-30 260 10 340 T0 470" stroke="#fff" stroke-width="5" fill="none" opacity=".9"/><path d="M0 146 l-20 30 h40z" fill="${d}"/><ellipse rx="116" ry="148" fill="${c}"/><ellipse cx="-44" cy="-58" rx="22" ry="44" fill="#fff" opacity=".5" transform="rotate(20 -44 -58)"/><ellipse cx="40" cy="62" rx="50" ry="70" fill="${d}" opacity=".18"/></g>`}
+const star4=(x,y,r,rot,fill,op=1)=>`<path d="M0 ${-r} Q${r*.14} ${-r*.14} ${r} 0 Q${r*.14} ${r*.14} 0 ${r} Q${-r*.14} ${r*.14} ${-r} 0 Q${-r*.14} ${-r*.14} 0 ${-r}Z" fill="${fill}" opacity="${op}" transform="translate(${f1(x)} ${f1(y)}) rotate(${f1(rot)})"/>`;
+function sparks(x,y,t,n,R,cols){let o='';for(let i=0;i<n;i++){const a=i*6.283/n+Math.sin(t*.7)*.3,r=R*(.8+.4*rnd(i)),tw=.5+.5*Math.sin(t*6+i*1.7);o+=star4(x+Math.cos(a)*r*1.3,y+Math.sin(a)*r*.55,16+20*rnd(i+3)*tw,t*40+i*20,cols[i%cols.length],.4+.6*tw)}return o}
+function fx(ts,x,y,c,d){let o='';if(ts<0||ts>2.4)return o;const cols=[c,d,'#fff','#ffd21f','#ff6fb5','#4fc3ff'];
+ for(let i=0;i<56;i++){const a=rnd(i)*6.283,v=300+rnd(i+50)*700,px=x+Math.cos(a)*v*ts,py=y+Math.sin(a)*v*ts+900*ts*ts*.6;o+=`<rect x="-9" y="-5" width="18" height="10" rx="3" fill="${cols[i%6]}" opacity="${clamp(1-ts/2.4)}" transform="translate(${f1(px)} ${f1(py)}) rotate(${f1(ts*(300+i*20))})"/>`}
+ for(let i=0;i<9;i++){const a=i*.7+rnd(i)*.4,v=520+rnd(i+7)*380,px=x+Math.cos(a)*v*ts,py=y+Math.sin(a)*v*ts+700*ts*ts;o+=`<path d="M-30 0 Q0 -22 30 0 Q0 -8 -30 0Z" fill="${c}" opacity="${clamp(1-ts/1.3)}" transform="translate(${f1(px)} ${f1(py)}) rotate(${f1(a*57+ts*500)})"/>`}
+ for(let i=0;i<14;i++){const a=rnd(i+90)*6.283,v=250+rnd(i+70)*700,px=x+Math.cos(a)*v*ts,py=y+Math.sin(a)*v*ts+800*ts*ts*.6;o+=star4(px,py,15+14*rnd(i),ts*300+i*40,cols[(i+3)%6],clamp(1.3-ts/1.8))}
+ const r=eo(ts/.5)*520;o+=`<circle cx="${x}" cy="${y}" r="${f1(r)}" fill="none" stroke="${c}" stroke-width="${f1(40*(1-clamp(ts/.5)))}" opacity="${1-clamp(ts/.5)}"/>`;
+ return o}
+function dust(ts,x){let o='';if(ts<0||ts>.6)return o;for(let i=0;i<7;i++){const sd=i%2?1:-1,d=(1+i>>1)*40*eo(ts/.6),r=(18+i*4)*(1+ts*1.5);o+=`<circle cx="${f1(x+sd*(70+d*1.4))}" cy="${f1(GY+14-ts*60-(i>>1)*6)}" r="${f1(r)}" fill="#fff" opacity="${(.75*(1-ts/.6)).toFixed(2)}"/>`}return o}
+function sunburst(x,y,ts,c,op=.3){let o=`<g transform="translate(${x} ${y}) rotate(${f1(ts*16)})" opacity="${(op*eo(ts/.25)*(1-clamp((ts-1.7)/.9))).toFixed(3)}">`;for(let i=0;i<14;i++)o+=`<polygon points="0,0 -90,-900 90,-900" fill="${c}" transform="rotate(${i*360/14})"/>`;return o+`</g>`}
+
+/* ---------- texto plano moderno ---------- */
+function txt(ts,x,y,size,sc,fill,rot=0,sw=null){const k=size/200,stw=sw??Math.max(10,24*k);
+ return `<g transform="translate(${x} ${y}) rotate(${rot}) scale(${f1(Math.max(sc,0)*100)/100})" filter="url(#ds)"><text text-anchor="middle" font-family="${FF}" font-weight="800" font-size="${size}" fill="${fill}" stroke="#fff" stroke-width="${f1(stw)}" stroke-linejoin="round" paint-order="stroke" y="8">${ts}</text></g>`}
+function word(str,x,y,size,sc,fill,rot,tt){let ts='',pv=0;[...str].forEach((ch,i)=>{const o=-55*Math.sin(clamp((tt-.2-i*.06)/.32)*Math.PI)+Math.sin(tt*5-i*.6)*3*clamp((tt-.8)/.4);ts+=`<tspan dy="${f1(o-pv)}">${ch}</tspan>`;pv=o});return txt(ts,x,y,size,sc,fill,rot)}
+const RAINBOW=['#ff4757','#ff8a3d','#ffc42e','#2fd06b','#2f8bff','#7a5cff','#ff5fa8'];
+
+
+/* ===== Distribucion por zonas (nada se encima) =====
+ guirnalda 0-170 | titulo 215-365 | tarjeta 440-960 | robot 1010-1600 | subtitulo/boton 1690-1800 | credito 1860 */
+const FLOOR=1590,CARD={x:80,y:440,w:920,h:520};
+const SH=[{n:'CÍRCULO',c:'#ff5a5f',o:'🍕',ol:'una pizza',f:'0 esquinas',l:['¡Es un círculo!','¡Redondo como una pizza!','¡No tiene esquinas!']},
+ {n:'CUADRADO',c:'#3d8bff',o:'🪟',ol:'una ventana',f:'4 lados iguales',l:['¡Es un cuadrado!','¡Cuadrado como una ventana!','¡Tiene cuatro lados iguales!']},
+ {n:'TRIÁNGULO',c:'#22c55e',o:'🏠',ol:'una casa',f:'3 lados',l:['¡Es un triángulo!','¡Como el techo de una casa!','¡Tiene tres lados!']},
+ {n:'ESTRELLA',c:'#ffc01f',o:'🌃',ol:'el cielo',f:'5 puntas',l:['¡Es una estrella!','¡Brilla como las del cielo!','¡Tiene cinco puntas!']}];
+const SEG0=4,SEGL=6,REC0=28,OUT0=34;
+const RECAP_T=[29.0,29.9,30.8,31.7];
+
+/* ---------- fondo: cuarto de juegos ---------- */
+function room(t){
+ let o=`<defs>
+ <linearGradient id="wl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9fe6da"/><stop offset="1" stop-color="#d9fbf4"/></linearGradient>
+ <linearGradient id="fl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6cf97"/><stop offset="1" stop-color="#e9b070"/></linearGradient>
+ <linearGradient id="btn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff5a5a"/><stop offset="1" stop-color="#d9002f"/></linearGradient>
+ <radialGradient id="vig" cx=".5" cy=".5" r=".8"><stop offset=".68" stop-color="#0d4f48" stop-opacity="0"/><stop offset="1" stop-color="#0d4f48" stop-opacity=".22"/></radialGradient>
+ <filter id="ds" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="9" stdDeviation="7" flood-color="#0d3b46" flood-opacity=".28"/></filter>
+ <clipPath id="rc"><rect x="0" y="0" width="500" height="873"/></clipPath></defs>
+ <rect x="-40" y="-40" width="${W+80}" height="1700" fill="url(#wl)"/>`;
+ // lunares grandes de la pared (solo decoracion de fondo, detras de todo)
+ for(let r=0;r<9;r++)for(let c=0;c<7;c++){const x=c*180+(r%2?90:0)-20,y=r*190+60;o+=`<circle cx="${x}" cy="${y}" r="26" fill="#fff" opacity=".28"/>`}
+ // zocalo
+ o+=`<rect x="-40" y="1470" width="${W+80}" height="40" fill="#7fd3c5"/><rect x="-40" y="1500" width="${W+80}" height="420" fill="url(#fl)"/>`;
+ for(let i=0;i<9;i++)o+=`<rect x="${i*135-30}" y="1500" width="6" height="420" fill="#c98f52" opacity=".35"/>`;
+ // alfombra
+ o+=`<ellipse cx="540" cy="1625" rx="470" ry="120" fill="#7c6cf0" opacity=".25" transform="translate(0 12)"/><ellipse cx="540" cy="1625" rx="470" ry="120" fill="#b9a9ff"/><ellipse cx="540" cy="1625" rx="420" ry="96" fill="none" stroke="#fff" stroke-width="8" stroke-dasharray="26 18" opacity=".8"/>`;
+ // bloques de juguete en los costados (fuera de la zona del robot y de los subtitulos)
+ const blk=(x,y,sz,c,l)=>`<g transform="translate(${x} ${y})"><rect width="${sz}" height="${sz}" rx="14" fill="${c}"/><rect width="${sz}" height="${sz*.28}" rx="14" fill="#fff" opacity=".25"/><text x="${sz/2}" y="${sz*.72}" text-anchor="middle" font-size="${sz*.6}" font-weight="800" fill="#fff" font-family="${FF}">${l}</text></g>`;
+ o+=blk(24,1520,100,'#ff5a5f','A')+blk(30,1420,84,'#3d8bff','B')+blk(960,1520,100,'#22c55e','C')+blk(966,1428,84,'#ffc01f','1');
+ // guirnalda (zona 0-170): la cuerda y los banderines usan la misma curva
+ const gy=x=>58+40*Math.sin(x/1080*Math.PI*3-.4);
+ let pd='M-20 '+gy(-20).toFixed(1);for(let x=0;x<=1100;x+=20)pd+=' L'+x+' '+gy(x).toFixed(1);
+ o+=`<path d="${pd}" fill="none" stroke="#7a5a3c" stroke-width="6"/>`;
+ const cols=['#ff5a5f','#ffc01f','#22c55e','#3d8bff','#b06cff'];
+ for(let i=0;i<13;i++){const x=i*88-6,py=gy(x);o+=`<polygon points="${x-30},${(py-2).toFixed(1)} ${x+30},${(py-2).toFixed(1)} ${x},${(py+62+Math.sin(t*2+i)*4).toFixed(1)}" fill="${cols[i%5]}"/>`}
+ return o}
+/* ---------- formas con carita ---------- */
+function face(R,t,i){return `<g><ellipse cx="${f1(-R*.28)}" cy="${f1(-R*.05)}" rx="${f1(R*.075)}" ry="${f1(R*.11)}" fill="#3b2a5a"/><ellipse cx="${f1(R*.28)}" cy="${f1(-R*.05)}" rx="${f1(R*.075)}" ry="${f1(R*.11)}" fill="#3b2a5a"/><circle cx="${f1(-R*.26)}" cy="${f1(-R*.09)}" r="${f1(R*.03)}" fill="#fff"/><circle cx="${f1(R*.3)}" cy="${f1(-R*.09)}" r="${f1(R*.03)}" fill="#fff"/><path d="M${f1(-R*.16)} ${f1(R*.12)} Q0 ${f1(R*.3)} ${f1(R*.16)} ${f1(R*.12)}" stroke="#3b2a5a" stroke-width="${f1(R*.055)}" fill="none" stroke-linecap="round"/><ellipse cx="${f1(-R*.46)}" cy="${f1(R*.14)}" rx="${f1(R*.11)}" ry="${f1(R*.065)}" fill="#ff8fb7" opacity=".75"/><ellipse cx="${f1(R*.46)}" cy="${f1(R*.14)}" rx="${f1(R*.11)}" ry="${f1(R*.065)}" fill="#ff8fb7" opacity=".75"/></g>`}
+function shapeSvg(k,cx,cy,size,t,sc,glow=0){const c=SH[k].c,R=size/2,bob=Math.sin((t/B4)%1*Math.PI)*8,rot=Math.sin(t*2.4+k)*4;let body='';
+ const st=`fill="${c}" stroke="${c}" stroke-width="${f1(R*.2)}" stroke-linejoin="round"`;
+ if(k===0)body=`<circle r="${f1(R*.9)}" ${st}/>`;
+ else if(k===1)body=`<rect x="${f1(-R*.82)}" y="${f1(-R*.82)}" width="${f1(R*1.64)}" height="${f1(R*1.64)}" rx="${f1(R*.2)}" ${st}/>`;
+ else if(k===2){const r=R*.95,p=[0,1,2].map(i=>{const a=-Math.PI/2+i*2*Math.PI/3;return f1(Math.cos(a)*r)+','+f1(Math.sin(a)*r*1.0+R*.12)}).join(' ');body=`<polygon points="${p}" ${st}/>`}
+ else{const p=[];for(let q=0;q<10;q++){const a=-Math.PI/2+q*Math.PI/5,r=(q%2?R*.5:R*.92);p.push(f1(Math.cos(a)*r)+','+f1(Math.sin(a)*r+R*.04))}body=`<polygon points="${p.join(' ')}" ${st}/>`}
+ const fy=k===2?R*.22:k===3?R*.06:0;
+ return `<g transform="translate(${f1(cx)} ${f1(cy-bob)}) rotate(${f1(rot)}) scale(${f1(Math.max(sc,0)*100)/100})" filter="url(#ds)">${glow?`<circle r="${f1(R*1.25)}" fill="#fff" opacity="${(.55*glow).toFixed(2)}"/>`:''}${body}<ellipse cx="${f1(-R*.3)}" cy="${f1(-R*.4)}" rx="${f1(R*.22)}" ry="${f1(R*.1)}" fill="#fff" opacity=".35" transform="rotate(-25 ${f1(-R*.3)} ${f1(-R*.4)})"/><g transform="translate(0 ${f1(fy)})">${face(R*(k===3?.95:1),t,k)}</g></g>`}
+function cardSvg(col){return `<g filter="url(#ds)"><rect x="${CARD.x}" y="${CARD.y}" width="${CARD.w}" height="${CARD.h}" rx="56" fill="#fff"/><rect x="${CARD.x+10}" y="${CARD.y+10}" width="${CARD.w-20}" height="${CARD.h-20}" rx="46" fill="none" stroke="${col}" stroke-width="12"/></g>`}
+const cap=(str,t0,t)=>{const a=t-t0;if(a<0)return '';const sz=Math.min(80,1500/str.length),w=Math.min(1000,str.length*sz*.5+90),sc=eb(a/.25)*(1+.015*Math.exp(-((t/B4)%1)*5));
+ return `<g transform="translate(540 1745) scale(${f1(Math.max(sc,0)*100)/100})" filter="url(#ds)"><rect x="${f1(-w/2)}" y="-58" width="${f1(w)}" height="116" rx="58" fill="#4b2fb8" opacity=".95"/><text text-anchor="middle" y="${f1(sz*.34)}" font-size="${f1(sz)}" font-weight="800" fill="#fff" font-family="${FF}">${str}</text></g>`};
+
+function frame(f){
+ const t=f/30,P=plan4(t);let world=room(t),mid='',ui='',zoom=1.0;
+ const pulse=P.pulse;
+ // ----- contenido por parte -----
+ if(t<SEG0){ // intro
+  ui+=txt('¡LAS FORMAS!',540,300+Math.sin(t*3)*5,132,eb((t-.1)/.4),'#ff5a5f',-2+Math.sin(t*2)*2);
+  ui+=cardSvg('#7c6cf0');
+  for(let k=0;k<4;k++){const ta=1.0+k*.5,x=CARD.x+CARD.w/2+(k-1.5)*215;if(t>=ta)ui+=shapeSvg(k,x,700,170,t,eb((t-ta)/.35))}
+  ui+=cap('¡Hoy vamos a descubrir las formas!',.6,t);
+ } else if(t<REC0){ // una forma cada 6 s
+  const k=Math.floor((t-SEG0)/SEGL),s=t-SEG0-k*SEGL,d=SH[k];
+  ui+=word(d.n,540,290,d.n.length>7?112:132,eb(s/.4),d.c,Math.sin(s*5)*2,s);
+  ui+=cardSvg(d.c);
+  ui+=shapeSvg(k,330,660,330,t,eb(s/.45));
+  if(s>=1.7){const a=s-1.7;
+   ui+=`<g transform="translate(562 ${f1(670)}) scale(${f1(Math.max(eb(a/.3),0)*100)/100})"><text text-anchor="middle" font-size="46" font-weight="800" fill="${mixc(d.c,0,.35)}" font-family="${FF}">como</text></g>`;
+   ui+=`<g transform="translate(790 660) rotate(${f1(Math.sin(t*5)*5)}) scale(${f1(Math.max(eb((a-.05)/.4),0)*100)/100})" filter="url(#ds)"><circle r="122" fill="#fff"/><circle r="122" fill="none" stroke="${d.c}" stroke-width="12"/><circle r="100" fill="${mixc(d.c,255,.85)}"/><text y="48" font-size="126" text-anchor="middle">${d.o}</text></g>`;
+   ui+=txt(d.ol,790,905,54,eb((a-.2)/.35),mixc(d.c,0,.25),0,10)}
+  if(s>=3.9){const a=s-3.9,w=d.f.length*26+96;
+   ui+=`<g transform="translate(330 905) scale(${f1(Math.max(eb(a/.35),0)*100)/100})" filter="url(#ds)"><rect x="${-w/2}" y="-36" width="${w}" height="72" rx="36" fill="${d.c}" stroke="#fff" stroke-width="8"/><text text-anchor="middle" y="17" font-size="48" font-weight="800" fill="#fff" font-family="${FF}">${d.f}</text></g>`;
+   if(a<1.8)ui+=sparks(330,660,t,6,100,['#fff','#ffe066',d.c])}
+  const bt=[[0.05,0],[1.7,1],[3.9,2]];let cur=0;for(const [ts,ix] of bt)if(s>=ts)cur=ix;ui+=cap(d.l[cur],SEG0+k*SEGL+bt[cur][0],t);
+ } else if(t<OUT0){ // repaso 2x2
+  const s=t-REC0;ui+=txt('¡REPASEMOS!',540,300,128,eb((s-.02)/.4),'#7c6cf0',-2+Math.sin(t*3)*2);
+  ui+=cardSvg('#7c6cf0');
+  for(let k=0;k<4;k++){const x=CARD.x+CARD.w/2+(k%2?1:-1)*225,y=k<2?585:800,ta=RECAP_T[k],on=t>=ta&&t<ta+.9,g=on?1-(t-ta)/.9:0,pop=1+(on?.22*Math.exp(-(t-ta)*6)*Math.cos((t-ta)*16)+.1:0);
+   ui+=shapeSvg(k,x,y,140,t,pop*eb((s-.1-k*.08)/.35),g);
+   ui+=txt(SH[k].n,x,y+104,42,1,SH[k].c,0,9)}
+  const caps=[[28.05,'¡Repasemos!'],[29.0,'¡Círculo!'],[29.9,'¡Cuadrado!'],[30.8,'¡Triángulo!'],[31.7,'¡Estrella!'],[32.6,'¡Muy bien, amiguitos!']];let cc=null;for(const c of caps)if(t>=c[0])cc=c;if(cc)ui+=cap(cc[1],cc[0],t);
+  if(t>=32.6)world+=fx(t-32.6,540,700,'#ffc01f','#ff5a5f');
+ } else { // cierre
+  const e=t-OUT0;ui+=txt('¡SUSCRÍBETE!',540,300,126,eb((e-.1)/.4),'#ff5a5f',-2);
+  ui+=cardSvg('#ffc01f');
+  ui+=`<g transform="translate(540 ${f1(640)}) rotate(${f1(Math.sin(t*12)*14)} 0 -80) scale(${f1(Math.max(eb((e-.3)/.4),0)*100)/100})"><text text-anchor="middle" y="90" font-size="250">🔔</text></g>`;
+  ui+=txt('y activa la campanita',540,880,76,eb((e-.6)/.4),'#3d8bff',0,12);
+  if(e>=.9){const u=eb((e-.9)/.4);ui+=`<g transform="translate(540 1745) scale(${f1(u*100)/100})"><rect x="-224" y="-46" width="460" height="120" rx="60" fill="#0d3b46" opacity=".25"/><rect x="-230" y="-60" width="460" height="120" rx="60" fill="url(#btn)" stroke="#fff" stroke-width="10"/><path d="M-170 -32 l50 32 l-50 32z" fill="#fff"/><text x="50" y="16" text-anchor="middle" font-size="46" font-weight="800" fill="#fff" font-family="${FF}">SUSCRIBIRME</text><g transform="translate(330 -10) rotate(${f1(Math.sin(t*14)*22)} 0 -50)"><path d="M0 -60 q-45 0 -45 50 v30 h-15 v14 h120 v-14 h-15 v-30 q0 -50 -45 -50z" fill="#ffc42e" stroke="#fff" stroke-width="8"/><circle cy="40" r="14" fill="#d49100"/></g></g>`}
+  if(e>=1.5)ui+=`<text x="540" y="1872" text-anchor="middle" font-size="28" font-weight="700" fill="#fff" opacity="${(.9*sst(1.5,2,e)).toFixed(2)}" font-family="Fredoka,sans-serif" style="filter:drop-shadow(0 2px 3px rgba(0,0,0,.45))">Personaje: JcToon · Rive (CC BY 4.0)</text>`;
+ }
+ // ----- robot (el sprite se recorta sobre sus pies para usar mi propia sombra) -----
+ const sh=clamp(1+P.Y/420,.5,1);
+ mid+=`<ellipse cx="${f1(P.X)}" cy="${FLOOR+14}" rx="${f1(150*sh)}" ry="${f1(24*sh)}" fill="#2a1f7a" opacity="${(.28*sh).toFixed(2)}"/>`;
+ mid+=`<g transform="translate(${f1(P.X)} ${f1(FLOOR+P.Y)}) rotate(${f1(P.ROT*57.3)}) scale(${f1(P.SX*.62*1000)/1000} ${f1(P.SY*.62*1000)/1000}) translate(-245 -870)"><g clip-path="url(#rc)"><image href="rive/spr4/s${String(f).padStart(4,'0')}.png" x="0" y="0" width="500" height="926"/></g></g>`;
+ document.getElementById('s').innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${world}${mid}<rect width="${W}" height="${H}" fill="url(#vig)"/>${ui}</svg>`}
+window.frame=frame;frame(0);
+</script></body></html>
