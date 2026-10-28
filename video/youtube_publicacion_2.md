@@ -26,7 +26,7 @@ números para niños, contar del 1 al 5, canción de números, canciones infanti
 
 ## Créditos (pégalos al final de la descripción)
 Personaje: "Rive App Mascot – Cloud Character" por AnggaMotion (Rive Community), licencia CC BY 4.0 — https://rive.app/marketplace/27043-50911-rive-app-mascot-cloud-character-with-state-machine-and-6-expressions/
-Voz: Chatterbox Multilingual (MIT) con timbre de referencia sintético de Kokoro-82M (Apache-2.0), versión "Bella" suave y tierna. Tipografías: Baloo 2 y Fredoka (SIL OFL 1.1). Música y efectos originales.
+Voz: Chatterbox Multilingual (MIT) con timbre de referencia sintético de Kokoro-82M (Apache-2.0),  Tipografías: Baloo 2 y Fredoka (SIL OFL 1.1). Música y efectos originales.
 
 ## Voz del video
-Versión "Bella cálida": voz de mujer dulce, pausada y tierna (muestras en `muestras_voz3/`, la número 4). Es sintética; para más identidad de canal puedes grabar tu propia voz.
+Versión "dulce y brillante": voz de mujer dulce y luminosa (muestra 2 de `muestras_voz2/`). Es sintética; para más identidad de canal puedes grabar tu propia voz.
