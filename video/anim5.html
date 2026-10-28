@@ -77,7 +77,7 @@ function numRow(t,t0,y,lightAt,cnt=5){let o='';for(let i=0;i<cnt;i++){const x=54
  o+=`<g transform="translate(${x} ${y}) scale(${f1(sc*100)/100})" filter="url(#ds)" opacity="${on?1:.55}"><circle r="70" fill="${on?col:'#fff'}" stroke="${on?'#fff':col}" stroke-width="9"/><text text-anchor="middle" y="28" font-size="84" font-weight="800" fill="${on?'#fff':col}" font-family="${FF}">${i+1}</text></g>`}return o}
 function chicks(t,x0,y0,n,tb,mode){let o='';const sp=Math.min(190,860/Math.max(n,1));
  for(let i=0;i<n;i++){const ta=mode==='bar'?chickT(tb,i):tb,age=t-ta;if(age<0)continue;const sc=Math.max(eb(age/.3),0),ph=(t/BEAT+i*.37)%1,hop=Math.abs(Math.sin(ph*Math.PI))*(mode==='dance'?70:26);
-  const x=x0+(i-(n-1)/2)*sp;o+=`<g transform="translate(${f1(x)} ${f1(y0-hop)}) scale(${f1(sc*100)/100})"><ellipse cy="${f1(70+hop*.55)}" rx="52" ry="12" fill="#1d6b3a" opacity=".25"/><text text-anchor="middle" y="52" font-size="136">🐥</text></g>`}return o}
+  const x=x0+(i-(n-1)/2)*sp;o+=`<g transform="translate(${f1(x)} ${f1(y0-hop)}) scale(${f1(sc*100)/100})"><ellipse cy="${f1(84+hop*.55)}" rx="66" ry="14" fill="#1d6b3a" opacity=".25"/><text text-anchor="middle" y="66" font-size="180">🐥</text></g>`}return o}
 function notes(t,cx){let o='';for(let k=0;k<14;k++){const tn=Math.floor(t/BEAT)*BEAT-k*BEAT,age=t-tn;if(age>3.2||tn<0)continue;const j=Math.round(tn/BEAT),x=cx+(rnd(j)-.5)*700+Math.sin(age*3+j)*40,y=1250-age*330;o+=`<text x="${f1(x)}" y="${f1(y)}" font-size="${f1(54+rnd(j+4)*26)}" text-anchor="middle" opacity="${(Math.max(0,1-age/3.2)*.85).toFixed(2)}" transform="rotate(${f1(Math.sin(age*4+j)*14)} ${f1(x)} ${f1(y)})">${['🎵','🎶','🎵','✨'][j%4]}</text>`}return o}
 function frame(f){
  const t=f/30,P=plan2(t);let world=bg(t),mid='',ui='',zoom=1.06,shake=0;

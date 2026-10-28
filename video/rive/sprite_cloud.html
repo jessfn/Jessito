@@ -1,0 +1,13 @@
+<!doctype html><html><body style="margin:0;background:#fff"><canvas id="c" width="1000" height="1000"></canvas><canvas id="k" width="960" height="960"></canvas>
+<script src="rive.js"></script><script src="timeline3.js"></script>
+<script>
+window.READY=false;
+rive.RuntimeLoader.getInstance(async rc=>{
+ window.rc=rc;const buf=await (await fetch('cloud/cloud.riv')).arrayBuffer();const file=await rc.load(new Uint8Array(buf));
+ const canvas=document.getElementById('c'),renderer=rc.makeRenderer(canvas),A={};
+ for(const n of ['2','5','4']){const art=file.artboardByName(n);const ins={};for(let i=0;i<art.animationCount();i++){const a=art.animationByIndex(i);ins[a.name]=new rc.LinearAnimationInstance(a,art)}A[n]={art,ins}}
+ window.drawPlan=(pl)=>{const {art,ins}=A[pl.art];for(const [n,t,m] of pl.A){ins[n].time=t;ins[n].apply(m)}art.advance(0);
+  renderer.clear();renderer.save();renderer.align(rc.Fit.contain,rc.Alignment.center,{minX:0,minY:0,maxX:canvas.width,maxY:canvas.height},art.bounds);art.draw(renderer);renderer.restore();renderer.flush()};
+ window.READY=true});
+window.extract=()=>{const o=document.getElementById('k'),x=o.getContext('2d');x.clearRect(0,0,960,960);x.imageSmoothingQuality='high';x.drawImage(document.getElementById('c'),0,0,960,960);return o.toDataURL('image/png')};
+</script></body></html>
