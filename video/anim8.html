@@ -75,16 +75,16 @@ function frame(f){
   const k=seg.k,col=ACOL[k];
   ui+=cardSvg(col)+word(TL.names[k],CX,175,TL.names[k].length>9?92:104,eb(sT/.4),col,Math.sin(sT*4)*1.5,sT);
   const cw=TL.child.find(c=>c[2]===k&&t>=c[0]&&t<c[1]);
-  ui+=faceAt(k,CX,425,205,t,eb((sT-.05)/.45));
+  ui+=faceAt(k,CX,495,190,t,eb((sT-.05)/.45));
   const wnd=TL.items.find(it=>it.id==='o'+(k+1)),w0=wnd?wnd.t:seg.word0,w1=seg.sound0+TL.items.find(it=>it.kind==='sfx'&&it.k===k).dur;
-  if(t>=w0&&t<=w1+.5)ui+=word(TL.words[k],CX,735,TL.words[k].length>8?96:116,eb((t-w0)/.3),'#ff8a1f',Math.sin(t*9)*2,t-w0);
-  if(cw){const a=t-cw[0],p=(a*2)%1;ui+=`<circle cx="${CX}" cy="425" r="${f1(225+p*30)}" fill="none" stroke="#ff8a1f" stroke-width="${f1(10*(1-p))}" opacity="${(1-p).toFixed(2)}"/>`+txt('¡TU TURNO! 🎤',CX,735,88,eb(a/.3),'#2f7d3a',0)}
+  if(t>=w0&&t<=w1+.5)ui+=word(TL.words[k],CX,775,TL.words[k].length>8?88:104,eb((t-w0)/.3),'#ff8a1f',Math.sin(t*9)*2,t-w0);
+  if(cw){const a=t-cw[0],p=(a*2)%1;ui+=`<circle cx="${CX}" cy="495" r="${f1(215+p*25)}" fill="none" stroke="#ff8a1f" stroke-width="${f1(10*(1-p))}" opacity="${(1-p).toFixed(2)}"/>`+txt('¡TU TURNO! 🎤',CX,775,84,eb(a/.3),'#2f7d3a',0)}
  } else if(seg.type==='quiz'){
   ui+=cardSvg('#7a5cff')+txt('¿QUIÉN SOY?',CX,175,100,eb(sT/.4),'#7a5cff',-1.5,null,'#fff');
   const r=seg.rounds.slice().reverse().find(r=>t>=r.t0)||seg.rounds[0],rev=t>=r.reveal;
-  if(!rev){const a=t-r.t0,bnc=Math.abs(Math.sin(t*5))*14;ui+=`<g transform="translate(${CX} ${f1(425-bnc)}) scale(${f1(Math.max(eb(a/.4),0)*100)/100})" filter="url(#ds)"><circle r="195" fill="#7a5cff"/><circle r="165" fill="#9a82ff"/><text text-anchor="middle" y="70" font-size="270" font-weight="800" fill="#fff" font-family="${FF}">?</text></g>`;
+  if(!rev){const a=t-r.t0,bnc=Math.abs(Math.sin(t*5))*14;ui+=`<g transform="translate(${CX} ${f1(495-bnc)}) scale(${f1(Math.max(eb(a/.4),0)*100)/100})" filter="url(#ds)"><circle r="195" fill="#7a5cff"/><circle r="165" fill="#9a82ff"/><text text-anchor="middle" y="70" font-size="270" font-weight="800" fill="#fff" font-family="${FF}">?</text></g>`;
    if(t>=r.sound&&t<r.sound+1.6)ui+=`<text x="${CX+230}" y="330" font-size="90" text-anchor="middle" transform="rotate(${f1(Math.sin(t*16)*8)} ${CX+230} 330)">🔊</text>`}
-  else{ui+=faceAt(r.k,CX,425,205,t,eb((t-r.reveal)/.4))+word(TL.names[r.k],CX,735,100,eb((t-r.reveal-.1)/.35),ACOL[r.k],0,t-r.reveal);
+  else{ui+=faceAt(r.k,CX,495,190,t,eb((t-r.reveal)/.4))+word(TL.names[r.k],CX,775,92,eb((t-r.reveal-.1)/.35),ACOL[r.k],0,t-r.reveal);
    if(t-r.reveal<1.8)world+=fx(t-r.reveal,CX,450,'#ffc01f','#ff5a5f')}
  } else {
   const e=sT,zi=TL.items.find(it=>it.id==='z2'),sub=zi.t+zi.dur+.1;
