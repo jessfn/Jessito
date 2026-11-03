@@ -5,7 +5,12 @@ import http from "node:http";
 
 const PORT = 53682;
 const REDIRECT = `http://localhost:${PORT}`;
-const { YT_CLIENT_ID, YT_CLIENT_SECRET } = process.env;
+import readline from "node:readline/promises";
+
+const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+const YT_CLIENT_ID = process.env.YT_CLIENT_ID || (await rl.question("Pega el ID de cliente y pulsa Enter: ")).trim();
+const YT_CLIENT_SECRET = process.env.YT_CLIENT_SECRET || (await rl.question("Pega el secreto de cliente y pulsa Enter: ")).trim();
+rl.close();
 
 const authUrl =
   "https://accounts.google.com/o/oauth2/v2/auth?" +
