@@ -5,9 +5,11 @@
   "type": "module",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "youtube": "node src/kids/index.js"
   },
   "dependencies": {
-    "msedge-tts": "^2.0.7"
+    "@resvg/resvg-js": "^2.6.2",
+    "msedge-tts": "^2.1.1"
   }
 }
