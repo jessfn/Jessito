@@ -1,6 +1,6 @@
 # Publicación YouTube — "Animales de la granja y sus sonidos" (video 4, largo)
 
-Archivo: `granja_largo.mp4` (1920x1080, 16:9, 2:07). Miniatura: `miniatura4.png` (1280x720).
+Archivo: `granja_largo.mp4` (1920x1080, 16:9, 2:11). Miniatura: `miniatura4.png` (1280x720).
 Video largo (no es Short). Personaje: un perrito. Escenario: la granja.
 
 ## Título (elige uno)
@@ -15,13 +15,13 @@ Video largo (no es Short). Personaje: un perrito. Escenario: la granja.
 ⏱️ Capítulos
 0:00 Introducción
 0:07 La vaca
-0:22 El gallo
-0:37 La oveja
-0:52 El pato
-1:06 El cerdito
-1:22 El caballo
-1:38 ¿Quién soy? Adivina el sonido
-1:58 Despedida
+0:21 El gallo
+0:38 La oveja
+0:51 El pato
+1:07 El cerdito
+1:23 El caballo
+1:40 ¿Quién soy? Adivina el sonido
+2:01 Despedida
 
 🔔 ¡Suscríbete y activa la campanita para más videos!
 👍 Dale like y compártelo con otros peques.
@@ -38,4 +38,5 @@ animales de la granja, sonidos de animales, sonidos de la granja para niños, ap
 
 ## Créditos (pégalos al final de la descripción)
 Personaje: "Interactive Dog Mascot" por PraneethKawyaThathsara (Rive Community), licencia CC BY 4.0 — https://rive.app/marketplace/27226-51415-interactive-dog-mascot-for-mobile-apps-rive-state-machine/
-Voz: Chatterbox Multilingual (MIT) con timbre de referencia sintético de Kokoro-82M (Apache-2.0). Tipografías: Baloo 2 y Fredoka (SIL OFL 1.1). Animales, escena, música y sonidos de animales originales (sintetizados).
+Sonidos de animales (grabaciones reales): vaca, gallo, oveja, cerdo y caballo de Mixkit (Mixkit Sound Effects Free License, https://mixkit.co/license/#sfxFree); pato: "Mallard Duck Quacking" por Mike Koenig, https://soundbible.com, licencia CC BY 3.0.
+Voz: Chatterbox Multilingual (MIT) con timbre de referencia sintético de Kokoro-82M (Apache-2.0). Tipografías: Baloo 2 y Fredoka (SIL OFL 1.1). Animales dibujados, escena y música originales.
