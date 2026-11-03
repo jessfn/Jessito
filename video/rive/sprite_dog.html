@@ -1,0 +1,25 @@
+<!doctype html><html><body style="margin:0;background:#fff"><canvas id="c" width="1000" height="1000"></canvas><canvas id="k"></canvas>
+<script src="rive.js"></script>
+<script>
+window.READY=false;const OUTS=580;
+rive.RuntimeLoader.getInstance(async rc=>{
+ window.rc=rc;const buf=await (await fetch('dog/dog.riv')).arrayBuffer();const file=await rc.load(new Uint8Array(buf));
+ const art=file.defaultArtboard(),canvas=document.getElementById('c'),renderer=rc.makeRenderer(canvas),ins={};
+ for(let i=0;i<art.animationCount();i++){const a=art.animationByIndex(i);ins[a.name]=new rc.LinearAnimationInstance(a,art)}
+ window.drawT=(t)=>{ins['Breathing'].time=(60+((t%1)*60))/60;ins['Breathing'].apply(1);ins['Eye Blink'].time=t%3;ins['Eye Blink'].apply(1);art.advance(0);
+  renderer.clear();renderer.save();renderer.align(rc.Fit.contain,rc.Alignment.center,{minX:0,minY:0,maxX:canvas.width,maxY:canvas.height},art.bounds);art.draw(renderer);renderer.restore();renderer.flush()};
+ window.READY=true});
+window.extract=()=>{
+ const src=document.getElementById('c'),sw=1000,sh=1000;const t=document.createElement('canvas');t.width=sw;t.height=sh;const x=t.getContext('2d',{willReadFrequently:true});x.drawImage(src,0,0);
+ const im=x.getImageData(0,0,sw,sh),d=im.data,n=sw*sh,m=new Uint8Array(n);
+ const bg=i=>{const r=d[i*4],g=d[i*4+1],b=d[i*4+2],mn=Math.min(r,g,b),mx=Math.max(r,g,b);return mn>=205&&mx-mn<=48};
+ const q=new Int32Array(n);let h=0,tl=0;const push=i=>{if(!m[i]&&bg(i)){m[i]=1;q[tl++]=i}};
+ for(let i=0;i<sw;i++){push(i);push((sh-1)*sw+i)}for(let j=0;j<sh;j++){push(j*sw);push(j*sw+sw-1)}
+ while(h<tl){const i=q[h++],cx=i%sw,cy=(i/sw)|0;if(cx>0)push(i-1);if(cx<sw-1)push(i+1);if(cy>0)push(i-sw);if(cy<sh-1)push(i+sw)}
+ const m2=new Uint8Array(m);
+ for(let pass=0;pass<2;pass++){const mm=new Uint8Array(m2);for(let j=1;j<sh-1;j++)for(let i=1;i<sw-1;i++){const k=j*sw+i;if(!m2[k]&&(m2[k-1]||m2[k+1]||m2[k-sw]||m2[k+sw]))mm[k]=1}m2.set(mm)}
+ for(let i=0;i<n;i++)if(m2[i])d[i*4+3]=0;
+ // quita la marca de agua (texto en la esquina superior derecha) y deja el resto
+ for(let j=0;j<110;j++)for(let i=766;i<1000;i++)d[(j*sw+i)*4+3]=0;
+ x.putImageData(im,0,0);const o=document.getElementById('k');o.width=OUTS;o.height=OUTS;const ox=o.getContext('2d');ox.imageSmoothingQuality='high';ox.drawImage(t,0,0,OUTS,OUTS);return o.toDataURL('image/png')};
+</script></body></html>
