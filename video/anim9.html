@@ -1,0 +1,105 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:'Baloo 2';font-weight:800;src:url(fonts/baloo2-800.woff2) format('woff2')}
+@font-face{font-family:'Fredoka';font-weight:700;src:url(fonts/fredoka-700.woff2) format('woff2')}
+</style></head><body style="margin:0;background:#000"><div id="s" style="width:1920px;height:1080px"></div>
+<script src="vocales/timeline.js"></script>
+<script>
+const W=1920,H=1080,FPS=TL.fps,GY=1470;
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x)),eo=x=>1-Math.pow(1-clamp(x),3),sst=(a,b,x)=>{const u=clamp((x-a)/(b-a));return u*u*(3-2*u)};
+const eb=x=>{x=clamp(x);const c=2.2;return 1+(c+1)*Math.pow(x-1,3)+c*Math.pow(x-1,2)};
+const rnd=i=>{const v=Math.sin(i*127.1+311.7)*43758.5453;return v-Math.floor(v)};
+const f1=n=>n.toFixed(1);
+const mixc=(h,m,t)=>{const p=v=>parseInt(h.slice(v,v+2),16);return '#'+[p(1),p(3),p(5)].map(c=>Math.round(c+(m-c)*t).toString(16).padStart(2,'0')).join('')};
+const FF="'Baloo 2','Fredoka','Arial Rounded MT Bold',Verdana,sans-serif";
+/* ---------- elementos ---------- */
+function balloon(x,y,c,d,rot,sx,sy){return `<g transform="translate(${f1(x)} ${f1(y)}) rotate(${f1(rot)}) scale(${f1(sx*100)/100} ${f1(sy*100)/100})"><path d="M0 150 Q-30 260 10 340 T0 470" stroke="#fff" stroke-width="5" fill="none" opacity=".9"/><path d="M0 146 l-20 30 h40z" fill="${d}"/><ellipse rx="116" ry="148" fill="${c}"/><ellipse cx="-44" cy="-58" rx="22" ry="44" fill="#fff" opacity=".5" transform="rotate(20 -44 -58)"/><ellipse cx="40" cy="62" rx="50" ry="70" fill="${d}" opacity=".18"/></g>`}
+const star4=(x,y,r,rot,fill,op=1)=>`<path d="M0 ${-r} Q${r*.14} ${-r*.14} ${r} 0 Q${r*.14} ${r*.14} 0 ${r} Q${-r*.14} ${r*.14} ${-r} 0 Q${-r*.14} ${-r*.14} 0 ${-r}Z" fill="${fill}" opacity="${op}" transform="translate(${f1(x)} ${f1(y)}) rotate(${f1(rot)})"/>`;
+function sparks(x,y,t,n,R,cols){let o='';for(let i=0;i<n;i++){const a=i*6.283/n+Math.sin(t*.7)*.3,r=R*(.8+.4*rnd(i)),tw=.5+.5*Math.sin(t*6+i*1.7);o+=star4(x+Math.cos(a)*r*1.3,y+Math.sin(a)*r*.55,16+20*rnd(i+3)*tw,t*40+i*20,cols[i%cols.length],.4+.6*tw)}return o}
+function fx(ts,x,y,c,d){let o='';if(ts<0||ts>2.4)return o;const cols=[c,d,'#fff','#ffd21f','#ff6fb5','#4fc3ff'];
+ for(let i=0;i<56;i++){const a=rnd(i)*6.283,v=300+rnd(i+50)*700,px=x+Math.cos(a)*v*ts,py=y+Math.sin(a)*v*ts+900*ts*ts*.6;o+=`<rect x="-9" y="-5" width="18" height="10" rx="3" fill="${cols[i%6]}" opacity="${clamp(1-ts/2.4)}" transform="translate(${f1(px)} ${f1(py)}) rotate(${f1(ts*(300+i*20))})"/>`}
+ for(let i=0;i<9;i++){const a=i*.7+rnd(i)*.4,v=520+rnd(i+7)*380,px=x+Math.cos(a)*v*ts,py=y+Math.sin(a)*v*ts+700*ts*ts;o+=`<path d="M-30 0 Q0 -22 30 0 Q0 -8 -30 0Z" fill="${c}" opacity="${clamp(1-ts/1.3)}" transform="translate(${f1(px)} ${f1(py)}) rotate(${f1(a*57+ts*500)})"/>`}
+ for(let i=0;i<14;i++){const a=rnd(i+90)*6.283,v=250+rnd(i+70)*700,px=x+Math.cos(a)*v*ts,py=y+Math.sin(a)*v*ts+800*ts*ts*.6;o+=star4(px,py,15+14*rnd(i),ts*300+i*40,cols[(i+3)%6],clamp(1.3-ts/1.8))}
+ const r=eo(ts/.5)*520;o+=`<circle cx="${x}" cy="${y}" r="${f1(r)}" fill="none" stroke="${c}" stroke-width="${f1(40*(1-clamp(ts/.5)))}" opacity="${1-clamp(ts/.5)}"/>`;
+ return o}
+function dust(ts,x){let o='';if(ts<0||ts>.6)return o;for(let i=0;i<7;i++){const sd=i%2?1:-1,d=(1+i>>1)*40*eo(ts/.6),r=(18+i*4)*(1+ts*1.5);o+=`<circle cx="${f1(x+sd*(70+d*1.4))}" cy="${f1(GY+14-ts*60-(i>>1)*6)}" r="${f1(r)}" fill="#fff" opacity="${(.75*(1-ts/.6)).toFixed(2)}"/>`}return o}
+function sunburst(x,y,ts,c,op=.3){let o=`<g transform="translate(${x} ${y}) rotate(${f1(ts*16)})" opacity="${(op*eo(ts/.25)*(1-clamp((ts-1.7)/.9))).toFixed(3)}">`;for(let i=0;i<14;i++)o+=`<polygon points="0,0 -90,-900 90,-900" fill="${c}" transform="rotate(${i*360/14})"/>`;return o+`</g>`}
+
+/* ---------- texto plano moderno ---------- */
+function txt(ts,x,y,size,sc,fill,rot=0,sw=null,stc='#fff'){const k=size/200,stw=sw??Math.max(10,24*k);
+ return `<g transform="translate(${x} ${y}) rotate(${rot}) scale(${f1(Math.max(sc,0)*100)/100})" filter="url(#ds)"><text text-anchor="middle" font-family="${FF}" font-weight="800" font-size="${size}" fill="${fill}" stroke="${stc}" stroke-width="${f1(stw)}" stroke-linejoin="round" paint-order="stroke" y="8">${ts}</text></g>`}
+function word(str,x,y,size,sc,fill,rot,tt){let ts='',pv=0;[...str].forEach((ch,i)=>{const o=-55*Math.sin(clamp((tt-.2-i*.06)/.32)*Math.PI)+Math.sin(tt*5-i*.6)*3*clamp((tt-.8)/.4);ts+=`<tspan dy="${f1(o-pv)}">${ch}</tspan>`;pv=o});return txt(ts,x,y,size,sc,fill,rot)}
+const RAINBOW=['#ff4757','#ff8a3d','#ffc42e','#2fd06b','#2f8bff','#7a5cff','#ff5fa8'];
+
+
+
+/* ===== Zonas: mascota x 120-760 | pizarron x 940-1860, y 70-830 | subtitulo y 880-970 | credito y 1050 ===== */
+const CARD={x:940,y:70,w:920,h:760},CX=CARD.x+CARD.w/2;
+const CHALK=['#ff8a8a','#ffd166','#7ee8b8','#74c0fc','#d0a2ff'],BOARD='#2f6b4f';
+function room(t){
+ let o=`<defs>
+ <linearGradient id="wl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe9c2"/><stop offset="1" stop-color="#fff6e3"/></linearGradient>
+ <linearGradient id="fl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f0bf86"/><stop offset="1" stop-color="#dba46a"/></linearGradient>
+ <linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7fd0ff"/><stop offset="1" stop-color="#dff4ff"/></linearGradient>
+ <linearGradient id="btn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff5a5a"/><stop offset="1" stop-color="#d9002f"/></linearGradient>
+ <radialGradient id="vig" cx=".5" cy=".5" r=".8"><stop offset=".68" stop-color="#6b3b10" stop-opacity="0"/><stop offset="1" stop-color="#6b3b10" stop-opacity=".2"/></radialGradient>
+ <filter id="ds" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="8" stdDeviation="7" flood-color="#4a2a0a" flood-opacity=".3"/></filter></defs>
+ <rect width="${W}" height="${H}" fill="url(#wl)"/>`;
+ for(let i=0;i<22;i++)o+=`<rect x="${i*90}" y="0" width="40" height="900" fill="#fff" opacity=".35"/>`;
+ // guirnalda de letras (decoracion, arriba a la izquierda)
+ const L='ABCDEFGHI',cl=['#ff6b6b','#ffd166','#4cc9a0','#4d9bff','#b07cff'];
+ o+=`<path d="M-20 30 Q440 120 900 30" fill="none" stroke="#8a5a2b" stroke-width="5"/>`;
+ for(let i=0;i<9;i++){const x=40+i*100,u=(x+20)/920,y=30+90*Math.sin(u*Math.PI)*.95;o+=`<g transform="translate(${x} ${f1(y+10)}) rotate(${f1(Math.sin(t*2+i)*4)})"><polygon points="-34,-4 34,-4 0,70" fill="${cl[i%5]}"/><text y="42" text-anchor="middle" font-size="40" font-weight="800" fill="#fff" font-family="${FF}">${L[i]}</text></g>`}
+ // ventana (arriba del perrito/mascota)
+ o+=`<g transform="translate(90 170)"><rect width="330" height="250" rx="14" fill="#fff"/><rect x="14" y="14" width="302" height="222" rx="8" fill="url(#sk)"/><circle cx="240" cy="70" r="36" fill="#ffd54a"/><g fill="#fff" opacity=".95" transform="translate(${f1(40+Math.sin(t*.5)*14)} 120)"><rect width="110" height="28" rx="14"/><circle cx="34" cy="2" r="24"/><circle cx="70" cy="-6" r="28"/></g><path d="M165 14 V236 M14 125 H316" stroke="#fff" stroke-width="12"/></g>`;
+ // estante con libros (decoracion de fondo)
+ o+=`<g transform="translate(30 520)"><rect width="340" height="380" rx="10" fill="#b9824a"/><rect x="14" y="14" width="312" height="352" rx="6" fill="#8a5a2b"/><rect x="14" y="180" width="312" height="14" fill="#b9824a"/>`;
+ const bk=['#ff6b6b','#4d9bff','#ffd166','#4cc9a0','#b07cff','#ff9a3d'];
+ for(let i=0;i<6;i++){const hh=70+rnd(i)*40;o+=`<rect x="${26+i*48}" y="${f1(176-hh)}" width="40" height="${f1(hh)}" rx="4" fill="${bk[i]}"/>`}
+ for(let i=0;i<5;i++){const hh=80+rnd(i+9)*50;o+=`<rect x="${30+i*56}" y="${f1(362-hh)}" width="46" height="${f1(hh)}" rx="4" fill="${bk[(i+2)%6]}"/>`}
+ o+=`</g>`;
+ o+=`<rect x="0" y="880" width="${W}" height="20" fill="#c98f52"/><rect x="0" y="900" width="${W}" height="200" fill="url(#fl)"/>`;
+ for(let i=0;i<16;i++)o+=`<rect x="${i*130+20}" y="900" width="5" height="200" fill="#b9814a" opacity=".4"/>`;
+ return o}
+function board(col){return `<g filter="url(#ds)"><rect x="${CARD.x}" y="${CARD.y}" width="${CARD.w}" height="${CARD.h}" rx="44" fill="#b9824a"/><rect x="${CARD.x+18}" y="${CARD.y+18}" width="${CARD.w-36}" height="${CARD.h-36}" rx="28" fill="${BOARD}"/><ellipse cx="${CARD.x+250}" cy="${CARD.y+260}" rx="190" ry="60" fill="#fff" opacity=".05"/><ellipse cx="${CARD.x+640}" cy="${CARD.y+520}" rx="240" ry="70" fill="#fff" opacity=".05"/></g>`}
+function sticker(x,y,r,emo,col,sc,rot=0){return `<g transform="translate(${f1(x)} ${f1(y)}) rotate(${f1(rot)}) scale(${f1(Math.max(sc,0)*100)/100})" filter="url(#ds)"><circle r="${r}" fill="#fff"/><circle r="${r}" fill="none" stroke="${col}" stroke-width="10"/><circle r="${r*.8}" fill="${mixc(col,255,.85)}"/><text y="${f1(r*.4)}" font-size="${f1(r*1.05)}" text-anchor="middle">${emo}</text></g>`}
+function curItem(t){let c=null;for(const it of TL.items)if(t>=it.t&&t<it.t+it.dur+.15)c=it;return c}
+function capPill(t){const it=curItem(t);if(!it||!it.cap)return '';const str=it.cap,a=t-it.t;let ls=[str];
+ if(str.length>30){const mid=str.length/2;let best=-1,bd=1e9;for(let i=0;i<str.length;i++)if(str[i]===' '&&Math.abs(i-mid)<bd){bd=Math.abs(i-mid);best=i}if(best>0)ls=[str.slice(0,best),str.slice(best+1)]}
+ const mx=Math.max(...ls.map(l=>l.length)),sz=Math.min(62,830/(mx*.5)),w=Math.min(880,mx*sz*.5+90),h=ls.length*sz*1.12+34,sc=eb(a/.2);
+ return `<g transform="translate(${CX} ${f1(925+(ls.length-1)*18)}) scale(${f1(Math.max(sc,0)*100)/100})" filter="url(#ds)"><rect x="${f1(-w/2)}" y="${f1(-h/2)}" width="${f1(w)}" height="${f1(h)}" rx="${f1(Math.min(46,h/2))}" fill="#3a5bd9" opacity=".96"/>${ls.map((l,i)=>`<text text-anchor="middle" y="${f1(-h/2+17+sz*.86+i*sz*1.12)}" font-size="${f1(sz)}" font-weight="800" fill="#fff" font-family="${FF}">${l}</text>`).join('')}</g>`}
+function frame(f){
+ const t=f/FPS;let world=room(t),ui='',mid='';
+ const seg=TL.segs.find(s=>t>=s.t0&&t<s.t1)||TL.segs[TL.segs.length-1],sT=t-seg.t0;
+ if(seg.type==='intro'){
+  ui+=board()+txt('¡LAS VOCALES!',CX,185,104,eb((t-.2)/.4),'#fff',-1.5,6,'#1f4d38');
+  for(let k=0;k<5;k++){const ta=seg.pop0+k*.4,x=CX+(k-2)*165;if(t>=ta)ui+=`<g transform="translate(${x} 470) scale(${f1(Math.max(eb((t-ta)/.35),0)*100)/100})" filter="url(#ds)"><circle r="70" fill="${CHALK[k]}"/><text text-anchor="middle" y="28" font-size="92" font-weight="800" fill="#1f4d38" font-family="${FF}">${TL.V[k]}</text></g>`}
+ } else if(seg.type==='vocal'){
+  const k=seg.k,col=CHALK[k],ch=TL.V[k];
+  const cw=t>=seg.child[0]&&t<seg.child[1];
+  ui+=board()+txt(cw?`¡DI LA ${ch}!`:`LA VOCAL ${ch}`,CX,170,76,eb(sT/.4),'#fff',0,6,'#1f4d38');
+  const lp=sT>=(seg.sound0-seg.t0)&&t<seg.sound0+1.2?1+.08*Math.sin((t-seg.sound0)*18):1;
+  ui+=`<g transform="translate(${CX} 345) scale(${f1(Math.max(eb((sT-.1)/.5),0)*lp*100)/100})" filter="url(#ds)"><text text-anchor="middle" y="120" font-size="290" font-weight="800" fill="${col}" stroke="#1f4d38" stroke-width="8" paint-order="stroke" font-family="${FF}">${ch}${ch.toLowerCase()}</text></g>`;
+  if(cw){const a=t-seg.child[0],p=(a*2)%1;ui+=`<ellipse cx="${CX}" cy="345" rx="${f1(250+p*30)}" ry="${f1(140+p*20)}" fill="none" stroke="${col}" stroke-width="${f1(8*(1-p))}" opacity="${(1-p).toFixed(2)}"/>`}
+  for(let j=0;j<3;j++){const ta=seg.words[j];if(t>=ta){const a=t-ta,x=CX+(j-1)*290;ui+=sticker(x,610,92,TL.EM[k][j],col,eb(a/.35),Math.sin(t*5+j)*4)+txt(TL.W[k][j],x,775,TL.W[k][j].length>7?42:52,eb((a-.1)/.3),'#fff',0,6,'#1f4d38')}}
+ } else if(seg.type==='quiz'){
+  ui+=board()+txt('¿CON QUÉ VOCAL EMPIEZA?',CX,165,58,eb(sT/.4),'#fff',0,6,'#1f4d38');
+  const r=seg.rounds.slice().reverse().find(r=>t>=r.t0)||seg.rounds[0],rev=t>=r.reveal,a=t-r.t0;
+  ui+=sticker(CX,395,150,TL.EM[r.k][r.j],CHALK[r.k],eb(a/.4),Math.sin(t*4)*3);
+  for(let i=0;i<5;i++){const x=CX+(i-2)*150,hit=rev&&i===r.k,sc=rev?(hit?1.25+.1*Math.sin((t-r.reveal)*14):.8):1;
+   ui+=`<g transform="translate(${x} 690) scale(${f1(sc*100)/100})" filter="url(#ds)" opacity="${rev&&!hit?.5:1}"><circle r="62" fill="${CHALK[i]}"/>${hit?`<circle r="78" fill="none" stroke="#fff" stroke-width="8"/>`:''}<text text-anchor="middle" y="26" font-size="82" font-weight="800" fill="#1f4d38" font-family="${FF}">${TL.V[i]}</text></g>`}
+  if(rev&&t-r.reveal<1.8)world+=fx(t-r.reveal,CX,395,CHALK[r.k],'#fff')
+ } else {
+  const e=sT,zi=TL.items.find(it=>it.id==='n_chao'),sub=zi.t+zi.dur+.1;
+  ui+=board()+txt('¡SUSCRÍBETE!',CX,185,100,eb((e-.1)/.4),'#ff8a8a',-1.5,6,'#1f4d38');
+  ui+=`<g transform="translate(${CX} 430) rotate(${f1(Math.sin(t*12)*12)} 0 -80) scale(${f1(Math.max(eb((e-.3)/.4),0)*100)/100})"><text text-anchor="middle" y="90" font-size="250">🔔</text></g>`+txt('y activa la campanita',CX,700,78,eb((e-.6)/.4),'#ffd166',0,6,'#1f4d38');
+  if(t>=sub){const u=eb((t-sub)/.4);ui+=`<g transform="translate(${CX} 925) scale(${f1(u*100)/100})"><rect x="-224" y="-46" width="460" height="120" rx="60" fill="#4a2a0a" opacity=".25"/><rect x="-230" y="-60" width="460" height="120" rx="60" fill="url(#btn)" stroke="#fff" stroke-width="10"/><path d="M-170 -32 l50 32 l-50 32z" fill="#fff"/><text x="50" y="16" text-anchor="middle" font-size="46" font-weight="800" fill="#fff" font-family="${FF}">SUSCRIBIRME</text><g transform="translate(330 -10) rotate(${f1(Math.sin(t*14)*22)} 0 -50)"><path d="M0 -60 q-45 0 -45 50 v30 h-15 v14 h120 v-14 h-15 v-30 q0 -50 -45 -50z" fill="#ffc42e" stroke="#fff" stroke-width="8"/><circle cy="40" r="14" fill="#d49100"/></g></g>`}
+  ui+=`<text x="${CX}" y="1050" text-anchor="middle" font-size="26" font-weight="700" fill="#4a2a0a" opacity="${(.9*sst(.8,1.4,e)).toFixed(2)}" font-family="Fredoka,sans-serif">Personaje: adrianl-C3DDF · Rive (CC BY 4.0)</text>`}
+ if(seg.type!=='outro'||t<TL.items.find(it=>it.id==='n_chao').t+TL.items.find(it=>it.id==='n_chao').dur+.1)ui+=capPill(t);
+ // ----- mascota -----
+ let hop=0,sq=0;for(const h of TL.hops){const u=(t-h)/.55;if(u>=0&&u<=1){hop=Math.sin(u*Math.PI)*70;sq=Math.sin(u*Math.PI)}}
+ const sway=Math.sin(t*2.2)*1.2;
+ mid+=`<ellipse cx="430" cy="1036" rx="${f1(170-hop*.8)}" ry="24" fill="#8a5a2b" opacity="${(.28-hop*.002).toFixed(2)}"/>`;
+ mid+=`<g transform="translate(430 ${f1(1030-hop)}) rotate(${f1(sway)}) scale(${f1(.9*(1-.04*sq))} ${f1(.9*(1+.07*sq))}) translate(-320 -618)"><image href="rive/spr6/d${String(f%120).padStart(2,'0')}.png" x="0" y="0" width="640" height="640"/></g>`;
+ document.getElementById('s').innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${world}${mid}<rect width="${W}" height="${H}" fill="url(#vig)"/>${ui}</svg>`}
+window.frame=frame;frame(0);
+</script></body></html>
