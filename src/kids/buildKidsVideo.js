@@ -4,7 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
 import { MsEdgeTTS, OUTPUT_FORMAT } from "msedge-tts";
-import { frameSvg, renderPng, loadEmojis, MASCOT_COLORS } from "./render.js";
+import { frameSvg, renderPng, thumbnailSvg, loadEmojis, MASCOT_COLORS } from "./render.js";
 import { makeMusic, makeAmbience, addSfx, writeWav } from "./audio.js";
 
 const run = promisify(execFile);
@@ -23,25 +23,44 @@ function pickScene(tema) {
   return hashOf(tema) % 2 === 0 ? "dia" : "atardecer";
 }
 
-// Guion de ~1:20: presentacion, cada item (presentar + repetir), juego de adivinar, repaso y despedida.
+function choicesFor(t, n, q) {
+  const others = [(t + 1) % n, (t + 2) % n];
+  const m = q % 3;
+  return m === 0 ? [t, ...others] : m === 1 ? [others[0], t, others[1]] : [others[0], others[1], t];
+}
+
+// Video largo (~4 min, horizontal): aprender, juego 1, repaso adivinando, juego 2, baile y despedida.
 function buildSegments(lesson) {
   const items = lesson.items;
   const n = items.length;
-  const segs = [{ kind: "intro", pad: 0.5, text: `¡Hola, amiguitos! Soy Pompi. Hoy vamos a aprender ${lesson.titulo.toLowerCase()}.` }];
+  const segs = [{ kind: "intro", chapter: "Introducción", pad: 0.6, text: `¡Hola, amiguitos! Soy Pompi. Hoy vamos a aprender ${lesson.titulo.toLowerCase()}. ¡Prepárate para jugar y divertirte!` }];
   items.forEach(([, word, dato], itemIndex) => {
-    segs.push({ kind: "present", itemIndex, pad: 0.5, text: `${word}. ${dato}` });
-    segs.push({ kind: "repeat", itemIndex, pad: 1.4, text: `Repite conmigo: ${word}.` });
+    segs.push({ kind: "present", itemIndex, chapter: itemIndex === 0 ? "Aprendemos" : undefined, pad: 0.6, text: `${word}. ${dato}` });
+    segs.push({ kind: "repeat", itemIndex, pad: 1.6, text: `Repite conmigo: ${word}.` });
   });
-  segs.push({ kind: "quizintro", pad: 0.5, text: "¡Ahora un juego! Encuentra la respuesta." });
-  [1, 3].forEach((target, q) => {
+  segs.push({ kind: "quizintro", chapter: "Primer juego", pad: 0.6, text: "¡Ahora un juego! Mira bien y encuentra la respuesta correcta." });
+  [1, 3, 0].forEach((target, q) => {
     const t = target % n;
-    const others = [(t + 1) % n, (t + 2) % n];
-    const choices = q % 3 === 0 ? [t, ...others] : q % 3 === 1 ? [others[0], t, others[1]] : [others[0], others[1], t];
-    segs.push({ kind: "quizq", itemIndex: t, choices, pad: 2.0, text: `Encuentra: ${items[t][1]}.` });
+    const choices = choicesFor(t, n, q);
+    segs.push({ kind: "quizq", itemIndex: t, choices, pad: 2.4, text: `Encuentra: ${items[t][1]}.` });
     segs.push({ kind: "quiza", itemIndex: t, choices, pad: 0.8, text: `¡Muy bien! ${items[t][1]}.` });
   });
-  segs.push({ kind: "recap", pad: 0.9, text: `Hoy aprendimos: ${items.map((i) => i[1].toLowerCase()).join(", ")}. ¡Qué bien lo hiciste!` });
-  segs.push({ kind: "outro", pad: 1.0, text: "¡Suscríbete y dale like! ¡Hasta mañana!" });
+  segs.push({ kind: "guessintro", chapter: "A repasar", pad: 0.6, text: "¡Vamos a repasar! Dime qué ves en cada tarjeta, ¡tú puedes!" });
+  const order = items.map((_, i) => (i * 2 + 1) % n);
+  [...new Set(order)].forEach((i) => {
+    segs.push({ kind: "guess", itemIndex: i, pad: 2.6, text: "¿Qué es esto?" });
+    segs.push({ kind: "reveal", itemIndex: i, pad: 0.8, text: `¡Muy bien! ${items[i][1]}. ${items[i][2]}` });
+  });
+  segs.push({ kind: "quizintro", chapter: "Segundo juego", pad: 0.6, text: "¡Otro juego! Toca la respuesta correcta." });
+  items.forEach((_, i) => {
+    const t = (i * 2 + 2) % n;
+    const choices = choicesFor(t, n, i + 1);
+    segs.push({ kind: "quizq", itemIndex: t, choices, pad: 2.2, text: `Encuentra: ${items[t][1]}.` });
+    segs.push({ kind: "quiza", itemIndex: t, choices, pad: 0.8, text: `¡Excelente! ${items[t][1]}.` });
+  });
+  segs.push({ kind: "dance", chapter: "¡A bailar!", pad: 16, text: "¡Momento de bailar! Mueve tu cuerpecito con Pompi." });
+  segs.push({ kind: "recap", chapter: "Repaso y despedida", pad: 1.0, text: `Hoy aprendimos: ${items.map((i) => i[1].toLowerCase()).join(", ")}. ¡Qué bien lo hiciste!` });
+  segs.push({ kind: "outro", pad: 1.2, text: "Si te gustó el video, suscríbete y dale like. ¡Nos vemos mañana con un video nuevo! ¡Adiós!" });
   return segs;
 }
 
@@ -50,7 +69,6 @@ async function duration(file) {
   return parseFloat(stdout.trim());
 }
 
-// Voz de cada segmento (con pausa al final) concatenada en un solo wav.
 async function buildNarration(segs, tmpDir) {
   const wavs = [];
   for (let i = 0; i < segs.length; i++) {
@@ -76,8 +94,9 @@ function buildSoundtrack(segs, total, scene, seed, tmpDir) {
   let t = 0;
   for (const s of segs) {
     if (s.kind === "present") events.push({ t: t + 0.05, type: "pop" }, { t: t - 0.15, type: "whoosh" });
-    if (s.kind === "quiza") events.push({ t: t + 0.05, type: "ding" });
-    if (s.kind === "recap") events.push({ t, type: "sparkle" });
+    if (s.kind === "guess") events.push({ t: t + 0.05, type: "pop" });
+    if (s.kind === "quiza" || s.kind === "reveal") events.push({ t: t + 0.05, type: "ding" });
+    if (s.kind === "recap" || s.kind === "dance") events.push({ t, type: "sparkle" });
     if (s.kind === "quizq" || s.kind === "outro") events.push({ t: t - 0.1, type: "whoosh" });
     t += s.duration;
   }
@@ -91,6 +110,8 @@ function buildSoundtrack(segs, total, scene, seed, tmpDir) {
   return { musicPath, sfxPath };
 }
 
+const stamp = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+
 export async function buildKidsVideo(lesson) {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "kids-"));
   await loadEmojis(lesson);
@@ -103,6 +124,16 @@ export async function buildKidsVideo(lesson) {
   const { musicPath, sfxPath } = buildSoundtrack(segs, total, scene, seed, tmpDir);
   console.log(`Duracion: ${total.toFixed(1)}s, escena: ${scene}`);
 
+  let acc = 0;
+  const chapters = [];
+  for (const s of segs) {
+    if (s.chapter) chapters.push(`${stamp(acc)} ${s.chapter}`);
+    acc += s.duration;
+  }
+
+  const thumbPath = path.join(tmpDir, "thumbnail.png");
+  fs.writeFileSync(thumbPath, renderPng(thumbnailSvg({ lesson, scene, mascotColor }), 1280));
+
   const outPath = path.join(tmpDir, "output.mp4");
   const ff = spawn("ffmpeg", [
     "-y", "-f", "image2pipe", "-framerate", String(FPS), "-c:v", "png", "-i", "-",
@@ -111,7 +142,7 @@ export async function buildKidsVideo(lesson) {
     `[1:a]volume=1.15[n];[2:a]volume=0.2,afade=t=in:d=1.5,afade=t=out:st=${(total - 2).toFixed(2)}:d=2[m];[3:a]volume=0.55[s];` +
       "[n][m][s]amix=inputs=3:duration=first:dropout_transition=0:normalize=0,alimiter=limit=0.95[a]",
     "-map", "0:v", "-map", "[a]",
-    "-c:v", "libx264", "-preset", "veryfast", "-crf", "23", "-pix_fmt", "yuv420p",
+    "-c:v", "libx264", "-preset", "veryfast", "-crf", "24", "-pix_fmt", "yuv420p",
     "-c:a", "aac", "-b:a", "160k", "-t", String(total), outPath,
   ], { stdio: ["pipe", "ignore", "inherit"] });
   const closed = new Promise((resolve, reject) => {
@@ -134,5 +165,5 @@ export async function buildKidsVideo(lesson) {
   }
   ff.stdin.end();
   await closed;
-  return { videoPath: outPath, tmpDir, seconds: total };
+  return { videoPath: outPath, thumbPath, tmpDir, seconds: total, chapters };
 }
