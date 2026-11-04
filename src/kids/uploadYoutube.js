@@ -53,3 +53,14 @@ export async function uploadToYouTube(videoPath, { title, description, tags }) {
   if (!put.ok) throw new Error(`Fallo la subida a YouTube: ${put.status} ${JSON.stringify(result)}`);
   return result;
 }
+
+// Pone la miniatura personalizada (el canal debe estar verificado por telefono en YouTube).
+export async function uploadThumbnail(videoId, thumbPath) {
+  const token = await accessToken();
+  const res = await fetch(`https://www.googleapis.com/upload/youtube/v3/thumbnails/set?videoId=${videoId}&uploadType=media`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "image/png" },
+    body: fs.readFileSync(thumbPath),
+  });
+  if (!res.ok) throw new Error(`YouTube rechazo la miniatura: ${res.status} ${await res.text()}`);
+}
