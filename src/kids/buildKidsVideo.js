@@ -3,12 +3,14 @@ import { promisify } from "node:util";
 import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
+import { fileURLToPath } from "node:url";
 import { MsEdgeTTS, OUTPUT_FORMAT } from "msedge-tts";
-import { frameSvg, renderPng, thumbnailSvg, loadEmojis, MASCOT_COLORS } from "./render.js";
+import { renderPng, thumbnailSvg, loadEmojis, MASCOT_COLORS } from "./render.js";
 import { makeMusic, makeAmbience, addSfx, writeWav } from "./audio.js";
 
 const run = promisify(execFile);
 const FPS = 24;
+const CHUNK = 150;
 const VOICE = "es-MX-DaliaNeural";
 
 function hashOf(text) {
@@ -150,18 +152,27 @@ export async function buildKidsVideo(lesson) {
     ff.on("error", reject);
   });
 
+  // El renderizador acumula memoria, asi que se dibuja por tandas en procesos hijos que se reinician.
   const frames = Math.floor(total * FPS);
-  let segIndex = 0;
-  let segStart = 0;
-  for (let f = 0; f < frames; f++) {
-    const t = f / FPS;
-    while (segIndex < segs.length - 1 && t >= segStart + segs[segIndex].duration) {
-      segStart += segs[segIndex].duration;
-      segIndex++;
-    }
-    const svg = frameSvg({ lesson, seg: segs[segIndex], segT: t - segStart, t, total, scene, mascotColor });
-    const png = renderPng(svg);
-    if (!ff.stdin.write(png)) await new Promise((r) => ff.stdin.once("drain", r));
+  const planPath = path.join(tmpDir, "plan.json");
+  fs.writeFileSync(planPath, JSON.stringify({
+    tema: lesson.tema, fps: FPS, total, scene, mascotColor,
+    segs: segs.map((s) => ({ kind: s.kind, itemIndex: s.itemIndex, choices: s.choices, duration: s.duration })),
+  }));
+  const worker = fileURLToPath(new URL("./renderWorker.js", import.meta.url));
+  for (let start = 0; start < frames; start += CHUNK) {
+    const end = Math.min(frames, start + CHUNK);
+    await new Promise((resolve, reject) => {
+      const child = spawn(process.execPath, [worker, planPath, String(start), String(end)], { stdio: ["ignore", "pipe", "inherit"] });
+      child.stdout.on("data", (d) => {
+        if (!ff.stdin.write(d)) {
+          child.stdout.pause();
+          ff.stdin.once("drain", () => child.stdout.resume());
+        }
+      });
+      child.on("error", reject);
+      child.on("close", (code) => (code === 0 ? resolve() : reject(new Error(`El render de cuadros ${start}-${end} salio con ${code}`))));
+    });
   }
   ff.stdin.end();
   await closed;
