@@ -1,11 +1,11 @@
 <!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Tortillería 3D</title>
-<style>:root{--bg:#2b1d18;--fg:#fbf1da;--ac:#d9261c}@media(prefers-color-scheme:light){:root{--bg:#f3e6cf;--fg:#3a1c12}}
+<style>:root{--bg:#2b1d18;--fg:#fbf1da;--ac:#d9261c}
 html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);font-family:system-ui,sans-serif;overflow:hidden}
 canvas{display:block;width:100%;height:100%}
 #ui{position:absolute;left:0;right:0;bottom:0;padding:12px 16px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
 button{font:inherit;padding:8px 14px;border-radius:999px;border:1px solid var(--ac);background:color-mix(in srgb,var(--bg) 80%,transparent);color:var(--fg);cursor:pointer}
 button.on,button:hover{background:var(--ac);color:#fff}
-#t{position:absolute;top:12px;left:16px;font-weight:700;letter-spacing:.05em}</style></head><body>
+#t{position:absolute;top:12px;left:16px;font-weight:700;letter-spacing:.05em}</style><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&display=swap"></head><body>
 <div id="t">TORTILLERÍA · modelo 3D 360°</div><div id="ui"></div>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 <script type="module">
@@ -97,14 +97,14 @@ function signCanvas() {
     x.fillStyle = '#e8a600'; x.beginPath(); x.arc(fx, fy, 13, 0, 7); x.fill();
     for (let i = 0; i < 3; i++) leaf(0, x, W / 2 + s * 720, 420, 120, s * (.9 + i * .3), '#3aa03a', .25);
   }
-  let size = 240, txt = 'TORTILLERÍA';
-  x.font = `900 ${size}px "Arial Black","DejaVu Sans",Impact,sans-serif`; x.letterSpacing = '4px';
-  const mw = x.measureText(txt).width; size *= Math.min(1, 1620 / mw);
-  x.font = `900 ${size}px "Arial Black","DejaVu Sans",Impact,sans-serif`;
+  let size = 300, txt = 'TORTILLERÍA';
+  x.font = `${size}px "Lilita One","Arial Black",sans-serif`; x.letterSpacing = '3px';
+  const mw = x.measureText(txt).width; size *= Math.min(1, 1780 / mw);
+  x.font = `${size}px "Lilita One","Arial Black",sans-serif`;
   x.textAlign = 'center'; x.textBaseline = 'alphabetic';
-  x.fillStyle = '#6f0a10'; x.fillText(txt, W / 2 + 6, 500 + 7);
-  x.fillStyle = '#b5121b'; x.fillText(txt, W / 2, 500);
-  x.fillStyle = 'rgba(255,120,120,.35)'; x.fillText(txt, W / 2 - 2, 494);
+  x.lineJoin = 'round'; x.strokeStyle = '#7d0a12'; x.lineWidth = 11; x.strokeText(txt, W / 2, 505);
+  x.fillStyle = '#c4111c'; x.fillText(txt, W / 2, 500);
+  x.fillStyle = 'rgba(255,110,100,.28)'; x.fillText(txt, W / 2 - 2, 493);
   return c;
 }
 function chalkCanvas() {
@@ -148,7 +148,7 @@ function burlapCanvas(label) {
   const c = cv(512, 512), x = c.getContext('2d'); x.fillStyle = '#c9a36b'; x.fillRect(0, 0, 512, 512);
   for (let i = 0; i < 512; i += 4) { x.fillStyle = `rgba(90,60,20,${.1 + rnd() * .12})`; x.fillRect(i, 0, 2, 512); x.fillRect(0, i, 512, 2); }
   if (label) {
-    x.fillStyle = '#2e7d2e'; x.font = '900 120px "Arial Black","DejaVu Sans",sans-serif'; x.textAlign = 'center'; x.fillText('MAÍZ', 256, 160);
+    x.fillStyle = '#2e7d2e'; x.font = '120px "Lilita One","Arial Black",sans-serif'; x.textAlign = 'center'; x.fillText('MAÍZ', 256, 160);
     emblem(x, 256, 330, 220);
   }
   return c;
@@ -251,9 +251,9 @@ function buildStall() {
   sh.moveTo(-2.2, .12); sh.quadraticCurveTo(-2.2, 0, -2.08, 0); sh.lineTo(2.08, 0); sh.quadraticCurveTo(2.2, 0, 2.2, .12); sh.lineTo(2.2, .95);
   sh.quadraticCurveTo(2.2, 1.05, 2.1, 1.07); sh.lineTo(1.3, 1.1); sh.bezierCurveTo(1.1, 1.1, 1.05, 1.5, .7, 1.5); sh.lineTo(-.7, 1.5);
   sh.bezierCurveTo(-1.05, 1.5, -1.1, 1.1, -1.3, 1.1); sh.lineTo(-2.1, 1.07); sh.quadraticCurveTo(-2.2, 1.05, -2.2, .95); sh.closePath();
-  const border = new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: .1, bevelEnabled: true, bevelSize: .03, bevelThickness: .03, bevelSegments: 2 }), std(0xd2201c, { roughness: .5 }));
+  const border = new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: .1, bevelEnabled: true, bevelSize: .03, bevelThickness: .03, bevelSegments: 2 }), std(0xc41a14, { roughness: .9 }));
   border.castShadow = true; sg.add(border);
-  const signTex = tex(signCanvas()); const faceMat = new THREE.MeshStandardMaterial({ map: signTex, roughness: .6 });
+  const signTex = tex(signCanvas()); const faceMat = new THREE.MeshStandardMaterial({ map: signTex, roughness: .9, envMapIntensity: .3, emissiveMap: signTex, emissive: 0x777777 });
   const mkFace = () => {
     const g = new THREE.ShapeGeometry(sh); const p = g.attributes.position, uv = g.attributes.uv;
     for (let i = 0; i < p.count; i++) uv.setXY(i, (p.getX(i) + 2.2) / 4.4, p.getY(i) / 1.5);
@@ -358,12 +358,13 @@ function buildStall() {
   return root;
 }
 
-const r=new THREE.WebGLRenderer({antialias:true});r.setPixelRatio(Math.min(devicePixelRatio,2));r.shadowMap.enabled=true;r.toneMapping=THREE.ACESFilmicToneMapping;r.toneMappingExposure=.85;r.outputColorSpace=THREE.SRGBColorSpace;document.body.prepend(r.domElement);
-const s=new THREE.Scene();s.background=new THREE.Color(0x3a2a24);s.environment=new THREE.PMREMGenerator(r).fromScene(new RoomEnvironment(),.04).texture;s.environmentIntensity=.5;
-s.add(new THREE.HemisphereLight(0xfff4e0,0x886644,1));
-const d=new THREE.DirectionalLight(0xfff0d8,2.2);d.position.set(5,9,8);d.castShadow=true;d.shadow.mapSize.set(2048,2048);Object.assign(d.shadow.camera,{left:-8,right:8,top:8,bottom:-8,near:1,far:30});s.add(d);
-const d2=new THREE.DirectionalLight(0xffe0c0,.9);d2.position.set(-8,5,-6);s.add(d2);
-const g=new THREE.Mesh(new THREE.CircleGeometry(12,48),new THREE.MeshStandardMaterial({color:0x6b5a4a}));g.rotation.x=-Math.PI/2;g.position.y=-.15;g.receiveShadow=true;s.add(g);
+await document.fonts.load('100px "Lilita One"','TORTILLERÍA MAÍZ');
+const r=new THREE.WebGLRenderer({antialias:true});r.setPixelRatio(Math.min(devicePixelRatio,2));r.shadowMap.enabled=true;r.toneMapping=THREE.ACESFilmicToneMapping;r.toneMappingExposure=.8;r.outputColorSpace=THREE.SRGBColorSpace;document.body.prepend(r.domElement);
+const s=new THREE.Scene();s.background=new THREE.Color(0x2b1d18);s.environment=new THREE.PMREMGenerator(r).fromScene(new RoomEnvironment(),.04).texture;s.environmentIntensity=.35;
+s.add(new THREE.HemisphereLight(0xfff4e0,0x886644,.55));
+const d=new THREE.DirectionalLight(0xfff0d8,1.5);d.position.set(5,9,8);d.castShadow=true;d.shadow.mapSize.set(2048,2048);Object.assign(d.shadow.camera,{left:-8,right:8,top:8,bottom:-8,near:1,far:30});s.add(d);
+const d2=new THREE.DirectionalLight(0xffe0c0,.5);d2.position.set(-8,5,-6);s.add(d2);
+
 const m=buildStall();s.add(m);
 const cam=new THREE.PerspectiveCamera(35,1,.1,100);cam.position.set(9,6,13);
 const c=new OrbitControls(cam,r.domElement);c.target.set(0,2.2,0);c.enableDamping=true;c.autoRotate=true;c.autoRotateSpeed=1.5;c.maxPolarAngle=Math.PI/2.02;c.minDistance=4;c.maxDistance=24;
@@ -372,7 +373,6 @@ const go=(a,e,dist=15)=>{c.autoRotate=false;cam.position.set(Math.sin(a)*Math.co
 const btn=(t,f)=>{const b=document.createElement('button');b.textContent=t;b.onclick=()=>f(b);ui.appendChild(b);return b};
 const rot=btn('Girar 360°',b=>{c.autoRotate=!c.autoRotate;b.classList.toggle('on',c.autoRotate)});rot.classList.add('on');
 [['Frente',0,.12],['Izquierda',-Math.PI/2,.15],['Atrás',Math.PI,.15],['Derecha',Math.PI/2,.15],['Arriba',.3,1.1]].forEach(([n,a,e])=>btn(n,()=>go(a,e)));
-btn('Descargar .glb',()=>new GLTFExporter().parse(m,b=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([b]));a.download='tortilleria.glb';a.click()},console.error,{binary:true}));
 const rs=()=>{r.setSize(innerWidth,innerHeight);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix()};addEventListener('resize',rs);rs();
 r.setAnimationLoop(()=>{c.update();r.render(s,cam)});
 </script></body></html>

@@ -3,7 +3,7 @@
 ## Contenido
 - `tortilleria.glb`  -> modelo 3D final (listo para web y videojuegos)
 - `ejemplo-web.html` -> página de ejemplo con el modelo giratorio, SIN zoom
-- `visor.html`       -> visor alterno hecho con Three.js (necesita internet)
+- `visor.html`       -> visor 3D de escritorio con Three.js (necesita internet)
 - `scene.js`         -> código que genera el modelo (por si hay que modificarlo)
 - `vistas/`          -> capturas del modelo (frente, izquierda, atrás, derecha, arriba)
 

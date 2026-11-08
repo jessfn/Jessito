@@ -83,14 +83,14 @@ function signCanvas() {
     x.fillStyle = '#e8a600'; x.beginPath(); x.arc(fx, fy, 13, 0, 7); x.fill();
     for (let i = 0; i < 3; i++) leaf(0, x, W / 2 + s * 720, 420, 120, s * (.9 + i * .3), '#3aa03a', .25);
   }
-  let size = 240, txt = 'TORTILLERÍA';
-  x.font = `900 ${size}px "Arial Black","DejaVu Sans",Impact,sans-serif`; x.letterSpacing = '4px';
-  const mw = x.measureText(txt).width; size *= Math.min(1, 1620 / mw);
-  x.font = `900 ${size}px "Arial Black","DejaVu Sans",Impact,sans-serif`;
+  let size = 300, txt = 'TORTILLERÍA';
+  x.font = `${size}px "Lilita One","Arial Black",sans-serif`; x.letterSpacing = '3px';
+  const mw = x.measureText(txt).width; size *= Math.min(1, 1780 / mw);
+  x.font = `${size}px "Lilita One","Arial Black",sans-serif`;
   x.textAlign = 'center'; x.textBaseline = 'alphabetic';
-  x.fillStyle = '#6f0a10'; x.fillText(txt, W / 2 + 6, 500 + 7);
-  x.fillStyle = '#b5121b'; x.fillText(txt, W / 2, 500);
-  x.fillStyle = 'rgba(255,120,120,.35)'; x.fillText(txt, W / 2 - 2, 494);
+  x.lineJoin = 'round'; x.strokeStyle = '#7d0a12'; x.lineWidth = 11; x.strokeText(txt, W / 2, 505);
+  x.fillStyle = '#c4111c'; x.fillText(txt, W / 2, 500);
+  x.fillStyle = 'rgba(255,110,100,.28)'; x.fillText(txt, W / 2 - 2, 493);
   return c;
 }
 function chalkCanvas() {
@@ -134,7 +134,7 @@ function burlapCanvas(label) {
   const c = cv(512, 512), x = c.getContext('2d'); x.fillStyle = '#c9a36b'; x.fillRect(0, 0, 512, 512);
   for (let i = 0; i < 512; i += 4) { x.fillStyle = `rgba(90,60,20,${.1 + rnd() * .12})`; x.fillRect(i, 0, 2, 512); x.fillRect(0, i, 512, 2); }
   if (label) {
-    x.fillStyle = '#2e7d2e'; x.font = '900 120px "Arial Black","DejaVu Sans",sans-serif'; x.textAlign = 'center'; x.fillText('MAÍZ', 256, 160);
+    x.fillStyle = '#2e7d2e'; x.font = '120px "Lilita One","Arial Black",sans-serif'; x.textAlign = 'center'; x.fillText('MAÍZ', 256, 160);
     emblem(x, 256, 330, 220);
   }
   return c;
@@ -237,9 +237,9 @@ export function buildStall() {
   sh.moveTo(-2.2, .12); sh.quadraticCurveTo(-2.2, 0, -2.08, 0); sh.lineTo(2.08, 0); sh.quadraticCurveTo(2.2, 0, 2.2, .12); sh.lineTo(2.2, .95);
   sh.quadraticCurveTo(2.2, 1.05, 2.1, 1.07); sh.lineTo(1.3, 1.1); sh.bezierCurveTo(1.1, 1.1, 1.05, 1.5, .7, 1.5); sh.lineTo(-.7, 1.5);
   sh.bezierCurveTo(-1.05, 1.5, -1.1, 1.1, -1.3, 1.1); sh.lineTo(-2.1, 1.07); sh.quadraticCurveTo(-2.2, 1.05, -2.2, .95); sh.closePath();
-  const border = new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: .1, bevelEnabled: true, bevelSize: .03, bevelThickness: .03, bevelSegments: 2 }), std(0xd2201c, { roughness: .5 }));
+  const border = new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: .1, bevelEnabled: true, bevelSize: .03, bevelThickness: .03, bevelSegments: 2 }), std(0xc41a14, { roughness: .9 }));
   border.castShadow = true; sg.add(border);
-  const signTex = tex(signCanvas()); const faceMat = new THREE.MeshStandardMaterial({ map: signTex, roughness: .6 });
+  const signTex = tex(signCanvas()); const faceMat = new THREE.MeshStandardMaterial({ map: signTex, roughness: .9, envMapIntensity: .3, emissiveMap: signTex, emissive: 0x777777 });
   const mkFace = () => {
     const g = new THREE.ShapeGeometry(sh); const p = g.attributes.position, uv = g.attributes.uv;
     for (let i = 0; i < p.count; i++) uv.setXY(i, (p.getX(i) + 2.2) / 4.4, p.getY(i) / 1.5);
