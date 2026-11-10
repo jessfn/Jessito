@@ -72,3 +72,10 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
 - Dientes chuecos, amarillentos, con colmillo montado y dos dientes de conejo asomados en reposo; unas largas, descascaradas, rosa desteñido y con mugre;
   muchos granos, ojeras marcadas, labios resecos, lunar con pelos, uniceja, ropa rota y sucia, sandalias gastadas.
 - Ella NO habla en pantalla: solo reacciona (cara y cuerpo). La voz es el narrador de ElevenLabs.
+
+## Reglas permanentes (del creador, recordar SIEMPRE)
+- El Día 1 queda como está (ya aprobado).
+- Del Día 2 en adelante, el cierre NO menciona "encuesta" ni sticker: se pide que la gente ELIJA una opción y la COMENTE en los comentarios
+  (ej.: "Comenta A o B: ¿qué le arreglamos mañana?"). En pantalla: botones A/B + texto "COMENTA TU ELECCIÓN" en vez de "VOTA EN LA ENCUESTA".
+- Ella no habla en pantalla; solo reacciona. La voz es el narrador (Jessica, eleven_v4, ajustes fijos de gen_voz.py).
+- Entre 40 y 59 s por video; se entrega solo cuando termino de generarlo; nada automático.
