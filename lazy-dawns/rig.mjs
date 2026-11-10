@@ -50,7 +50,7 @@ function eyeSvg(x, open, blink, squint, gx, gy, tear, tearT, side) {
     <ellipse rx="36" ry="40" fill="none" stroke="${OUT}" stroke-width="7"/>
     <path d="M-40,${lashY + 10} Q0,${lashY + ctrl} 40,${lashY + 10}" stroke="${OUT}" stroke-width="9" fill="none" stroke-linecap="round"/>
     ${ticks}${tearDrop}
-    <ellipse cy="48" rx="34" ry="${12 + squint * 8}" fill="#3d1f0e" opacity="${0.4 + squint * 0.2}"/>
+    <ellipse cy="50" rx="38" ry="${16 + squint * 8}" fill="#2a1208" opacity="${0.62 + squint * 0.15}"/>
   </g>`;
 }
 function browSvg(side, r, i) {
@@ -69,19 +69,27 @@ function mouthSvg(m, yaw) {
   const up = mid + 6 - open * 6;
   const lo = mid + 8 + open * 150 * (1 - 0.3 * Math.max(0, wide)) + (smile > 0.5 ? 14 : 0);
   const shape = `M${cl.x},${cl.y} Q0,${up} ${cr.x},${cr.y} Q0,${lo} ${cl.x},${cl.y}Z`;
-  const showTeeth = open > 0.1 || smile > 0.35;
-  const teeth = [[-56, 0, -10, 24], [-30, 3, -3, 22], [-6, 5, 5, 30], [20, 3, -6, 20], [42, 0, 12, 26]].map(([x, y, r, h], k) => `<rect x="${x}" y="${y - 2 + (smile > 0.35 && open < 0.1 ? 6 : 0)}" width="22" height="${h}" rx="6" fill="${['#e3cf6a', '#d4be52', '#e8d77a', '#c6b04a', '#dcc860'][k]}" stroke="${OUT}" stroke-width="3" transform="rotate(${r} ${x + 11} ${y})"/>`).join('');
+  const showTeeth = open > 0.08 || smile > 0.3;
+  const T = (x, y, w, h, rot, col) => `<g transform="rotate(${rot} ${x + w / 2} ${y})"><path d="M${x},${y} h${w} v${h - 8} q0,8 ${-w / 2},8 q${-w / 2},0 ${-w / 2},-8Z" fill="${col}" stroke="${OUT}" stroke-width="3"/><path d="M${x + 3},${y + 4} v${h * 0.5}" stroke="#7a5a12" stroke-width="3" opacity="0.5"/></g>`;
+  const drop = smile > 0.3 && open < 0.1 ? 6 : 0;
+  const upper = [T(-66, -2 + drop, 20, 20, -14, '#cdb64a'), T(-44, 2 + drop, 16, 30, 8, '#e3cf6a'), T(-27, 0 + drop, 26, 38, -5, '#d9c35a'), T(2, 4 + drop, 16, 22, 12, '#b9a23e'), T(24, -1 + drop, 20, 34, -10, '#e0cd6a'), T(52, 2 + drop, 14, 18, 18, '#b59a36')].join('');
+  const fang = T(40, 6 + drop, 12, 30, 24, '#d8c458');
+  const lower = open > 0.35 ? [T(-40, 70 + open * 20, 16, 22, 6, '#c2ab46'), T(-18, 74 + open * 22, 18, 26, -12, '#d3bd52'), T(8, 72 + open * 20, 16, 20, 14, '#b89f3c'), T(28, 76 + open * 22, 14, 18, -6, '#cdb54a')].join('') : '';
+  const teeth = upper + fang + lower;
+  const buck = (open < 0.1 && smile < 0.3) ? `<g>${T(-18, 8, 20, 26, 6, '#e3cf6a')}${T(4, 9, 18, 22, -8, '#d4be52')}</g>` : '';
   return `<g>
     <clipPath id="mouthClip"><path d="${shape}"/></clipPath>
     <path d="${shape}" fill="#4a0f12"/>
     <g clip-path="url(#mouthClip)">${showTeeth ? teeth : ''}${open > 0.35 ? `<ellipse cx="0" cy="${lo * 0.62}" rx="${w * 0.55}" ry="${22 + open * 14}" fill="#c4505e"/>` : ''}</g>
     <path d="${shape}" fill="none" stroke="#7b2a2a" stroke-width="${12 + press * 4}" stroke-linejoin="round" stroke-linecap="round"/>
     <path d="${shape}" fill="none" stroke="${OUT}" stroke-width="3" opacity="0.5"/>
+    ${buck}
+    <g stroke="#3a1010" stroke-width="3" opacity="0.7" stroke-linecap="round"><path d="M-30,${(cl.y + cr.y) / 2 + 14} l2,9 M-6,${(cl.y + cr.y) / 2 + 16} l-2,9 M20,${(cl.y + cr.y) / 2 + 14} l3,9"/></g>
     ${press > 0.4 ? `<path d="M${-w - 6},${cl.y - 6} q-6,8 0,16 M${w + 6},${cr.y - 6} q6,8 0,16" stroke="#3a1d10" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.6"/>` : ''}
   </g>`;
 }
 
-const PIMPLES = [[-75, -20, 15], [62, -42, 13], [108, 26, 16], [-118, 38, 12], [24, 56, 14], [-34, -78, 12], [88, -96, 13], [-98, -92, 11], [2, -4, 10], [54, 100, 12], [-60, 92, 10], [130, -20, 9]]
+const PIMPLES = [[-75, -20, 15], [-4, 20, 17], [-150, 78, 13], [148, 70, 14], [-22, -112, 11], [60, -132, 12], [112, -70, 11], [-40, 128, 11], [62, -42, 13], [108, 26, 16], [-118, 38, 12], [24, 56, 14], [-34, -78, 12], [88, -96, 13], [-98, -92, 11], [2, -4, 10], [54, 100, 12], [-60, 92, 10], [130, -20, 9]]
   .map(([x, y, r]) => `<g transform="translate(${x},${y})"><circle r="${r + 4}" fill="#8f1d14" opacity="0.35"/><circle r="${r}" fill="#d6453a" stroke="${OUT}" stroke-width="3"/><circle r="${r * 0.55}" cx="${-r * 0.25}" cy="${-r * 0.25}" fill="#ffb3a6" opacity="0.8"/><circle r="${r * 0.25}" cx="${-r * 0.3}" cy="${-r * 0.35}" fill="#fff"/></g>`).join('');
 const CURLS = (() => { const a = []; for (let i = 0; i < 26; i++) { const t = Math.PI * (1.05 + (i / 25) * 0.9), r = 200 + (i % 3) * 18; a.push(`<circle cx="${Math.cos(t) * r * 1.02}" cy="${Math.sin(t) * r * 0.95 - 8}" r="${46 + (i % 4) * 7}" fill="${HAIR}" ${O8}/>`); } return a.join(''); })();
 const HAIRHI = `<g opacity="0.35">${[...Array(8)].map((_, i) => `<path d="M${-150 + i * 40},${-215 - (i % 3) * 14} q25,-20 44,2" stroke="#9a8782" stroke-width="5" fill="none" stroke-linecap="round"/>`).join('')}</g>`;
@@ -123,6 +131,8 @@ function headSvg(p) {
       </g>
       <g transform="translate(${yaw * 6},${102 + jaw * 0.8})">${mouthSvg(p.mouth, yaw)}</g>
       ${PIMPLES}
+      <g transform="translate(96,94)"><circle r="9" fill="#2a1208" stroke="${OUT}" stroke-width="3"/><path d="M-2,-8 q-6,-18 -2,-28 M3,-8 q4,-16 12,-22 M6,-4 q16,-6 24,-4" stroke="#12090a" stroke-width="3" fill="none" stroke-linecap="round"/></g>
+      <ellipse cx="-46" cy="-56" rx="30" ry="12" fill="#fff" opacity="0.14" filter="url(#blur8)"/>
       <ellipse cx="-130" cy="20" rx="40" ry="18" fill="#2e1a0c" opacity="0.3" filter="url(#blur8)"/><ellipse cx="110" cy="110" rx="46" ry="16" fill="#2e1a0c" opacity="0.3" filter="url(#blur8)"/>
     </g>
   </g>`;
@@ -174,8 +184,9 @@ function legSvg(side, leg) {
   </g>`;
 }
 
-function armSvg(side, target, wrist) {
-  const k = solveArm(side, target);
+function armSvg(side, arm) {
+  const k = arm.rot1 !== undefined ? { S: { x: side * 296, y: 58 }, rot1: arm.rot1, rot2: arm.rot2 } : solveArm(side, arm.t);
+  const wrist = arm.w || 0;
   const sleeve = `<g transform="translate(0,-26)"><path d="${taper(112, 82, 84, 74)}" fill="${SHIRT}" ${O8}/><path d="${taper(112, 82, 84, 74)}" fill="url(#pantG)" opacity="0.55"/>
       <path d="M-72,74 Q0,92 72,74" stroke="#2ecc71" stroke-width="16" fill="none" opacity="0.9"/><path d="M-76,100 Q0,122 76,100 L72,122 Q0,144 -72,122Z" fill="#c95f12" stroke="${OUT}" stroke-width="5" transform="translate(0,-8)"/></g>`;
   return `<g transform="translate(${k.S.x},${k.S.y}) rotate(${k.rot1})">
@@ -214,13 +225,13 @@ export function drawLazy(p) {
     ${SHADE_DEFS}
     <clipPath id="eyeClip"><ellipse rx="36" ry="40"/></clipPath>
     <ellipse cx="0" cy="780" rx="420" ry="46" fill="#000" opacity="0.4" filter="url(#blur20)"/>
-    ${legSvg(-1, lg.l)}${legSvg(1, lg.r)}${chest}
+    <g transform="translate(0,${p.hop || 0})">${legSvg(-1, lg.l)}${legSvg(1, lg.r)}<g transform="translate(${p.lean || 0},0)">${chest}
     <g transform="translate(0,${-sh * 0.4})">
       <path d="M-62,-150 C-70,-110 -86,-96 -110,-84 L110,-84 C86,-96 70,-110 62,-150Z" fill="${SKINB}" ${O8}/>
       <path d="M-40,-90 C-30,-70 30,-70 40,-90" stroke="#000" stroke-opacity="0.2" stroke-width="6" fill="none"/>
       <ellipse cx="0" cy="-60" rx="104" ry="24" fill="#000" opacity="0.18" filter="url(#blur8)"/>
       <g transform="translate(0,${rollY}) rotate(${p.roll || 0}) translate(0,${-rollY}) translate(0,${-215 + (p.pitch || 0) * 10 + (p.bob || 0)})">${headSvg(p)}</g>
     </g>
-    <g transform="translate(0,${-sh})">${armSvg(-1, p.armL.t, p.armL.w)}${armSvg(1, p.armR.t, p.armR.w)}</g>
-  </g>`;
+    <g transform="translate(0,${-sh})">${armSvg(-1, p.armL)}${armSvg(1, p.armR)}</g>
+  </g></g></g>`;
 }

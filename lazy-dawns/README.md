@@ -67,3 +67,8 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
 - Principios y fuentes: parpadeo humano 100-150 ms (Wikipedia/UCL), parpadeos basados en datos reales se ven mas naturales (Disney
   Research), mirada con saccades, visemas Preston Blair, sonrisa genuina = comisura + mejillas (AU12+AU6).
 - Para un episodio nuevo: escribir `script_dia0N.txt`, generar voz con `gen_voz.py`, definir tiempos/gestos y correr `run_dia01.sh`.
+
+## Diseno del personaje (definitivo, 'antes')
+- Dientes chuecos, amarillentos, con colmillo montado y dos dientes de conejo asomados en reposo; unas largas, descascaradas, rosa desteñido y con mugre;
+  muchos granos, ojeras marcadas, labios resecos, lunar con pelos, uniceja, ropa rota y sucia, sandalias gastadas.
+- Ella NO habla en pantalla: solo reacciona (cara y cuerpo). La voz es el narrador de ElevenLabs.

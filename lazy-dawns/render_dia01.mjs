@@ -296,7 +296,14 @@ function frame(t) {
   return new Resvg(svg, ropt).render().asPng();
 }
 
-if (process.argv[2] === 'preview') {
+function lerpT(a, b, k) { return a + (b - a) * k; }
+if (process.argv[2] === 'motion') {
+  // uso: node render_dia01.mjs motion nombre t0 t1 n  -> tira de n cuadros del personaje solo (para revisar el movimiento)
+  const [name, t0, t1, n] = [process.argv[3], parseFloat(process.argv[4]), parseFloat(process.argv[5]), parseInt(process.argv[6])];
+  let g = ''; for (let i = 0; i < n; i++) { const t = lerpT(t0, t1, i / (n - 1)); g += `<g transform="translate(${i * 330 + 165},262) scale(0.3)">${drawLazy(pose(t))}</g><text x="${i * 330 + 165}" y="40" font-family="Inter" font-weight="700" font-size="30" text-anchor="middle" fill="#fff">${t.toFixed(2)}s</text>`; }
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${n * 330}" height="520">${charDefs}<rect width="100%" height="100%" fill="#5b3a8a"/>${g}</svg>`;
+  writeFileSync(path.join(here, `build/motion_${name}.png`), new Resvg(svg, ropt).render().asPng()); console.log('motion ok');
+} else if (process.argv[2] === 'preview') {
   for (const s of process.argv.slice(3)) writeFileSync(path.join(here, `build/p_${s}.png`), frame(parseFloat(s)));
   console.log('preview ok', 'DUR', DUR.toFixed(2), 'frames', Math.round(DUR * FPS));
 } else {

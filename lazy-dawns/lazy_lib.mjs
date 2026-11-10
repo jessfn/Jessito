@@ -18,14 +18,17 @@ export function defs(mode) {
 
 
 export function hand(cx, cy, side, O, skinB, soft) {
+  const nail = (len, chip) => `<path d="M-9,${len - 16} Q-12,${len + 12} -5,${len + 36} Q3,${len + 44} 10,${len + 32} Q13,${len + 8} 9,${len - 16}Z" fill="#d7a1b6" ${O ? 'stroke="#12090a" stroke-width="3"' : ''}/>
+    <path d="M-7,${len + 14} Q0,${len + 30} 8,${len + 14} Q6,${len + 38} 0,${len + 40} Q-6,${len + 36} -7,${len + 14}Z" fill="#2a1608" opacity="0.75"/>
+    ${chip ? `<path d="M-10,${len + 6} l7,6 l-6,7 l8,6 l-9,2Z" fill="#8a4e2b"/>` : ''}<path d="M-5,${len - 6} q1,18 3,30" stroke="#fff" stroke-opacity="0.45" stroke-width="3" fill="none"/>`;
   const f = (dx, dy, len, rot, i) => `<g transform="translate(${dx},${dy}) rotate(${rot})"><rect x="-13" y="0" width="26" height="${len}" rx="13" fill="${skinB}" ${O}/>
-    <ellipse cx="0" cy="${len - 9}" rx="9" ry="7" fill="#e8c9a8" ${O ? 'stroke="#12090a" stroke-width="2"' : ''}/><path d="M-8,${len - 4} h16" stroke="#2a1608" stroke-width="3" opacity="0.7"/>
+    ${nail(len, i % 2 === 0)}<path d="M-8,${len - 4} h16" stroke="#2a1608" stroke-width="3" opacity="0.7"/>
     <path d="M-9,${len * 0.5} h18" stroke="#000" stroke-opacity="0.25" stroke-width="3"/></g>`;
   const sd = side;
   return `<g transform="translate(${cx},${cy})">
     <ellipse cx="0" cy="0" rx="60" ry="54" fill="${skinB}" ${O}/>
     ${f(-36 * sd, 34, 52, -14 * sd, 0)}${f(-12 * sd, 44, 62, -4 * sd, 1)}${f(12 * sd, 44, 66, 4 * sd, 2)}${f(36 * sd, 34, 54, 14 * sd, 3)}
-    <g transform="translate(${52 * sd},-6) rotate(${-40 * sd})"><rect x="-13" y="-6" width="26" height="50" rx="13" fill="${skinB}" ${O}/><ellipse cx="0" cy="36" rx="9" ry="7" fill="#e8c9a8"/></g>
+    <g transform="translate(${52 * sd},-6) rotate(${-40 * sd})"><rect x="-13" y="-6" width="26" height="50" rx="13" fill="${skinB}" ${O}/>${nail(44, true)}</g>
     ${soft ? `<ellipse cx="-14" cy="-16" rx="30" ry="16" fill="#fff" opacity="0.14"/>` : ''}
     <path d="M-30,-8 q12,10 24,0 M2,-10 q12,10 24,0" stroke="#000" stroke-opacity="0.25" stroke-width="3" fill="none"/>
     <ellipse cx="14" cy="26" rx="20" ry="9" fill="#3b2412" opacity="0.28"/>
