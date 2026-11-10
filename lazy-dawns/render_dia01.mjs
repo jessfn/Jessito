@@ -22,16 +22,18 @@ const DUR = words[words.length - 1][2] + 1.4;
 
 // ---------- LINEA DE TIEMPO (todo sale de los tiempos de la voz) ----------
 const T = {
-  name: 0.25, nameOut: 2.9,
-  notif: wt('mensaje'), open: wt('Mi') - 0.25,
-  m1: wt('amiga') + 0.1, m2: wt('modelos,'), m3: wt('ir.') - 0.2,
-  m4: wt('¿Yo,'), m5: wt('Mírame.') + 0.15, m6: wt('Mírame.') + 0.7, close: wt('luego') + 0.35,
-  mirror: wt('luego') + 0.7, gr: wt('espejo...') - 0.05, ce: wt('espejo...') + 0.75, di: wt('espejo...') + 1.45, mirOut: wt('Tengo') - 0.15,
-  d30: wt('treinta') - 0.1, decide: wt('decides') - 0.1,
-  vote: wt('Primer') - 0.05, optA: wt('¿piel'), optB: wt('dientes?') - 0.1, cta: wt('Vota'),
+  name: 0.2, nameOut: 2.3,
+  notif: wt('mensaje'), open: wt('Mi') - 0.2,
+  m1: wt('Mari') + 0.2, m2: wt('modelos...'), m3: wt('ir.') - 0.2,
+  m4: wt('¿Yo,'), m5: wt('Mírame.') + 0.25, m6: wt('rindió.') - 0.1, m7: wt('nadie'), m8: wt('pensando.') - 0.1, close: wt('paré') - 0.3,
+  mirror: wt('paré') + 0.1, gr: wt('piel,', 0), ce: wt('cejas,', 0), di: wt('sonrisa...'), sparkle: wt('ganas'), mirOut: wt('Así') - 0.2,
+  d30: wt('treinta') - 0.1, bPiel: wt('piel,', 1), bDientes: wt('dientes,'), bCejas: wt('cejas,', 1), bPelo: wt('pelo,'), bEstilo: wt('estilo,'), bGym: wt('gimnasio.') - 0.1,
+  decide: wt('decides') - 0.1,
+  vote: wt('Hoy') - 0.1, optA: wt('¿Piel'), optB: wt('dientes?') - 0.1, cta: wt('Vota'),
 };
+writeFileSync(path.join(here, 'build/timeline.json'), JSON.stringify({ T, DUR }));
 const kf = [[0, 540, 0.62, 1480], [T.open - 0.3, 540, 0.62, 1480], [T.open + 0.4, 150, 0.28, 1800], [T.close - 0.1, 150, 0.28, 1800],
-  [T.mirror + 0.2, 380, 0.66, 1480], [T.mirOut - 0.3, 380, 0.66, 1480], [T.mirOut + 0.4, 540, 0.72, 1500], [T.vote - 0.3, 540, 0.72, 1500], [T.vote + 0.4, 540, 0.44, 1010], [99, 540, 0.44, 1010]];
+  [T.mirror + 0.3, 380, 0.66, 1480], [T.mirOut - 0.3, 380, 0.66, 1480], [T.mirOut + 0.5, 540, 0.46, 1600], [T.vote - 0.3, 540, 0.46, 1600], [T.vote + 0.4, 540, 0.44, 1010], [999, 540, 0.44, 1010]];
 function camAt(t) {
   for (let i = 0; i < kf.length - 1; i++) { const a = kf[i], b = kf[i + 1]; if (t >= a[0] && t <= b[0]) { const u = ease((t - a[0]) / (b[0] - a[0] || 1)); return [1, 2, 3].map((k) => a[k] + (b[k] - a[k]) * u); } }
   return kf[kf.length - 1].slice(1);
@@ -126,10 +128,12 @@ function avatar(id, cx, cy, r, kind = 'mari') {
 const msgs = [
   { t: T.m1, side: 'l', lines: ['Amigaaa, mira este', 'casting de modelos!!'], time: '9:41' },
   { t: T.m2, side: 'l', card: true, time: '9:41' },
-  { t: T.m3, side: 'l', lines: ['tienes que ir!! 🙏'.replace(' 🙏', '')], time: '9:42' },
+  { t: T.m3, side: 'l', lines: ['tienes que ir!!'], time: '9:42' },
   { t: T.m4, side: 'r', lines: ['jajaja yo?? modelo??', 'mírame...'], time: '9:43' },
   { t: T.m5, side: 'l', troll: true, lines: ['ni en tus sueños jaja'], time: '9:43' },
-  { t: T.m6, side: 'l', lines: ['Ignóralos. TÚ PUEDES', 'yo te ayudo 💪'.replace(' 💪', '')], time: '9:44' },
+  { t: T.m6, side: 'l', lines: ['No les hagas caso,', 'tú puedes!!'], time: '9:44' },
+  { t: T.m7, side: 'l', lines: ['Nadie nace listo, Lazy'], time: '9:44' },
+  { t: T.m8, side: 'r', lines: ['ok... déjame pensarlo'], time: '9:45' },
 ];
 const msgH = (m) => (m.card ? 330 : m.lines.length * 46 + 70);
 function bubbleSvg(m, x, y, a, t) {
@@ -231,7 +235,8 @@ function subtitle(t) {
   if (!cur) return '';
   const sp = cur.map((o) => `<tspan fill="${t >= o.s && t < o.e + 0.05 ? '#ffe14d' : '#fff'}">${esc(o.w.replace(/\.\.\./g, '').toUpperCase())} </tspan>`).join('');
   const inChat = t > T.open && t < T.close + 0.4;
-  return `<text x="${inChat ? 640 : 540}" y="1590" font-family="Anton" font-size="${inChat ? 80 : 88}" text-anchor="middle" stroke="${OUT}" stroke-width="16" stroke-linejoin="round" paint-order="stroke" letter-spacing="2">${sp}</text>`;
+  const sy = t > T.mirOut ? 1745 : 1590;
+  return `<text x="${inChat ? 640 : 540}" y="${sy}" font-family="Anton" font-size="${inChat ? 80 : 88}" text-anchor="middle" stroke="${OUT}" stroke-width="16" stroke-linejoin="round" paint-order="stroke" letter-spacing="2">${sp}</text>`;
 }
 function callout(t, t0, text, x, y, col = '#ffe14d') {
   const p = pop(t, t0); if (p <= 0 || t > t0 + 0.7) return '';
@@ -246,6 +251,28 @@ function vote(t) {
   if (t >= T.cta) s += `<text x="540" y="1690" font-family="Anton" font-size="62" text-anchor="middle" fill="#ffe14d" stroke="${OUT}" stroke-width="10" paint-order="stroke" opacity="${0.65 + 0.35 * Math.sin(t * 8)}">VOTA EN LA ENCUESTA ↓</text>`;
   return s;
 }
+
+function badges(t) {
+  const items = [['PIEL', T.bPiel, '#ff4d8d', 'drop'], ['DIENTES', T.bDientes, '#22d3ee', 'tooth'], ['CEJAS', T.bCejas, '#a3e635', 'brow'], ['PELO', T.bPelo, '#ffb020', 'hair'], ['ESTILO', T.bEstilo, '#a78bfa', 'shirt'], ['GYM', T.bGym, '#fb7185', 'gym']];
+  const icon = (k) => ({
+    drop: '<path d="M0,-34 C22,-6 28,6 28,14 A28,28 0 0 1 -28,14 C-28,6 -22,-6 0,-34Z"/>',
+    tooth: '<path d="M-26,-22 Q-26,-34 -12,-32 Q0,-26 12,-32 Q26,-34 26,-22 Q26,-4 18,10 Q16,34 8,34 Q2,34 0,16 Q-2,34 -8,34 Q-16,34 -18,10 Q-26,-4 -26,-22Z"/>',
+    brow: '<path d="M-32,10 Q-8,-24 32,-10 Q6,-4 -32,10Z"/>',
+    hair: '<circle cx="-16" cy="-6" r="16"/><circle cx="2" cy="-14" r="17"/><circle cx="18" cy="-4" r="16"/><circle cx="0" cy="8" r="16"/>',
+    shirt: '<path d="M-18,-30 L-34,-14 L-24,0 L-18,-6 L-18,30 L18,30 L18,-6 L24,0 L34,-14 L18,-30 Q0,-20 -18,-30Z"/>',
+    gym: '<rect x="-34" y="-8" width="68" height="16" rx="5"/><rect x="-40" y="-22" width="14" height="44" rx="5"/><rect x="26" y="-22" width="14" height="44" rx="5"/>',
+  })[k];
+  return items.map(([label, t0, col, ic], i) => { const p = pop(t, t0, 0.4); if (p <= 0) return ''; const x = 140 + i * 160;
+    return `<g transform="translate(${x},885) scale(${p})"><circle cx="4" cy="8" r="56" fill="#000" opacity="0.3"/><circle r="56" fill="${col}" stroke="${OUT}" stroke-width="7"/><circle cx="-16" cy="-22" r="14" fill="#fff" opacity="0.3"/><g fill="#fff" stroke="${OUT}" stroke-width="4" stroke-linejoin="round" transform="scale(0.85)">${icon(ic)}</g>
+      <text x="0" y="102" font-family="Anton" font-size="34" text-anchor="middle" fill="#fff" stroke="${OUT}" stroke-width="9" paint-order="stroke">${label}</text></g>`; }).join('');
+}
+function sparkles(t) {
+  if (t < T.sparkle || t > T.sparkle + 1.5) return '';
+  const o = clamp((T.sparkle + 1.5 - t) * 2);
+  return [[250, 760, 34], [520, 740, 26], [190, 960, 22], [560, 930, 30], [400, 640, 24]].map(([x, y, r], i) => { const p = pop(t, T.sparkle + i * 0.08, 0.4) * (0.8 + 0.2 * Math.sin(t * 10 + i));
+    return `<g transform="translate(${x},${y}) scale(${p}) rotate(${t * 60})" opacity="${o}"><path d="M0,${-r} Q4,-4 ${r},0 Q4,4 0,${r} Q-4,4 ${-r},0 Q-4,-4 0,${-r}Z" fill="#ffe14d" stroke="${OUT}" stroke-width="4"/></g>`; }).join('');
+}
+
 function frame(t) {
   const [cx, S, fy] = camAt(t);
   const bob = Math.sin(t * 5) * 6 * S, sq = 1 + Math.sin(t * 5) * 0.012;
@@ -257,11 +284,11 @@ function frame(t) {
   const refl = inMir ? `<clipPath id="mc"><rect x="790" y="930" width="200" height="512" rx="94"/></clipPath><g clip-path="url(#mc)" opacity="0.9"><rect x="790" y="930" width="200" height="512" fill="#9bd7f0" opacity="0.5"/><g transform="translate(890,${1415 - 700 * 0.3}) scale(${-0.3},0.3)">${charBody}</g><path d="M790,930 h120 l-90,512 h-30Z" fill="#fff" opacity="0.12"/></g>` : '';
   const nameCard = t >= T.name && t < T.nameOut ? `<g transform="translate(540,545) scale(${pop(t, T.name, 0.45) * (t > T.nameOut - 0.3 ? clamp((T.nameOut - t) / 0.3) : 1)})"><text x="0" y="0" font-family="Anton" font-size="150" text-anchor="middle" fill="#ff4d8d" stroke="${OUT}" stroke-width="20" paint-order="stroke" letter-spacing="3">LAZY</text><text x="0" y="86" font-family="Anton" font-size="84" text-anchor="middle" fill="#ffe14d" stroke="${OUT}" stroke-width="14" paint-order="stroke" letter-spacing="14">DAWNS</text></g>` : '';
   const notif = t >= T.notif && t < T.open ? `<g transform="translate(540,720) scale(${pop(t, T.notif)})"><rect x="-296" y="-56" width="620" height="150" rx="44" fill="#000" opacity="0.3"/><rect x="-310" y="-70" width="620" height="150" rx="44" fill="#fff" stroke="${OUT}" stroke-width="6"/>${avatar('avn', -234, 5, 46)}<text x="-170" y="-12" font-family="Inter" font-weight="800" font-size="34" fill="#1c1c28">Mari</text><text x="-170" y="30" font-family="Inter" font-weight="500" font-size="30" fill="#4b4b5c">Amiga, tienes que ver esto…</text><circle cx="270" cy="-30" r="20" fill="#ff4d8d"/><text x="270" y="-21" font-family="Inter" font-weight="800" font-size="26" text-anchor="middle" fill="#fff">1</text></g>` : '';
-  const calls = callout(t, T.gr, 'GRANOS', 380, 600) + callout(t, T.ce, 'CEJAS', 380, 600, '#ff9ad0') + callout(t, T.di, 'DIENTES', 380, 600, '#22d3ee');
+  const calls = callout(t, T.gr, 'GRANOS', 380, 600) + callout(t, T.ce, 'CEJAS', 380, 600, '#ff9ad0') + callout(t, T.di, 'SONRISA', 380, 600, '#22d3ee');
   const big30 = t >= T.d30 && t < T.vote ? `<g transform="translate(540,640) scale(${pop(t, T.d30, 0.5)})"><text x="0" y="0" font-family="Anton" font-size="230" text-anchor="middle" fill="#ff4d8d" stroke="${OUT}" stroke-width="22" paint-order="stroke">30 DÍAS</text><text x="0" y="130" font-family="Anton" font-size="84" text-anchor="middle" fill="#ffe14d" stroke="${OUT}" stroke-width="14" paint-order="stroke" opacity="${pop(t, T.decide)}">TÚ DECIDES CADA PASO</text></g>` : '';
   const flash = t >= T.vote && t < T.vote + 0.12 ? `<rect width="${W}" height="${H}" fill="#fff" opacity="${0.6 * (1 - (t - T.vote) / 0.12)}"/>` : '';
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${charDefs}
-    <image href="${roomPng}" width="${W}" height="${H}"/>${pill}${shadow}${ch}${refl}${nameCard}${phone(t)}${notif}${calls}${big30}
+    <image href="${roomPng}" width="${W}" height="${H}"/>${pill}${shadow}${ch}${refl}${nameCard}${phone(t)}${notif}${calls}${sparkles(t)}${big30}${badges(t)}
     ${t < T.vote ? subtitle(t) : vote(t)}${flash}
     <image href="${grainPng}" width="${W}" height="${H}"/></svg>`;
   return new Resvg(svg, ropt).render().asPng();
@@ -269,11 +296,12 @@ function frame(t) {
 
 if (process.argv[2] === 'preview') {
   for (const s of process.argv.slice(3)) writeFileSync(path.join(here, `build/p_${s}.png`), frame(parseFloat(s)));
-  console.log('preview ok', JSON.stringify(Object.fromEntries(Object.entries(T).map(([k, v]) => [k, +v.toFixed(2)]))), 'DUR', DUR.toFixed(2));
+  console.log('preview ok', 'DUR', DUR.toFixed(2), 'frames', Math.round(DUR * FPS));
 } else {
-  const out = process.argv[2] || path.join(here, 'build/video_mudo.mp4');
-  const ff = spawn('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(FPS), '-i', '-', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '18', '-preset', 'medium', out], { stdio: ['pipe', 'inherit', 'inherit'] });
-  const total = Math.round(DUR * FPS);
-  for (let i = 0; i < total; i++) { if (!ff.stdin.write(frame(i / FPS))) await new Promise((r) => ff.stdin.once('drain', r)); if (i % 60 === 0) console.log('frame', i, '/', total); }
+  // uso: node render_dia01.mjs <inicio> <fin> <salida.mp4>   (rango de fotogramas; fin=-1 hasta el final)
+  const a0 = parseInt(process.argv[2] ?? '0'), total = Math.round(DUR * FPS), a1 = process.argv[3] && parseInt(process.argv[3]) >= 0 ? Math.min(parseInt(process.argv[3]), total) : total;
+  const out = process.argv[4] || path.join(here, 'build/video_mudo.mp4');
+  const ff = spawn('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(FPS), '-i', '-', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '18', '-preset', 'medium', '-g', '30', out], { stdio: ['pipe', 'inherit', 'inherit'] });
+  for (let i = a0; i < a1; i++) { if (!ff.stdin.write(frame(i / FPS))) await new Promise((r) => ff.stdin.once('drain', r)); if ((i - a0) % 60 === 0) console.log('frame', i, '/', a1); }
   ff.stdin.end(); await new Promise((r) => ff.on('close', r)); console.log('listo', out);
 }
