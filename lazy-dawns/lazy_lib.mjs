@@ -17,7 +17,7 @@ export function defs(mode) {
 }
 
 
-function hand(cx, cy, side, O, skinB, soft) {
+export function hand(cx, cy, side, O, skinB, soft) {
   const f = (dx, dy, len, rot, i) => `<g transform="translate(${dx},${dy}) rotate(${rot})"><rect x="-13" y="0" width="26" height="${len}" rx="13" fill="${skinB}" ${O}/>
     <ellipse cx="0" cy="${len - 9}" rx="9" ry="7" fill="#e8c9a8" ${O ? 'stroke="#12090a" stroke-width="2"' : ''}/><path d="M-8,${len - 4} h16" stroke="#2a1608" stroke-width="3" opacity="0.7"/>
     <path d="M-9,${len * 0.5} h18" stroke="#000" stroke-opacity="0.25" stroke-width="3"/></g>`;
@@ -31,7 +31,7 @@ function hand(cx, cy, side, O, skinB, soft) {
     <ellipse cx="14" cy="26" rx="20" ry="9" fill="#3b2412" opacity="0.28"/>
   </g>`;
 }
-function foot(cx, O, skinB, soft, strapCol) {
+export function foot(cx, O, skinB, soft, strapCol) {
   const toes = [-58, -30, -2, 24, 48].map((x, i) => `<g><circle cx="${cx + x}" cy="${676 - (i === 0 ? 0 : Math.abs(i - 2) * -2 + 4)}" r="${i === 0 ? 20 : 15 - i * 0.6}" fill="${skinB}" ${O}/>
     <ellipse cx="${cx + x}" cy="${684}" rx="${i === 0 ? 10 : 8}" ry="5" fill="#d9bfa0" ${O ? 'stroke="#12090a" stroke-width="2"' : ''}/><ellipse cx="${cx + x}" cy="${686}" rx="6" ry="2.5" fill="#2a1608" opacity="0.55"/></g>`).join('');
   return `<g>

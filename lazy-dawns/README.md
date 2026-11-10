@@ -14,7 +14,10 @@ Serie interactiva: cada dia se arregla UNA cosa de Lazy Dawns, segun lo que voto
   (sombras, brillos, volumen), detalle fino: manos, pies, ropa rota y sucia, celular/chat realista moderno.
 - Cada video cuenta una historia (chat, casting de modelos, espejo) y termina con votacion A/B para el dia siguiente.
 - NO es automatico: el creador pide cada video cuando quiere; se entrega terminado (MP4 con voz ElevenLabs).
-- Voz: ElevenLabs "Laura" (id FGY2WhTYpPnrIDTdsKH5), espanol, en primera persona como Lazy.
+- VOZ DEFINITIVA (no cambiar nunca): ElevenLabs voz "Jessica" (id cgSgspJ2msm6clMCkdW9), modelo eleven_v4, language_code es,
+  stability 0.5, similarity_boost 0.75, style 0.0, speaker_boost on. Primera persona como Lazy. Script: gen_voz.py.
+- Duracion de cada video: entre 40 y 59 s. Se entrega solo cuando termino de generarlo (sin automatizar).
+- Personaje con animacion de persona real: parpadeo, miradas, cejas, boca sincronizada con la voz, huesos/articulaciones.
 - Obesa y morena; el arco del gimnasio llega mas adelante segun voten.
 
 ## Personaje: Lazy Dawns
@@ -53,3 +56,14 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
 ## Pendiente (necesita tus accesos)
 - API key de ElevenLabs (se guarda como secret, nunca en el chat ni en el repo).
 - Decidir si se renderiza con Remotion o con otra herramienta.
+
+## Animacion del personaje (rig.mjs + director.mjs)
+- `rig.mjs`: personaje articulado. Cuello/cabeza (giro, cabeceo, inclinacion), hombros, brazo-antebrazo-muneca-mano con IK de 2 huesos,
+  cadera, muslo-rodilla-pantorrilla-tobillo-pie, respiracion, parpados (parpadeo, guino), pupilas, cejas (alzar/fruncir),
+  boca por visemas, mejillas y arrugas de expresion (frente, patas de gallo, pliegues nasogenianos), lagrimas.
+- `director.mjs`: actuacion por fotograma a partir de los tiempos de cada palabra de la voz: parpadeo espontaneo (100-150 ms cada
+  2-4.5 s), micro-saccades, enfasis de palabras (cabeceo + cejas), emociones (feliz, triste, sorpresa, risa, duda, determinada...),
+  boca sincronizada por letra, y gestos de brazos (saludo, mano al pecho, tocarse mejilla/ceja, puno, manos abiertas).
+- Principios y fuentes: parpadeo humano 100-150 ms (Wikipedia/UCL), parpadeos basados en datos reales se ven mas naturales (Disney
+  Research), mirada con saccades, visemas Preston Blair, sonrisa genuina = comisura + mejillas (AU12+AU6).
+- Para un episodio nuevo: escribir `script_dia0N.txt`, generar voz con `gen_voz.py`, definir tiempos/gestos y correr `run_dia01.sh`.

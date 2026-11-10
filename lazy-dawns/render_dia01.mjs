@@ -6,7 +6,9 @@ import { spawn } from 'node:child_process';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { defs, lazy } from './lazy_lib.mjs';
+import { defs } from './lazy_lib.mjs';
+import { drawLazy } from './rig.mjs';
+import { makeDirector } from './director.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const W = 1080, H = 1920, FPS = 30;
@@ -32,8 +34,9 @@ const T = {
   vote: wt('Hoy') - 0.1, optA: wt('¿Piel'), optB: wt('dientes?') - 0.1, cta: wt('Vota'),
 };
 writeFileSync(path.join(here, 'build/timeline.json'), JSON.stringify({ T, DUR }));
-const kf = [[0, 540, 0.62, 1480], [T.open - 0.3, 540, 0.62, 1480], [T.open + 0.4, 150, 0.28, 1800], [T.close - 0.1, 150, 0.28, 1800],
-  [T.mirror + 0.3, 380, 0.66, 1480], [T.mirOut - 0.3, 380, 0.66, 1480], [T.mirOut + 0.5, 540, 0.46, 1600], [T.vote - 0.3, 540, 0.46, 1600], [T.vote + 0.4, 540, 0.44, 1010], [999, 540, 0.44, 1010]];
+const pose = makeDirector(words, T, DUR, wt);
+const kf = [[0, 540, 0.62, 1480], [T.open - 0.3, 540, 0.62, 1480], [T.open + 0.4, 150, 0.25, 1830], [T.close - 0.1, 150, 0.25, 1830],
+  [T.mirror + 0.3, 380, 0.66, 1480], [T.mirOut - 0.3, 380, 0.66, 1480], [T.mirOut + 0.5, 540, 0.44, 1620], [T.vote - 0.3, 540, 0.44, 1620], [T.vote + 0.4, 540, 0.44, 1010], [999, 540, 0.44, 1010]];
 function camAt(t) {
   for (let i = 0; i < kf.length - 1; i++) { const a = kf[i], b = kf[i + 1]; if (t >= a[0] && t <= b[0]) { const u = ease((t - a[0]) / (b[0] - a[0] || 1)); return [1, 2, 3].map((k) => a[k] + (b[k] - a[k]) * u); } }
   return kf[kf.length - 1].slice(1);
@@ -100,7 +103,6 @@ const b64 = (buf) => 'data:image/png;base64,' + Buffer.from(buf).toString('base6
 const roomPng = b64(new Resvg(roomSvg(), ropt).render().asPng());
 const grainPng = b64(new Resvg(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><filter id="g" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="7"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.9 -0.42"/></filter><rect width="${W}" height="${H}" filter="url(#g)" opacity="0.35"/></svg>`, ropt).render().asPng());
 const charDefs = defs('e3d');
-const charBody = lazy('e3d');
 
 // ---------- AVATAR de Mari (ilustracion) ----------
 function avatar(id, cx, cy, r, kind = 'mari') {
@@ -275,16 +277,16 @@ function sparkles(t) {
 
 function frame(t) {
   const [cx, S, fy] = camAt(t);
-  const bob = Math.sin(t * 5) * 6 * S, sq = 1 + Math.sin(t * 5) * 0.012;
-  const py = fy - 700 * S + bob;
+  const P = pose(t);
+  const py = fy - 830 * S;
   const pill = `<g transform="translate(540,300)"><rect x="-206" y="-42" width="420" height="96" rx="48" fill="#000" opacity="0.3"/><rect x="-210" y="-48" width="420" height="96" rx="48" fill="#ffe14d" stroke="${OUT}" stroke-width="8"/><text x="0" y="24" font-family="Anton" font-size="68" text-anchor="middle" fill="${OUT}">DÍA 1/30</text></g>`;
-  const shadow = `<ellipse cx="${cx}" cy="${fy + 8}" rx="${380 * S}" ry="${34 * S}" fill="#000" opacity="0.4"/>`;
-  const ch = `<g transform="translate(${cx},${py}) scale(${S * (2 - sq)},${S * sq})">${charBody}</g>`;
+  const shadow = '';
+  const ch = `<g transform="translate(${cx},${py}) scale(${S})">${drawLazy(P)}</g>`;
   const inMir = t >= T.mirror - 0.3 && t < T.mirOut + 0.4;
-  const refl = inMir ? `<clipPath id="mc"><rect x="790" y="930" width="200" height="512" rx="94"/></clipPath><g clip-path="url(#mc)" opacity="0.9"><rect x="790" y="930" width="200" height="512" fill="#9bd7f0" opacity="0.5"/><g transform="translate(890,${1415 - 700 * 0.3}) scale(${-0.3},0.3)">${charBody}</g><path d="M790,930 h120 l-90,512 h-30Z" fill="#fff" opacity="0.12"/></g>` : '';
+  const refl = inMir ? `<clipPath id="mc"><rect x="790" y="930" width="200" height="512" rx="94"/></clipPath><g clip-path="url(#mc)" opacity="0.9"><rect x="790" y="930" width="200" height="512" fill="#9bd7f0" opacity="0.5"/><g transform="translate(890,${1415 - 830 * 0.3}) scale(${-0.3},0.3)">${drawLazy(P)}</g><path d="M790,930 h120 l-90,512 h-30Z" fill="#fff" opacity="0.12"/></g>` : '';
   const nameCard = t >= T.name && t < T.nameOut ? `<g transform="translate(540,545) scale(${pop(t, T.name, 0.45) * (t > T.nameOut - 0.3 ? clamp((T.nameOut - t) / 0.3) : 1)})"><text x="0" y="0" font-family="Anton" font-size="150" text-anchor="middle" fill="#ff4d8d" stroke="${OUT}" stroke-width="20" paint-order="stroke" letter-spacing="3">LAZY</text><text x="0" y="86" font-family="Anton" font-size="84" text-anchor="middle" fill="#ffe14d" stroke="${OUT}" stroke-width="14" paint-order="stroke" letter-spacing="14">DAWNS</text></g>` : '';
   const notif = t >= T.notif && t < T.open ? `<g transform="translate(540,720) scale(${pop(t, T.notif)})"><rect x="-296" y="-56" width="620" height="150" rx="44" fill="#000" opacity="0.3"/><rect x="-310" y="-70" width="620" height="150" rx="44" fill="#fff" stroke="${OUT}" stroke-width="6"/>${avatar('avn', -234, 5, 46)}<text x="-170" y="-12" font-family="Inter" font-weight="800" font-size="34" fill="#1c1c28">Mari</text><text x="-170" y="30" font-family="Inter" font-weight="500" font-size="30" fill="#4b4b5c">Amiga, tienes que ver esto…</text><circle cx="270" cy="-30" r="20" fill="#ff4d8d"/><text x="270" y="-21" font-family="Inter" font-weight="800" font-size="26" text-anchor="middle" fill="#fff">1</text></g>` : '';
-  const calls = callout(t, T.gr, 'GRANOS', 380, 600) + callout(t, T.ce, 'CEJAS', 380, 600, '#ff9ad0') + callout(t, T.di, 'SONRISA', 380, 600, '#22d3ee');
+  const calls = callout(t, T.gr, 'GRANOS', 380, 500) + callout(t, T.ce, 'CEJAS', 380, 500, '#ff9ad0') + callout(t, T.di, 'SONRISA', 380, 500, '#22d3ee');
   const big30 = t >= T.d30 && t < T.vote ? `<g transform="translate(540,640) scale(${pop(t, T.d30, 0.5)})"><text x="0" y="0" font-family="Anton" font-size="230" text-anchor="middle" fill="#ff4d8d" stroke="${OUT}" stroke-width="22" paint-order="stroke">30 DÍAS</text><text x="0" y="130" font-family="Anton" font-size="84" text-anchor="middle" fill="#ffe14d" stroke="${OUT}" stroke-width="14" paint-order="stroke" opacity="${pop(t, T.decide)}">TÚ DECIDES CADA PASO</text></g>` : '';
   const flash = t >= T.vote && t < T.vote + 0.12 ? `<rect width="${W}" height="${H}" fill="#fff" opacity="${0.6 * (1 - (t - T.vote) / 0.12)}"/>` : '';
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${charDefs}
