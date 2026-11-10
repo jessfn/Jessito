@@ -81,3 +81,6 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
 - Entre 40 y 59 s por video; se entrega solo cuando termino de generarlo; nada automático.
 - Cierre de TODOS los videos desde el Día 2: además de pedir que comenten su elección, la voz dice que SIGAN la cuenta para ver el siguiente día
   (ej.: "Comenta A o B, y sígueme para ver el día 3"). En pantalla: texto "SÍGUEME PARA EL DÍA N+1" junto a "COMENTA TU ELECCIÓN".
+- ACTUALIZACION (creador): cada video es una HISTORIA tipo escena de pelicula: cómo se hizo el cambio (ej. clinica/skincare, reventar granos),
+  algo inesperado que surge a medio camino, y se resuelve bien; cierra con gancho al siguiente dia. Ya puede pasar de 1 minuto (objetivo ~80-95 s).
+  Personajes de apoyo (Mari, doctora) NO hablan con voz: solo globos de texto; la voz es el narrador. Dia 2 = "La clinica Glow" (piel y granos).
