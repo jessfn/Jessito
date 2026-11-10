@@ -1,6 +1,6 @@
-# lazyp3 - Glow up de 30 dias (Instagram Stories 9:16)
+# Lazy Dawns - Glow up de 30 dias (Instagram Stories 9:16)
 
-Serie interactiva: cada dia se arregla UNA cosa de lazyp3, segun lo que voto la gente el dia anterior.
+Serie interactiva: cada dia se arregla UNA cosa de Lazy Dawns, segun lo que voto la gente el dia anterior.
 
 ## Formato tecnico
 - 1080x1920 px, 9:16, 30 fps, H.264/MP4, 15-45 s por episodio.
@@ -8,7 +8,16 @@ Serie interactiva: cada dia se arregla UNA cosa de lazyp3, segun lo que voto la 
 - Votacion: sticker de encuesta de Stories con 2 opciones (o "comenta A/B" en Reel).
 - Voz: ElevenLabs (espanol latino). SFX: whoosh, pop, ding, glitch. Subtitulos palabra por palabra.
 
-## Personaje: lazyp3
+## Decisiones del creador (recordar siempre)
+- Nombre: **Lazy Dawns**. En el dia a dia solo "Lazy"; el apellido "Dawns" solo cuando haga falta.
+- Estilo elegido: **opcion E** (ilustracion con contorno + textura/grano), con fondo detallado (cuarto), ligero efecto 3D
+  (sombras, brillos, volumen), detalle fino: manos, pies, ropa rota y sucia, celular/chat realista moderno.
+- Cada video cuenta una historia (chat, casting de modelos, espejo) y termina con votacion A/B para el dia siguiente.
+- NO es automatico: el creador pide cada video cuando quiere; se entrega terminado (MP4 con voz ElevenLabs).
+- Voz: ElevenLabs "Laura" (id FGY2WhTYpPnrIDTdsKH5), espanol, en primera persona como Lazy.
+- Obesa y morena; el arco del gimnasio llega mas adelante segun voten.
+
+## Personaje: Lazy Dawns
 - Morena, obesa, caricatura 2D flat moderno, ojos grandes expresivos, mucha personalidad y humor.
 - "Antes" exagerado y comico: granos, cejas descuidadas, dientes chuecos/manchados, pelo desastre,
   ropa espantosa, mala postura.
