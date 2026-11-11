@@ -93,3 +93,4 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
 - Al final del arco de dientes: sonrisa derecha y blanca (salto de tiempo "Meses despues", quitan los brackets).
 - Cierre: pregunta A/B + "COMENTA TU ELECCION" + "SIGUEME PARA EL DIA N+1" (sin encuesta).
 - Dia 4 sale de lo que voten: CEJAS o PELO.
+- Subtitulos: SIN fondo oscuro (solo letras con contorno); siempre dentro de pantalla (ajuste automatico de tamano, ver `node render_dia03.mjs audit`); etiqueta de nombre separada del texto.

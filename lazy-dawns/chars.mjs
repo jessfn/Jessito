@@ -95,7 +95,7 @@ export function drawDentist(p) {
     <rect x="-84" y="470" width="70" height="200" rx="26" fill="#1e3a5f" ${O}/><rect x="14" y="470" width="70" height="200" rx="26" fill="#1e3a5f" ${O}/>
     <ellipse cx="-50" cy="684" rx="58" ry="24" fill="#f8fafc" ${O}/><ellipse cx="50" cy="684" rx="58" ry="24" fill="#f8fafc" ${O}/>
     <path d="M-168,560 Q-154,170 -84,150 L84,150 Q154,170 168,560Z" fill="#ffffff" ${O}/><path d="M-44,150 L0,260 L44,150Z" fill="#0ea5e9" ${O}/><path d="M-74,150 L0,214 L74,150" fill="none" stroke="${OUT}" stroke-width="7"/>
-    <path d="M0,150 L0,560" stroke="#cbd5e1" stroke-width="5"/><rect x="62" y="262" width="92" height="38" rx="7" fill="#e0f2fe" ${O}/><text x="108" y="288" font-family="Inter" font-weight="800" font-size="15" text-anchor="middle" fill="#0f172a">DR. MENDOZA</text>
+    <path d="M0,150 L0,560" stroke="#cbd5e1" stroke-width="5"/><rect x="56" y="262" width="104" height="38" rx="7" fill="#e0f2fe" ${O}/><text x="108" y="288" font-family="Inter" font-weight="800" font-size="13" text-anchor="middle" fill="#0f172a">DR. MENDOZA</text>
     <rect x="-24" y="96" width="48" height="60" fill="${SKD}" ${O}/>
     <ellipse cx="0" cy="0" rx="102" ry="116" fill="${SK}" ${O}/><ellipse cx="-106" cy="10" rx="14" ry="24" fill="${SK}" ${O}/><ellipse cx="106" cy="10" rx="14" ry="24" fill="${SK}" ${O}/>
     <path d="M-104,-6 Q-112,-120 0,-124 Q112,-120 104,-6 Q70,-62 0,-66 Q-70,-62 -104,-6Z" fill="#1f1a17" ${O}/><path d="M-104,-4 Q-110,-30 -96,-50 M104,-4 Q110,-30 96,-50" stroke="#9ca3af" stroke-width="12" fill="none" stroke-linecap="round"/>

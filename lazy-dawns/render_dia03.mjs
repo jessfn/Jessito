@@ -30,7 +30,7 @@ const L = Object.fromEntries(DATA.lines.map((l) => [l.id, l]));
 const DUR = DATA.total;
 const w = (id, word, n = 0) => { const r = L[id].words.filter((x) => nm(x[0]) === nm(word))[n]; if (!r) throw new Error('palabra no encontrada ' + id + ' ' + word); return r[1]; };
 const T = {
-  slateEnd: 1.5, sit: L.l3.end + 0.1, xrayStart: L.l6.start + 0.5, xrayEnd: L.l9.end + 0.3,
+  slateEnd: 1.5, sit: L.l3.end + 0.1, xrayStart: L.l6.start + 0.5, xrayEnd: L.l8.end + 0.5,
   exA: w('l4', 'grande') - 0.2, exB: w('l5', 'serio') - 0.4,
   needle: w('l12', 'piquetito'), nA: L.l11.start - 0.2, nB: L.l12.end + 0.7,
   drillW: w('l13', 'turbina'), crack: w('l13', 'crac'), eA: L.l13.start - 0.3, eB: L.l14.end + 0.3,
@@ -68,7 +68,7 @@ function roomSvg() {
   <rect x="80" y="70" width="920" height="110" rx="20" fill="#fff" stroke="${OUT}" stroke-width="7" opacity="0.95"/><rect x="80" y="70" width="920" height="110" rx="20" fill="url(#lampg)"/>
   <ellipse cx="540" cy="360" rx="520" ry="340" fill="url(#lampg)" opacity="0.5"/>
   <!-- letrero -->
-  <g transform="translate(850,505) scale(0.52)"><rect x="-300" y="-54" width="600" height="108" rx="28" fill="#fff" stroke="${OUT}" stroke-width="7"/><rect x="-284" y="-40" width="568" height="80" rx="20" fill="#0ea5e9"/><text x="34" y="24" font-family="Anton" font-size="66" text-anchor="middle" fill="#fff" stroke="${OUT}" stroke-width="7" paint-order="stroke" letter-spacing="3">DR. MENDOZA</text>
+  <g transform="translate(880,384) scale(0.46)"><rect x="-300" y="-54" width="600" height="108" rx="28" fill="#fff" stroke="${OUT}" stroke-width="7"/><rect x="-284" y="-40" width="568" height="80" rx="20" fill="#0ea5e9"/><text x="34" y="24" font-family="Anton" font-size="66" text-anchor="middle" fill="#fff" stroke="${OUT}" stroke-width="7" paint-order="stroke" letter-spacing="3">DR. MENDOZA</text>
     <g transform="translate(-236,0)"><path d="M-26,-26 C-26,-44 26,-44 26,-26 C28,-4 16,30 8,30 C2,30 2,10 0,10 C-2,10 -2,30 -8,30 C-16,30 -28,-4 -26,-26Z" fill="#fff" stroke="${OUT}" stroke-width="5"/></g></g>
   <!-- ventana -->
   <g transform="translate(60,580)"><rect x="-12" y="-12" width="324" height="364" rx="14" fill="#fff" stroke="${OUT}" stroke-width="8"/><rect width="300" height="340" fill="#bfe9ff" stroke="${OUT}" stroke-width="6"/>${blinds}<path d="M300,0 L-100,520 L120,520 L300,200Z" fill="url(#ray)"/></g>
@@ -79,7 +79,7 @@ function roomSvg() {
     <path d="M95,60 C40,60 40,110 52,150 C60,190 70,230 84,230 C94,230 92,190 95,190 C98,190 96,230 106,230 C120,230 130,190 138,150 C150,110 150,60 95,60Z" fill="#fff" stroke="${OUT}" stroke-width="5"/><circle cx="78" cy="112" r="7" fill="${OUT}"/><circle cx="112" cy="112" r="7" fill="${OUT}"/><path d="M78,140 Q95,156 112,140" stroke="${OUT}" stroke-width="5" fill="none"/>
     <text x="95" y="270" font-family="Anton" font-size="34" text-anchor="middle" fill="#fff" stroke="${OUT}" stroke-width="6" paint-order="stroke">¡SONRÍE!</text></g>
   <!-- caja de luz con radiografia -->
-  <g transform="translate(700,820)"><rect x="6" y="12" width="300" height="220" fill="#000" opacity="0.25" filter="url(#b10)"/><rect width="300" height="220" rx="12" fill="#e5e7eb" stroke="${OUT}" stroke-width="7"/><rect x="14" y="14" width="272" height="192" fill="#0b1b2b"/><g transform="translate(0,10)">${xr}</g><path d="M30,60 Q150,20 270,60" stroke="#e5f3ff" stroke-opacity="0.35" stroke-width="4" fill="none"/></g>
+  <g transform="translate(690,830)"><rect x="6" y="12" width="320" height="190" fill="#000" opacity="0.25" filter="url(#b10)"/><rect width="320" height="190" rx="12" fill="#e5e7eb" stroke="${OUT}" stroke-width="7"/><clipPath id="wallx"><rect x="14" y="14" width="292" height="162"/></clipPath><g clip-path="url(#wallx)"><g transform="translate(14,14) scale(0.3244)">${panoSvg(0, { extra: true })}</g></g></g>
   <!-- estante con mandibula y vasos -->
   <g transform="translate(60,1000)"><rect x="6" y="14" width="260" height="16" fill="#000" opacity="0.25" filter="url(#b10)"/><rect width="260" height="16" fill="#fff" stroke="${OUT}" stroke-width="5"/>
     <path d="M30,0 C20,-50 40,-70 90,-70 C140,-70 160,-50 150,0Z" fill="#fff7ed" stroke="${OUT}" stroke-width="5"/>${[0, 1, 2, 3, 4].map((i) => `<rect x="${48 + i * 18}" y="-60" width="14" height="22" rx="5" fill="#fff" stroke="${OUT}" stroke-width="3"/>`).join('')}
@@ -91,7 +91,7 @@ function roomSvg() {
   <rect width="${W}" height="${H}" fill="url(#vig)"/></svg>`;
 }
 const b64 = (buf) => 'data:image/png;base64,' + Buffer.from(buf).toString('base64');
-const roomPng = b64(new Resvg(roomSvg(), ropt).render().asPng());
+
 const grainPng = b64(new Resvg(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><filter id="g" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="7"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.9 -0.42"/></filter><rect width="${W}" height="${H}" filter="url(#g)" opacity="0.3"/></svg>`, ropt).render().asPng());
 const charDefs = defs('e3d');
 
@@ -118,7 +118,7 @@ function lampSvg(on, t) {
 }
 
 // ---------------- camara ----------------
-const MARI_X = 170, DR_X = 905, CHAR_Y = 934;
+const MARI_X = 185, DR_X = 880, CHAR_Y = 934;
 const camKF = [[0, 1, 540, 960], [L.l3.start, 1, 540, 960], [L.l3.start + 0.4, 1.5, 330, 1010], [L.l3.end + 0.1, 1, 540, 960], [L.l4.start + 0.3, 1.5, 760, 1010], [L.l4.end - 0.6, 1, 540, 960],
   [L.l5.start, 1, 540, 960], [L.l6.start + 0.2, 1.5, 760, 1010], [L.l6.end, 1, 540, 960], [T.xrayEnd, 1, 540, 960], [L.l8.start, 1.5, 330, 1010], [L.l8.end + 0.2, 1, 540, 960], [L.l9.start, 1.5, 760, 1010], [L.l10.end, 1, 540, 960],
   [L.l12.start, 1.3, 760, 1000], [L.l12.end, 1, 540, 960], [L.l14.start, 1.4, 760, 1010], [L.l14.end, 1, 540, 960], [L.l15.start, 1, 540, 960], [L.l16.start, 1.45, 330, 1010], [L.l16.end, 1, 540, 960], [L.l17.start, 1.45, 760, 1010], [L.l17.end, 1, 540, 960],
@@ -141,13 +141,17 @@ const UP_SPEC = [ // desde el centro hacia atras: ancho, alto, encia (y rel.), b
   { w: 92, gum: -142, edge: -10, t: 'inc' }, { w: 70, gum: -130, edge: -26, t: 'inc' }, { w: 78, gum: -142, edge: -10, t: 'can' }, { w: 58, gum: -134, edge: -30, t: 'pre' }, { w: 48, gum: -126, edge: -46, t: 'pre' }];
 const LO_SPEC = [{ w: 58, gum: 152, edge: 62, t: 'inc' }, { w: 62, gum: 152, edge: 60, t: 'inc' }, { w: 68, gum: 154, edge: 56, t: 'can' }, { w: 58, gum: 148, edge: 70, t: 'pre' }, { w: 48, gum: 142, edge: 86, t: 'pre' }];
 const JIT = { rot: [-9, 8, 15, -11, 7], dx: [-6, 9, 12, -8, 5], dy: [10, -12, 16, 8, -6] }; // desorden (se multiplica por "crooked")
+function jit(i, side, up, crk) { // el MISMO desorden se usa en la boca y en la radiografia
+  const jr = JIT.rot[(i + (side < 0 ? 2 : 0)) % 5] * (side < 0 ? -1 : 1) * crk, jx = JIT.dx[(i + (side < 0 ? 1 : 3)) % 5] * crk, jy = JIT.dy[(i + (side < 0 ? 3 : 1)) % 5] * crk * (up ? 1 : -1);
+  const fang = up && i === 2 && side > 0;
+  return { jr: jr + (fang ? 20 * crk : 0), jx: jx + (fang ? 14 * crk : 0), jy };
+}
 function layout(spec, cx, cy, crk, up) {
   const out = []; let off = 0;
   for (let i = 0; i < spec.length; i++) { const sp = spec[i];
-    for (const side of [1, -1]) { const k = i + (side < 0 ? 0 : 1);
-      const jr = JIT.rot[(i + (side < 0 ? 2 : 0)) % 5] * (side < 0 ? -1 : 1) * crk, jx = JIT.dx[(i + (side < 0 ? 1 : 3)) % 5] * crk, jy = JIT.dy[(i + (side < 0 ? 3 : 1)) % 5] * crk * (up ? 1 : -1);
-      const x = cx + side * (off + sp.w / 2) + jx, y = cy + sp.gum + jy, h = Math.abs(sp.edge - sp.gum);
-      out.push({ x: up && crk > 0.3 && i === 2 && side > 0 ? x + 14 * crk : x, y, w: sp.w, h, rot: jr + (up && i === 2 && side > 0 ? 20 * crk : 0), t: sp.t, i, side }); }
+    for (const side of [1, -1]) { const j = jit(i, side, up, crk);
+      const x = cx + side * (off + sp.w / 2) + j.jx, y = cy + sp.gum + j.jy, h = Math.abs(sp.edge - sp.gum);
+      out.push({ x, y, w: sp.w, h, rot: j.jr, t: sp.t, i, side }); }
     off += sp.w; }
   return out.sort((a, b) => a.x - b.x);
 }
@@ -259,32 +263,86 @@ function mouthOverlay(t, P) {
   const [a, b, mode] = c; const open = ease((t - a) / 0.35), close = ease((b - t) / 0.3), k = Math.min(open, close);
   const inner = closeup(t, P, mode, a, b);
   const dark = t >= T.dark && t < T.power;
-  const inset = `<g transform="translate(905,1370)"><circle r="158" fill="#000" opacity="0.35" transform="translate(5,8)"/><clipPath id="inset"><circle r="150"/></clipPath><circle r="150" fill="#cfe9f4"/><g clip-path="url(#inset)"><g transform="translate(0,${215 * 0.62 + 18}) scale(0.62)">${drawLazy(P)}</g></g><circle r="150" fill="none" stroke="#fff" stroke-width="10"/><circle r="154" fill="none" stroke="${OUT}" stroke-width="6"/></g>`;
+  const inset = `<g transform="translate(935,1320)"><circle r="158" fill="#000" opacity="0.35" transform="translate(5,8)"/><clipPath id="inset"><circle r="150"/></clipPath><circle r="150" fill="#cfe9f4"/><g clip-path="url(#inset)"><g transform="translate(0,${215 * 0.62 + 18}) scale(0.62)">${drawLazy(P)}</g></g><circle r="150" fill="none" stroke="#fff" stroke-width="10"/><circle r="154" fill="none" stroke="${OUT}" stroke-width="6"/></g>`;
   const darkMask = dark ? `<rect width="${W}" height="${H}" fill="#02030a" opacity="0.9" mask="url(#spotMask)"/>` : '';
   return `<clipPath id="iris"><circle cx="540" cy="900" r="${lerp(0, 1500, k)}"/></clipPath><g clip-path="url(#iris)">${inner.svg}${darkMask}${inset}</g>${k < 1 ? `<circle cx="540" cy="900" r="${lerp(0, 1500, k)}" fill="none" stroke="${OUT}" stroke-width="14"/>` : ''}`;
 }
+
+// ---------------- radiografia panoramica (ortopantomografia) ----------------
+const PSPEC = [ // desde el centro hacia atras: ancho, alto corona, largo raiz, tipo
+  { w: 25, ch: 52, rl: 72, t: 'inc' }, { w: 20, ch: 46, rl: 64, t: 'inc' }, { w: 26, ch: 54, rl: 88, t: 'can' }, { w: 27, ch: 42, rl: 66, t: 'pre' }, { w: 27, ch: 42, rl: 62, t: 'pre' }, { w: 42, ch: 40, rl: 54, t: 'mol' }, { w: 40, ch: 38, rl: 50, t: 'mol' }];
+const PJ = { rot: [-12, 9, 14, -8, 6, -4, 3], dx: [-5, 8, 10, -6, 4, 0, 0] };
+function xrayTooth(x, edge, sp, up, rot) {
+  const w = sp.w * 1.2, ch = sp.ch, rl = sp.rl, sg = up ? -1 : 1; // sg: sentido alejandose del plano oclusal (superior: hacia arriba)
+  const occ = sp.t === 'can' ? `Q${-w * 0.2},${-sg * 4} 0,${-sg * 11} Q${w * 0.2},${-sg * 4} ${w * 0.44},0`
+    : sp.t === 'pre' ? `Q${-w * 0.3},${-sg * 8} ${-w * 0.14},${-sg * 3} Q0,${sg * 2} ${w * 0.14},${-sg * 3} Q${w * 0.3},${-sg * 8} ${w * 0.44},0`
+    : sp.t === 'mol' ? `Q${-w * 0.3},${-sg * 9} ${-w * 0.16},${-sg * 3} Q${-w * 0.05},${sg * 2} 0,${-sg * 4} Q${w * 0.06},${sg * 2} ${w * 0.16},${-sg * 3} Q${w * 0.3},${-sg * 9} ${w * 0.44},0`
+    : `L${w * 0.44},0`;
+  const crown = `M${-w * 0.44},0 ${occ} C${w * 0.52},${sg * ch * 0.4} ${w * 0.46},${sg * ch * 0.9} ${w * 0.34},${sg * ch} L${-w * 0.34},${sg * ch} C${-w * 0.46},${sg * ch * 0.9} ${-w * 0.52},${sg * ch * 0.4} ${-w * 0.44},0Z`;
+  const root = (off, wd, len) => `M${off - w * wd},${sg * ch} C${off - w * wd * 0.9},${sg * (ch + len * 0.5)} ${off - w * 0.06},${sg * (ch + len * 0.92)} ${off + (off > 0 ? 2 : off < 0 ? -2 : 0)},${sg * (ch + len)} C${off + w * 0.06},${sg * (ch + len * 0.92)} ${off + w * wd * 0.9},${sg * (ch + len * 0.5)} ${off + w * wd},${sg * ch}Z`;
+  const roots = sp.t === 'mol' ? root(-w * 0.2, 0.2, rl) + root(w * 0.2, 0.2, rl * 0.94) : sp.t === 'pre' && !up ? root(0, 0.3, rl) : root(0, 0.3, rl);
+  const canals = sp.t === 'mol' ? [-w * 0.2, w * 0.2].map((o) => `<path d="M${o},${sg * ch * 0.9} L${o},${sg * (ch + rl * 0.8)}" stroke="#44525e" stroke-width="2.2" opacity="0.75"/>`).join('') : `<path d="M0,${sg * ch * 0.85} L0,${sg * (ch + rl * 0.85)}" stroke="#44525e" stroke-width="2.4" opacity="0.75" stroke-linecap="round"/>`;
+  return `<g transform="translate(${x},${edge}) rotate(${rot})">
+    <path d="${roots}" fill="#9fb2c0" opacity="0.9" stroke="#d9e6ee" stroke-opacity="0.4" stroke-width="1.6"/>${canals}
+    <path d="${crown}" fill="#c9d8e3" stroke="#f4fafe" stroke-opacity="0.85" stroke-width="2.4"/>
+    <path d="M${-w * 0.36},${sg * 3} ${occ.replace(/Q/g, 'Q').split(' ').length ? '' : ''}L${w * 0.36},${sg * 3} L${w * 0.3},${sg * ch * 0.5} L${-w * 0.3},${sg * ch * 0.5}Z" fill="#f4f9fc" opacity="0.92"/>
+    <path d="M${-w * 0.22},${sg * ch * 0.42} Q0,${sg * ch * 0.28} ${w * 0.22},${sg * ch * 0.42} L${w * 0.15},${sg * ch * 0.93} L${-w * 0.15},${sg * ch * 0.93}Z" fill="#7d8d9a" opacity="0.7"/>
+    <ellipse cx="0" cy="${sg * ch * 0.68}" rx="${w * 0.09}" ry="${ch * 0.2}" fill="#3d4a55" opacity="0.85"/></g>`;
+}
+function panoSvg(t = 0, opt = {}) {
+  const Wp = 900, Hp = 500, cx = 450, yocc = (x) => 292 - 30 * Math.pow((x - cx) / 330, 2);
+  const crkX = opt.crk ?? 1;
+  const arch = (up) => { let out = ''; let off = 0; const k = 1.62;
+    for (let i = 0; i < PSPEC.length; i++) { const sp = PSPEC[i]; for (const side of [-1, 1]) { const x = cx + side * (off + sp.w / 2) * k;
+        const j = i < 5 ? jit(i, side, up, crkX) : { jr: 3 * side * crkX * (up ? 1 : -1), jx: 0, jy: 0 };   // mismo giro/desplazamiento que en la boca (lado invertido por espejo clinico)
+        const arcTilt = (side * (x - cx) / 330) * -8, edgeY = yocc(x) + (up ? -7 : 7) + j.jy * 0.55;
+        out += xrayTooth(x + j.jx * 0.45, edgeY, sp, up, j.jr + arcTilt); } off += sp.w; } return out; };
+  const pulse = 0.5 + 0.5 * Math.sin(t * 9);
+  const extra = opt.extra === false ? '' : `<g transform="translate(${cx + 4},${yocc(cx) - 108})"><path d="M-9,0 L9,0 L6,26 L-6,26Z" fill="#fff7c2" stroke="#fff" stroke-opacity="0.7" stroke-width="2"/><path d="M-5,26 C-5,50 -2,62 0,70 C2,62 5,50 5,26Z" fill="#c7d4dd" opacity="0.9"/>
+    ${opt.mark ? `<circle cx="0" cy="26" r="${50 + pulse * 10}" fill="none" stroke="#ff3b3b" stroke-width="5"/><circle cx="0" cy="26" r="${50 + pulse * 10}" fill="#ff3b3b" opacity="${0.08 + 0.08 * pulse}"/>` : ''}</g>`;
+  const noise = `<filter id="xg" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="3"/><feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.55 -0.2"/></filter><filter id="xb"><feGaussianBlur stdDeviation="7"/></filter><filter id="xb2"><feGaussianBlur stdDeviation="3"/></filter>`;
+  return `<defs>${noise}<radialGradient id="xbg" cx="0.5" cy="0.5" r="0.75"><stop offset="0" stop-color="#3a4752"/><stop offset="0.7" stop-color="#1d262e"/><stop offset="1" stop-color="#0b1015"/></radialGradient><linearGradient id="xjaw" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e3edf4" stop-opacity="0.55"/><stop offset="1" stop-color="#a9bccb" stop-opacity="0.3"/></linearGradient></defs>
+    <rect width="${Wp}" height="${Hp}" fill="url(#xbg)"/>
+    <g filter="url(#xb)" opacity="0.8"><rect x="22" y="10" width="62" height="470" rx="26" fill="#9db0be" opacity="0.28"/><rect x="816" y="10" width="62" height="470" rx="26" fill="#9db0be" opacity="0.28"/>
+      <ellipse cx="225" cy="132" rx="118" ry="62" fill="#05090d" opacity="0.55"/><ellipse cx="675" cy="132" rx="118" ry="62" fill="#05090d" opacity="0.55"/><ellipse cx="${cx}" cy="112" rx="50" ry="78" fill="#05090d" opacity="0.5"/>
+      <path d="M96,40 Q300,96 ${cx},70 Q600,96 804,40" stroke="#cfdce6" stroke-width="26" fill="none" opacity="0.4"/></g>
+    <path d="M120,214 Q${cx},150 780,214" stroke="#d9e6ee" stroke-width="16" fill="none" opacity="0.38" filter="url(#xb2)"/>
+    <path d="M92,60 C84,150 86,250 112,334 C190,414 330,462 ${cx},468 C570,462 710,414 788,334 C814,250 816,150 808,60" fill="none" stroke="url(#xjaw)" stroke-width="40" stroke-linejoin="round" filter="url(#xb2)"/>
+    <path d="M92,60 C84,150 86,250 112,334 C190,414 330,462 ${cx},468 C570,462 710,414 788,334 C814,250 816,150 808,60" fill="none" stroke="#f2f8fc" stroke-width="5" opacity="0.55"/>
+    <path d="M150,330 C230,372 340,392 ${cx},394 C560,392 670,372 750,330" fill="none" stroke="#2a3640" stroke-width="12" opacity="0.55" filter="url(#xb2)" stroke-dasharray="1 0"/>
+    <ellipse cx="330" cy="414" rx="9" ry="6" fill="#26313a" opacity="0.8"/><ellipse cx="570" cy="414" rx="9" ry="6" fill="#26313a" opacity="0.8"/>
+    <ellipse cx="96" cy="42" rx="22" ry="14" fill="#e6eff5" opacity="0.7"/><ellipse cx="804" cy="42" rx="22" ry="14" fill="#e6eff5" opacity="0.7"/>
+    <g opacity="0.95">${arch(true)}${arch(false)}</g>${extra}
+    <rect width="${Wp}" height="${Hp}" filter="url(#xg)" opacity="0.22"/>
+    <text x="22" y="40" font-family="Inter" font-weight="800" font-size="30" fill="#e6eff5" opacity="0.85">D</text><text x="860" y="40" font-family="Inter" font-weight="800" font-size="30" fill="#e6eff5" opacity="0.85">I</text>
+    <path d="M30,476 H870" stroke="#e6eff5" stroke-width="2" opacity="0.5"/>${[...Array(19)].map((_, i) => `<path d="M${30 + i * 46.7},476 v${i % 2 ? 7 : 12}" stroke="#e6eff5" stroke-width="2" opacity="0.5"/>`).join('')}`;
+}
 function xrayOverlay(t) {
   const a = win(t, T.xrayStart, T.xrayEnd, 0.35, 0.35); if (a <= 0) return '';
-  const p = pop(t, T.xrayStart, 0.4), scan = ((t - T.xrayStart) * 0.8) % 1;
-  const arch = (cy, dir, n, rots) => [...Array(n)].map((_, i) => { const x = 160 + i * 110, y = cy + dir * Math.pow(i - 3.5, 2) * 7; return `<g transform="translate(${x},${y}) rotate(${rots[i]})"><path d="M-30,0 h60 v${dir * 120 - dir * 20} q0,${dir * 20} -30,${dir * 20} q-30,0 -30,${-dir * 20}Z" fill="#e5f3ff" opacity="0.92"/><path d="M-30,0 h60" stroke="#fff" stroke-width="4"/></g>`; }).join('');
-  const pulse = 0.5 + 0.5 * Math.sin(t * 9);
-  return `<g opacity="${a}" transform="translate(540,900) scale(${p}) translate(-540,-900)"><rect x="60" y="420" width="960" height="760" rx="46" fill="#0b1b2b" stroke="${OUT}" stroke-width="10"/><rect x="60" y="420" width="960" height="760" rx="46" fill="#e5e7eb" opacity="0.08"/>
-    <rect x="86" y="446" width="908" height="708" rx="30" fill="#05101c"/><g transform="translate(86,446)"><g transform="translate(0,160)">${arch(150, 1, 8, [-12, 8, -6, 12, -10, 7, -13, 10])}</g><g transform="translate(0,380)">${arch(120, -1, 8, [8, -9, 6, -11, 9, -7, 10, -8])}</g>
-    <path d="M60,250 Q454,170 848,250" stroke="#7dd3fc" stroke-opacity="0.35" stroke-width="6" fill="none"/>
-    <g transform="translate(442,298)"><path d="M-22,0 L22,0 L0,90Z" fill="#fff7ae"/><circle cx="0" cy="40" r="${70 + pulse * 16}" fill="none" stroke="#ef4444" stroke-width="9"/><circle cx="0" cy="40" r="${70 + pulse * 16}" fill="#ef4444" opacity="${0.1 + 0.1 * pulse}"/><path d="M150,-120 L72,-6" stroke="#ef4444" stroke-width="8" stroke-linecap="round"/><path d="M72,-6 l10,-26 M72,-6 l28,10" stroke="#ef4444" stroke-width="8" stroke-linecap="round"/></g>
-    <rect x="530" y="150" width="330" height="76" rx="18" fill="#ef4444" stroke="#fff" stroke-width="5"/><text x="695" y="204" font-family="Anton" font-size="52" text-anchor="middle" fill="#fff" letter-spacing="2">DIENTE EXTRA</text>
-    <rect x="0" y="${scan * 700}" width="908" height="10" fill="#7cf29a" opacity="0.35"/></g>
-    <text x="540" y="486" font-family="Anton" font-size="42" text-anchor="middle" fill="#7dd3fc" letter-spacing="6">RADIOGRAFÍA PANORÁMICA</text></g>`;
+  const p = pop(t, T.xrayStart, 0.4), scan = ((t - T.xrayStart) * 0.7) % 1, reveal = clamp((t - T.xrayStart - 0.3) / 0.9), mark = clamp((t - T.xrayStart - 2.2) / 0.4);
+  const px = 90, py = 600;
+  return `<g opacity="${a}" transform="translate(540,880) scale(${p}) translate(-540,-880)">
+    <rect x="48" y="548" width="984" height="664" rx="40" fill="#000" opacity="0.35" transform="translate(6,12)"/>
+    <rect x="48" y="548" width="984" height="664" rx="40" fill="#1f2933" stroke="${OUT}" stroke-width="9"/><rect x="60" y="560" width="960" height="640" rx="30" fill="#0b1015"/>
+    <circle cx="96" cy="580" r="7" fill="#22c55e"/><text x="116" y="587" font-family="Inter" font-weight="700" font-size="20" fill="#8ea1b0">RX PANORÁMICA · LAZY DAWNS</text><text x="1000" y="587" font-family="Inter" font-weight="700" font-size="20" text-anchor="end" fill="#8ea1b0">KV 70 · mA 8</text>
+    <clipPath id="panoClip"><rect x="${px}" y="${py}" width="900" height="500" rx="10"/></clipPath>
+    <g clip-path="url(#panoClip)"><g transform="translate(${px},${py})" opacity="${0.15 + 0.85 * reveal}">${panoSvg(t, { mark: mark > 0.5 })}</g><rect x="${px}" y="${py + scan * 500}" width="900" height="8" fill="#7cf29a" opacity="${0.3 * (1 - reveal * 0.6)}"/></g>
+    <rect x="${px}" y="${py}" width="900" height="500" rx="10" fill="none" stroke="#51606e" stroke-width="4"/>
+    ${mark > 0 ? `<g opacity="${mark}" transform="translate(${px + 450 + 4},${py + 292 - 108 + 26})"><path d="M120,-110 L56,-46" stroke="#ff3b3b" stroke-width="6" stroke-linecap="round"/><path d="M56,-46 l6,-26 M56,-46 l26,6" stroke="#ff3b3b" stroke-width="6" stroke-linecap="round"/>
+      <rect x="110" y="-160" width="330" height="70" rx="16" fill="#ff3b3b" stroke="#fff" stroke-width="4"/><text x="275" y="-110" font-family="Anton" font-size="46" text-anchor="middle" fill="#fff" letter-spacing="2">DIENTE EXTRA</text></g>` : ''}
+    <rect x="72" y="1122" width="936" height="66" rx="14" fill="#141c24"/><text x="96" y="1166" font-family="Inter" font-weight="700" font-size="26" fill="#cfe0ec">Hallazgo: diente extra detrás de los incisivos centrales</text></g>`;
 }
 function skipCard(t) {
   const a = win(t, T.skipA, T.skipB, 0.3, 0.4); if (a <= 0) return '';
   const k = (t - T.skipA) / (T.skipB - T.skipA), month = Math.min(12, Math.floor(k * 12) + 1), fl = ((k * 12) % 1);
   const meses = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
+  const bump = -Math.sin(fl * Math.PI) * 8;
   return `<g opacity="${a}"><rect width="${W}" height="${H}" fill="#0b1226"/>${[...Array(30)].map((_, i) => `<circle cx="${(i * 197) % W}" cy="${(i * 331 + t * 40) % H}" r="${3 + i % 4}" fill="#fff" opacity="0.25"/>`).join('')}
-    <text x="540" y="560" font-family="Anton" font-size="150" text-anchor="middle" fill="#ffe14d" stroke="${OUT}" stroke-width="16" paint-order="stroke" letter-spacing="4">MESES</text><text x="540" y="720" font-family="Anton" font-size="150" text-anchor="middle" fill="#ff4d8d" stroke="${OUT}" stroke-width="16" paint-order="stroke" letter-spacing="4">DESPUÉS</text>
-    <g transform="translate(540,1050)"><rect x="-230" y="-200" width="460" height="400" rx="34" fill="#000" opacity="0.3" transform="translate(8,12)"/><rect x="-230" y="-200" width="460" height="400" rx="34" fill="#fff" stroke="${OUT}" stroke-width="9"/><rect x="-230" y="-200" width="460" height="110" rx="34" fill="#ef4444" stroke="${OUT}" stroke-width="9"/>
-      <text x="0" y="-122" font-family="Anton" font-size="68" text-anchor="middle" fill="#fff">MES ${month}</text><g transform="scale(1,${1 - Math.abs(Math.sin(fl * Math.PI)) * 0.0})"><text x="0" y="60" font-family="Anton" font-size="190" text-anchor="middle" fill="${OUT}" transform="translate(0,${Math.sin(fl * Math.PI) * -14})">${meses[month - 1]}</text></g>
-      <rect x="-140" y="104" width="280" height="40" rx="20" fill="#ffe3ef"/><path d="M-120,124 h240" stroke="#ff4d8d" stroke-width="8" stroke-linecap="round" stroke-dasharray="1 26"/></g></g>`;
+    <text x="540" y="560" font-family="Anton" font-size="140" text-anchor="middle" fill="#ffe14d" stroke="${OUT}" stroke-width="14" paint-order="stroke" letter-spacing="4">MESES</text><text x="540" y="770" font-family="Anton" font-size="140" text-anchor="middle" fill="#ff4d8d" stroke="${OUT}" stroke-width="14" paint-order="stroke" letter-spacing="4">DESPUÉS</text>
+    <g transform="translate(540,1170)"><rect x="-230" y="-200" width="460" height="420" rx="34" fill="#000" opacity="0.3" transform="translate(8,12)"/><rect x="-230" y="-200" width="460" height="420" rx="34" fill="#fff" stroke="${OUT}" stroke-width="9"/><rect x="-230" y="-200" width="460" height="104" rx="34" fill="#ef4444" stroke="${OUT}" stroke-width="9"/><rect x="-226" y="-140" width="452" height="40" fill="#ef4444"/>
+      <text x="0" y="-128" font-family="Anton" font-size="64" text-anchor="middle" fill="#fff">MES ${month}</text>
+      <text x="0" y="${58 + bump}" font-family="Anton" font-size="150" text-anchor="middle" fill="${OUT}">${meses[month - 1]}</text>
+      <rect x="-140" y="120" width="280" height="40" rx="20" fill="#ffe3ef"/><path d="M-120,140 h240" stroke="#ff4d8d" stroke-width="8" stroke-linecap="round" stroke-dasharray="1 26"/></g></g>`;
 }
 function flashFx(t) { const d = t - T.bracesOff; if (d < 0 || d > 0.5) return ''; return `<rect width="${W}" height="${H}" fill="#fff" opacity="${0.85 * (1 - d / 0.5)}"/><g transform="translate(540,900) scale(${pop(t, T.bracesOff, 0.25)})" opacity="${1 - d / 0.5}"><text x="0" y="0" font-family="Anton" font-size="140" text-anchor="middle" fill="#7cf29a" stroke="${OUT}" stroke-width="14" paint-order="stroke">¡LISTO!</text></g>`; }
 function mirrorOverlay(t) { if (T.closeups.find(([a, b]) => t >= a && t <= b)) return ''; const a = (win(t, T.mirrorStart + 0.2, T.mirrorEnd, 0.3, 0.35) + win(t, L.l22c.start + 0.1, T.finalA - 0.15, 0.3, 0.2) + win(t, T.finalB, L.l22d.end, 0.2, 0.4)); if (a <= 0) return '';
@@ -328,16 +386,30 @@ function slate(t) {
     <text x="-310" y="108" font-family="Inter" font-weight="800" font-size="26" fill="#9ca3af">DÍA</text><text x="-310" y="172" font-family="Anton" font-size="56" fill="#ff4d8d">3 / 30</text><text x="60" y="108" font-family="Inter" font-weight="800" font-size="26" fill="#9ca3af">TOMA</text><text x="60" y="172" font-family="Anton" font-size="56" fill="#fff">1</text>
     ${clap >= 1 && t < 1.15 ? `<text x="0" y="-300" font-family="Anton" font-size="110" text-anchor="middle" fill="#ffe14d" stroke="${OUT}" stroke-width="12" paint-order="stroke">¡CLAC!</text>` : ''}</g></g>`;
 }
+
+// ---- medir texto real (para que ningun subtitulo se salga de la pantalla) ----
+const mCache = new Map();
+function inkWidth(str, fs) {
+  const key = fs.toFixed(1) + '|' + str; if (mCache.has(key)) return mCache.get(key);
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="3200" height="${Math.ceil(fs * 2)}"><text x="40" y="${fs * 1.3}" font-family="Anton" font-size="${fs}" letter-spacing="2" stroke="#000" stroke-width="16" stroke-linejoin="round" paint-order="stroke" fill="#fff">${str}</text></svg>`;
+  const im = new Resvg(svg, ropt).render(), px = im.pixels, wd = im.width, ht = im.height; let lo = wd, hi = 0;
+  for (let y = 0; y < ht; y += 2) for (let x = 0; x < wd; x++) if (px[(y * wd + x) * 4 + 3] > 20) { if (x < lo) lo = x; if (x > hi) hi = x; }
+  const r = Math.max(0, hi - lo); mCache.set(key, r); return r;
+}
+const SAFE_W = 920;
 const SPEAK = { N: { col: '#ffe14d', name: null }, M: { col: '#ff9ad0', name: 'MARI' }, D: { col: '#7cc3ff', name: 'DR. MENDOZA' } };
 function captions(t, closeupOn) {
   const cur = DATA.lines.find((l) => t >= l.start - 0.15 && t <= l.end + 0.3); if (!cur) return '';
-  const sy = closeupOn ? 1700 : 1580, sp = SPEAK[cur.who];
+  const sy = 1590, sp = SPEAK[cur.who];
   const groups = []; let g = [];
   cur.words.forEach(([ww, s, e]) => { g.push({ w: ww, s, e }); if (g.length === 3 || /[.?!:]$|\.\.\.$/.test(ww)) { groups.push(g); g = []; } }); if (g.length) groups.push(g);
   const grp = groups.find((gr) => t >= gr[0].s - 0.05 && t <= gr[gr.length - 1].e + 0.25) || groups[groups.length - 1];
+  const txt = grp.map((o) => esc(o.w.replace(/\.\.\./g, '').toUpperCase())).join(' ');
+  let fs = 84, wdt = inkWidth(txt, fs); if (wdt > SAFE_W) { fs = Math.max(40, Math.floor(fs * SAFE_W / wdt)); wdt = inkWidth(txt, fs); }
   const spans = grp.map((o) => `<tspan fill="${t >= o.s && t < o.e + 0.05 ? sp.col : '#fff'}">${esc(o.w.replace(/\.\.\./g, '').toUpperCase())} </tspan>`).join('');
-  const tag = sp.name ? `<g transform="translate(540,${sy - 112})"><rect x="-${sp.name.length * 17 + 30}" y="-34" width="${sp.name.length * 34 + 60}" height="68" rx="34" fill="${sp.col}" stroke="${OUT}" stroke-width="7"/><text x="0" y="14" font-family="Anton" font-size="44" text-anchor="middle" fill="${OUT}" letter-spacing="2">${sp.name}</text></g>` : '';
-  return `${tag}<text x="540" y="${sy}" font-family="Anton" font-size="84" text-anchor="middle" stroke="${OUT}" stroke-width="16" stroke-linejoin="round" paint-order="stroke" letter-spacing="2">${spans}</text>`;
+  const tag = sp.name ? `<g transform="translate(540,${sy - fs * 0.98 - 58})"><rect x="-${sp.name.length * 17 + 30}" y="-34" width="${sp.name.length * 34 + 60}" height="68" rx="34" fill="${sp.col}" stroke="${OUT}" stroke-width="7"/><text x="0" y="14" font-family="Anton" font-size="44" text-anchor="middle" fill="${OUT}" letter-spacing="2">${sp.name}</text></g>` : '';
+  const plate = `<rect x="${540 - wdt / 2 - 34}" y="${sy - fs * 0.98}" width="${wdt + 68}" height="${fs * 1.3}" rx="${fs * 0.34}" fill="#05070c" opacity="0.42"/>`;
+  return `${tag}<text x="540" y="${sy}" font-family="Anton" font-size="${fs}" text-anchor="middle" stroke="${OUT}" stroke-width="16" stroke-linejoin="round" paint-order="stroke" letter-spacing="2">${spans}</text>`;
 }
 function talkIcon(t, who, x, y) { const l = DATA.lines.find((q) => q.who === who && t >= q.start && t <= q.end); if (!l) return '';
   const p = 0.5 + 0.5 * Math.sin(t * 14), col = SPEAK[who].col;
@@ -400,6 +472,7 @@ function drState(t) {
 }
 function W5() { return w('l5', 'serio') - 0.2; }
 
+const roomPng = b64(new Resvg(roomSvg(), ropt).render().asPng());
 // ---------------- FRAME ----------------
 function frame(t) {
   const P = pose(t), cam = camAt(t), lp = lazyPos(t), seated = t >= T.sit + 0.28;
@@ -424,7 +497,12 @@ function frame(t) {
     <image href="${grainPng}" width="${W}" height="${H}"/></svg>`;
   return new Resvg(svg, ropt).render().asPng();
 }
-if (process.argv[2] === 'preview') {
+if (process.argv[2] === 'audit') {
+  let n = 0, shrunk = 0, worst = 0;
+  for (const l of DATA.lines) { const groups = []; let g = []; l.words.forEach(([ww]) => { g.push(ww); if (g.length === 3 || /[.?!:]$|\.\.\.$/.test(ww)) { groups.push(g); g = []; } }); if (g.length) groups.push(g);
+    for (const gr of groups) { const txt = esc(gr.map((x) => x.replace(/\.\.\./g, '').toUpperCase()).join(' ')); let fs = 84, wd = inkWidth(txt, fs); if (wd > SAFE_W) { fs = Math.max(40, Math.floor(fs * SAFE_W / wd)); wd = inkWidth(txt, fs); shrunk++; console.log('ajustado', fs, txt); } n++; worst = Math.max(worst, wd); } }
+  console.log('grupos', n, 'ajustados', shrunk, 'ancho maximo final', worst, '(limite', SAFE_W + ')');
+} else if (process.argv[2] === 'preview') {
   for (const s of process.argv.slice(3)) writeFileSync(path.join(B, `p_${s}.png`), frame(parseFloat(s)));
   console.log('preview ok', 'DUR', DUR.toFixed(2), 'frames', Math.round(DUR * FPS));
 } else {
