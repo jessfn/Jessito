@@ -1,0 +1,164 @@
+[
+ {
+  "id": "l1",
+  "who": "N",
+  "text": "Día tres. Ustedes eligieron dientes... y todavía no sé si darles las gracias.",
+  "pad": 0.5
+ },
+ {
+  "id": "l2",
+  "who": "N",
+  "text": "Mari me llevó con el doctor Mendoza, el mejor dentista de la ciudad.",
+  "pad": 0.2
+ },
+ {
+  "id": "l3",
+  "who": "M",
+  "text": "Tranquila, amiga. Yo te sostengo la mano.",
+  "pad": 0.25
+ },
+ {
+  "id": "l4",
+  "who": "D",
+  "text": "Buenos días, Lazy. Veamos esa sonrisa. Abre bien grande.",
+  "pad": 0.3
+ },
+ {
+  "id": "l5",
+  "who": "N",
+  "text": "Me revisó cada diente con un espejito. Y de pronto, se puso serio.",
+  "pad": 0.7
+ },
+ {
+  "id": "l6",
+  "who": "D",
+  "text": "Esto es raro. Necesito una radiografía, por favor.",
+  "pad": 0.6
+ },
+ {
+  "id": "l7",
+  "who": "N",
+  "text": "Y ahí estaba, en la pantalla: un diente de más, escondido atrás, empujando a todos los demás.",
+  "pad": 1.2
+ },
+ {
+  "id": "l8",
+  "who": "M",
+  "text": "¿¡Tenía un diente de sobra!?",
+  "pad": 0.2
+ },
+ {
+  "id": "l9",
+  "who": "D",
+  "text": "Por eso todo está chueco. Hay que sacarlo. Después, limpieza, blanqueamiento y brackets.",
+  "pad": 0.3
+ },
+ {
+  "id": "l10",
+  "who": "D",
+  "text": "Los brackets llevan meses, pero hoy empezamos.",
+  "pad": 0.15
+ },
+ {
+  "id": "l11",
+  "who": "N",
+  "text": "Primero, la anestesia. Yo odio las agujas.",
+  "pad": 0.4
+ },
+ {
+  "id": "l12",
+  "who": "D",
+  "text": "Un piquetito... y ya.",
+  "pad": 1.0
+ },
+ {
+  "id": "l13",
+  "who": "N",
+  "text": "Cerré los ojos tan fuerte que vi estrellitas. Luego, la turbina... un crac... y salió.",
+  "pad": 0.4
+ },
+ {
+  "id": "l14",
+  "who": "D",
+  "text": "¡Listo! Mira qué trofeo.",
+  "pad": 1.8
+ },
+ {
+  "id": "l15",
+  "who": "N",
+  "text": "Pensé que lo peor ya había pasado... pero entonces, se fue la luz.",
+  "pad": 0.3
+ },
+ {
+  "id": "l16",
+  "who": "M",
+  "text": "¡Aaah! ¿Quién apagó todo?",
+  "pad": 1.5
+ },
+ {
+  "id": "l17",
+  "who": "D",
+  "text": "Calma, tengo una lámpara. Lazy, no te muevas.",
+  "pad": 0.25
+ },
+ {
+  "id": "l18",
+  "who": "N",
+  "text": "Con una linterna en la frente y el celular de Mari, el doctor siguió como si nada. Limpieza... y blanqueamiento.",
+  "pad": 0.3
+ },
+ {
+  "id": "l19",
+  "who": "N",
+  "text": "Y cuando la luz volvió, mis dientes ya no parecían los mismos.",
+  "pad": 1.6
+ },
+ {
+  "id": "l20",
+  "who": "N",
+  "text": "Después, los brackets. Rosa y morado, claro.",
+  "pad": 0.35
+ },
+ {
+  "id": "l21",
+  "who": "D",
+  "text": "Nada de dulces duros, y cepíllate tres veces al día. ¿Prometido?",
+  "pad": 1.2
+ },
+ {
+  "id": "l22",
+  "who": "N",
+  "text": "Me miré al espejo con mis brackets, y sonreí. Todavía faltaban meses, pero ya no escondía mi sonrisa.",
+  "pad": 0.6
+ },
+ {
+  "id": "l22b",
+  "who": "N",
+  "text": "Y los meses pasaron. Ajustes, paciencia, y cepillarme tres veces al día... hasta que un día, el doctor me los quitó.",
+  "pad": 1.0
+ },
+ {
+  "id": "l22c",
+  "who": "N",
+  "text": "Me miré al espejo... y ahí estaba. Una sonrisa derecha, blanca, y mía. La que nunca me atreví a mostrar.",
+  "pad": 1.0
+ },
+ {
+  "id": "l22d",
+  "who": "M",
+  "text": "¡Estás hermosa, Lazy!",
+  "pad": 0.5
+ },
+ {
+  "id": "l23",
+  "who": "M",
+  "text": "Lazy... ¿y esas cejas?",
+  "pad": 0.35
+ },
+ {
+  "id": "l24",
+  "who": "N",
+  "text": "Creo que ya sé lo que sigue... ¿Qué arreglamos mañana: cejas o pelo? Comenta tu elección, y sígueme para ver el día cuatro.",
+  "pad": 0.6
+ }
+]

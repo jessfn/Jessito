@@ -84,3 +84,12 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
 - ACTUALIZACION (creador): cada video es una HISTORIA tipo escena de pelicula: cómo se hizo el cambio (ej. clinica/skincare, reventar granos),
   algo inesperado que surge a medio camino, y se resuelve bien; cierra con gancho al siguiente dia. Ya puede pasar de 1 minuto (objetivo ~80-95 s).
   Personajes de apoyo (Mari, doctora) NO hablan con voz: solo globos de texto; la voz es el narrador. Dia 2 = "La clinica Glow" (piel y granos).
+
+## Reglas permanentes (actualizacion dia 3)
+- Los personajes de apoyo (Mari, Dr. Mendoza, etc.) tienen VOZ PROPIA distinta al narrador (Mari = Laura, Dr. Mendoza = Brian, narrador = Jessica, fija),
+  pero NO mueven la boca: solo se escucha su voz y se muestra un icono de "hablando" + subtitulo con su nombre. gen_voz_multi.py arma el audio por linea.
+- Efectos de sonido REALISTAS: se generan con ElevenLabs sound-generation (build/dia03/sfx), ambiente de clinica y musica sintetizada con ducking.
+- Cada capitulo es una historia con imprevisto y se resuelve bien. Puede pasar de 1 minuto (dia 3: ~150 s).
+- Al final del arco de dientes: sonrisa derecha y blanca (salto de tiempo "Meses despues", quitan los brackets).
+- Cierre: pregunta A/B + "COMENTA TU ELECCION" + "SIGUEME PARA EL DIA N+1" (sin encuesta).
+- Dia 4 sale de lo que voten: CEJAS o PELO.

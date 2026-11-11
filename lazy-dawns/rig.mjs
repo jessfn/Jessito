@@ -70,13 +70,23 @@ function mouthSvg(m, yaw) {
   const lo = mid + 8 + open * 150 * (1 - 0.3 * Math.max(0, wide)) + (smile > 0.5 ? 14 : 0);
   const shape = `M${cl.x},${cl.y} Q0,${up} ${cr.x},${cr.y} Q0,${lo} ${cl.x},${cl.y}Z`;
   const showTeeth = open > 0.08 || smile > 0.3;
-  const T = (x, y, w, h, rot, col) => `<g transform="rotate(${rot} ${x + w / 2} ${y})"><path d="M${x},${y} h${w} v${h - 8} q0,8 ${-w / 2},8 q${-w / 2},0 ${-w / 2},-8Z" fill="${col}" stroke="${OUT}" stroke-width="3"/><path d="M${x + 3},${y + 4} v${h * 0.5}" stroke="#7a5a12" stroke-width="3" opacity="0.5"/></g>`;
+  const tq = m.teeth || { clean: 0, braces: 0, crooked: 1 };
+  const crk = tq.crooked ?? 1;
+  const mix = (hex, k) => { const a = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)), b = [247, 247, 240]; return '#' + a.map((v, i) => Math.round(v + (b[i] - v) * k).toString(16).padStart(2, '0')).join(''); };
+  const T = (x, y, w, h, rot, col) => `<g transform="rotate(${rot * crk} ${x + w / 2} ${y})"><path d="M${x},${y} h${w} v${h - 8} q0,8 ${-w / 2},8 q${-w / 2},0 ${-w / 2},-8Z" fill="${mix(col, tq.clean)}" stroke="${OUT}" stroke-width="3"/>${tq.clean < 0.7 ? `<path d="M${x + 3},${y + 4} v${h * 0.5}" stroke="#7a5a12" stroke-width="3" opacity="${0.5 * (1 - tq.clean)}"/>` : `<path d="M${x + 4},${y + 3} v${h * 0.4}" stroke="#fff" stroke-width="3" opacity="0.7"/>`}</g>`;
+  const BR = (x, y, w, h, rot, i) => tq.braces > 0.02 ? `<g transform="rotate(${rot * crk} ${x + w / 2} ${y}) translate(${x + w / 2},${y + h * 0.45}) scale(${tq.braces})"><rect x="-8" y="-7" width="16" height="14" rx="3" fill="#cbd5e1" stroke="${OUT}" stroke-width="2.5"/><rect x="-5" y="-4" width="10" height="8" rx="2" fill="${i % 2 ? '#a855f7' : '#ff4d8d'}"/></g>` : '';
   const drop = smile > 0.3 && open < 0.1 ? 6 : 0;
-  const upper = [T(-66, -2 + drop, 20, 20, -14, '#cdb64a'), T(-44, 2 + drop, 16, 30, 8, '#e3cf6a'), T(-27, 0 + drop, 26, 38, -5, '#d9c35a'), T(2, 4 + drop, 16, 22, 12, '#b9a23e'), T(24, -1 + drop, 20, 34, -10, '#e0cd6a'), T(52, 2 + drop, 14, 18, 18, '#b59a36')].join('');
+  const UP = [[-66, -2 + drop, 20, 20, -14, '#cdb64a'], [-44, 2 + drop, 16, 30, 8, '#e3cf6a'], [-27, 0 + drop, 26, 38, -5, '#d9c35a'], [2, 4 + drop, 16, 22, 12, '#b9a23e'], [24, -1 + drop, 20, 34, -10, '#e0cd6a'], [52, 2 + drop, 14, 18, 18, '#b59a36']];
+  const upper = UP.map((u) => T(...u)).join('') + UP.map((u, i) => BR(...u, i)).join('') + (tq.braces > 0.02 ? `<path d="M-60,${6 + drop} Q0,${14 + drop} 60,${10 + drop}" stroke="#94a3b8" stroke-width="${3 * tq.braces}" fill="none"/>` : '');
   const fang = T(40, 6 + drop, 12, 30, 24, '#d8c458');
   const lower = open > 0.35 ? [T(-40, 70 + open * 20, 16, 22, 6, '#c2ab46'), T(-18, 74 + open * 22, 18, 26, -12, '#d3bd52'), T(8, 72 + open * 20, 16, 20, 14, '#b89f3c'), T(28, 76 + open * 22, 14, 18, -6, '#cdb54a')].join('') : '';
-  const teeth = upper + fang + lower;
-  const buck = (open < 0.1 && smile < 0.3) ? `<g>${T(-18, 8, 20, 26, 6, '#e3cf6a')}${T(4, 9, 18, 22, -8, '#d4be52')}</g>` : '';
+  const perfect = (tq.crooked ?? 1) < 0.08;
+  const topY = (cl.y + 2 * up + cr.y) / 4, botY = (cl.y + 2 * lo + cr.y) / 4;
+  const PU = [-66, -44, -22, 0, 22, 44].map((x, i) => [x, topY - 4, 22, 30 + (i === 2 || i === 3 ? 3 : 0), 0, '#e3cf6a']);
+  const PL = open > 0.55 ? [-36, -18, 0, 18].map((x, i) => [x, botY - 22, 18, 22, 0, '#e3cf6a']).map((u) => T(...u)).join('') : '';
+  const perfTeeth = PU.map((u) => T(...u)).join('') + PL + (tq.shine ? `<path d="M-60,${6 + drop} l120,0" stroke="#fff" stroke-width="5" opacity="0.7"/>` : '');
+  const teeth = perfect ? perfTeeth : upper + fang + lower;
+  const buck = (open < 0.1 && smile < 0.3 && !perfect) ? `<g>${T(-18, 8, 20, 26, 6, '#e3cf6a')}${T(4, 9, 18, 22, -8, '#d4be52')}</g>` : '';
   return `<g>
     <clipPath id="mouthClip"><path d="${shape}"/></clipPath>
     <path d="${shape}" fill="#4a0f12"/>

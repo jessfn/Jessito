@@ -28,7 +28,7 @@ const MOODS = { // brows [inner, outer], boca, ojos grandes
   happy: { b: [0.2, 0.2], m: 'smile', big: 0 }, grin: { b: [0.3, 0.3], m: 'grin', big: 0.3 }, worry: { b: [0.9, 0], m: 'worry', big: 0.2 },
   scream: { b: [0.8, 0.8], m: 'scream', big: 1 }, cry: { b: [0.9, 0], m: 'cry', big: 0.2 }, calm: { b: [0, 0.1], m: 'smile', big: 0 },
   focus: { b: [-0.5, -0.1], m: 'flat', big: 0 }, serious: { b: [-0.2, 0], m: 'flat', big: 0 }, amused: { b: [0.1, 0.4], m: 'smirk', big: 0 },
-  shock: { b: [0.7, 0.7], m: 'o', big: 0.8 }, relief: { b: [0.6, 0], m: 'smile', big: 0.1 },
+  proud: { b: [0.3, 0.3], m: 'smile', big: 0.2 }, shock: { b: [0.7, 0.7], m: 'o', big: 0.8 }, relief: { b: [0.6, 0], m: 'smile', big: 0.1 },
 };
 const hand = (x, y, r = 0, s = 1) => `<g transform="translate(${x},${y}) rotate(${r}) scale(${s})"><ellipse rx="34" ry="30" fill="#f2c4a2" ${O}/>${[-22, -8, 6, 20].map((fx) => `<rect x="${fx - 7}" y="-52" width="14" height="34" rx="7" fill="#f2c4a2" ${O}/>`).join('')}</g>`;
 
@@ -79,4 +79,30 @@ export function drawDoc(p) {
     ${eyes(40, -6, blink, p.look || 0, m.big, m.b)}
     <circle cx="-40" cy="-6" r="36" fill="#bfe9ff" opacity="0.25" stroke="${OUT}" stroke-width="6"/><circle cx="40" cy="-6" r="36" fill="#bfe9ff" opacity="0.25" stroke="${OUT}" stroke-width="6"/><path d="M-4,-8 h8" stroke="${OUT}" stroke-width="6"/><path d="M-20,-24 l12,-10" stroke="#fff" stroke-width="5" opacity="0.8"/>
     ${mouth(m.m, 54, t)}</g>`;
+}
+
+// Dr. Mendoza (dentista): cubrebocas (no se le ve la boca => no habla con la boca), lampara frontal, guantes, bata.
+export function drawDentist(p) {
+  const m = MOODS[p.mood || 'calm'], t = p.t || 0, bob = Math.sin(t * 1.7 + 2) * 2.5, blink = p.blink || 0, lamp = p.lamp ?? 0;
+  const SK = '#d3a070', SKD = '#b98558';
+  const tool = { mirror: `<g transform="translate(${p.toolX ?? 150},${p.toolY ?? 150}) rotate(${p.toolR ?? -20})"><rect x="-6" y="0" width="12" height="190" rx="6" fill="#cbd5e1" ${O}/><circle cx="0" cy="-26" r="34" fill="#cfefff" opacity="0.8" stroke="${OUT}" stroke-width="7"/><path d="M-16,-40 q14,-14 30,-8" stroke="#fff" stroke-width="6" fill="none"/></g>`,
+    pointer: `<g transform="translate(${p.toolX ?? 150},${p.toolY ?? 150}) rotate(${p.toolR ?? -50})"><rect x="-5" y="0" width="10" height="230" rx="5" fill="#475569" ${O}/><circle cx="0" cy="0" r="9" fill="#ef4444" ${O}/></g>`,
+    tooth: `<g transform="translate(${p.toolX ?? 120},${p.toolY ?? 120}) rotate(${p.toolR ?? -14})"><rect x="-8" y="0" width="16" height="170" rx="8" fill="#e5e7eb" ${O}/><path d="M-30,-40 C-30,-70 30,-70 30,-40 C32,-10 18,40 8,40 C0,40 0,10 0,10 C0,10 0,40 -8,40 C-18,40 -32,-10 -30,-40Z" fill="#f5f5ef" ${O}/></g>`,
+    none: '' }[p.tool || 'none'] || '';
+  const handSvg = p.hand ? `<g transform="translate(${p.hand[0]},${p.hand[1]}) rotate(${p.hand[2] || 0})"><ellipse rx="36" ry="32" fill="#7cc3ff" ${O}/>${[-22, -8, 6, 20].map((fx) => `<rect x="${fx - 8}" y="-54" width="16" height="36" rx="8" fill="#7cc3ff" ${O}/>`).join('')}</g>` : '';
+  if (p.part === 'tool') return `<g transform="translate(0,${bob})">${tool}${handSvg}</g>`;
+  return `<g transform="translate(0,${bob})">
+    <rect x="-84" y="470" width="70" height="200" rx="26" fill="#1e3a5f" ${O}/><rect x="14" y="470" width="70" height="200" rx="26" fill="#1e3a5f" ${O}/>
+    <ellipse cx="-50" cy="684" rx="58" ry="24" fill="#f8fafc" ${O}/><ellipse cx="50" cy="684" rx="58" ry="24" fill="#f8fafc" ${O}/>
+    <path d="M-168,560 Q-154,170 -84,150 L84,150 Q154,170 168,560Z" fill="#ffffff" ${O}/><path d="M-44,150 L0,260 L44,150Z" fill="#0ea5e9" ${O}/><path d="M-74,150 L0,214 L74,150" fill="none" stroke="${OUT}" stroke-width="7"/>
+    <path d="M0,150 L0,560" stroke="#cbd5e1" stroke-width="5"/><rect x="62" y="262" width="92" height="38" rx="7" fill="#e0f2fe" ${O}/><text x="108" y="288" font-family="Inter" font-weight="800" font-size="15" text-anchor="middle" fill="#0f172a">DR. MENDOZA</text>
+    <rect x="-24" y="96" width="48" height="60" fill="${SKD}" ${O}/>
+    <ellipse cx="0" cy="0" rx="102" ry="116" fill="${SK}" ${O}/><ellipse cx="-106" cy="10" rx="14" ry="24" fill="${SK}" ${O}/><ellipse cx="106" cy="10" rx="14" ry="24" fill="${SK}" ${O}/>
+    <path d="M-104,-6 Q-112,-120 0,-124 Q112,-120 104,-6 Q70,-62 0,-66 Q-70,-62 -104,-6Z" fill="#1f1a17" ${O}/><path d="M-104,-4 Q-110,-30 -96,-50 M104,-4 Q110,-30 96,-50" stroke="#9ca3af" stroke-width="12" fill="none" stroke-linecap="round"/>
+    ${eyes(40, -8, blink, p.look || 0, m.big, m.b)}
+    <rect x="-80" y="-34" width="64" height="52" rx="14" fill="#7dd3fc" opacity="0.18" stroke="${OUT}" stroke-width="6"/><rect x="16" y="-34" width="64" height="52" rx="14" fill="#7dd3fc" opacity="0.18" stroke="${OUT}" stroke-width="6"/><path d="M-16,-12 h32" stroke="${OUT}" stroke-width="6"/>
+    <path d="M-92,18 Q-96,96 -50,112 Q0,128 50,112 Q96,96 92,18 Q40,34 0,30 Q-40,34 -92,18Z" fill="#9be7f7" ${O}/><path d="M-70,52 Q0,66 70,52 M-66,76 Q0,90 66,76" stroke="#5bbad1" stroke-width="4" fill="none"/><path d="M-92,22 Q-120,50 -108,76 M92,22 Q120,50 108,76" stroke="#5bbad1" stroke-width="4" fill="none"/>
+    <path d="M-12,18 Q0,8 12,18" stroke="#5bbad1" stroke-width="5" fill="none"/>
+    <path d="M-110,-76 Q0,-118 110,-76" stroke="#374151" stroke-width="13" fill="none" stroke-linecap="round"/><g transform="translate(0,-92)"><rect x="-26" y="-16" width="52" height="30" rx="10" fill="#374151" ${O}/><circle cx="0" cy="0" r="12" fill="${lamp > 0.05 ? '#fffbe0' : '#9ca3af'}" stroke="${OUT}" stroke-width="4"/>${lamp > 0.05 ? `<circle cx="0" cy="0" r="30" fill="#fffbe0" opacity="${0.5 * lamp}"/>` : ''}</g>
+    ${handSvg}</g>`;
 }
