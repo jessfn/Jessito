@@ -1,150 +1,114 @@
 [
 {
+"id": "l0",
+"who": "Tomas",
+"text": "Si encuentras esta cinta... no importa lo que te digan. Nosotros lo vimos.",
+"say": "[whispers] Si encuentras esta cinta... [serious] no importa lo que te digan. Nosotros lo vimos."
+},
+{
 "id": "l1",
 "who": "Tomas",
-"text": "¿Ya está grabando? ... A ver, sí, ya salió la lucecita roja. Va.",
-"say": "¿Ya está grabando? ... A ver, sí, ya salió la lucecita roja. Va."
+"text": "Última noche de Diego en la ciudad. Diego, dile algo a la cámara.",
+"say": "[softly] Última noche de Diego en la ciudad. Diego... dile algo a la cámara."
 },
 {
 "id": "l2",
-"who": "Beto",
-"text": "¡Oye, oye, enfócame a mí! ¡Soy la estrella de la fiesta!",
-"say": "[excited] ¡Oye, oye, enfócame a mí! ¡Soy la estrella de la fiesta!"
+"who": "Diego",
+"text": "Mañana a esta hora ya estaré lejos. Y lo raro es que... no quiero irme.",
+"say": "[quietly] Mañana a esta hora ya estaré lejos. Y lo raro es que... no quiero irme."
 },
 {
 "id": "l3",
-"who": "Tomas",
-"text": "Tú no eres la estrella, Beto. El festejado es Diego, ¿ya se te olvidó?",
-"say": "[laughing] Tú no eres la estrella, Beto. El festejado es Diego, ¿ya se te olvidó?"
+"who": "Marta",
+"text": "Mamá no contesta desde esta mañana. Algo no está bien.",
+"say": "[worried] Mamá no contesta desde esta mañana. Algo no está bien."
 },
 {
 "id": "l4",
-"who": "Diego",
-"text": "Ya, ya, no exageren. Solo me voy un año.",
-"say": "[chuckles] Ya, ya, no exageren. Solo me voy un año."
+"who": "Beto",
+"text": "Siempre exageras. La gente a veces apaga el teléfono, ¿sabes?",
+"say": "[forcing calm] Siempre exageras. La gente a veces apaga el teléfono, ¿sabes?"
 },
 {
 "id": "l5",
-"who": "Marta",
-"text": "Sí, claro, un año. Se va a volver cinco y lo sabes.",
-"say": "[sarcastic] Sí, claro, un año. Se va a volver cinco y lo sabes."
+"who": "Lucia",
+"text": "Escuchen. Todos los perros de la ciudad están ladrando. Todos al mismo tiempo.",
+"say": "[uneasy] Escuchen. Todos los perros de la ciudad están ladrando. [whispers] Todos al mismo tiempo."
 },
 {
 "id": "l6",
-"who": "Diego",
-"text": "Marta, por favor, no empieces con el drama.",
-"say": "[sighs] Marta, por favor, no empieces con el drama."
+"who": "Tomas",
+"text": "Y no hay un solo pájaro en los cables. Se fueron. Hace minutos.",
+"say": "[low voice] Y no hay un solo pájaro en los cables. Se fueron. Hace minutos."
 },
 {
 "id": "l7",
-"who": "Marta",
-"text": "No es drama. Le prometí a mi mamá que te iba a cuidar.",
-"say": "No es drama. Le prometí a mi mamá que te iba a cuidar."
+"who": "Diego",
+"text": "Desde que subimos siento que algo nos está mirando.",
+"say": "[uneasy] Desde que subimos... siento que algo nos está mirando."
 },
 {
 "id": "l8",
-"who": "Lucia",
-"text": "Oigan, ¿ya cortamos el pastel? Se me están derritiendo las velas.",
-"say": "Oigan, ¿ya cortamos el pastel? Se me están derritiendo las velas."
+"who": "Marta",
+"text": "Sin señal. Ni una raya. Es como si la ciudad hubiera desaparecido.",
+"say": "[tense] Sin señal. Ni una raya. Es como si la ciudad... hubiera desaparecido."
 },
 {
 "id": "l9",
-"who": "Tomas",
-"text": "Lucía, ven, dile algo a Diego para la cámara.",
-"say": "Lucía, ven, dile algo a Diego para la cámara."
+"who": "Beto",
+"text": "¿Vieron las luces? Parpadean. Todas.",
+"say": "[nervous] ¿Vieron las luces? Parpadean. Todas."
 },
 {
 "id": "l10",
 "who": "Lucia",
-"text": "Eh... pues... Diego, gracias por aguantarnos tanto tiempo. Vas a hacer cosas increíbles allá, de verdad.",
-"say": "[nervously] Eh... pues... Diego, gracias por aguantarnos tanto tiempo. [softly] Vas a hacer cosas increíbles allá, de verdad."
+"text": "Tomás... los edificios. Se están apagando uno por uno. Viene hacia nosotros.",
+"say": "[whispers] Tomás... los edificios. Se están apagando, uno por uno. [scared] Viene hacia nosotros."
 },
 {
 "id": "l11",
-"who": "Diego",
-"text": "Ay, ya me hicieron llorar. ¡Tomás, deja de grabar!",
-"say": "[laughing] Ay, ya me hicieron llorar. ¡Tomás, deja de grabar!"
+"who": "Marta",
+"text": "Eso no fue un rayo. Fue una explosión.",
+"say": "[tense] Eso no fue un rayo. Fue una explosión."
 },
 {
 "id": "l12",
-"who": "Tomas",
-"text": "Ni lo sueñes. Esto es para cuando regreses.",
-"say": "Ni lo sueñes. Esto es para cuando regreses."
+"who": "Diego",
+"text": "Escuchen... ese sonido. Viene de abajo. Del suelo.",
+"say": "[whispers] Escuchen... ese sonido. Viene de abajo. Del suelo."
 },
 {
 "id": "l13",
-"who": "Beto",
-"text": "¡Un brindis! Por Diego, por la ciudad, y porque mañana nadie me haga limpiar.",
-"say": "[excited] ¡Un brindis! Por Diego, por la ciudad, y porque mañana nadie me haga limpiar."
+"who": "Lucia",
+"text": "Tomás, dime que estás viendo lo mismo que yo.",
+"say": "[scared] Tomás... dime que estás viendo lo mismo que yo."
 },
 {
 "id": "l14",
-"who": "Lucia",
-"text": "¿Y la música?",
-"say": "¿Y la música?"
+"who": "Beto",
+"text": "Bajemos. Ahora. ¡Ya, ya, ya!",
+"say": "[panicked] Bajemos. Ahora. ¡Ya, ya, ya!"
 },
 {
 "id": "l15",
-"who": "Beto",
-"text": "¿Quién se tropezó con el cable otra vez?",
-"say": "¿Quién se tropezó con el cable otra vez?"
+"who": "Diego",
+"text": "Dios... algo se movió entre los edificios. Algo enorme.",
+"say": "[gasps] Dios... [whispers] algo se movió entre los edificios. Algo enorme."
 },
 {
 "id": "l16",
 "who": "Marta",
-"text": "No fue el cable. Mira... se apagó toda la calle.",
-"say": "[uneasy] No fue el cable. Mira... se apagó toda la calle."
+"text": "Tomás, apaga esa cámara y corre.",
+"say": "[panicked] Tomás, apaga esa cámara y ¡corre!"
 },
 {
 "id": "l17",
-"who": "Diego",
-"text": "¿Eso fue un trueno?",
-"say": "[uneasy] ¿Eso fue un trueno?"
+"who": "Tomas",
+"text": "No. Alguien tiene que saber lo que pasó esta noche. Sigo grabando.",
+"say": "[breathless] No. Alguien tiene que saber lo que pasó esta noche. Sigo grabando."
 },
 {
 "id": "l18",
-"who": "Tomas",
-"text": "No hay nubes. Marta, ¿tú viste esa luz?",
-"say": "No hay nubes. Marta, ¿tú viste esa luz?"
-},
-{
-"id": "l19",
-"who": "Marta",
-"text": "Sí. Eso no fue un rayo.",
-"say": "[tense] Sí. Eso no fue un rayo."
-},
-{
-"id": "l20",
-"who": "Lucia",
-"text": "Tomás... ¿qué está pasando?",
-"say": "[scared] Tomás... ¿qué está pasando?"
-},
-{
-"id": "l21",
-"who": "Beto",
-"text": "Esto ya no es gracioso.",
-"say": "[nervous] Esto ya no es gracioso."
-},
-{
-"id": "l22",
-"who": "Diego",
-"text": "Dios mío... ¿vieron eso? Algo se movió entre los edificios.",
-"say": "[gasps] Dios... ¿vieron eso? [whispers] Algo se movió entre los edificios."
-},
-{
-"id": "l23",
-"who": "Marta",
-"text": "Tomás, apaga eso y vámonos, ya.",
-"say": "[panicked] Tomás, apaga eso y vámonos, ¡ya!"
-},
-{
-"id": "l24",
-"who": "Tomas",
-"text": "No. Sigo grabando. Alguien tiene que mostrar esto.",
-"say": "[determined] No. Sigo grabando. Alguien tiene que mostrar esto."
-},
-{
-"id": "l25",
 "who": "Lucia",
 "text": "¡Cuidado! ¡Viene hacia nosotros!",
 "say": "[screaming] ¡Cuidado! ¡Viene hacia nosotros!"
