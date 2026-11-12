@@ -76,12 +76,12 @@ export function makeDirector({ L, T, DUR }) {
   const G = [
     { arm: 'L', t0: L.l4.start, t1: L.l13.end, tgt: () => ({ x: -350, y: 250 }) },
     { arm: 'R', t0: T.sit + 0.3, t1: T.combStuck + 1.2, tgt: () => ({ x: 340, y: 300 }) },
-    { arm: 'R', t0: T.combStuck - 0.2, t1: T.combStuck + 1.4, tgt: () => ({ x: 180, y: -250 }) },
+    { arm: 'R', t0: T.combStuck - 0.2, t1: T.combStuck + 1.4, tgt: () => ({ x: 262, y: -205 }) },
     { arm: 'B', t0: T.cutA - 0.4, t1: T.cutA + 1.8, tgt: (t, s) => ({ x: s * 110, y: 200 }) },
-    { arm: 'R', t0: T.straightB, t1: T.straightB + 1.6, tgt: () => ({ x: 250, y: -90 }) },
-    { arm: 'B', t0: T.greenA, t1: T.greenA + 2.0, tgt: (t, s) => ({ x: s * 175, y: -150 + Math.sin(t * 20) * 6 }) },
-    { arm: 'R', t0: T.mirrorStart + 0.6, t1: T.mirrorStart + 2.4, tgt: (t) => ({ x: 335 - (t - T.mirrorStart - 0.6) * 20, y: -70 + (t - T.mirrorStart - 0.6) * 110 }) },
-    { arm: 'B', t0: T.mirrorStart + 2.6, t1: L.l24.end, tgt: (t, s) => ({ x: s * 330, y: 40 + Math.sin(t * 3) * 20 }) },
+    { arm: 'R', t0: T.straightB, t1: T.straightB + 1.6, tgt: () => ({ x: 318, y: -40 }) },
+    { arm: 'B', t0: T.greenA, t1: T.greenA + 2.0, tgt: (t, s) => ({ x: s * 246, y: -118 + Math.sin(t * 20) * 5 }) },
+    { arm: 'R', t0: T.mirrorStart + 0.6, t1: T.mirrorStart + 2.4, tgt: (t) => ({ x: 318, y: 20 + (t - T.mirrorStart - 0.6) * 90 }) },
+    { arm: 'B', t0: T.mirrorStart + 2.6, t1: L.l24.end, tgt: (t, s) => ({ x: s * 350, y: 250 + Math.sin(t * 3) * 14 }) },
     { arm: 'R', t0: W('l27', 'sigueme'), t1: DUR + 1, tgt: (t) => ({ x: 440 + Math.sin(t * 9) * 30, y: -205 }), wr: (t) => Math.sin(t * 9) * 16 },
   ];
   const armTarget = (t, side) => {

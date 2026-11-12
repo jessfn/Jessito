@@ -119,3 +119,8 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
   tijeras en las puntas del lado, secadora hacia el pelo desde arriba/lado, plancha en los mechones del lado, tinte/neutralizador en la raiz, extensiones junto a las cortinas de pelo.
 - Quien usa la herramienta debe poder ALCANZAR con el brazo el punto de trabajo (IK); si no alcanza, se reubica al personaje.
 - Antes de dar un video por bueno: revisar cuadros clave y verificar (1) nada cortado, (2) herramienta en el sitio logico, (3) manos/brazos correctos, (4) texto sin encimarse.
+
+## Logica de brazos de Lazy (regla permanente)
+- Codo SIEMPRE hacia afuera y abajo (IK de 2 huesos con codo exterior); las manos nunca cruzan el pecho ni tapan los ojos sin razon.
+- Susto/sorpresa: manos a los COSTADOS de la cara (x=+-246, y=-118), no sobre los ojos. Tocarse la cabeza: lado de la cabeza (x=262).
+- Peinarse/mostrar el pelo: brazo hacia afuera junto al torso (x=318-350). Referencia IK: pole vector hacia afuera/atras del codo (Unreal/Godot TwoBoneIK).
