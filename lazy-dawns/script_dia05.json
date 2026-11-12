@@ -1,0 +1,134 @@
+[
+ {
+  "id": "l1",
+  "who": "N",
+  "text": "Día cinco. Ustedes eligieron maquillaje... pero antes, había un pendiente.",
+  "pad": 0.3
+ },
+ {
+  "id": "l2",
+  "who": "N",
+  "text": "Mari insistió en algo: el lunar con pelitos de mi mejilla.",
+  "pad": 0.25
+ },
+ {
+  "id": "l3",
+  "who": "M",
+  "text": "Amiga, hoy te lo quitamos. Ya hice la cita.",
+  "pad": 0.3
+ },
+ {
+  "id": "l4",
+  "who": "S",
+  "text": "Buenos días, Lazy. Primero lo revisamos, por seguridad.",
+  "pad": 0.35
+ },
+ {
+  "id": "l5",
+  "who": "N",
+  "text": "La doctora lo miró con una lupa de luz... y asintió.",
+  "pad": 0.3
+ },
+ {
+  "id": "l6",
+  "who": "S",
+  "text": "Es benigno. Lo quitamos con láser, y en minutos queda listo.",
+  "pad": 0.3
+ },
+ {
+  "id": "l7",
+  "who": "N",
+  "text": "Una anestesia pequeñita, un zumbido, un olor raro... y ya.",
+  "pad": 0.4
+ },
+ {
+  "id": "l8",
+  "who": "S",
+  "text": "Listo. Saldrá una costrita, y en unos días sanará.",
+  "pad": 0.4
+ },
+ {
+  "id": "l9",
+  "who": "N",
+  "text": "Mi mejilla quedó limpia. Por primera vez, nada en medio de mi cara.",
+  "pad": 0.5
+ },
+ {
+  "id": "l10",
+  "who": "N",
+  "text": "Una semana después, la piel ya estaba sana, y llegó Nina, la maquilladora más famosa de la colonia.",
+  "pad": 0.5
+ },
+ {
+  "id": "l11",
+  "who": "K",
+  "text": "¡Hola, reina! Empezamos con la base. Este tono se verá hermoso.",
+  "pad": 0.35
+ },
+ {
+  "id": "l12",
+  "who": "N",
+  "text": "Pasó la esponja... y mi cara quedó blanca como un fantasma.",
+  "pad": 0.5
+ },
+ {
+  "id": "l13",
+  "who": "M",
+  "text": "¡Aaah! ¡Pareces un fantasma!",
+  "pad": 0.3
+ },
+ {
+  "id": "l14",
+  "who": "K",
+  "text": "Ups. Tono equivocado. Hay que buscar uno que combine con tu piel.",
+  "pad": 0.4
+ },
+ {
+  "id": "l15",
+  "who": "N",
+  "text": "Probó tonos y tonos, hasta encontrar el perfecto. Mi piel morena se veía pareja y radiante.",
+  "pad": 0.5
+ },
+ {
+  "id": "l16",
+  "who": "N",
+  "text": "Después, contorno, iluminador, sombras doradas, delineado suave y pestañas larguísimas.",
+  "pad": 0.7
+ },
+ {
+  "id": "l17",
+  "who": "K",
+  "text": "Y para terminar, un gloss rosado, brillante y natural.",
+  "pad": 0.4
+ },
+ {
+  "id": "l18",
+  "who": "N",
+  "text": "Me miré al espejo, y me quedé sin palabras. Era yo, pero la mejor versión de mí.",
+  "pad": 0.6
+ },
+ {
+  "id": "l19",
+  "who": "M",
+  "text": "¡Lazy, pareces una estrella de cine!",
+  "pad": 0.4
+ },
+ {
+  "id": "l20",
+  "who": "N",
+  "text": "Entonces Mari miró hacia abajo, y dijo...",
+  "pad": 0.5
+ },
+ {
+  "id": "l21",
+  "who": "M",
+  "text": "Amiga... ¿y esa ropa?",
+  "pad": 0.35
+ },
+ {
+  "id": "l22",
+  "who": "N",
+  "text": "Jaja, tiene razón. ¿Qué arreglamos mañana: ropa o gimnasio? Comenta tu elección, y sígueme para ver el día seis.",
+  "pad": 0.4
+ }
+]

@@ -159,6 +159,14 @@ function salonTool(kind, o = {}) {
     case 'brush': return `<g><rect x="-12" y="-10" width="24" height="170" rx="12" fill="#a855f7" ${O}/><g transform="translate(0,200) rotate(${k * 360})"><circle r="58" fill="#7c3aed" ${O}/>${[...Array(16)].map((_, i) => `<rect x="-3" y="-80" width="6" height="26" rx="3" fill="#312e81" transform="rotate(${i * 22.5})"/>`).join('')}</g></g>`;
     case 'dryer': return `<g><rect x="-16" y="-10" width="32" height="130" rx="14" fill="#f472b6" ${O}/><path d="M-40,110 L-60,260 Q-6,300 60,260 L40,110Z" fill="#fb7185" ${O}/><ellipse cx="0" cy="270" rx="60" ry="18" fill="#1f2937" ${O}/>${[...Array(5)].map((_, i) => `<path d="M${-40 + i * 20},${300 + (i % 2) * 8} q${6 + Math.sin(k * 30 + i) * 4},${40} 0,${80}" stroke="#fff" stroke-width="7" fill="none" stroke-linecap="round" opacity="${0.5 + 0.3 * Math.sin(k * 20 + i)}"/>`).join('')}</g>`;
     case 'iron': return `<g><g transform="rotate(${(Math.sin(k * 6) * 4)})"><rect x="-24" y="-10" width="48" height="250" rx="14" fill="#1f2937" ${O}/><rect x="-30" y="-10" width="60" height="120" rx="14" fill="#ec4899" ${O}/><rect x="-18" y="130" width="36" height="150" rx="10" fill="#9ca3af" ${O}/><path d="M-26,0 v280 M26,0 v280" stroke="#f9a8d4" stroke-width="5" opacity="0.7"/></g>${[...Array(6)].map((_, i) => `<circle cx="${Math.sin(i * 2 + k * 9) * 30}" cy="${300 + ((k * 90 + i * 40) % 160)}" r="${14 + (i % 3) * 5}" fill="#fff" opacity="${0.55 - ((k * 90 + i * 40) % 160) / 320}"/>`).join('')}</g>`;
+    case 'laser': return `<g><rect x="-17" y="0" width="34" height="150" rx="14" fill="#e2e8f0" ${O}/><rect x="-17" y="20" width="34" height="38" rx="8" fill="#38bdf8" ${O}/><path d="M-10,150 L-5,196 L5,196 L10,150Z" fill="#94a3b8" ${O}/><circle cx="0" cy="200" r="${9 + Math.abs(Math.sin(k * 40)) * 5}" fill="#ef4444" ${O}/><circle cx="0" cy="200" r="${24 + Math.abs(Math.sin(k * 40)) * 14}" fill="#ff4d4d" opacity="0.35"/></g>`;
+    case 'lupa': return `<g><rect x="-9" y="0" width="18" height="150" rx="9" fill="#7c3aed" ${O}/><circle cx="0" cy="200" r="58" fill="#cfefff" opacity="0.6" stroke="${OUT}" stroke-width="9"/><circle cx="0" cy="200" r="46" fill="none" stroke="#fffbe0" stroke-width="5" opacity="0.7"/><path d="M-30,176 q18,-22 44,-14" stroke="#fff" stroke-width="6" fill="none" opacity="0.8"/></g>`;
+    case 'syringe': return `<g><rect x="-20" y="0" width="40" height="150" rx="14" fill="#f1f5f9" ${O}/><rect x="-14" y="40" width="28" height="90" rx="8" fill="#93c5fd" opacity="0.9"/><rect x="-6" y="150" width="12" height="40" fill="#cbd5e1" ${O}/><path d="M0,190 L0,214" stroke="#94a3b8" stroke-width="4"/></g>`;
+    case 'sponge': return `<g><rect x="-10" y="0" width="20" height="120" rx="10" fill="#f9a8d4" ${O}/><ellipse cx="0" cy="146" rx="42" ry="34" fill="#fcd9b6" stroke="${OUT}" stroke-width="7"/><circle cx="-12" cy="136" r="6" fill="#e9b88a" opacity="0.7"/><circle cx="10" cy="152" r="5" fill="#e9b88a" opacity="0.7"/></g>`;
+    case 'brushM': return `<g><rect x="-9" y="0" width="18" height="130" rx="9" fill="#e5e7eb" ${O}/><rect x="-12" y="104" width="24" height="26" fill="#c0c0c8" ${O}/><path d="M-22,130 Q0,214 22,130Z" fill="#fde68a" stroke="${OUT}" stroke-width="6"/><path d="M-12,138 q12,40 24,0" stroke="#f59e0b" stroke-width="5" fill="none" opacity="0.7"/></g>`;
+    case 'wandL': return `<g><rect x="-8" y="0" width="16" height="140" rx="8" fill="#1f2937" ${O}/><rect x="-6" y="140" width="12" height="46" rx="6" fill="#111827" ${O}/><path d="M-6,186 L0,206 L6,186Z" fill="#0a0508" stroke="${OUT}" stroke-width="3"/></g>`;
+    case 'gloss': return `<g><rect x="-13" y="0" width="26" height="120" rx="12" fill="#fb7185" ${O}/><rect x="-10" y="120" width="20" height="36" rx="8" fill="#fecdd3" ${O}/><path d="M-6,156 q6,36 12,0Z" fill="#f43f5e" stroke="${OUT}" stroke-width="4"/><circle cx="-4" cy="196" r="4" fill="#fff" opacity="0.9"/></g>`;
+    case 'palette': return `<g><rect x="-9" y="0" width="18" height="110" rx="9" fill="#fde68a" ${O}/><g transform="translate(0,150)">${['#f3d7b6', '#e0b080', '#c68a5a', '#a96a42', '#7a4a2e'].map((cc, i) => `<rect x="${-96 + i * 38}" y="-46" width="36" height="92" rx="8" fill="${cc}" stroke="${OUT}" stroke-width="4"/>`).join('')}</g></g>`;
     case 'bottleG': return `<g><rect x="-34" y="0" width="68" height="150" rx="22" fill="#22c55e" ${O}/><rect x="-18" y="-44" width="36" height="50" rx="8" fill="#f1f5f9" ${O}/><rect x="-30" y="48" width="60" height="64" rx="8" fill="#bbf7d0" ${O}/><text x="0" y="90" font-family="Anton" font-size="26" text-anchor="middle" fill="#14532d">VERDE</text></g>`;
     case 'bottleB': return `<g><rect x="-34" y="0" width="68" height="150" rx="22" fill="#1f2937" ${O}/><rect x="-18" y="-44" width="36" height="50" rx="8" fill="#f1f5f9" ${O}/><rect x="-30" y="48" width="60" height="64" rx="8" fill="#e5e7eb" ${O}/><text x="0" y="90" font-family="Anton" font-size="26" text-anchor="middle" fill="#111827">NEGRO</text></g>`;
     case 'bottle': return `<g><rect x="-34" y="0" width="68" height="150" rx="22" fill="#38bdf8" ${O}/><rect x="-18" y="-44" width="36" height="50" rx="8" fill="#f1f5f9" ${O}/><rect x="-30" y="48" width="60" height="64" rx="8" fill="#e0f2fe" ${O}/><text x="0" y="88" font-family="Anton" font-size="22" text-anchor="middle" fill="#0c4a6e">SERUM</text></g>`;
@@ -191,6 +199,54 @@ export function drawStylist(p) {
     ${armsLayer(p, { sleeve: '#d946ef', skin: SK }, 'body')}
   </g>`;
 }
+
+export function drawDerm(p) {
+  const m = MOODS[p.mood || 'calm'], t = p.t || 0, bob = Math.sin(t * 1.9 + 3) * 2.5, blink = p.blink || 0;
+  const SK = '#c28a62', SKD = '#a8734e';
+  const tool = p.tool && p.tool !== 'none' ? `<g transform="translate(${toolAnchor(p).x},${toolAnchor(p).y}) rotate(${p.toolR ?? 70}) ${p.toolS ? `scale(${p.toolS})` : ''}">${salonTool(p.tool, { k: t })}${p.noHand ? '' : `<g transform="translate(0,${p.gripY ?? 4})">${gripHand(SK)}</g>`}</g>` : '';
+  if (p.part === 'tool') return `<g transform="translate(0,${bob})">${armsLayer(p, { sleeve: '#ffffff', skin: SK }, 'tool')}${tool}</g>`;
+  return `<g transform="translate(0,${bob})">
+    <rect x="-84" y="470" width="70" height="200" rx="26" fill="#475569" ${O}/><rect x="14" y="470" width="70" height="200" rx="26" fill="#475569" ${O}/>
+    <ellipse cx="-50" cy="684" rx="58" ry="24" fill="#14b8a6" ${O}/><ellipse cx="50" cy="684" rx="58" ry="24" fill="#14b8a6" ${O}/>
+    <path d="M-160,560 Q-150,170 -84,150 L84,150 Q150,170 160,560Z" fill="#ffffff" ${O}/><path d="M-90,270 L90,270 L110,560 L-110,560Z" fill="#475569" ${O}/><path d="M-90,270 Q0,300 90,270" fill="#475569" ${O}/><path d="M-60,150 L-50,270 M60,150 L50,270" stroke="#475569" stroke-width="14"/>
+    <rect x="-70" y="380" width="60" height="64" rx="10" fill="#1f2937" ${O}/><rect x="10" y="380" width="60" height="64" rx="10" fill="#1f2937" ${O}/><path d="M-50,380 v-34 M-36,380 v-40" stroke="#e5e7eb" stroke-width="7" stroke-linecap="round"/><path d="M30,380 v-40" stroke="#14b8a6" stroke-width="12" stroke-linecap="round"/>
+    <path d="M-48,150 Q0,214 48,150" fill="${SKD}" ${O}/>
+    <rect x="-24" y="96" width="48" height="60" fill="${SKD}" ${O}/>
+    <circle cx="0" cy="-122" r="74" fill="#3b2314" ${O}/><path d="M-30,-170 Q-10,-130 -40,-100" stroke="#14b8a6" stroke-width="16" fill="none" stroke-linecap="round"/><path d="M20,-176 Q40,-140 14,-110" stroke="#14b8a6" stroke-width="12" fill="none" stroke-linecap="round" opacity="0.9"/>
+    <ellipse cx="0" cy="0" rx="102" ry="116" fill="${SK}" ${O}/><ellipse cx="-106" cy="10" rx="14" ry="24" fill="${SK}" ${O}/><ellipse cx="106" cy="10" rx="14" ry="24" fill="${SK}" ${O}/>
+    <circle cx="-110" cy="48" r="22" fill="none" stroke="#e5e7eb" stroke-width="7"/><circle cx="110" cy="48" r="22" fill="none" stroke="#e5e7eb" stroke-width="7"/>
+    <path d="M-104,-8 Q-112,-110 0,-114 Q112,-110 104,-8 Q70,-70 0,-76 Q-70,-70 -104,-8Z" fill="#3b2314" ${O}/>
+    ${eyes(40, -6, blink, p.look || 0, m.big, m.b)}<path d="M-76,-30 l-14,-10 M76,-30 l14,-10" stroke="${OUT}" stroke-width="6" stroke-linecap="round"/>
+    <ellipse cx="-58" cy="34" rx="22" ry="11" fill="#fb7185" opacity="0.5"/><ellipse cx="58" cy="34" rx="22" ry="11" fill="#fb7185" opacity="0.5"/>
+    ${(() => { const mm = mouth(m.m, 54, t); return mm.replace(/stroke="#12090a"/g, 'stroke="#12090a"').replace(/fill="#7a1f2a"/g, 'fill="#b91c1c"'); })()}<path d="M-26,64 Q0,82 26,64" stroke="#be123c" stroke-width="9" fill="none" stroke-linecap="round" opacity="0.65"/>
+    <circle cx="-40" cy="-6" r="36" fill="#bfe9ff" opacity="0.22" stroke="${OUT}" stroke-width="6"/><circle cx="40" cy="-6" r="36" fill="#bfe9ff" opacity="0.22" stroke="${OUT}" stroke-width="6"/><path d="M-4,-8 h8" stroke="${OUT}" stroke-width="6"/>
+    ${armsLayer(p, { sleeve: '#ffffff', skin: SK }, 'body')}
+  </g>`;
+}
+
+export function drawNina(p) {
+  const m = MOODS[p.mood || 'calm'], t = p.t || 0, bob = Math.sin(t * 1.9 + 3) * 2.5, blink = p.blink || 0;
+  const SK = '#e2b48e', SKD = '#c99a74';
+  const tool = p.tool && p.tool !== 'none' ? `<g transform="translate(${toolAnchor(p).x},${toolAnchor(p).y}) rotate(${p.toolR ?? 70}) ${p.toolS ? `scale(${p.toolS})` : ''}">${salonTool(p.tool, { k: t })}${p.noHand ? '' : `<g transform="translate(0,${p.gripY ?? 4})">${gripHand(SK)}</g>`}</g>` : '';
+  if (p.part === 'tool') return `<g transform="translate(0,${bob})">${armsLayer(p, { sleeve: '#f9a8d4', skin: SK }, 'tool')}${tool}</g>`;
+  return `<g transform="translate(0,${bob})">
+    <rect x="-84" y="470" width="70" height="200" rx="26" fill="#be185d" ${O}/><rect x="14" y="470" width="70" height="200" rx="26" fill="#be185d" ${O}/>
+    <ellipse cx="-50" cy="684" rx="58" ry="24" fill="#8b5cf6" ${O}/><ellipse cx="50" cy="684" rx="58" ry="24" fill="#8b5cf6" ${O}/>
+    <path d="M-160,560 Q-150,170 -84,150 L84,150 Q150,170 160,560Z" fill="#f9a8d4" ${O}/><path d="M-90,270 L90,270 L110,560 L-110,560Z" fill="#be185d" ${O}/><path d="M-90,270 Q0,300 90,270" fill="#be185d" ${O}/><path d="M-60,150 L-50,270 M60,150 L50,270" stroke="#be185d" stroke-width="14"/>
+    <rect x="-70" y="380" width="60" height="64" rx="10" fill="#1f2937" ${O}/><rect x="10" y="380" width="60" height="64" rx="10" fill="#1f2937" ${O}/><path d="M-50,380 v-34 M-36,380 v-40" stroke="#e5e7eb" stroke-width="7" stroke-linecap="round"/><path d="M30,380 v-40" stroke="#8b5cf6" stroke-width="12" stroke-linecap="round"/>
+    <path d="M-48,150 Q0,214 48,150" fill="${SKD}" ${O}/>
+    <rect x="-24" y="96" width="48" height="60" fill="${SKD}" ${O}/>
+    <circle cx="0" cy="-122" r="74" fill="#ef4444" ${O}/><path d="M-30,-170 Q-10,-130 -40,-100" stroke="#8b5cf6" stroke-width="16" fill="none" stroke-linecap="round"/><path d="M20,-176 Q40,-140 14,-110" stroke="#8b5cf6" stroke-width="12" fill="none" stroke-linecap="round" opacity="0.9"/>
+    <ellipse cx="0" cy="0" rx="102" ry="116" fill="${SK}" ${O}/><ellipse cx="-106" cy="10" rx="14" ry="24" fill="${SK}" ${O}/><ellipse cx="106" cy="10" rx="14" ry="24" fill="${SK}" ${O}/>
+    <circle cx="-110" cy="48" r="22" fill="none" stroke="#fbbf24" stroke-width="7"/><circle cx="110" cy="48" r="22" fill="none" stroke="#fbbf24" stroke-width="7"/>
+    <path d="M-104,-8 Q-112,-110 0,-114 Q112,-110 104,-8 Q70,-70 0,-76 Q-70,-70 -104,-8Z" fill="#ef4444" ${O}/>
+    ${eyes(40, -6, blink, p.look || 0, m.big, m.b)}<path d="M-76,-30 l-14,-10 M76,-30 l14,-10" stroke="${OUT}" stroke-width="6" stroke-linecap="round"/>
+    <ellipse cx="-58" cy="34" rx="22" ry="11" fill="#fb7185" opacity="0.5"/><ellipse cx="58" cy="34" rx="22" ry="11" fill="#fb7185" opacity="0.5"/>
+    ${(() => { const mm = mouth(m.m, 54, t); return mm.replace(/stroke="#12090a"/g, 'stroke="#12090a"').replace(/fill="#7a1f2a"/g, 'fill="#b91c1c"'); })()}<path d="M-26,64 Q0,82 26,64" stroke="#be123c" stroke-width="9" fill="none" stroke-linecap="round" opacity="0.65"/>
+    ${armsLayer(p, { sleeve: '#f9a8d4', skin: SK }, 'body')}
+  </g>`;
+}
+
 export function drawMemo(p) {
   const m = MOODS[p.mood || 'calm'], t = p.t || 0, bob = Math.sin(t * 2.3 + 1) * 3, blink = p.blink || 0;
   const SK = '#8d5a3b', SKD = '#744a30';

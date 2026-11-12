@@ -124,3 +124,9 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
 - Codo SIEMPRE hacia afuera y abajo (IK de 2 huesos con codo exterior); las manos nunca cruzan el pecho ni tapan los ojos sin razon.
 - Susto/sorpresa: manos a los COSTADOS de la cara (x=+-246, y=-118), no sobre los ojos. Tocarse la cabeza: lado de la cabeza (x=262).
 - Peinarse/mostrar el pelo: brazo hacia afuera junto al torso (x=318-350). Referencia IK: pole vector hacia afuera/atras del codo (Unreal/Godot TwoBoneIK).
+
+## Dia 5 (El maquillaje): decisiones
+- Se quito el lunar con laser (dermatologa, con revision previa, costra y sanado). Maquillaje MODERNO y natural: piel luminosa, contorno, iluminador, sombras doradas,
+  delineado suave, pestanas largas y gloss rosado (NO labial rojo clasico). Imprevisto: base demasiado clara (fantasma) -> se busca el tono que combina con su piel morena.
+- Duracion < 2 min (1:58). Comparacion ANTES/DESPUES en el espejo. Voces: Dra. Valentina (Alice), Nina (Sarah), Mari (Laura), narrador Jessica. Siguiente voto: ROPA vs GIMNASIO.
+- Profesionales alcanzan la cara con el brazo: se sientan tras una mesa (cintura oculta) para que el brazo IK llegue a la cara.
