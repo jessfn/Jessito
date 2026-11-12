@@ -1,0 +1,98 @@
+import {Resvg} from '@resvg/resvg-js';import fs from 'fs';import {spawn,spawnSync} from 'child_process';import path from 'path';import {fileURLToPath} from 'url';
+import {CAST,body,defs} from '../body.mjs';
+import {clamp,sm,lerp,defsScene,backdrop,rooftop,T_BLACKOUT,giantLeg} from './scene.mjs';
+const HERE=path.dirname(fileURLToPath(import.meta.url));const BUILD=path.join(HERE,'../build/ep1');
+const W=1080,H=1920,FPS=30,DUR=136;
+const script=JSON.parse(fs.readFileSync(path.join(HERE,'script.json'),'utf8'));
+const START={l1:11.0,l2:16.0,l3:20.0,l4:25.0,l5:27.6,l6:31.4,l7:34.0,l8:38.0,l9:42.2,l10:45.5,l11:52.5,l12:55.6,l13:59.2,l14:69.0,l15:70.8,l16:73.6,l17:83.0,l18:85.0,l19:88.8,l20:94.5,l21:97.0,l22:105.0,l23:109.5,l24:112.6,l25:117.0};
+export {START};
+const NAMES={Tomas:'TOMÁS (cámara)',Beto:'BETO',Diego:'DIEGO',Marta:'MARTA',Lucia:'LUCÍA'};
+const POSX={beto:700,diego:1100,marta:1500,lucia:1900};
+const WHOKEY={Beto:'beto',Diego:'diego',Marta:'marta',Lucia:'lucia'};
+// ---- envelopes
+function envelope(id){const r=spawnSync('ffmpeg',['-v','error','-i',path.join(BUILD,'voz',id+'.mp3'),'-f','s16le','-ac','1','-ar','8000','-'],{maxBuffer:1e8});const b=r.stdout;const n=Math.floor(b.length/2);const hop=Math.round(8000/FPS);const out=[];let mx=1e-6;for(let i=0;i+hop<=n;i+=hop){let s=0;for(let j=0;j<hop;j++){const v=b.readInt16LE((i+j)*2)/32768;s+=v*v}const e=Math.sqrt(s/hop);out.push(e);mx=Math.max(mx,e)}const nn=out.map(v=>v/mx);return nn.map((v,i)=>Math.max(v,(nn[i-1]||0)*.55))}
+const LINES=script.map(l=>({...l,t0:START[l.id],env:envelope(l.id)}));LINES.forEach(l=>l.dur=l.env.length/FPS);
+function speakerAt(t){return LINES.find(l=>t>=l.t0&&t<l.t0+l.dur+.15)}
+// ---- camera
+const SHOTS=[[10.0,900,1500,1.0,6],[11.6,760,1090,1.1,-1],[16.0,700,1050,1.35,0],[19.6,900,1060,.8,0],[22.8,1100,1050,1.3,2],[27.9,1500,1050,1.3,-2],[31.5,1100,1050,1.3,1],[34.0,1500,1050,1.3,-1],[38.2,1900,1040,1.3,0],[42.0,1900,1040,1.15,3],[45.6,1900,1000,1.75,0],[52.4,1100,1040,1.55,-2],[55.7,1300,1050,.7,0],[59.3,700,1050,1.2,0],[63.5,1300,1050,.68,0],[67.4,1300,900,.62,6],[68.8,1900,1040,1.3,-3],[70.6,700,1050,1.25,2],[73.4,1500,1050,1.3,0],[78.6,2300,900,.75,-3],[83.3,1100,1050,1.35,0],[85.0,1500,1050,1.2,2],[88.7,1500,1050,1.4,0],[91.6,1300,900,.7,-4],[94.4,1900,1040,1.4,3],[97.0,700,1050,1.35,-3],[99.9,1300,820,.62,5],[104.8,1100,1050,1.3,-2],[109.2,1500,1050,1.3,2],[112.4,1300,780,.6,3],[116.2,1500,760,.6,-6],[117.0,1900,1040,1.4,-4],[119.3,1300,700,.6,2],[119.7,1300,1500,.8,78]];
+function stepResp(tau,w,z){if(tau<=0)return 0;const wd=w*Math.sqrt(1-z*z);return 1-Math.exp(-z*w*tau)*(Math.cos(wd*tau)+(z/Math.sqrt(1-z*z))*Math.sin(wd*tau))}
+function camera(t){let c=SHOTS[0].slice(1);for(let i=1;i<SHOTS.length;i++){const g=stepResp(t-SHOTS[i][0]-.28,SHOTS[i][4]>40?14:8,.7);if(g===0)continue;for(let k=0;k<4;k++)c[k]+= (SHOTS[i][k+1]-SHOTS[i-1][k+1])*g}return c}
+const IMPULSES=[[80.4,38],[92.1,60],[100.0,50],[116.3,60],[119.5,90]];
+function shakeAmp(t){let a=5;if(t>78&&t<90)a=14;if(t>92&&t<100)a=26;if(t>100&&t<116)a=14;if(t>116&&t<121.5)a=34;if(t>67&&t<78)a=8;for(const [ti,m] of IMPULSES)if(t>ti)a+=m*Math.exp(-(t-ti)/.5);return a}
+const nz=(t,s)=>Math.sin(t*1.7*s+1)*.5+Math.sin(t*3.9*s+2)*.3+Math.sin(t*7.3*s+3)*.2;
+function quakeLvl(t){return clamp(shakeAmp(t)/40,0,1.4)}
+// ---- characters
+const EXPR={
+ beto:[[0,'smile'],[67.2,'neutral'],[74,'surprise'],[95,'fear'],[105,'surprise'],[116,'fear']],
+ diego:[[0,'smile'],[52.2,'sad'],[56,'smile'],[67.2,'neutral'],[80,'fear'],[105,'surprise'],[116,'fear']],
+ marta:[[0,'neutral'],[34,'neutral'],[37.5,'smile'],[67.2,'neutral'],[78,'fear'],[105,'fear'],[116,'surprise']],
+ lucia:[[0,'smile'],[45.5,'smile'],[52,'smile'],[67.2,'neutral'],[80,'fear'],[94,'fear'],[116,'surprise']]};
+const REL={L:{w:[146,422],hand:'relax'},R:{w:[354,422],hand:'relax'}};
+const KF={
+ beto:[[0,{...REL,R:{w:[398,248],hand:'grip',prop:'bottle'}}],[59,{...REL,R:{w:[404,170],hand:'grip',prop:'bottle'}}],[65,{...REL,R:{w:[398,250],hand:'grip',prop:'bottle'}}],[75,{...REL,R:{w:[386,330],hand:'grip',prop:'bottle'}}],[93,{L:{w:[212,206],hand:'open'},R:{w:[288,206],hand:'open'}}]],
+ diego:[[0,{L:{w:[132,252],hand:'grip',prop:'cup'},R:REL.R}],[24.8,{L:{w:[132,252],hand:'grip',prop:'cup'},R:{w:[408,330],hand:'open'}}],[32,{L:{w:[132,252],hand:'grip',prop:'cup'},R:REL.R}],[52,{L:{w:[132,252],hand:'grip',prop:'cup'},R:{w:[286,178],hand:'open'}}],[56,{L:{w:[132,252],hand:'grip',prop:'cup'},R:REL.R}],[80,{L:{w:[150,350],hand:'grip',prop:'cup'},R:{w:[300,300],hand:'open'}}],[93,{L:{w:[206,250],hand:'open'},R:{w:[300,250],hand:'open'}}],[105,{L:{w:[206,250],hand:'open'},R:{w:[424,210],hand:'open'}}]],
+ marta:[[0,{L:{w:[262,332],hand:'relax'},R:{w:[238,336],hand:'relax'}}],[37,REL],[60,{L:{w:[262,332],hand:'relax'},R:{w:[238,336],hand:'relax'}}],[78,{L:REL.L,R:{w:[424,206],hand:'open'}}],[93,{L:{w:[214,208],hand:'open'},R:{w:[286,208],hand:'open'}}],[109,{L:{w:[214,208],hand:'open'},R:{w:[350,262],hand:'open'}}]],
+ lucia:[[0,{L:REL.L,R:{w:[364,254],hand:'grip',prop:'cup'}}],[45,{L:{w:[116,300],hand:'open'},R:{w:[364,254],hand:'grip',prop:'cup'}}],[67.5,{L:REL.L,R:{w:[372,330],hand:'grip',prop:'cup'}}],[80,{L:{w:[214,206],hand:'open'},R:{w:[286,206],hand:'open'}}]]};
+function kfAt(arr,t){let i=0;while(i+1<arr.length&&arr[i+1][0]<=t)i++;const cur=arr[i][1],prev=i>0?arr[i-1][1]:cur;const u=sm((t-arr[i][0])/.55);const out={};for(const s of ['L','R']){const a=prev[s],b=cur[s];out[s]={w:[lerp(a.w[0],b.w[0],u),lerp(a.w[1],b.w[1],u)],hand:u>.3?b.hand:a.hand,prop:u>.3?b.prop:a.prop}}return out}
+function exprAt(arr,t){let e=arr[0][1];for(const [ti,ex] of arr)if(t>=ti)e=ex;return e}
+function blinkAt(seed,t){const per=3.1;const k=Math.floor(t/per+seed);const jit=((Math.sin(k*12.9898+seed*78.2)*43758.5453)%1+1)%1;const t0=(k-seed)*per+jit*1.2;const d=t-t0;return d>=0&&d<.14?Math.sin(d/.14*Math.PI):0}
+function look(who,t){const sp=speakerAt(t);const mx=POSX[who];if(t>78.4&&t<83&&who!=='x')return[.9,-.6];if(t>100&&t<104.8)return[.4,-.7];if(t>112.4&&t<117)return[.5,-.6];if(sp&&sp.who!=='Tomas'&&WHOKEY[sp.who]!==who)return[clamp((POSX[WHOKEY[sp.who]]-mx)/500,-1,1),.1];return[0,.15]}
+function charSVG(who,t,shock){const st=CAST[who];const pose=kfAt(KF[who],t);const sp=speakerAt(t);const talk=sp&&WHOKEY[sp.who]===who?clamp((sp.env[Math.floor((t-sp.t0)*FPS)]||0)*1.7):0;
+ const idx=Object.keys(POSX).indexOf(who);const bl=blinkAt(idx*.37,t);const lk=look(who,t);
+ const br=Math.sin(t*1.9+idx);const fear=t>78?1.6:0.8;const sway=Math.sin(t*.8+idx*2)*.8+(t>78?Math.sin(t*9+idx)*.5*quakeLvl(t):0);
+ for(const s of ['L','R']){pose[s].w=[pose[s].w[0]+Math.sin(t*1.3+idx+(s==='L'?0:2))*2.5,pose[s].w[1]+Math.sin(t*1.7+idx*3)*2.5+(t>78?Math.sin(t*14+idx)*2*quakeLvl(t):0)]}
+ const ex=exprAt(EXPR[who],t);
+ pose.expr=ex;pose.blink=bl;pose.look=lk;pose.talk=talk;pose.breath=br;pose.head={rot:lk[0]*3+Math.sin(t*.9+idx)*1.6+(talk>.2?Math.sin(t*9+idx)*1.2:0),dx:lk[0]*3,dy:Math.sin(t*1.9+idx)*1.2};
+ const s=1.5,x=POSX[who],fy=1500;
+ return `<ellipse cx="${x}" cy="${fy+10}" rx="${190}" ry="${28}" fill="#000" opacity=".5"/><g transform="translate(${x-250*s},${fy-752*s}) scale(${s}) rotate(${sway.toFixed(2)} 250 752)">${body(st,pose)}</g>`}
+// ---- overlays
+function wrap(txt,max){const w=txt.split(' ');const out=[];let cur='';for(const x of w){if((cur+' '+x).trim().length>max){out.push(cur.trim());cur=x}else cur+=' '+x}out.push(cur.trim());return out}
+function caption(t){const sp=speakerAt(t);if(!sp)return'';const lines=wrap(sp.text.replace(/\.\.\./g,'…'),24);const fs=lines.length>2?50:56;let s='';const y0=1560-(lines.length-1)*34;lines.forEach((l,i)=>{s+=`<text x="540" y="${y0+i*(fs+10)}" text-anchor="middle" font-family="Inter" font-weight="800" font-size="${fs}" fill="#fff" stroke="#000" stroke-width="10" paint-order="stroke" stroke-linejoin="round">${l.replace(/&/g,'&amp;')}</text>`});
+ return `<text x="540" y="${y0-fs-14}" text-anchor="middle" font-family="Inter" font-weight="800" font-size="30" letter-spacing="4" fill="#ffd54a" stroke="#000" stroke-width="7" paint-order="stroke">${NAMES[sp.who]}</text>`+s}
+function hud(t){const el=Math.max(0,t-10);const hh=String(Math.floor(el/3600)).padStart(2,'0'),mm=String(Math.floor(el/60)%60).padStart(2,'0'),ss=String(Math.floor(el)%60).padStart(2,'0');const on=Math.floor(t*1.6)%2===0;
+ return `<g font-family="DejaVu Sans Mono" fill="#fff" stroke="#000" stroke-width="5" paint-order="stroke"><circle cx="86" cy="96" r="15" fill="#ff2222" opacity="${on?1:.12}" stroke="none"/><text x="116" y="108" font-size="38" font-weight="700">REC</text><text x="760" y="108" font-size="36">${hh}:${mm}:${ss}</text><text x="70" y="1780" font-size="32">SEP 18 2025  22:14</text><text x="800" y="1780" font-size="32">SP ▮▮▮▯</text></g><g stroke="#fff" stroke-width="4" fill="none" opacity=".75"><path d="M50,50h60M50,50v60M1030,50h-60M1030,50v60M50,1870h60M50,1870v-60M1030,1870h-60M1030,1870v-60"/><path d="M510,960h60M540,930v60" opacity=".5"/></g>`}
+const rng=s=>{let x=s>>>0;return()=>(x=(x*1664525+1013904223)>>>0)/4294967296};
+function glitch(inner,t,amt){const r=rng(Math.floor(t*30)*7919);const dx=(r()-.5)*70*amt;let s=`<g transform="translate(${dx.toFixed(0)},0)">${inner}</g>`;const cols=['#ff2a3a','#2af0ff','#ffffff','#ff2a3a'];for(let i=0;i<Math.round(3+amt*6);i++){const y=Math.floor(r()*(H-60)),h=6+Math.floor(r()*40*amt+4);s+=`<rect x="0" y="${y}" width="${W}" height="${h}" fill="${cols[i%4]}" fill-opacity="${(.15+r()*.35).toFixed(2)}"/>`;if(r()<.5)s+=`<rect x="${Math.floor(r()*500)}" y="${y+h}" width="${Math.floor(200+r()*500)}" height="${Math.floor(3+r()*10)}" fill="#fff" fill-opacity="${(.3+r()*.4).toFixed(2)}"/>`}return s}
+// ---- special scenes
+function hook(t){const sh=(n)=>(Math.sin(t*61*n)+Math.sin(t*37*n+1))*18;const st=CAST.lucia;const pose={...REL,L:{w:[212,206],hand:'open'},R:{w:[288,206],hand:'open'},expr:'surprise',talk:.55+.45*Math.sin(t*28),blink:0,look:[0,0],head:{rot:0}};
+ const flash=t>2.05?1:Math.max(0,Math.sin(t*34))*.35;
+ return `<rect width="${W}" height="${H}" fill="#2a0c06"/><circle cx="${300+sh(.3)}" cy="500" r="480" fill="url(#glowO)"/><g transform="translate(${W-120},0)">${giantLeg(t,0).replace(/translate\(0,/,'translate(0,')}</g><g transform="translate(${540+sh(1)},${900+sh(2)}) rotate(${16+sh(.4)*.2}) translate(-1125,-700) scale(4.5)">${body(st,pose).replace(/<g transform="translate\([^"]*\) scale/,'<g transform="scale')}</g><rect width="${W}" height="${H}" fill="#ff3a1a" opacity="${(.12+.1*Math.sin(t*40)).toFixed(2)}"/><rect width="${W}" height="${H}" fill="#fff" opacity="${flash.toFixed(2)}"/>`}
+function typeText(lines,t,t0,cps){let s='';let n=Math.floor((t-t0)*cps);lines.forEach((l,i)=>{const k=clamp(n,0,l.length);n-=l.length+4;s+=`<text x="90" y="${820+i*74}" font-family="DejaVu Sans Mono" font-size="${i===0?50:40}" fill="${i===0?'#fff':'#c9d1d9'}" font-weight="${i===0?700:400}">${l.slice(0,k).replace(/&/g,'&amp;')}${(k<l.length&&k>0)||(i===lines.length-1&&Math.floor(t*2)%2===0)?'▌':''}</text>`});return s}
+function intro(t){const fl=Math.random()<0?0:(Math.sin(t*50)>.9?.5:1);return `<rect width="${W}" height="${H}" fill="#05070a"/>`+typeText(['MATERIAL RECUPERADO','CÁMARA DIGITAL · CINTA 1','ZONA RESTRINGIDA — SECTOR NORTE','ESTADO: SIN VERIFICAR'],t,3.2,34)+`<g opacity=".25">${Array.from({length:30},(_,i)=>`<rect x="0" y="${i*64}" width="${W}" height="2" fill="#fff"/>`).join('')}</g>`}
+function title(t){const u=t-7;const fl=u<.4?(Math.sin(u*90)>0?1:.2):1;const g=(u>.3&&u<.55)||(u>2.3)?10:2;return `<rect width="${W}" height="${H}" fill="#05070a"/><g opacity="${fl}"><text x="${540-g}" y="900" text-anchor="middle" font-family="Inter" font-weight="900" font-size="64" letter-spacing="14" fill="#ff2a3a" opacity=".7">CAPÍTULO 1</text><text x="${540+g}" y="900" text-anchor="middle" font-family="Inter" font-weight="900" font-size="64" letter-spacing="14" fill="#2af0ff" opacity=".6">CAPÍTULO 1</text><text x="540" y="900" text-anchor="middle" font-family="Inter" font-weight="900" font-size="64" letter-spacing="14" fill="#fff">CAPÍTULO 1</text><rect x="470" y="935" width="140" height="6" fill="#ff2a3a"/><text x="540" y="1090" text-anchor="middle" font-family="Inter" font-weight="900" font-size="150" letter-spacing="8" fill="#fff" stroke="#000" stroke-width="3">LA NOCHE</text></g>`}
+function endcard(t){const u=t-122.4;const fade=clamp(u/.6);return `<rect width="${W}" height="${H}" fill="#05070a"/><g opacity="${fade}"><text x="540" y="520" text-anchor="middle" font-family="DejaVu Sans Mono" font-size="40" fill="#9aa4ae">// CINTA 1 — FIN DEL REGISTRO</text><text x="540" y="700" text-anchor="middle" font-family="Inter" font-weight="900" font-size="58" fill="#ff2a3a" letter-spacing="6">PRÓXIMO CAPÍTULO</text><text x="540" y="800" text-anchor="middle" font-family="Inter" font-weight="900" font-size="56" fill="#fff">CAPÍTULO 2 | LAS ESCALERAS</text>${u>2?`<text x="540" y="1000" text-anchor="middle" font-family="Inter" font-weight="800" font-size="56" fill="#ffd54a">¿QUÉ CREES QUE ES?</text><text x="540" y="1100" text-anchor="middle" font-family="Inter" font-weight="800" font-size="50" fill="#fff">A) UN EXPERIMENTO MILITAR</text><text x="540" y="1180" text-anchor="middle" font-family="Inter" font-weight="800" font-size="50" fill="#fff">B) ALGO QUE SALIÓ DEL MAR</text>`:''}${u>4?`<text x="540" y="1400" text-anchor="middle" font-family="Inter" font-weight="900" font-size="52" fill="#2af0ff">COMENTA TU ELECCIÓN</text><text x="540" y="1480" text-anchor="middle" font-family="Inter" font-weight="900" font-size="44" fill="#fff">SÍGUEME PARA EL CAPÍTULO 2</text>`:''}</g>`}
+// ---- scene
+function sceneWorld(t){const [cx,cy,z,rot]=camera(t);const a=shakeAmp(t);const sx=nz(t,1)*a+nz(t,2.3)*a*.5,sy=nz(t+5,1.2)*a*.8,sr=nz(t+9,.9)*a*.04;
+ const q=quakeLvl(t);
+ const dark=t<T_BLACKOUT?0:sm((t-T_BLACKOUT)/2.5)*.34;
+ let w=`<g transform="translate(${(540+sx).toFixed(1)},${(960+sy).toFixed(1)}) rotate(${(rot+sr).toFixed(2)}) scale(${z.toFixed(3)}) translate(${-cx.toFixed(1)},${-cy.toFixed(1)})">`;
+ const SK=(process.env.SKIP||'').split(',');if(!SK.includes('bd'))w+=backdrop(t,cx,cy);if(!SK.includes('rf'))w+=rooftop(t,cx,cy,q);
+ const rr=(rot+sr)*Math.PI/180,cs=Math.cos(rr),sn=Math.sin(rr);const cor=[[-540,-960],[540,-960],[540,960],[-540,960]].map(([px,py])=>[cx+(px*cs+py*sn)/z,cy+(-px*sn+py*cs)/z]);const vx0=Math.min(...cor.map(c=>c[0])),vx1=Math.max(...cor.map(c=>c[0])),vy0=Math.min(...cor.map(c=>c[1])),vy1=Math.max(...cor.map(c=>c[1]));
+ Object.keys(POSX).forEach(k=>{if(SK.includes(k))return;const x=POSX[k];if(x+300<vx0||x-300>vx1||1580<vy0||280>vy1)return;w+=charSVG(k,t,q)});
+ w+=`<rect x="-3500" y="-3000" width="9000" height="6000" fill="#050a1e" opacity="${dark.toFixed(2)}"/>`;
+ const fire=t>80.4?.18*sm((t-80.4)/3)*(1+.2*Math.sin(t*19)):0;w+=`<rect x="-3500" y="-3000" width="9000" height="6000" fill="#ff5a1a" opacity="${fire.toFixed(3)}"/>`;
+ w+=`</g>`;
+ // flashes
+ let fl=0;for(const ft of [80.0,91.7,119.5]){if(t>=ft&&t<ft+.5)fl=Math.max(fl,Math.exp(-(t-ft)/.12)*.95)}
+ if(t>=67.0&&t<67.12)fl=Math.max(fl,0);
+ w+=`<rect width="${W}" height="${H}" fill="#fff6e0" opacity="${fl.toFixed(2)}"/>`;
+ if(t>116){const d=sm((t-116)/5.3);w+=`<rect width="${W}" height="${H}" fill="#9a8a78" opacity="${(d*.8).toFixed(2)}"/>`+Array.from({length:6},(_,i)=>`<circle cx="${(i*260+((t*90)%260)).toFixed(0)}" cy="${(700+i*180+Math.sin(t*2+i)*60).toFixed(0)}" r="${(220+d*300).toFixed(0)}" fill="#c4b4a0" opacity="${(d*.35).toFixed(2)}"/>`).join('')}
+ return w}
+function fixOp(s){return s.replace(/<([a-zA-Z]+)((?:[^>"]|"[^"]*")*?) opacity="([^"]*)"((?:[^>"]|"[^"]*")*)>/g,(m,tag,a,o,b)=>{let self='';if(b.endsWith('/')){b=b.slice(0,-1);self='/'}const all=a+b;const hasStroke=/ stroke="/.test(all)&&!/ stroke="none"/.test(all);const hasFill=!/ fill="none"/.test(all);let ex;if(tag==='g'||tag==='text')ex=`fill-opacity="${o}" stroke-opacity="${o}"`;else{ex='';if(hasFill)ex+=`fill-opacity="${o}" `;if(hasStroke)ex+=`stroke-opacity="${o}"`;if(!ex)ex=`fill-opacity="${o}"`}return `<${tag}${a}${b} ${ex}${self}>`})}
+export function frame(t){let inner,hudOn=false;
+ if(t<2.4)inner=hook(t);else if(t<3.2)inner=`<rect width="${W}" height="${H}" fill="#000"/>`;else if(t<7)inner=intro(t);else if(t<10)inner=title(t);
+ else if(t<122.0){inner=sceneWorld(t);hudOn=true}
+ else if(t<122.4)inner=`<rect width="${W}" height="${H}" fill="#000"/>`;else inner=endcard(t);
+ let g=0;if(t>=10&&t<10.25)g=.6;if(t>=66.95&&t<67.2)g=.7;if(t>=119.3&&t<122)g=clamp((t-119.3)/2.5)*.9+.2;if(t>=2.0&&t<2.4)g=.8;
+ if(t>=121.2&&t<122)inner=`<rect width="${W}" height="${H}" fill="#000"/>`;
+ let out=g>0?glitch(inner,t,g):inner;
+ if(hudOn&&!(t>=121.2))out+=hud(t)+caption(t);
+ return fixOp(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${defsScene}${defs(CAST.beto)}${out}</svg>`)}
+function renderPng(t){return new Resvg(frame(t),{font:{loadSystemFonts:true,defaultFontFamily:'Inter'},fitTo:{mode:'original'}}).render()}
+if(process.argv[1]===fileURLToPath(import.meta.url)){
+ const mode=process.argv[2];
+ if(mode==='preview'){for(const a of process.argv.slice(3)){const t=parseFloat(a);const t0=Date.now();fs.writeFileSync(path.join(BUILD,`prev_${a}.png`),renderPng(t).asPng());console.log(a,Date.now()-t0,'ms')}}
+ else if(mode==='part'){const i=+process.argv[3],n=+process.argv[4];const total=DUR*FPS;const a=Math.floor(total*i/n),b=Math.floor(total*(i+1)/n);
+  const ff=spawn('ffmpeg',['-y','-v','error','-f','rawvideo','-pix_fmt','rgba','-s',`${W}x${H}`,'-r',String(FPS),'-i','-','-vf','gblur=sigma=0.7,eq=contrast=1.07:saturation=1.08,rgbashift=rh=-2:bh=2,noise=alls=11:allf=t,vignette=angle=PI/4.2','-c:v','libx264','-preset','veryfast','-crf','18','-pix_fmt','yuv420p',path.join(BUILD,`part_${i}.mp4`)],{stdio:['pipe','inherit','inherit']});
+  (async()=>{for(let f=a;f<b;f++){if(process.env.DBG)console.error("f",f);const px=renderPng(f/FPS).pixels;if(!ff.stdin.write(Buffer.from(px.buffer,px.byteOffset,px.length)))await new Promise(r=>ff.stdin.once('drain',r));if((f-a)%90===0)console.error('part',i,f-a,'/',b-a)}ff.stdin.end()})()}
+}

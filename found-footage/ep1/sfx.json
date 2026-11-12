@@ -1,0 +1,17 @@
+{
+"amb_party":["rooftop party at night, distant city traffic, muffled bass music from a speaker, faint crowd chatter",20],
+"toast":["glass bottles and plastic cups clinking in a toast, people cheering",3],
+"blackout":["power outage, electric hum powering down, speaker music abruptly cutting off with a thunk, then silence",3],
+"rumble":["deep low frequency ground tremor rumble, glasses rattling, building shaking",10],
+"boom_far":["distant massive explosion with delayed rolling boom echoing over a city at night",6],
+"roar":["giant monster roar, extremely deep distorted, echoing across a city, close then far",7],
+"alarms":["many car alarms and distant sirens across a city at night, faint screams far away",12],
+"collapse":["huge building collapsing, concrete debris crumbling, rumbling wall of dust",9],
+"handling":["handheld camcorder microphone handling noise, rustling fabric",5],
+"rec_beep":["camera record start beep and click",2],
+"hit":["cinematic sub bass impact hit, deep boom with long tail",4],
+"riser":["cinematic tension riser building up, dark",8],
+"glitch":["digital video tape glitch static burst",2],
+"wind":["strong night wind on a rooftop",12],
+"fire":["distant fire crackling and burning, low rumble",12]
+}
