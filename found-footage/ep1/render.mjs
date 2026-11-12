@@ -13,34 +13,41 @@ const NAMES={Tomas:'TOMÁS (cámara)',Beto:'BETO',Diego:'DIEGO',Marta:'MARTA',Lu
 const POSX={beto:700,diego:1100,marta:1500,lucia:1900};
 const WHOKEY={Beto:'beto',Diego:'diego',Marta:'marta',Lucia:'lucia'};
 // ---- envelopes
-function envelope(id){const r=spawnSync('ffmpeg',['-v','error','-i',path.join(BUILD,'voz_c',id+'.mp3'),'-f','s16le','-ac','1','-ar','8000','-'],{maxBuffer:1e8});const b=r.stdout;const n=Math.floor(b.length/2);const hop=Math.round(8000/FPS);const out=[];let mx=1e-6;for(let i=0;i+hop<=n;i+=hop){let s=0;for(let j=0;j<hop;j++){const v=b.readInt16LE((i+j)*2)/32768;s+=v*v}const e=Math.sqrt(s/hop);out.push(e);mx=Math.max(mx,e)}const nn=out.map(v=>v/mx);return nn.map((v,i)=>Math.max(v,(nn[i-1]||0)*.55))}
+function envelope(id){const r=spawnSync('ffmpeg',['-v','error','-i',path.join(BUILD,'voz_e_t',id+'.mp3'),'-f','s16le','-ac','1','-ar','8000','-'],{maxBuffer:1e8});const b=r.stdout;const n=Math.floor(b.length/2);const hop=Math.round(8000/FPS);const out=[];let mx=1e-6;for(let i=0;i+hop<=n;i+=hop){let s=0;for(let j=0;j<hop;j++){const v=b.readInt16LE((i+j)*2)/32768;s+=v*v}const e=Math.sqrt(s/hop);out.push(e);mx=Math.max(mx,e)}const nn=out.map(v=>v/mx);return nn.map((v,i)=>Math.max(v,(nn[i-1]||0)*.55))}
 const LINES=script.map(l=>({...l,t0:START[l.id],env:envelope(l.id)}));LINES.forEach(l=>l.dur=l.env.length/FPS);
 function speakerAt(t){return LINES.find(l=>t>=l.t0&&t<l.t0+l.dur+.15)}
 // ---- camera
-const SHOTS=[[10.0,900,1500,1.0,6,'s',0],[11.0,800,1150,.95,-1,'p',0],
- [Ls('l1')+.6,1100,900,1.1,0,'p',0],
- [Ls('l2')-.2,1100,700,1.8,1,'s',0],[Ls('l2')+2.6,1100,620,2.2,0,'p',0],
- [Ls('l3')-.3,1500,780,1.6,-2,'s',-2],[Ls('l3')+1.8,1500,690,2.2,1,'p',0],
- [Ls('l4')-.2,700,780,1.6,2,'s',2],
- [Ls('l5')-.5,1900,800,1.5,3,'s',-3],[Ls('l5')+2.0,2500,1000,.9,-3,'w',0],
- [Ls('l6')-.3,1500,960,.8,0,'s',0],[EVT.birds,1400,480,.7,4,'s',0],
- [Ls('l7')-.3,1100,720,1.9,-2,'s',3],[Ls('l7')+2.5,1100,640,2.3,0,'p',0],
- [Ls('l8')-.3,1500,700,2.1,2,'s',0],
- [Ls('l9')-.4,700,760,1.7,-3,'s',0],[EVT.flick0+3,700,360,1.0,4,'n',0],
- [Ls('l10')-.3,1900,760,1.8,3,'s',-2],[Ls('l10')+1.2,1500,900,.62,2,'s',0],
+const SHOTS=[[10.0,900,1500,1.0,6,'s',0],[10.4,800,1100,.8,-1,'s',0],
+ [Ls('l1')+.5,1100,900,1.0,0,'s',0],
+ [Ls('l2')-.1,700,780,1.6,2,'n',2],
+ [Ls('l3')-.1,1100,740,1.8,-2,'n',0],
+ [Ls('l4')-.1,1500,740,1.8,2,'n',-2],
+ [Ls('l5')-.1,1100,660,2.1,-1,'n',0],
+ [Ls('a1')-.1,1500,700,1.9,1,'n',2],
+ [Ls('a2')-.1,900,1300,1.0,6,'n',0],[Ls('a2')+1.6,1900,800,1.5,-2,'s',0],
+ [Ls('a3')-.1,1900,680,2.0,2,'n',-2],
+ [Ls('l6')-.1,1900,760,1.5,3,'n',-3],[Ls('l6')+1.2,1800,1050,.8,0,'s',0],
+ [Ls('l7')-.1,1900,700,1.8,-2,'s',0],
+ [Ls('l8')-.1,1900,610,2.2,0,'s',2],[Ls('l8')+3,1900,590,2.5,2,'p',0],
+ [Ls('l9')-.1,1100,620,2.3,-2,'n',0],[Ls('l9')+2.5,1100,590,2.6,0,'p',0],
+ [Ls('l10')-.2,700,780,1.6,0,'n',0],[Ls('l10')+2.0,1300,980,.75,2,'s',0],
+ [EVT.tB-.2,1300,980,.72,0,'s',0],[EVT.tB+.5,1300,850,.62,5,'w',0],
+ [Ls('l11')-.1,1900,760,1.7,-3,'n',0],
+ [Ls('l12')-.1,1500,720,1.9,2,'n',0],
  [EVT.rumble0,1300,1000,.7,-2,'s',0],
- [EVT.flash1-.3,2300,880,.75,-3,'n',0],[EVT.boom1+.5,2300,780,1.0,2,'z',0],
- [Ls('l11')-.2,1500,700,1.9,0,'s',0],
- [Ls('l12')-.2,1100,660,2.1,-2,'s',0],[Ls('l12')+2.8,1100,1250,1.2,0,'s',0],
+ [EVT.flash1-.3,2300,880,.75,-3,'n',0],[EVT.boom1+.4,2300,780,1.0,2,'z',0],
+ [Ls('l13')-.1,1100,660,2.0,0,'n',0],
+ [Ls('l14')-.1,1500,700,1.9,2,'n',0],
+ [Ls('l15')-.1,1500,610,2.3,0,'z',0],
  [EVT.flash2-.2,1300,880,.7,-4,'n',0],
- [Ls('l13')-.2,1900,620,2.2,3,'s',2],
- [Ls('l14')-.2,700,640,2.0,-3,'n',0],
- [EVT.roar-.2,1300,820,.62,5,'w',0],[EVT.roar+2.2,1300,500,.6,2,'s',0],
- [Ls('l15')-.3,1100,640,2.1,-2,'s',3],[Ls('l15')+3.0,1100,600,2.6,0,'p',0],
- [Ls('l16')-.2,1500,640,2.0,2,'n',-2],
- [Ls('l17')-.2,1300,780,.6,3,'n',0],
+ [Ls('l16')-.1,1900,620,2.2,3,'n',0],
+ [Ls('l17')-.1,700,640,2.0,-3,'n',0],
+ [EVT.roar-.2,1300,820,.62,5,'w',0],[EVT.roar+2.0,1300,500,.6,2,'s',0],
+ [Ls('l18')-.2,1100,640,2.1,-2,'s',3],[Ls('l18')+3,1100,600,2.6,0,'p',0],
+ [Ls('l19')-.1,1500,640,2.0,2,'n',-2],
+ [Ls('l20')-.1,1300,780,.6,3,'n',0],
  [EVT.collapse+.3,1500,760,.6,-6,'w',0],
- [Ls('l18')-.1,1900,620,2.0,-4,'w',3],
+ [Ls('l21')-.1,1900,620,2.0,-4,'w',3],
  [EVT.impact-.2,1300,700,.6,2,'w',0],[EVT.fall,1300,1500,.8,78,'w',0]];
 SHOTS.sort((x,y)=>x[0]-y[0]);
 const MODE={s:[3.2,.92],n:[8,.72],w:[16,.5],c:[55,.9],p:[2.4,.95],z:[12,.6]};
@@ -56,38 +63,45 @@ const WHOL=['beto','diego','marta','lucia'];
 const A=(a,b,c,d)=>({beto:a,diego:b,marta:c,lucia:d});
 const EXL={
  l0:A('neutral','neutral','neutral','neutral'),
- l1:A('neutral','tender','worry','tender'),
- l2:A('tender',[[0,'sad'],[.6,'tender']],'tender','tender'),
- l3:A('annoyed','worry','worry','worry'),
- l4:A([[0,'annoyed'],[.7,'worry']],'worry','annoyed','worry'),
- l5:A('worry','worry','worry',[[0,'worry'],[.6,'fear']]),
- l6:A('disbelief','worry','worry','fear'),
- l7:A('worry',[[0,'worry'],[.6,'fear']],'worry','fear'),
- l8:A('worry','fear',[[0,'annoyed'],[.6,'fear']],'fear'),
- l9:A('fear','fear','fear','fear'),
- l10:A('fear','shock','fear','fear'),
- l11:A('shock','fear','shock','fear'),
- l12:A('fear','fear','fear','fear'),
- l13:A('fear','fear','fear','fear'),
- l14:A('scream','fear','fear','fear'),
- l15:A('shock','shock','shock','shock'),
- l16:A('fear','fear','scream','fear'),
- l17:A('fear','fear','fear','fear'),
- l18:A('shock','shock','shock','scream')};
-function exprNew(who,tn){const idx=WHOL.indexOf(who);let ex=tn<START.l1?'tender':'neutral';if(tn<START.l1)return ex;
+ l1:A('amused','smirk','annoyed','amused'),
+ l2:A('laugh','annoyed','smirk','amused'),
+ l3:A('laugh',[[0,'worry'],[.6,'tender']],'smirk','laugh'),
+ l4:A('neutral','tender',[[0,'annoyed'],[.7,'sad']],'tender'),
+ l5:A('amused','smirk','annoyed','tender'),
+ a1:A('amused','smirk','smirk','tender'),
+ a2:A('laugh','amused','smirk','amused'),
+ a3:A('amused','amused','laugh',[[0,'disbelief'],[.6,'smirk']]),
+ l6:A('amused','neutral','neutral','amused'),
+ l7:A('amused','amused','amused','worry'),
+ l8:A('amused',[[0,'amused'],[.6,'tender'],[.9,'sad']],[[0,'amused'],[.7,'tender']],[[0,'worry'],[.5,'tender']]),
+ l9:A('amused','cryLaugh','tender','tender'),
+ l10:A('laugh','amused','laugh','laugh'),
+ l11:A('disbelief','neutral','neutral','worry'),
+ l12:A('worry','worry','worry','worry'),
+ l13:A('worry','worry','worry','worry'),
+ l14:A('worry','worry','worry','fear'),
+ l15:A('fear','fear','fear','fear'),
+ l16:A('fear','shock','fear','fear'),
+ l17:A('scream','fear','fear','fear'),
+ l18:A('shock','shock','shock','shock'),
+ l19:A('fear','fear','scream','fear'),
+ l20:A('fear','fear','fear','fear'),
+ l21:A('shock','shock','shock','scream')};
+function exprNew(who,tn){const idx=WHOL.indexOf(who);let ex='amused';if(tn<START.l1)return ex;
  for(const l of LINES){const spk=WHOKEY[l.who]===who;const t0=l.t0+(spk?0:.25+.12*idx);if(tn<t0)break;const en=EXL[l.id][who];if(Array.isArray(en)){for(const [fr,e] of en)if(tn>=t0+fr*l.dur)ex=e}else ex=en}
- if(tn>Le('l18')+2.6)ex='shock';return ex}
+ if(tn>Le('l21')+2.6)ex='shock';return ex}
 const HEADROT={laugh:-7,cryLaugh:-6,sad:4,worry:2,tender:3,annoyed:-2,fear:-2,shock:-3,scream:-4,smirk:2,disbelief:-3};
 const REL={L:{w:[146,422],hand:'relax'},R:{w:[354,422],hand:'relax'}};
 const CUPR={w:[352,326],hand:'grip',prop:'cup',fs:.55,rot:4},CUPL={w:[152,330],hand:'grip',prop:'cup',fs:.55,rot:-4};
-const MOUTH=(f)=>({L:{e:[168,332],w:[224,238],hand:'open',front:1},R:{e:[332,332],w:[276,238],hand:'open',front:1}});
+const MOUTH=()=>({L:{e:[168,332],w:[224,238],hand:'open',front:1},R:{e:[332,332],w:[276,238],hand:'open',front:1}});
 const DEF2={L:{e:[118,322],w:[134,214],hand:'open'},R:{e:[382,322],w:[366,214],hand:'open'}};
 const CLUTCH={L:{e:[116,290],w:[160,168],hand:'open',front:1},R:{e:[384,290],w:[340,168],hand:'open',front:1}};
+const CUPUPR=(y)=>({w:[404,y],hand:'grip',prop:'cup',rot:8});
 const KF={
- beto:[[0,{L:REL.L,R:CUPR}],[Ls('l4'),{L:{w:[132,330],hand:'open'},R:CUPR}],[Le('l4')+.5,{L:REL.L,R:CUPR}],[Ls('l9'),{L:{w:[206,300],hand:'open'},R:{w:[294,300],hand:'open'}}],[EVT.boom2-.5,DEF2],[EVT.roar,CLUTCH]],
- diego:[[0,{L:CUPL,R:REL.R}],[Ls('l2')+1.5,{L:CUPL,R:{e:[332,332],w:[282,238],hand:'open',front:1}}],[Ls('l2')+3.8,{L:CUPL,R:REL.R}],[Ls('l7'),{L:CUPL,R:{w:[390,320],hand:'open'}}],[Le('l7'),{L:CUPL,R:REL.R}],[EVT.tB,REL],[EVT.boom2-.3,MOUTH()],[Ls('l15')+1,{L:MOUTH().L,R:{w:[452,200],hand:'point'}}]],
- marta:[[0,{L:{w:[262,332],hand:'relax'},R:{w:[352,286],hand:'grip',prop:'phone',fs:.55,rot:3}}],[EVT.tB,{L:{w:[262,332],hand:'relax'},R:{w:[360,330],hand:'grip',prop:'phone',fs:.55,rot:5}}],[EVT.boom1+.2,MOUTH()],[Ls('l16'),{L:MOUTH().L,R:{w:[350,262],hand:'open'}}]],
- lucia:[[0,{L:REL.L,R:{w:[364,254],hand:'grip',prop:'cup'}}],[Ls('l5'),{L:{w:[236,322],hand:'open'},R:{w:[364,254],hand:'grip',prop:'cup'}}],[EVT.tB-1,{L:REL.L,R:CUPR}],[Ls('l10')+1,MOUTH()],[EVT.boom2-.3,CLUTCH]]};
+ beto:[[0,{L:REL.L,R:CUPR}],[Ls('l2'),{L:{w:[120,300],hand:'open'},R:{w:[398,236],hand:'grip',prop:'cup',rot:12}}],[Le('l2')+.4,{L:REL.L,R:CUPR}],[Ls('l10')-.2,{L:REL.L,R:CUPUPR(172)}],[Le('l10')+.6,{L:REL.L,R:CUPR}],[EVT.tB,{L:{w:[206,300],hand:'open'},R:CUPR}],[EVT.boom2-.5,DEF2],[EVT.roar,CLUTCH]],
+ diego:[[0,{L:CUPL,R:REL.R}],[Ls('l3'),{L:CUPL,R:{e:[332,332],w:[282,238],hand:'open',front:1}}],[Le('l3'),{L:CUPL,R:REL.R}],[Ls('l9')+1.2,{L:CUPL,R:{e:[332,332],w:[286,178],hand:'open',front:1}}],[Le('l9'),{L:CUPL,R:REL.R}],[Ls('l10')-.2,{L:{w:[96,196],hand:'grip',prop:'cup',rot:-8},R:REL.R}],[Le('l10')+.6,{L:CUPL,R:REL.R}],[EVT.tB,REL],[EVT.boom2-.3,MOUTH()],[Ls('l18')+1,{L:MOUTH().L,R:{w:[452,200],hand:'point'}}]],
+ marta:[[0,{L:REL.L,R:CUPR}],[Ls('l4'),{L:{w:[262,332],hand:'relax'},R:{w:[238,336],hand:'relax'}}],[Le('l5'),{L:REL.L,R:CUPR}],[Ls('l10')-.2,{L:REL.L,R:CUPUPR(200)}],[Le('l10')+.6,{L:REL.L,R:CUPR}],[EVT.boom1+.2,MOUTH()],[Ls('l19'),{L:MOUTH().L,R:{w:[350,262],hand:'open'}}]],
+ lucia:[[0,{L:REL.L,R:{w:[364,254],hand:'grip',prop:'cup'}}],[Ls('l8'),{L:{w:[236,322],hand:'open'},R:{w:[364,254],hand:'grip',prop:'cup'}}],[Ls('l10')-.2,{L:REL.L,R:CUPUPR(196)}],[Le('l10')+.6,{L:REL.L,R:{w:[364,254],hand:'grip',prop:'cup'}}],[EVT.tB,{L:REL.L,R:CUPR}],[Ls('l16'),MOUTH()],[EVT.boom2-.3,CLUTCH]]};
 const SH={L:[186,240],R:[314,240]};
 const ease=x=>{x=clamp(x);const c1=1.1,c3=c1+1;return 1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2)};
 function polar(sh,a,b,u){const ra=Math.hypot(a[0]-sh[0],a[1]-sh[1]),rb=Math.hypot(b[0]-sh[0],b[1]-sh[1]);let ta=Math.atan2(a[1]-sh[1],a[0]-sh[0]),tb=Math.atan2(b[1]-sh[1],b[0]-sh[0]);let d=tb-ta;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;const th=ta+d*u,rr=ra+(rb-ra)*u;return[sh[0]+Math.cos(th)*rr,sh[1]+Math.sin(th)*rr]}
@@ -95,7 +109,7 @@ function kfAt(arr,t){let i=0;while(i+1<arr.length&&arr[i+1][0]<=t)i++;const cur=
  if(a.e||b.e){const ea=a.e||elbow(SH[s],a.w,side,a.fs||1),eb=b.e||elbow(SH[s],b.w,side,b.fs||1);out[s].e=polar(SH[s],ea,eb,u)}}return out}
 function exprAt(arr,t){let e=arr[0][1];for(const [ti,ex] of arr)if(t>=ti)e=ex;return e}
 function blinkAt(seed,t){const per=3.1;const k=Math.floor(t/per+seed);const jit=((Math.sin(k*12.9898+seed*78.2)*43758.5453)%1+1)%1;const t0=(k-seed)*per+jit*1.2;const d=t-t0;return d>=0&&d<.14?Math.sin(d/.14*Math.PI):0}
-function look(who,t,tn){const sp=speakerAt(tn);const mx=POSX[who];if(t>EVT.flash1-.5&&t<EVT.boom1+3)return[.9,-.6];if(t>EVT.birds&&t<EVT.birds+4)return[.1,-.9];if(t>EVT.roar&&t<Ls('l15'))return[.4,-.7];if(t>Ls('l17')&&t<EVT.impact)return[.5,-.6];if(sp&&sp.who!=='Tomas'&&WHOKEY[sp.who]!==who)return[clamp((POSX[WHOKEY[sp.who]]-mx)/500,-1,1),.1];return[0,.15]}
+function look(who,t,tn){const sp=speakerAt(tn);const mx=POSX[who];if(t>EVT.flash1-.5&&t<EVT.boom1+3)return[.9,-.6];if(t>EVT.roar&&t<Ls('l18'))return[.4,-.7];if(t>Ls('l20')&&t<EVT.impact)return[.5,-.6];if(sp&&sp.who!=='Tomas'&&WHOKEY[sp.who]!==who)return[clamp((POSX[WHOKEY[sp.who]]-mx)/500,-1,1),.1];return[0,.15]}
 function charSVG(who,t,shock,tn){const st=CAST[who];const pose=kfAt(KF[who],t);const sp=speakerAt(tn);const talk=sp&&WHOKEY[sp.who]===who?clamp((sp.env[Math.floor((tn-sp.t0)*FPS)]||0)*1.7):0;
  const idx=Object.keys(POSX).indexOf(who);const bl=blinkAt(idx*.37,t);const lk=look(who,t,tn);
  const br=Math.sin(t*1.9+idx);const fear=t>78?1.6:0.8;const sway=Math.sin(t*.8+idx*2)*.8+(t>78?Math.sin(t*9+idx)*.5*quakeLvl(t):0);

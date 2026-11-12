@@ -8,107 +8,143 @@
 {
 "id": "l1",
 "who": "Tomas",
-"text": "Última noche de Diego en la ciudad. Diego, dile algo a la cámara.",
-"say": "[softly] Última noche de Diego en la ciudad. Diego... dile algo a la cámara."
+"text": "¿Ya graba? A ver, listo. Última noche de Diego en la ciudad. Diego, dile algo a la cámara.",
+"say": "[warmly] ¿Ya graba? A ver, listo. Última noche de Diego en la ciudad. Diego, dile algo a la cámara."
 },
 {
 "id": "l2",
-"who": "Diego",
-"text": "Mañana a esta hora ya estaré lejos. Y lo raro es que... no quiero irme.",
-"say": "[quietly] Mañana a esta hora ya estaré lejos. Y lo raro es que... no quiero irme."
+"who": "Beto",
+"text": "¡Eh, Diego! ¡Que te están grabando!",
+"say": "[cheerful, shouting over music] ¡Eh, Diego! ¡Que te están grabando!"
 },
 {
 "id": "l3",
-"who": "Marta",
-"text": "Mamá no contesta desde esta mañana. Algo no está bien.",
-"say": "[worried] Mamá no contesta desde esta mañana. Algo no está bien."
+"who": "Diego",
+"text": "No, no, apaga eso. Tomás, en serio. Voy a llorar.",
+"say": "[laughing nervously] No, no, apaga eso. Tomás, en serio. Voy a llorar."
 },
 {
 "id": "l4",
-"who": "Beto",
-"text": "Siempre exageras. La gente a veces apaga el teléfono, ¿sabes?",
-"say": "[forcing calm] Siempre exageras. La gente a veces apaga el teléfono, ¿sabes?"
+"who": "Marta",
+"text": "Ya empezó el drama. Un año, Diego. Solo un año.",
+"say": "[teasing, slightly sad] Ya empezó el drama. Un año, Diego. Solo un año."
 },
 {
 "id": "l5",
+"who": "Diego",
+"text": "Un año que se va a volver cinco, ya lo sé.",
+"say": "[softly] Un año que se va a volver cinco, ya lo sé."
+},
+{
+"id": "a1",
+"who": "Marta",
+"text": "Y tú, Tomás, ¿ya le dijiste a Lucía lo que me contaste?",
+"say": "[teasing, playful] Y tú, Tomás, ¿ya le dijiste a Lucía lo que me contaste?"
+},
+{
+"id": "a2",
+"who": "Tomas",
+"text": "Marta... estoy grabando. Después.",
+"say": "[embarrassed, whispering] Marta... estoy grabando. Después."
+},
+{
+"id": "a3",
 "who": "Lucia",
-"text": "Escuchen. Todos los perros de la ciudad están ladrando. Todos al mismo tiempo.",
-"say": "[uneasy] Escuchen. Todos los perros de la ciudad están ladrando. [whispers] Todos al mismo tiempo."
+"text": "¿Qué cosa? ¿Qué me tiene que decir?",
+"say": "[curious, smiling] ¿Qué cosa? ¿Qué me tiene que decir?"
 },
 {
 "id": "l6",
-"who": "Tomas",
-"text": "Y no hay un solo pájaro en los cables. Se fueron. Hace minutos.",
-"say": "[low voice] Y no hay un solo pájaro en los cables. Se fueron. Hace minutos."
+"who": "Lucia",
+"text": "Oigan, vengan, ya van a cortar el pastel.",
+"say": "[excited] Oigan, vengan, ya van a cortar el pastel."
 },
 {
 "id": "l7",
-"who": "Diego",
-"text": "Desde que subimos siento que algo nos está mirando.",
-"say": "[uneasy] Desde que subimos... siento que algo nos está mirando."
+"who": "Tomas",
+"text": "Lucía, ven. Dile algo a Diego para la cámara.",
+"say": "Lucía, ven. Dile algo a Diego para la cámara."
 },
 {
 "id": "l8",
-"who": "Marta",
-"text": "Sin señal. Ni una raya. Es como si la ciudad hubiera desaparecido.",
-"say": "[tense] Sin señal. Ni una raya. Es como si la ciudad... hubiera desaparecido."
+"who": "Lucia",
+"text": "¿Yo? Ay, no. Diego, gracias por todo. En serio. Te vamos a extrañar muchísimo.",
+"say": "[nervously] ¿Yo? Ay, no. [softly, emotional] Diego, gracias por todo. En serio. Te vamos a extrañar muchísimo."
 },
 {
 "id": "l9",
-"who": "Beto",
-"text": "¿Vieron las luces? Parpadean. Todas.",
-"say": "[nervous] ¿Vieron las luces? Parpadean. Todas."
+"who": "Diego",
+"text": "Ya, ya, me van a hacer llorar. Los quiero, ¿saben? A todos.",
+"say": "[emotional, voice cracking] Ya, ya, me van a hacer llorar. Los quiero, ¿saben? A todos."
 },
 {
 "id": "l10",
-"who": "Lucia",
-"text": "Tomás... los edificios. Se están apagando uno por uno. Viene hacia nosotros.",
-"say": "[whispers] Tomás... los edificios. Se están apagando, uno por uno. [scared] Viene hacia nosotros."
+"who": "Beto",
+"text": "¡Un brindis! Por Diego, por la ciudad, y por esta última noche.",
+"say": "[excited] ¡Un brindis! Por Diego, por la ciudad, y por esta última noche."
 },
 {
 "id": "l11",
-"who": "Marta",
-"text": "Eso no fue un rayo. Fue una explosión.",
-"say": "[tense] Eso no fue un rayo. Fue una explosión."
+"who": "Lucia",
+"text": "¿Y la música?",
+"say": "[confused] ¿Y la música?"
 },
 {
 "id": "l12",
-"who": "Diego",
-"text": "Escuchen... ese sonido. Viene de abajo. Del suelo.",
-"say": "[whispers] Escuchen... ese sonido. Viene de abajo. Del suelo."
+"who": "Marta",
+"text": "Se apagó toda la calle.",
+"say": "[uneasy] Se apagó toda la calle."
 },
 {
 "id": "l13",
-"who": "Lucia",
-"text": "Tomás, dime que estás viendo lo mismo que yo.",
-"say": "[scared] Tomás... dime que estás viendo lo mismo que yo."
+"who": "Diego",
+"text": "¿Eso fue un trueno?",
+"say": "[uneasy] ¿Eso fue un trueno?"
 },
 {
 "id": "l14",
+"who": "Tomas",
+"text": "No hay nubes. Marta, ¿viste esa luz?",
+"say": "[tense] No hay nubes. Marta, ¿viste esa luz?"
+},
+{
+"id": "l15",
+"who": "Marta",
+"text": "Sí. Eso no fue un rayo. Fue una explosión.",
+"say": "[tense] Sí. Eso no fue un rayo. Fue una explosión."
+},
+{
+"id": "l16",
+"who": "Lucia",
+"text": "Tomás... ¿qué está pasando?",
+"say": "[scared] Tomás... ¿qué está pasando?"
+},
+{
+"id": "l17",
 "who": "Beto",
 "text": "Bajemos. Ahora. ¡Ya, ya, ya!",
 "say": "[panicked] Bajemos. Ahora. ¡Ya, ya, ya!"
 },
 {
-"id": "l15",
+"id": "l18",
 "who": "Diego",
 "text": "Dios... algo se movió entre los edificios. Algo enorme.",
 "say": "[gasps] Dios... [whispers] algo se movió entre los edificios. Algo enorme."
 },
 {
-"id": "l16",
+"id": "l19",
 "who": "Marta",
 "text": "Tomás, apaga esa cámara y corre.",
 "say": "[panicked] Tomás, apaga esa cámara y ¡corre!"
 },
 {
-"id": "l17",
+"id": "l20",
 "who": "Tomas",
 "text": "No. Alguien tiene que saber lo que pasó esta noche. Sigo grabando.",
 "say": "[breathless] No. Alguien tiene que saber lo que pasó esta noche. Sigo grabando."
 },
 {
-"id": "l18",
+"id": "l21",
 "who": "Lucia",
 "text": "¡Cuidado! ¡Viene hacia nosotros!",
 "say": "[screaming] ¡Cuidado! ¡Viene hacia nosotros!"
