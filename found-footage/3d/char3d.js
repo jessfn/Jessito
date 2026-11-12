@@ -64,7 +64,7 @@ function buildHead(cfg,skin){const g=new THREE.Group();const W=.19,Hh=.2,D=.19,t
  if(hs==='curly'){for(let i=0;i<64;i++){const a=Math.random()*Math.PI*2,ph=Math.random()*1.25;const rr=1.04+Math.random()*.12;const px=Math.sin(ph)*Math.cos(a)*W*rr,py=Math.cos(ph)*Hh*rr,pz=Math.sin(ph)*Math.sin(a)*D*rr;if(pz>D*.55&&py<Hh*.55)continue;const cm=new THREE.Mesh(new THREE.SphereGeometry(.036+Math.random()*.02,10,8),hm);cm.position.set(px,py,pz-.02);g.add(cm)}const cap=new THREE.Mesh(new THREE.SphereGeometry(1,36,20,0,Math.PI*2,0,Math.PI*.33),hm);cap.scale.set(W*1.07,Hh*1.08,D*1.07);cap.position.y=.03;g.add(cap)}
  return {g,eyes,brows,lips,cav,teeth,tongue,blush,tear,sweat,sz,W,Hh,D,ex,ey,er}}
 function setFace(F,cfg,e,st){const ex=EXP[e]||EXP.neutral;const open=Math.min(1.2,ex.lid)/1.2;const bl=st.blink;
- for(const E of F.eyes){const o=open*(1-bl*.96);E.up.rotation.x=Math.max(-1.6,1.55-o*4.3);E.lo.rotation.x=-(.2-o*.25)+(ex.lid<.4?.3:0);E.ball.rotation.set(-st.look[1]*.3,st.look[0]*.38,0)}
+ for(const E of F.eyes){const o=open*(1-bl*.96);E.up.rotation.x=Math.max(-1.6,1.55-o*4.3);E.lo.rotation.x=o*.95-(ex.lid<.4?.25:0);E.ball.rotation.set(-st.look[1]*.3,st.look[0]*.38,0)}
  // brows
  F.brows.forEach((bm,k)=>{const s=k?1:-1;const by=F.ey+F.er*2.7;const mid=(ex.bi+ex.bo)/2;const dir=s;const pts=[[-.032,ex.bi],[-.012,mid+.004],[.012,mid+.003],[.034,ex.bo]].map(([dx,dy])=>{const x=s*(F.ex+(s===1?dx:-dx));const y=by+dy;return V(x,y,F.sz(F.ex,y)+.003)});bm.geometry.dispose();bm.geometry=new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),12,.0095,6)});
  // mouth

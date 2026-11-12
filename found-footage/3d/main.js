@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import {makeChar,PX} from './char3d.js';
+import {makeChar2 as makeChar,PX} from './char3d2.js';
 const Q=new URLSearchParams(location.search);const OW=+(Q.get('w')||720),OH=Math.round(OW*16/9);
 const renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});renderer.setSize(OW,OH);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.5;renderer.setPixelRatio(1);
 const comp=document.createElement('canvas');comp.width=OW;comp.height=OH;document.body.appendChild(comp);const g2=comp.getContext('2d');
@@ -10,7 +10,7 @@ let ST=null;let tex=null;
 function noiseTex(base,rep,amp=24){const c=document.createElement('canvas');c.width=256;c.height=256;const g=c.getContext('2d');g.fillStyle=base;g.fillRect(0,0,256,256);for(let i=0;i<9000;i++){const v=Math.floor(Math.random()*amp);g.fillStyle=`rgba(${v},${v},${v},.3)`;g.fillRect(Math.random()*256,Math.random()*256,2,2)}for(let i=0;i<14;i++){g.fillStyle='rgba(0,0,0,.16)';g.fillRect(0,i*18+Math.random()*6,256,3)}const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(...rep);t.colorSpace=THREE.SRGBColorSpace;return t}
 function labelTex(txt,fg='#cfd6df'){const c=document.createElement('canvas');c.width=256;c.height=256;const g=c.getContext('2d');g.clearRect(0,0,256,256);g.fillStyle=fg;g.font='900 150px Inter,Arial';g.textAlign='center';g.textBaseline='middle';g.fillText(txt,128,110);g.font='800 36px Inter,Arial';g.fillText('P I S O',128,215);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;return t}
 // ---------- lights
-scene.add(new THREE.HemisphereLight(0x9a6a76,0x20202c,.9));
+scene.add(new THREE.HemisphereLight(0x9a6a76,0x20202c,1.15));
 const reds=[V(-3.6,2.5,-1.2),V(4.4,2.5,-1.0),V(.4,2.7,-2.3)].map(p=>{const L=new THREE.PointLight(0xff2a1a,2,9,1.6);L.position.copy(p);scene.add(L);return L});
 // ---------- stairwell
 const concrete=noiseTex('#4a4d55',[3,3]);const floorT=noiseTex('#3b3e45',[6,1]);
@@ -56,21 +56,21 @@ const cam=new THREE.PerspectiveCamera(50,OW/OH,.03,80);scene.add(cam);
 const rig=new THREE.Group();cam.add(rig);
 function mkLimbR(r0,r1,mat){const g=new THREE.Group();const c=new THREE.Mesh(new THREE.CylinderGeometry(r1,r0,1,14),mat);c.position.y=.5;g.add(c);const s=new THREE.Mesh(new THREE.SphereGeometry(r1,14,10),mat);g.add(s);g.userData={c,s};return g}
 const skinOp=new THREE.MeshStandardMaterial({color:0xe0a98a,roughness:.5,emissive:0x3a2218});const sleeveM=M(0x55606e,{roughness:.9,emissive:0x151a22});const fillL=new THREE.PointLight(0xfff0e0,1.2,3,1.5);fillL.position.set(.1,.2,.2);cam.add(fillL);
-const sleeve=mkLimbR(.1,.075,sleeveM);rig.add(sleeve);
+const sleeve=mkLimbR(.052,.042,sleeveM);rig.add(sleeve);
 const opHand=(()=>{const g=new THREE.Group();const pm=new THREE.Mesh(new THREE.CapsuleGeometry(.03,.05,6,10),skinOp);pm.scale.set(1.5,1,.62);pm.rotation.z=Math.PI/2;g.add(pm);const fing=[];[.06,.068,.063,.05].forEach((L,i)=>{let par=g,off=V((i-1.5)*.022,.05,0);const segs=[];for(let j=0;j<3;j++){const sg=new THREE.Group();sg.position.copy(off);const m=new THREE.Mesh(new THREE.CapsuleGeometry(.0115-j*.001,L/3*.7,4,8),skinOp);m.position.y=L/6;sg.add(m);if(j===2){const n=new THREE.Mesh(new THREE.SphereGeometry(.007,8,8),new THREE.MeshBasicMaterial({color:0xf6d6c8}));n.scale.set(1,.5,1.2);n.position.set(0,L/3*.78,.008);sg.add(n)}par.add(sg);par=sg;off=V(0,L/3,0);segs.push(sg)}fing.push(segs)});
- const th=new THREE.Group();th.position.set(.038,.01,.015);const t1=new THREE.Mesh(new THREE.CapsuleGeometry(.013,.034,4,8),skinOp);t1.position.y=.026;th.add(t1);g.add(th);const fl=new THREE.Group();const body=new THREE.Mesh(new THREE.CylinderGeometry(.022,.02,.2,16),M(0x2a2e36,{metalness:.5,roughness:.4}));body.position.set(0,.05,-.045);fl.add(body);const head=new THREE.Mesh(new THREE.CylinderGeometry(.034,.024,.06,16),M(0x4a505c,{metalness:.6,roughness:.3}));head.position.set(0,.18,-.045);fl.add(head);const lens=new THREE.Mesh(new THREE.CircleGeometry(.03,16),new THREE.MeshBasicMaterial({color:0xfffbe0}));lens.rotation.x=-Math.PI/2;lens.position.set(0,.21,-.045);fl.add(lens);g.add(fl);
+ const th=new THREE.Group();th.position.set(.038,.01,.015);const t1=new THREE.Mesh(new THREE.CapsuleGeometry(.013,.034,4,8),skinOp);t1.position.y=.026;th.add(t1);g.add(th);const fl=new THREE.Group();const body=new THREE.Mesh(new THREE.CylinderGeometry(.022,.02,.2,16),M(0x2a2e36,{metalness:.5,roughness:.4}));body.rotation.z=Math.PI/2;body.position.set(.01,.04,-.04);fl.add(body);const head=new THREE.Mesh(new THREE.CylinderGeometry(.034,.024,.06,16),M(0x4a505c,{metalness:.6,roughness:.3}));head.rotation.z=-Math.PI/2;head.position.set(.14,.04,-.04);fl.add(head);const lens=new THREE.Mesh(new THREE.CircleGeometry(.03,16),new THREE.MeshBasicMaterial({color:0xfffbe0}));lens.rotation.y=Math.PI/2;lens.position.set(.171,.04,-.04);fl.add(lens);g.add(fl);
  fing.forEach(segs=>segs.forEach((sg,j)=>{sg.rotation.x=-1.0*(j+1)*.55}));th.rotation.set(-.4,0,-.5);return {g,fl,fing}})();
-rig.add(opHand.g);
-const spot=new THREE.SpotLight(0xdde9ff,22,16,.55,.75,1.4);spot.castShadow=true;spot.shadow.mapSize.set(1024,1024);spot.shadow.bias=-.0005;spot.shadow.camera.near=.3;cam.add(spot);const spotT=new THREE.Object3D();cam.add(spotT);spot.target=spotT;
+const opOuter=new THREE.Group();opOuter.add(opHand.g);rig.add(opOuter);opHand.g.rotation.y=Math.PI/2;opHand.g.scale.setScalar(1.8);
+const spot=new THREE.SpotLight(0xdde9ff,20,16,.55,.75,1.6);spot.castShadow=true;spot.shadow.mapSize.set(1024,1024);spot.shadow.bias=-.0005;spot.shadow.camera.near=.3;cam.add(spot);const spotT=new THREE.Object3D();cam.add(spotT);spot.target=spotT;
 const leftHand=(()=>{const g=new THREE.Group();const pm=new THREE.Mesh(new THREE.CapsuleGeometry(.03,.05,6,10),skinOp);pm.scale.set(1.5,1,.62);pm.rotation.z=Math.PI/2;g.add(pm);[.06,.068,.063,.05].forEach((L,i)=>{let par=g,off=V((i-1.5)*.022,.05,0);for(let j=0;j<3;j++){const sg=new THREE.Group();sg.position.copy(off);const m=new THREE.Mesh(new THREE.CapsuleGeometry(.0115-j*.001,L/3*.7,4,8),skinOp);m.position.y=L/6;sg.add(m);sg.rotation.x=-.08*(j+1);par.add(sg);par=sg;off=V(0,L/3,0)}});const th=new THREE.Group();th.position.set(-.038,.01,.015);th.rotation.set(-.3,0,.8);const t1=new THREE.Mesh(new THREE.CapsuleGeometry(.013,.034,4,8),skinOp);t1.position.y=.026;th.add(t1);g.add(th);g.visible=false;return g})();rig.add(leftHand);
 // ---------- frame
 const PXm=PX;const X=px=>(px-1230)*PXm,Y=py=>(1500-py)*PXm;
 function placeCamera(st,f){if(window.DBG&&window.DBG.cam){const d=window.DBG.cam;cam.position.set(d[0],d[1],d[2]);cam.lookAt(d[3],d[4],d[5]);return}const [cx,cy,z,rot]=f.cam;const [sx,sy,sr]=f.shake;const hm=1920/(z*617);const d=hm/(2*Math.tan(25*Math.PI/180));const T=V(X(cx),Y(cy),0);cam.position.set(T.x-sx*PXm/z,T.y+sy*PXm/z,d);cam.up.set(0,1,0);cam.lookAt(T.x-sx*PXm/z,T.y+sy*PXm/z,0);cam.rotateZ(-(rot+sr)*Math.PI/180)}
 function operator(f){const o=f.op;const sx=(px)=>(px-540)/540*.2623,sy=(py)=>-(py-960)/960*.4663;const dz=1.0;
- const wx=sx(o.wx)*dz,wy=sy(o.wy)*dz;opHand.g.position.set(wx,wy,-dz);opHand.g.rotation.set(-.2,0,-(o.ang)*Math.PI/180*-1);opHand.g.rotation.z=-o.ang*Math.PI/180;
- const a=V(wx+.2,wy-.6,-dz),b=V(wx,wy-.06,-dz);const d=b.clone().sub(a),len=d.length();sleeve.position.copy(a);sleeve.quaternion.setFromUnitVectors(V(0,1,0),d.clone().normalize());sleeve.userData.c.scale.set(1,len,1);sleeve.userData.s.position.y=len;
+ const wx=sx(o.wx)*dz,wy=sy(o.wy)*dz+.14;opOuter.position.set(wx,wy,-dz);opOuter.rotation.set(-.3,0,-o.ang*Math.PI/180*.6);
+ const a=V(wx+.16,wy-.7,-dz),b=V(wx,wy-.1,-dz);const d=b.clone().sub(a),len=d.length();sleeve.position.copy(a);sleeve.quaternion.setFromUnitVectors(V(0,1,0),d.clone().normalize());sleeve.userData.c.scale.set(1,len,1);sleeve.userData.s.position.y=len;
  // beam
- const ox=opHand.g.localToWorld(V(0,.21,-.045));const lensCam=cam.worldToLocal(ox.clone());spot.position.copy(lensCam);const tx=sx(o.bx)*8,ty=sy(o.by)*8;spotT.position.set(tx,ty,-8);spot.intensity=o.on?22:0}
+ opOuter.updateMatrixWorld(true);cam.updateMatrixWorld(true);const ox=opHand.g.localToWorld(V(.175,.04,-.04));const lensCam=cam.worldToLocal(ox.clone());spot.position.copy(lensCam);const tx=sx(o.bx)*8,ty=sy(o.by)*8;spotT.position.set(tx,ty,-8);spot.intensity=o.on?20:0}
 function renderFrame(i){const f=ST.frames[i];const t=f.t;const E=ST.ev;
  // chars
  for(const n of NAMES){const c=f.chars[n];chars[n].root.visible=!(n==='sofi'&&!f.sofiOn);chars[n].update(c,X(c.x))}
@@ -109,3 +109,4 @@ function hookFrame(f){// creature leaping at the lens
  renderer.render(scene,cam);g2.clearRect(0,0,OW,OH);g2.drawImage(renderer.domElement,0,0);const fl=f.t>2.4?(f.t-2.4)/.4:Math.max(0,Math.sin(f.t*34))*.3;g2.fillStyle=`rgba(255,255,255,${Math.min(1,fl)})`;g2.fillRect(0,0,OW,OH);return comp.toDataURL('image/png')}
 window.initScene=async(url)=>{const r=await fetch(url);ST=await r.json();window.READY=true;return ST.N};
 window.renderFrame=(i)=>{const f=ST.frames[i];f.cam0=ST.ev.cam;if(f.t<2.8)return hookFrame(f);return renderFrame(i)};
+window.__dbg={scene,cam,sleeve,opHand,opOuter,leftHand};
