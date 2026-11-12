@@ -1,0 +1,12 @@
+import { Resvg } from '@resvg/resvg-js';
+import { writeFileSync } from 'node:fs';
+import { execSync } from 'node:child_process';
+import { defs } from './lazy_lib.mjs';
+import { drawLazy } from './rig.mjs';
+const base = () => ({ yaw: 0, pitch: 0, roll: 0, bob: 0, sway: 0, breath: 0, shoulders: 0, flare: 0, squint: 0, tears: 0, tearT: 1, gaze: { x: 0, y: 0 }, lid: { l: 1, r: 1 }, blink: { l: 0, r: 0 }, brow: { l: { r: 0, i: 0 }, r: { r: 0, i: 0 } }, mouth: { open: 0.3, wide: 0.5, smile: 0.8, asym: 0, press: 0, teeth: { clean: 1, braces: 0, crooked: 0 } }, armL: { t: { x: -392, y: 335 }, w: 0 }, armR: { t: { x: 392, y: 335 }, w: 0 }, skin: { acne: 0.03, glow: 0.9 } });
+const S = [['rizado', { s: 0 }], ['espuma', { s: 0, foam: 1 }], ['frizz', { s: 0, frizz: 1 }], ['lacio corto', { s: 1, len: 0.45 }], ['verde', { s: 1, len: 0.55, green: 1 }], ['lacio LARGO', { s: 1, len: 1, shine: 0.9 }]];
+S.forEach(([n, h], i) => { const p = base(); p.hair = h;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1100">${defs('e3d')}<rect width="100%" height="100%" fill="#f4c8dc"/><g transform="translate(450,420) scale(0.78)">${drawLazy(p)}</g><text x="450" y="50" font-family="Inter" font-weight="800" font-size="40" text-anchor="middle" fill="#12090a">${n}</text></svg>`;
+  writeFileSync(`build/h_${i}.png`, new Resvg(svg, { font: { loadSystemFonts: true, defaultFontFamily: 'Inter' } }).render().asPng()); });
+execSync('ffmpeg -y -loglevel error -i build/h_0.png -i build/h_1.png -i build/h_2.png -i build/h_3.png -i build/h_4.png -i build/h_5.png -filter_complex "[0][1][2]hstack=3[a];[3][4][5]hstack=3[b];[a][b]vstack,scale=1800:-1" build/hair_test.png');
+console.log('ok');

@@ -1,0 +1,164 @@
+[
+ {
+  "id": "l1",
+  "who": "N",
+  "text": "Día cuatro. Ustedes eligieron pelo... y mi pelo y yo tenemos una historia complicada.",
+  "pad": 0.5
+ },
+ {
+  "id": "l2",
+  "who": "N",
+  "text": "Mari me llevó al Salón Rapunzel, el lugar donde, dicen, nacen los milagros.",
+  "pad": 0.25
+ },
+ {
+  "id": "l3",
+  "who": "V",
+  "text": "¡Bienvenida, mi reina! Siéntate, que hoy trabajamos en equipo.",
+  "pad": 0.3
+ },
+ {
+  "id": "l4",
+  "who": "M",
+  "text": "Ella es Vero, la mejor estilista de toda la ciudad.",
+  "pad": 0.3
+ },
+ {
+  "id": "l5",
+  "who": "V",
+  "text": "A ver ese cabello... Uy. Este pelo ha vivido muchas aventuras.",
+  "pad": 0.35
+ },
+ {
+  "id": "l6",
+  "who": "N",
+  "text": "Pasó el peine por mi cabello... y el peine entró. Pero nunca más salió.",
+  "pad": 0.8
+ },
+ {
+  "id": "l7",
+  "who": "E",
+  "text": "¡Yo lo rescato, jefa!",
+  "pad": 0.3
+ },
+ {
+  "id": "l8",
+  "who": "V",
+  "text": "Memo, cálmate. Primero, lavado profundo y mascarilla.",
+  "pad": 0.3
+ },
+ {
+  "id": "l9",
+  "who": "N",
+  "text": "Agua tibia, espuma, y un masaje que casi me hace dormir.",
+  "pad": 0.7
+ },
+ {
+  "id": "l10",
+  "who": "N",
+  "text": "Después, las tijeras: adiós, puntas abiertas.",
+  "pad": 1.1
+ },
+ {
+  "id": "l11",
+  "who": "V",
+  "text": "Ahora viene lo bueno: keratina, secadora y plancha. Respira, mi reina.",
+  "pad": 0.4
+ },
+ {
+  "id": "l12",
+  "who": "N",
+  "text": "El vapor subió... y mi pelo rizado empezó a estirarse, mechón por mechón, hasta quedar lacio como seda.",
+  "pad": 1.0
+ },
+ {
+  "id": "l13",
+  "who": "M",
+  "text": "¡Lazy, te ves increíble!",
+  "pad": 0.3
+ },
+ {
+  "id": "l14",
+  "who": "N",
+  "text": "Pero entonces, Memo agarró una botella. La equivocada.",
+  "pad": 0.7
+ },
+ {
+  "id": "l15",
+  "who": "E",
+  "text": "Jefa... ¿el tinte negro era el de la etiqueta verde?",
+  "pad": 0.5
+ },
+ {
+  "id": "l16",
+  "who": "V",
+  "text": "¿¡QUÉ HICISTE, MEMO!?",
+  "pad": 0.3
+ },
+ {
+  "id": "l17",
+  "who": "N",
+  "text": "Mi pelo, mi hermoso pelo... se puso verde.",
+  "pad": 0.8
+ },
+ {
+  "id": "l18",
+  "who": "M",
+  "text": "¡Aaah! ¡Pareces un brócoli!",
+  "pad": 0.3
+ },
+ {
+  "id": "l19",
+  "who": "V",
+  "text": "Tranquilas. Tengo el neutralizador. Esto se arregla.",
+  "pad": 0.4
+ },
+ {
+  "id": "l20",
+  "who": "N",
+  "text": "Y así fue. Diez minutos después, mi pelo estaba negro, brillante, y perfecto.",
+  "pad": 0.7
+ },
+ {
+  "id": "l21",
+  "who": "V",
+  "text": "Ahora, el toque final: extensiones de cabello natural, hasta la cintura.",
+  "pad": 0.5
+ },
+ {
+  "id": "l22",
+  "who": "N",
+  "text": "Mechón por mechón, mi cabello creció... y creció... y creció.",
+  "pad": 0.8
+ },
+ {
+  "id": "l23",
+  "who": "N",
+  "text": "Me miré al espejo y casi no me reconocí. Largo, lacio, brillante. El pelo con el que siempre soñé.",
+  "pad": 1.2
+ },
+ {
+  "id": "l24",
+  "who": "M",
+  "text": "¡Pareces una princesa, Lazy!",
+  "pad": 0.4
+ },
+ {
+  "id": "l25",
+  "who": "N",
+  "text": "Todo era perfecto... hasta que Mari me miró fijo y dijo...",
+  "pad": 0.9
+ },
+ {
+  "id": "l26",
+  "who": "M",
+  "text": "Oye... ¿y esas cejas?",
+  "pad": 0.35
+ },
+ {
+  "id": "l27",
+  "who": "N",
+  "text": "Ay, no. ¿Qué arreglamos mañana: cejas o maquillaje? Comenta tu elección, y sígueme para ver el día cinco.",
+  "pad": 0.6
+ }
+]

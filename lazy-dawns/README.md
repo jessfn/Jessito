@@ -94,3 +94,7 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
 - Cierre: pregunta A/B + "COMENTA TU ELECCION" + "SIGUEME PARA EL DIA N+1" (sin encuesta).
 - Dia 4 sale de lo que voten: CEJAS o PELO.
 - Subtitulos: SIN fondo oscuro (solo letras con contorno); siempre dentro de pantalla (ajuste automatico de tamano, ver `node render_dia03.mjs audit`); etiqueta de nombre separada del texto.
+
+## Tamano / encuadre (decision del creador, dia 4)
+- Se descarto el ajuste especial para Reels: el tamano y encuadre se quedan igual que en los dias 1-3 (1080x1920, subtitulos en y=1580, pill en y=300).
+- Dia 4 = El salon (pelo): voces Jessica (narrador), Laura (Mari), Lily (Vero, estilista), Liam (Memo, ayudante). Final: pelo LARGO y LACIO. Siguiente voto: CEJAS vs MAQUILLAJE.

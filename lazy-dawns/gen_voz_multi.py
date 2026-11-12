@@ -3,10 +3,14 @@ import json, subprocess, base64, sys, time, os
 script, out = sys.argv[1], sys.argv[2]
 VOICES = {'N': 'cgSgspJ2msm6clMCkdW9',   # Narrador: Jessica (FIJA, no cambiar)
           'M': 'FGY2WhTYpPnrIDTdsKH5',   # Mari: Laura
-          'D': 'nPczCjzI2devNBz1zQrb'}   # Dr. Mendoza: Brian (voz grave)
+          'D': 'nPczCjzI2devNBz1zQrb',   # Dr. Mendoza: Brian (voz grave)
+          'V': 'pFZP5JQG7iQjIQuC4Bku',   # Vero (estilista): Lily
+          'E': 'TX3LPaxmHKxFdv7VOQHJ'}   # Memo (ayudante): Liam
 VS = {'N': dict(stability=0.5, similarity_boost=0.75, style=0.0, use_speaker_boost=True),
       'M': dict(stability=0.4, similarity_boost=0.75, style=0.3, use_speaker_boost=True),
-      'D': dict(stability=0.55, similarity_boost=0.75, style=0.15, use_speaker_boost=True)}
+      'D': dict(stability=0.55, similarity_boost=0.75, style=0.15, use_speaker_boost=True),
+      'V': dict(stability=0.4, similarity_boost=0.75, style=0.35, use_speaker_boost=True),
+      'E': dict(stability=0.35, similarity_boost=0.75, style=0.4, use_speaker_boost=True)}
 lines = json.load(open(script)); os.makedirs(out + '/lines', exist_ok=True)
 for L in lines:
     cache = f"{out}/lines/{L['id']}.json"
@@ -45,7 +49,7 @@ json.dump({'lines': lines, 'total': total}, open(out + '/lines.json', 'w'), ensu
 inp = []; fc = []; labs = []
 for i, L in enumerate(lines):
     inp += ['-i', f"{out}/lines/{L['id']}.mp3"]; ms = int(L['start'] * 1000)
-    gain = {'N': 1.0, 'M': 1.0, 'D': 1.1}[L['who']]
+    gain = {'N': 1.0, 'M': 1.0, 'D': 1.1, 'V': 1.05, 'E': 1.0}[L['who']]
     fc.append(f"[{i}:a]loudnorm=I=-17:TP=-1.5:LRA=7,aresample=44100,pan=stereo|c0=c0|c1=c0,volume={gain},adelay={ms}|{ms}[v{i}]"); labs.append(f"[v{i}]")
 fc.append(''.join(labs) + f"amix=inputs={len(labs)}:normalize=0:duration=longest,apad=whole_dur={total}[a]")
 subprocess.run(['ffmpeg', '-y', '-loglevel', 'error'] + inp + ['-filter_complex', ';'.join(fc), '-map', '[a]', '-ar', '44100', out + '/voces.wav'], check=True)
