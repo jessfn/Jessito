@@ -2,15 +2,16 @@ import {Resvg} from '@resvg/resvg-js';import fs from 'fs';import {spawn,spawnSyn
 import {CAST,body,defs,elbow} from '../body.mjs';
 import {clamp,sm,lerp,defsScene,backdrop,rooftop,T_BLACKOUT,giantLeg} from './scene.mjs';
 const HERE=path.dirname(fileURLToPath(import.meta.url));const BUILD=path.join(HERE,'../build/ep1');
-const W=1080,H=1920,FPS=30,DUR=136;
+const TL=JSON.parse(fs.readFileSync(path.join(HERE,'timeline.json'),'utf8'));const W=1080,H=1920,FPS=30,DUR=Math.ceil(TL.dur);
 const script=JSON.parse(fs.readFileSync(path.join(HERE,'script.json'),'utf8'));
-const START={l1:11.0,l2:16.0,l3:20.0,l4:25.0,l5:27.6,l6:31.4,l7:34.0,l8:38.0,l9:42.2,l10:45.5,l11:52.5,l12:55.6,l13:59.2,l14:69.0,l15:70.8,l16:73.6,l17:83.0,l18:85.0,l19:88.8,l20:94.5,l21:97.0,l22:105.0,l23:109.5,l24:112.6,l25:117.0};
+const START=TL.start;
+function inv(tn){const A=TL.anchors;if(tn<=A[0][1])return tn;for(let i=1;i<A.length;i++){if(tn<=A[i][1]){const [o0,n0]=A[i-1],[o1,n1]=A[i];return n1===n0?o1:o0+(tn-n0)*(o1-o0)/(n1-n0)}}return tn-TL.delay}
 export {START,KF,kfAt};
 const NAMES={Tomas:'TOMÁS (cámara)',Beto:'BETO',Diego:'DIEGO',Marta:'MARTA',Lucia:'LUCÍA'};
 const POSX={beto:700,diego:1100,marta:1500,lucia:1900};
 const WHOKEY={Beto:'beto',Diego:'diego',Marta:'marta',Lucia:'lucia'};
 // ---- envelopes
-function envelope(id){const r=spawnSync('ffmpeg',['-v','error','-i',path.join(BUILD,'voz',id+'.mp3'),'-f','s16le','-ac','1','-ar','8000','-'],{maxBuffer:1e8});const b=r.stdout;const n=Math.floor(b.length/2);const hop=Math.round(8000/FPS);const out=[];let mx=1e-6;for(let i=0;i+hop<=n;i+=hop){let s=0;for(let j=0;j<hop;j++){const v=b.readInt16LE((i+j)*2)/32768;s+=v*v}const e=Math.sqrt(s/hop);out.push(e);mx=Math.max(mx,e)}const nn=out.map(v=>v/mx);return nn.map((v,i)=>Math.max(v,(nn[i-1]||0)*.55))}
+function envelope(id){const r=spawnSync('ffmpeg',['-v','error','-i',path.join(BUILD,'voz_es',id+'.mp3'),'-f','s16le','-ac','1','-ar','8000','-'],{maxBuffer:1e8});const b=r.stdout;const n=Math.floor(b.length/2);const hop=Math.round(8000/FPS);const out=[];let mx=1e-6;for(let i=0;i+hop<=n;i+=hop){let s=0;for(let j=0;j<hop;j++){const v=b.readInt16LE((i+j)*2)/32768;s+=v*v}const e=Math.sqrt(s/hop);out.push(e);mx=Math.max(mx,e)}const nn=out.map(v=>v/mx);return nn.map((v,i)=>Math.max(v,(nn[i-1]||0)*.55))}
 const LINES=script.map(l=>({...l,t0:START[l.id],env:envelope(l.id)}));LINES.forEach(l=>l.dur=l.env.length/FPS);
 function speakerAt(t){return LINES.find(l=>t>=l.t0&&t<l.t0+l.dur+.15)}
 // ---- camera
@@ -40,9 +41,9 @@ function kfAt(arr,t){let i=0;while(i+1<arr.length&&arr[i+1][0]<=t)i++;const cur=
  if(a.e||b.e){const ea=a.e||elbow(SH[s],a.w,side,a.fs||1),eb=b.e||elbow(SH[s],b.w,side,b.fs||1);out[s].e=polar(SH[s],ea,eb,u)}}return out}
 function exprAt(arr,t){let e=arr[0][1];for(const [ti,ex] of arr)if(t>=ti)e=ex;return e}
 function blinkAt(seed,t){const per=3.1;const k=Math.floor(t/per+seed);const jit=((Math.sin(k*12.9898+seed*78.2)*43758.5453)%1+1)%1;const t0=(k-seed)*per+jit*1.2;const d=t-t0;return d>=0&&d<.14?Math.sin(d/.14*Math.PI):0}
-function look(who,t){const sp=speakerAt(t);const mx=POSX[who];if(t>78.4&&t<83&&who!=='x')return[.9,-.6];if(t>100&&t<104.8)return[.4,-.7];if(t>112.4&&t<117)return[.5,-.6];if(sp&&sp.who!=='Tomas'&&WHOKEY[sp.who]!==who)return[clamp((POSX[WHOKEY[sp.who]]-mx)/500,-1,1),.1];return[0,.15]}
-function charSVG(who,t,shock){const st=CAST[who];const pose=kfAt(KF[who],t);const sp=speakerAt(t);const talk=sp&&WHOKEY[sp.who]===who?clamp((sp.env[Math.floor((t-sp.t0)*FPS)]||0)*1.7):0;
- const idx=Object.keys(POSX).indexOf(who);const bl=blinkAt(idx*.37,t);const lk=look(who,t);
+function look(who,t,tn){const sp=speakerAt(tn);const mx=POSX[who];if(t>78.4&&t<83&&who!=='x')return[.9,-.6];if(t>100&&t<104.8)return[.4,-.7];if(t>112.4&&t<117)return[.5,-.6];if(sp&&sp.who!=='Tomas'&&WHOKEY[sp.who]!==who)return[clamp((POSX[WHOKEY[sp.who]]-mx)/500,-1,1),.1];return[0,.15]}
+function charSVG(who,t,shock,tn){const st=CAST[who];const pose=kfAt(KF[who],t);const sp=speakerAt(tn);const talk=sp&&WHOKEY[sp.who]===who?clamp((sp.env[Math.floor((tn-sp.t0)*FPS)]||0)*1.7):0;
+ const idx=Object.keys(POSX).indexOf(who);const bl=blinkAt(idx*.37,t);const lk=look(who,t,tn);
  const br=Math.sin(t*1.9+idx);const fear=t>78?1.6:0.8;const sway=Math.sin(t*.8+idx*2)*.8+(t>78?Math.sin(t*9+idx)*.5*quakeLvl(t):0);
  for(const s of ['L','R']){pose[s].w=[pose[s].w[0]+Math.sin(t*1.3+idx+(s==='L'?0:2))*2.5,pose[s].w[1]+Math.sin(t*1.7+idx*3)*2.5+(t>78?Math.sin(t*14+idx)*2*quakeLvl(t):0)]}
  const ex=exprAt(EXPR[who],t);
@@ -66,13 +67,13 @@ function intro(t){const fl=Math.random()<0?0:(Math.sin(t*50)>.9?.5:1);return `<r
 function title(t){const u=t-7;const fl=u<.4?(Math.sin(u*90)>0?1:.2):1;const g=(u>.3&&u<.55)||(u>2.3)?10:2;return `<rect width="${W}" height="${H}" fill="#05070a"/><g opacity="${fl}"><text x="${540-g}" y="900" text-anchor="middle" font-family="Inter" font-weight="900" font-size="64" letter-spacing="14" fill="#ff2a3a" opacity=".7">CAPÍTULO 1</text><text x="${540+g}" y="900" text-anchor="middle" font-family="Inter" font-weight="900" font-size="64" letter-spacing="14" fill="#2af0ff" opacity=".6">CAPÍTULO 1</text><text x="540" y="900" text-anchor="middle" font-family="Inter" font-weight="900" font-size="64" letter-spacing="14" fill="#fff">CAPÍTULO 1</text><rect x="470" y="935" width="140" height="6" fill="#ff2a3a"/><text x="540" y="1090" text-anchor="middle" font-family="Inter" font-weight="900" font-size="150" letter-spacing="8" fill="#fff" stroke="#000" stroke-width="3">LA NOCHE</text></g>`}
 function endcard(t){const u=t-122.4;const fade=clamp(u/.6);return `<rect width="${W}" height="${H}" fill="#05070a"/><g opacity="${fade}"><text x="540" y="520" text-anchor="middle" font-family="DejaVu Sans Mono" font-size="40" fill="#9aa4ae">// CINTA 1 — FIN DEL REGISTRO</text><text x="540" y="700" text-anchor="middle" font-family="Inter" font-weight="900" font-size="58" fill="#ff2a3a" letter-spacing="6">PRÓXIMO CAPÍTULO</text><text x="540" y="800" text-anchor="middle" font-family="Inter" font-weight="900" font-size="56" fill="#fff">CAPÍTULO 2 | LAS ESCALERAS</text>${u>2?`<text x="540" y="1000" text-anchor="middle" font-family="Inter" font-weight="800" font-size="56" fill="#ffd54a">¿QUÉ CREES QUE ES?</text><text x="540" y="1100" text-anchor="middle" font-family="Inter" font-weight="800" font-size="50" fill="#fff">A) UN EXPERIMENTO MILITAR</text><text x="540" y="1180" text-anchor="middle" font-family="Inter" font-weight="800" font-size="50" fill="#fff">B) ALGO QUE SALIÓ DEL MAR</text>`:''}${u>4?`<text x="540" y="1400" text-anchor="middle" font-family="Inter" font-weight="900" font-size="52" fill="#2af0ff">COMENTA TU ELECCIÓN</text><text x="540" y="1480" text-anchor="middle" font-family="Inter" font-weight="900" font-size="44" fill="#fff">SÍGUEME PARA EL CAPÍTULO 2</text>`:''}</g>`}
 // ---- scene
-function sceneWorld(t){const [cx,cy,z,rot]=camera(t);const a=shakeAmp(t);const sx=nz(t,1)*a+nz(t,2.3)*a*.5,sy=nz(t+5,1.2)*a*.8,sr=nz(t+9,.9)*a*.04;
+function sceneWorld(t,tn){const [cx,cy,z,rot]=camera(t);const a=shakeAmp(t);const sx=nz(t,1)*a+nz(t,2.3)*a*.5,sy=nz(t+5,1.2)*a*.8,sr=nz(t+9,.9)*a*.04;
  const q=quakeLvl(t);
  const dark=t<T_BLACKOUT?0:sm((t-T_BLACKOUT)/2.5)*.34;
  let w=`<g transform="translate(${(540+sx).toFixed(1)},${(960+sy).toFixed(1)}) rotate(${(rot+sr).toFixed(2)}) scale(${z.toFixed(3)}) translate(${-cx.toFixed(1)},${-cy.toFixed(1)})">`;
  const SK=(process.env.SKIP||'').split(',');if(!SK.includes('bd'))w+=backdrop(t,cx,cy);if(!SK.includes('rf'))w+=rooftop(t,cx,cy,q);
  const rr=(rot+sr)*Math.PI/180,cs=Math.cos(rr),sn=Math.sin(rr);const cor=[[-540,-960],[540,-960],[540,960],[-540,960]].map(([px,py])=>[cx+(px*cs+py*sn)/z,cy+(-px*sn+py*cs)/z]);const vx0=Math.min(...cor.map(c=>c[0])),vx1=Math.max(...cor.map(c=>c[0])),vy0=Math.min(...cor.map(c=>c[1])),vy1=Math.max(...cor.map(c=>c[1]));
- Object.keys(POSX).forEach(k=>{if(SK.includes(k))return;const x=POSX[k];if(x+300<vx0||x-300>vx1||1580<vy0||280>vy1)return;w+=charSVG(k,t,q)});
+ Object.keys(POSX).forEach(k=>{if(SK.includes(k))return;const x=POSX[k];if(x+300<vx0||x-300>vx1||1580<vy0||280>vy1)return;w+=charSVG(k,t,q,tn)});
  w+=`<rect x="-3500" y="-3000" width="9000" height="6000" fill="#050a1e" opacity="${dark.toFixed(2)}"/>`;
  const fire=t>80.4?.18*sm((t-80.4)/3)*(1+.2*Math.sin(t*19)):0;w+=`<rect x="-3500" y="-3000" width="9000" height="6000" fill="#ff5a1a" opacity="${fire.toFixed(3)}"/>`;
  w+=`</g>`;
@@ -83,14 +84,14 @@ function sceneWorld(t){const [cx,cy,z,rot]=camera(t);const a=shakeAmp(t);const s
  if(t>116){const d=sm((t-116)/5.3);w+=`<rect width="${W}" height="${H}" fill="#9a8a78" opacity="${(d*.8).toFixed(2)}"/>`+Array.from({length:6},(_,i)=>`<circle cx="${(i*260+((t*90)%260)).toFixed(0)}" cy="${(700+i*180+Math.sin(t*2+i)*60).toFixed(0)}" r="${(220+d*300).toFixed(0)}" fill="#c4b4a0" opacity="${(d*.35).toFixed(2)}"/>`).join('')}
  return w}
 function fixOp(s){return s.replace(/<([a-zA-Z]+)((?:[^>"]|"[^"]*")*?) opacity="([^"]*)"((?:[^>"]|"[^"]*")*)>/g,(m,tag,a,o,b)=>{let self='';if(b.endsWith('/')){b=b.slice(0,-1);self='/'}const all=a+b;const hasStroke=/ stroke="/.test(all)&&!/ stroke="none"/.test(all);const hasFill=!/ fill="none"/.test(all);let ex;if(tag==='g'||tag==='text')ex=`fill-opacity="${o}" stroke-opacity="${o}"`;else{ex='';if(hasFill)ex+=`fill-opacity="${o}" `;if(hasStroke)ex+=`stroke-opacity="${o}"`;if(!ex)ex=`fill-opacity="${o}"`}return `<${tag}${a}${b} ${ex}${self}>`})}
-export function frame(t){let inner,hudOn=false;
+export function frame(tn){const t=inv(tn);let inner,hudOn=false;
  if(t<2.4)inner=hook(t);else if(t<3.2)inner=`<rect width="${W}" height="${H}" fill="#000"/>`;else if(t<7)inner=intro(t);else if(t<10)inner=title(t);
- else if(t<122.0){inner=sceneWorld(t);hudOn=true}
+ else if(t<122.0){inner=sceneWorld(t,tn);hudOn=true}
  else if(t<122.4)inner=`<rect width="${W}" height="${H}" fill="#000"/>`;else inner=endcard(t);
  let g=0;if(t>=10&&t<10.25)g=.6;if(t>=66.95&&t<67.2)g=.7;if(t>=119.3&&t<122)g=clamp((t-119.3)/2.5)*.9+.2;if(t>=2.0&&t<2.4)g=.8;
  if(t>=121.2&&t<122)inner=`<rect width="${W}" height="${H}" fill="#000"/>`;
  let out=g>0?glitch(inner,t,g):inner;
- if(hudOn&&!(t>=121.2))out+=hud(t)+caption(t);
+ if(hudOn&&!(t>=121.2))out+=hud(tn)+caption(tn);
  return fixOp(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${defsScene}${defs(CAST.beto)}${out}</svg>`)}
 function renderPng(t){return new Resvg(frame(t),{font:{loadSystemFonts:true,defaultFontFamily:'Inter'},fitTo:{mode:'original'}}).render()}
 if(process.argv[1]===fileURLToPath(import.meta.url)){

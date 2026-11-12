@@ -23,7 +23,7 @@ t_=np.arange(N)/SR
 # ---------- voices
 V=np.zeros((N,2))
 for lid,t0 in START.items():
-    x=load(f'{B}/voz/{lid}.mp3','highpass=f=110,lowpass=f=8500,aecho=0.8:0.55:35|70:0.16|0.08,volume=1.0')
+    x=load(f'{B}/voz_es/{lid}.mp3','highpass=f=110,lowpass=f=8500,aecho=0.8:0.55:35|70:0.16|0.08,volume=1.0')
     w=who[lid];place(V,x,t0,GAIN[w]*.9,PAN[w])
 # ---------- sfx
 S=np.zeros((N,2))
