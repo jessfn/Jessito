@@ -98,3 +98,12 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
 ## Tamano / encuadre (decision del creador, dia 4)
 - Se descarto el ajuste especial para Reels: el tamano y encuadre se quedan igual que en los dias 1-3 (1080x1920, subtitulos en y=1580, pill en y=300).
 - Dia 4 = El salon (pelo): voces Jessica (narrador), Laura (Mari), Lily (Vero, estilista), Liam (Memo, ayudante). Final: pelo LARGO y LACIO. Siguiente voto: CEJAS vs MAQUILLAJE.
+
+## Regla de guion (voz): evitar sonidos pegados
+- ElevenLabs funde palabras cuando una termina como empieza la siguiente ("botella. La" -> "botela"; "peine entro" -> "peinentro").
+  Antes de generar voz, revisar el guion y reescribir esos pares (ej. "botella. Y era la equivocada"). Ver el escaneo en la historia del dia 4.
+
+## Personajes (regla permanente)
+- Todos los personajes (Mari, Vero, Memo, Dr. Mendoza) tienen BRAZOS articulados (hombro-codo-mano con IK), no manos sueltas.
+- Sin personajes encimados: cada uno ocupa su lugar (Mari izquierda, Vero derecha, Memo al fondo derecha) y solo se superponen por profundidad
+  detras de Lazy. Las herramientas las sostiene la mano del brazo que llega hasta ellas.

@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { defs } from './lazy_lib.mjs';
 import { drawLazy } from './rig.mjs';
-import { drawMari, drawStylist, drawMemo } from './chars.mjs';
+import { drawMari, drawStylist, drawMemo, handsToTargets } from './chars.mjs';
 import { makeDirector } from './director4.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -33,7 +33,7 @@ const DUR = DATA.total;
 const w = (id, word, n = 0) => { const r = L[id].words.filter((x) => nm(x[0]) === nm(word))[n]; if (!r) throw new Error('palabra no encontrada ' + id + ' ' + word); return r[1]; };
 const T = {
   slateEnd: 1.6, sit: L.l3.end + 0.15, memoIn: L.l7.start - 0.4,
-  combA: L.l5.start + 1.0, combStuck: w('l6', 'entro'), combOut: L.l8.start + 0.4,
+  combA: L.l5.start + 1.0, combStuck: w('l6', 'metio'), combOut: L.l8.start + 0.4,
   washA: L.l9.start + 0.5, washB: L.l9.end + 0.2, cutA: L.l10.start + 0.3, cutB: L.l10.end,
   keratA: L.l11.start + 0.2, dryA: w('l11', 'secadora') + 0.2, ironA: w('l11', 'plancha') + 0.2, straightA: L.l12.start + 0.5, straightB: w('l12', 'seda') + 0.5,
   bottleA: w('l14', 'botella') - 0.5, greenA: w('l17', 'verde'), neutA: L.l20.start + 0.5, neutB: w('l20', 'perfecto') + 0.4,
@@ -102,7 +102,7 @@ function chairFront() {
 
 // ---------------- personajes en el mundo ----------------
 const LZ = { x: 540, S: 0.62 };
-const MARI = { x: 170, y: 930, s: 0.85 }, VERO = { x: 800, y: 880, s: 0.92 }, MEMO = { x: 985, y: 930, s: 0.85 };
+const MARI = { x: 150, y: 930, s: 0.8 }, VERO = { x: 765, y: 880, s: 0.92 }, MEMO = { x: 1040, y: 930, s: 0.78 };
 const lazyFy = (t) => lerp(1480, 1380, smooth((t - T.sit) / 0.55));
 const lazyHeadWorld = (t) => { const py = lazyFy(t) - 830 * LZ.S; return { x: 540, y: py - 215 * LZ.S }; };
 // colocar una herramienta de un personaje de modo que su extremo de trabajo quede en (tx,ty)
@@ -130,7 +130,8 @@ function veroState(t) {
   if (t >= T.growB + 0.5) { tool = 'none'; mood = 'proud'; }
   if (t >= T.mirrorStart) { mood = 'happy'; tool = 'none'; }
   if (t >= L.l26.start) mood = 'amused';
-  return { mood, tool, ...o };
+  const hands = (mood === 'scream' || mood === 'shock') ? 'cheeks' : (mood === 'proud' || mood === 'amused') ? 'hips' : 'none';
+  return { mood, tool, hands, ...o };
 }
 function memoState(t) {
   let mood = 'happy', tool = 'none', o = {}; const x = lerp(1250, MEMO.x, ease((t - T.memoIn) / 0.7));
@@ -142,7 +143,8 @@ function memoState(t) {
   if (t >= T.greenA) { mood = 'shock'; tool = 'bottleG'; }
   if (t >= T.neutA) { tool = 'none'; mood = 'worry'; }
   if (t >= T.mirrorStart) mood = 'happy';
-  return { x, mood, tool, ...o };
+  const hands = (mood === 'shock' || mood === 'worry') ? 'cheeks' : 'none';
+  return { x, mood, tool, hands, ...o };
 }
 function mariState(t) {
   let mood = 'happy', hands = 'none', tears = false;
@@ -272,13 +274,17 @@ function frame(t) {
   const ms = mariState(t), vs = veroState(t), es = memoState(t);
   const py = lazyFy(t) - 830 * LZ.S;
   const lazy = `<g transform="translate(${LZ.x},${py}) scale(${LZ.S})">${drawLazy(P)}</g>`;
-  const mari = `<g transform="translate(${MARI.x},${MARI.y}) scale(${MARI.s})">${drawMari({ mood: ms.mood, hands: ms.hands, tears: ms.tears, blink: blinkOf(t, 0.4), look: 0.7, t })}</g>`;
-  const vero = `<g transform="translate(${VERO.x},${VERO.y}) scale(${VERO.s})">${drawStylist({ ...vs, blink: blinkOf(t, 1.9), look: -0.7, t, part: 'body' })}</g>`;
+  const sm = { L: { x: 0, y: 0 }, R: { x: 0, y: 0 } }; for (let k = 0; k < 6; k++) { const tg = handsToTargets(mariState(Math.max(0, t - k * 0.055)).hands); sm.L.x += tg.L.x / 6; sm.L.y += tg.L.y / 6; sm.R.x += tg.R.x / 6; sm.R.y += tg.R.y / 6; }
+  const smH = (fn) => { const o = { L: { x: 0, y: 0 }, R: { x: 0, y: 0 } }; for (let k = 0; k < 6; k++) { const tg = handsToTargets(fn(Math.max(0, t - k * 0.055)).hands); o.L.x += tg.L.x / 6; o.L.y += tg.L.y / 6; o.R.x += tg.R.x / 6; o.R.y += tg.R.y / 6; } return o; };
+  const vsm = smH(veroState), msm = smH((tt) => ({ hands: memoState(tt).hands }));
+  const mari = `<g transform="translate(${MARI.x},${MARI.y}) scale(${MARI.s})">${drawMari({ mood: ms.mood, armL: sm.L, armR: sm.R, tears: ms.tears, blink: blinkOf(t, 0.4), look: 0.7, t })}</g>`;
+  const vero = `<g transform="translate(${VERO.x},${VERO.y}) scale(${VERO.s})">${drawStylist({ ...vs, armL: vsm.L, armR: vsm.R, blink: blinkOf(t, 1.9), look: -0.7, t, part: 'body' })}</g>`;
   const veroTool = `<g transform="translate(${VERO.x},${VERO.y}) scale(${VERO.s})">${drawStylist({ ...vs, t, part: 'tool' })}</g>`;
-  const memo = es.x < 1180 ? `<g transform="translate(${es.x},${MEMO.y}) scale(${MEMO.s})">${drawMemo({ ...es, blink: blinkOf(t, 2.7), look: -0.7, t, part: 'body' })}</g><g transform="translate(${es.x},${MEMO.y}) scale(${MEMO.s})">${drawMemo({ ...es, t, part: 'tool' })}</g>` : '';
+  const memoBody = es.x < 1180 ? `<g transform="translate(${es.x},${MEMO.y}) scale(${MEMO.s})">${drawMemo({ ...es, armL: msm.L, armR: msm.R, blink: blinkOf(t, 2.7), look: -0.7, t, part: 'body' })}</g>` : '';
+  const memoTool = es.x < 1180 ? `<g transform="translate(${es.x},${MEMO.y}) scale(${MEMO.s})">${drawMemo({ ...es, t, part: 'tool' })}</g>` : '';
   const icons = talkIcon(t, 'M', MARI.x + 120, MARI.y - 150) + talkIcon(t, 'V', VERO.x - 120, VERO.y - 160) + talkIcon(t, 'E', es.x - 110, MEMO.y - 140);
   const fx = foamTowel(t) + showerFx(t) + steamFx(t) + snippetsFx(t) + combProp(t) + dyeFx(t) + growFx(t) + sparklesAll(t) + windFx(t);
-  const world = `<g transform="${worldT(cam)}"><image href="${roomPng}" width="${W}" height="${H}"/>${chairBack(seated)}${mari}${vero}${lazy}${seated ? chairFront() : ''}${veroTool}${memo}${icons}${fx}</g>`;
+  const world = `<g transform="${worldT(cam)}"><image href="${roomPng}" width="${W}" height="${H}"/>${chairBack(seated)}${memoBody}${mari}${vero}${lazy}${seated ? chairFront() : ''}${memoTool}${veroTool}${icons}${fx}</g>`;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${charDefs}
     <defs><filter id="b10"><feGaussianBlur stdDeviation="10"/></filter></defs>${world}
     ${mirrorOverlay(t)}

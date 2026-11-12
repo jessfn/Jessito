@@ -28,7 +28,7 @@ export function hand(cx, cy, side, O, skinB, soft) {
   return `<g transform="translate(${cx},${cy})">
     <ellipse cx="0" cy="0" rx="60" ry="54" fill="${skinB}" ${O}/>
     ${f(-36 * sd, 34, 52, -14 * sd, 0)}${f(-12 * sd, 44, 62, -4 * sd, 1)}${f(12 * sd, 44, 66, 4 * sd, 2)}${f(36 * sd, 34, 54, 14 * sd, 3)}
-    <g transform="translate(${52 * sd},-6) rotate(${-40 * sd})"><rect x="-13" y="-6" width="26" height="50" rx="13" fill="${skinB}" ${O}/>${nail(44, true)}</g>
+    <g transform="translate(${-48 * sd},-4) rotate(${38 * sd})"><rect x="-13" y="-6" width="26" height="52" rx="13" fill="${skinB}" ${O}/>${nail(46, true)}</g>
     ${soft ? `<ellipse cx="-14" cy="-16" rx="30" ry="16" fill="#fff" opacity="0.14"/>` : ''}
     <path d="M-30,-8 q12,10 24,0 M2,-10 q12,10 24,0" stroke="#000" stroke-opacity="0.25" stroke-width="3" fill="none"/>
     <ellipse cx="14" cy="26" rx="20" ry="9" fill="#3b2412" opacity="0.28"/>

@@ -30,16 +30,51 @@ const MOODS = { // brows [inner, outer], boca, ojos grandes
   focus: { b: [-0.5, -0.1], m: 'flat', big: 0 }, serious: { b: [-0.2, 0], m: 'flat', big: 0 }, amused: { b: [0.1, 0.4], m: 'smirk', big: 0 },
   proud: { b: [0.3, 0.3], m: 'smile', big: 0.2 }, shock: { b: [0.7, 0.7], m: 'o', big: 0.8 }, relief: { b: [0.6, 0], m: 'smile', big: 0.1 },
 };
+
+// ---------- Brazos articulados para personajes de apoyo (hombro -> codo -> mano, IK de 2 huesos) ----------
+const clampN = (x, a, b) => Math.min(b, Math.max(a, x));
+const SHD = { '-1': { x: -122, y: 184 }, '1': { x: 122, y: 184 } };
+export function armIK(side, T, L1 = 150, L2 = 142) {
+  const S = SHD[side]; let dx = T.x - S.x, dy = T.y - S.y, d = Math.hypot(dx, dy);
+  const dmax = L1 + L2 - 3, dmin = Math.abs(L1 - L2) + 3, dc = Math.min(dmax, Math.max(dmin, d));
+  if (d > 1e-6) { dx *= dc / d; dy *= dc / d; } d = dc;
+  const base = Math.atan2(dy, dx), A = Math.acos(clampN((L1 * L1 + d * d - L2 * L2) / (2 * L1 * d), -1, 1));
+  const c = [base + A, base - A].map((a) => ({ x: S.x + L1 * Math.cos(a), y: S.y + L1 * Math.sin(a) }));
+  const E = side < 0 ? (c[0].x < c[1].x ? c[0] : c[1]) : (c[0].x > c[1].x ? c[0] : c[1]);
+  return { S, E, H: { x: S.x + dx, y: S.y + dy } };
+}
+export function handsToTargets(h) {
+  switch (h) {
+    case 'clasp': return { L: { x: -28, y: 330 }, R: { x: 28, y: 330 } };
+    case 'cheeks': return { L: { x: -112, y: 72 }, R: { x: 112, y: 72 } };
+    case 'cover': return { L: { x: -48, y: -2 }, R: { x: 48, y: -2 } };
+    case 'hips': return { L: { x: -160, y: 300 }, R: { x: 160, y: 300 } };
+    case 'wave': return { L: { x: -165, y: 400 }, R: { x: 175, y: -150 } };
+    default: return { L: { x: -150, y: 392 }, R: { x: 150, y: 392 } };
+  }
+}
+const plainHand = (col, ang, side = 1) => `<g transform="rotate(${ang})"><g transform="scale(${side < 0 ? -1 : 1},1)"><ellipse cx="-30" cy="2" rx="12" ry="20" fill="${col}" stroke="${OUT}" stroke-width="5" transform="rotate(32 -30 2)"/><ellipse rx="33" ry="30" fill="${col}" stroke="${OUT}" stroke-width="6"/>${[-21, -7, 7, 21].map((x, i) => `<rect x="${x - 7}" y="14" width="14" height="${[30, 38, 40, 32][i]}" rx="7" fill="${col}" stroke="${OUT}" stroke-width="4.5"/>`).join('')}<path d="M-16,12 q16,8 32,0" stroke="#000" stroke-opacity="0.18" stroke-width="3" fill="none"/></g></g>`;
+function limbSvg(side, T, sleeve, skin, withHand = true) {
+  const { S, E, H } = armIK(side, T);
+  const seg = (a, b, w, col) => `<path d="M${a.x},${a.y} L${b.x},${b.y}" stroke="${OUT}" stroke-width="${w + 10}" stroke-linecap="round"/><path d="M${a.x},${a.y} L${b.x},${b.y}" stroke="${col}" stroke-width="${w}" stroke-linecap="round"/>`;
+  const ang = Math.atan2(H.y - E.y, H.x - E.x) * 180 / Math.PI - 90;
+  return `<g>${seg(S, E, 54, sleeve)}${seg(E, H, 42, skin)}<ellipse cx="${(E.x + S.x) / 2}" cy="${(E.y + S.y) / 2}" rx="8" ry="26" fill="#fff" opacity="0.12" transform="rotate(${Math.atan2(E.y - S.y, E.x - S.x) * 180 / Math.PI - 90} ${(E.x + S.x) / 2} ${(E.y + S.y) / 2})"/>${withHand ? `<g transform="translate(${H.x},${H.y})">${plainHand(skin, ang, side)}</g>` : ''}<circle cx="${S.x}" cy="${S.y}" r="34" fill="${sleeve}" stroke="${OUT}" stroke-width="6"/></g>`;
+}
+// mode 'body': dibuja los brazos libres; mode 'tool': dibuja el brazo que sostiene la herramienta (la mano la dibuja la herramienta)
+function armsLayer(p, spec, mode) {
+  const tgt = handsToTargets(p.hands || 'none');
+  const sway = (k) => ({ x: Math.sin((p.t || 0) * 1.1 + k) * 4, y: Math.sin((p.t || 0) * 1.6 + k) * 3 });
+  const L = p.armL || tgt.L, R = p.armR || tgt.R; const toolSide = p.toolSide ?? -1, hasTool = p.tool && p.tool !== 'none';
+  const items = [[-1, L, 0], [1, R, 1.7]];
+  if (mode === 'tool') { if (!hasTool) return ''; const sd = toolSide; const T0 = { x: p.toolX ?? -200, y: p.toolY ?? 0 }; const ik = armIK(sd, T0); return limbSvg(sd, ik.H, spec.sleeve, spec.skin, false); }
+  return items.map(([sd, T0, k]) => (hasTool && sd === toolSide) ? '' : limbSvg(sd, { x: T0.x + sway(k).x, y: T0.y + sway(k).y }, spec.sleeve, spec.skin)).join('');
+}
+const toolAnchor = (p) => { if (!p.tool || p.tool === 'none') return { x: p.toolX ?? 0, y: p.toolY ?? 0 }; return armIK(p.toolSide ?? -1, { x: p.toolX ?? -200, y: p.toolY ?? 0 }).H; };
 const hand = (x, y, r = 0, s = 1) => `<g transform="translate(${x},${y}) rotate(${r}) scale(${s})"><ellipse rx="34" ry="30" fill="#f2c4a2" ${O}/>${[-22, -8, 6, 20].map((fx) => `<rect x="${fx - 7}" y="-52" width="14" height="34" rx="7" fill="#f2c4a2" ${O}/>`).join('')}</g>`;
 
 export function drawMari(p) {
   const m = MOODS[p.mood || 'happy'], t = p.t || 0, bob = Math.sin(t * 2.2) * 3, blink = p.blink || 0;
-  const hands = p.hands || 'none';
   const tears = p.tears ? `${[-1, 1].map((s) => `<path d="M${s * 46},${6 + ((t * 0.9) % 1) * 60} q9,14 0,24 q-9,-10 0,-24Z" fill="#bfe9ff" stroke="#fff" stroke-width="2"/>`).join('')}` : '';
-  const handSvg = hands === 'cover' ? `${hand(-52, -4, 0, 1.2)}${hand(52, -4, 0, 1.2)}`
-    : hands === 'cheeks' ? `${hand(-112, 56, -20)}${hand(112, 56, 20)}`
-      : hands === 'wave' ? hand(150, -40 + Math.sin(t * 9) * 8, 18 + Math.sin(t * 9) * 14, 1.1)
-        : hands === 'clasp' ? hand(0, 150, 0, 1.2) : '';
   return `<g transform="translate(0,${bob})">
     <path d="M-120,-20 Q-150,120 -130,250 L130,250 Q150,120 120,-20Z" fill="#5a2d82" ${O}/>
     <rect x="-96" y="420" width="82" height="250" rx="30" fill="#3b4cca" ${O}/><rect x="14" y="420" width="82" height="250" rx="30" fill="#3b4cca" ${O}/>
@@ -51,7 +86,7 @@ export function drawMari(p) {
     <path d="M-108,-10 Q-110,-120 0,-124 Q110,-120 108,-10 Q80,-78 0,-80 Q-80,-78 -108,-10Z" fill="#5a2d82" ${O}/>
     <ellipse cx="-62" cy="34" rx="22" ry="12" fill="#ff8fa3" opacity="0.55"/><ellipse cx="62" cy="34" rx="22" ry="12" fill="#ff8fa3" opacity="0.55"/>
     ${eyes(42, -6, blink, p.look || 0, m.big, m.b)}${tears}${mouth(m.m, 52, t)}
-    ${handSvg}</g>`;
+    ${armsLayer(p, { sleeve: '#22d3ee', skin: '#f2c4a2' }, 'body')}</g>`;
 }
 
 export function drawDoc(p) {
@@ -108,7 +143,7 @@ export function drawDentist(p) {
 }
 
 // ---------- Salon: Vero (estilista) y Memo (ayudante). No mueven la boca para hablar: solo la expresion cambia con el animo. ----------
-const gripHand = (col = '#d9a37c') => `<g><ellipse rx="38" ry="32" fill="${col}" ${O}/>${[-22, -8, 6, 20].map((fx) => `<rect x="${fx - 8}" y="-48" width="16" height="30" rx="8" fill="${col}" ${O}/>`).join('')}</g>`;
+const gripHand = (col = '#d9a37c') => `<g><ellipse cx="0" cy="2" rx="44" ry="36" fill="${col}" stroke="${OUT}" stroke-width="7"/>${[0, 1, 2, 3].map((i) => `<rect x="-38" y="${-30 + i * 15}" width="76" height="17" rx="8.5" fill="${col}" stroke="${OUT}" stroke-width="4.5"/>`).join('')}<ellipse cx="-34" cy="-38" rx="17" ry="12" fill="${col}" stroke="${OUT}" stroke-width="5" transform="rotate(-22 -34 -38)"/><path d="M-30,-26 q30,6 60,0" stroke="#000" stroke-opacity="0.15" stroke-width="3" fill="none"/></g>`;
 function salonTool(kind, o = {}) {
   const k = o.k ?? 0; // animacion 0..1
   switch (kind) {
@@ -130,8 +165,8 @@ function salonTool(kind, o = {}) {
 export function drawStylist(p) {
   const m = MOODS[p.mood || 'calm'], t = p.t || 0, bob = Math.sin(t * 1.9 + 3) * 2.5, blink = p.blink || 0;
   const SK = '#c98f66', SKD = '#b0764f';
-  const tool = p.tool && p.tool !== 'none' ? `<g transform="translate(${p.toolX ?? -250},${p.toolY ?? -40}) rotate(${p.toolR ?? 70}) ${p.toolS ? `scale(${p.toolS})` : ''}">${salonTool(p.tool, { k: t })}${p.noHand ? '' : `<g transform="translate(0,${p.gripY ?? 4})">${gripHand(SK)}</g>`}</g>` : '';
-  if (p.part === 'tool') return `<g transform="translate(0,${bob})">${tool}</g>`;
+  const tool = p.tool && p.tool !== 'none' ? `<g transform="translate(${toolAnchor(p).x},${toolAnchor(p).y}) rotate(${p.toolR ?? 70}) ${p.toolS ? `scale(${p.toolS})` : ''}">${salonTool(p.tool, { k: t })}${p.noHand ? '' : `<g transform="translate(0,${p.gripY ?? 4})">${gripHand(SK)}</g>`}</g>` : '';
+  if (p.part === 'tool') return `<g transform="translate(0,${bob})">${armsLayer(p, { sleeve: '#d946ef', skin: SK }, 'tool')}${tool}</g>`;
   return `<g transform="translate(0,${bob})">
     <rect x="-84" y="470" width="70" height="200" rx="26" fill="#111827" ${O}/><rect x="14" y="470" width="70" height="200" rx="26" fill="#111827" ${O}/>
     <ellipse cx="-50" cy="684" rx="58" ry="24" fill="#ec4899" ${O}/><ellipse cx="50" cy="684" rx="58" ry="24" fill="#ec4899" ${O}/>
@@ -146,13 +181,14 @@ export function drawStylist(p) {
     ${eyes(40, -6, blink, p.look || 0, m.big, m.b)}<path d="M-76,-30 l-14,-10 M76,-30 l14,-10" stroke="${OUT}" stroke-width="6" stroke-linecap="round"/>
     <ellipse cx="-58" cy="34" rx="22" ry="11" fill="#fb7185" opacity="0.5"/><ellipse cx="58" cy="34" rx="22" ry="11" fill="#fb7185" opacity="0.5"/>
     ${(() => { const mm = mouth(m.m, 54, t); return mm.replace(/stroke="#12090a"/g, 'stroke="#12090a"').replace(/fill="#7a1f2a"/g, 'fill="#b91c1c"'); })()}<path d="M-26,64 Q0,82 26,64" stroke="#be123c" stroke-width="9" fill="none" stroke-linecap="round" opacity="0.65"/>
+    ${armsLayer(p, { sleeve: '#d946ef', skin: SK }, 'body')}
   </g>`;
 }
 export function drawMemo(p) {
   const m = MOODS[p.mood || 'calm'], t = p.t || 0, bob = Math.sin(t * 2.3 + 1) * 3, blink = p.blink || 0;
   const SK = '#8d5a3b', SKD = '#744a30';
-  const tool = p.tool && p.tool !== 'none' ? `<g transform="translate(${p.toolX ?? -230},${p.toolY ?? 40}) rotate(${p.toolR ?? 80}) ${p.toolS ? `scale(${p.toolS})` : ''}">${salonTool(p.tool, { k: t })}<g transform="translate(0,4)">${gripHand(SK)}</g></g>` : '';
-  if (p.part === 'tool') return `<g transform="translate(0,${bob})">${tool}</g>`;
+  const tool = p.tool && p.tool !== 'none' ? `<g transform="translate(${toolAnchor(p).x},${toolAnchor(p).y}) rotate(${p.toolR ?? 80}) ${p.toolS ? `scale(${p.toolS})` : ''}">${salonTool(p.tool, { k: t })}<g transform="translate(0,4)">${gripHand(SK)}</g></g>` : '';
+  if (p.part === 'tool') return `<g transform="translate(0,${bob})">${armsLayer(p, { sleeve: '#fbbf24', skin: SK }, 'tool')}${tool}</g>`;
   return `<g transform="translate(0,${bob})">
     <rect x="-80" y="470" width="68" height="200" rx="26" fill="#475569" ${O}/><rect x="12" y="470" width="68" height="200" rx="26" fill="#475569" ${O}/>
     <ellipse cx="-48" cy="684" rx="56" ry="24" fill="#f97316" ${O}/><ellipse cx="48" cy="684" rx="56" ry="24" fill="#f97316" ${O}/>
@@ -164,5 +200,6 @@ export function drawMemo(p) {
     ${eyes(38, -4, blink, p.look || 0, Math.max(m.big, 0.4), m.b)}
     <ellipse cx="-54" cy="34" rx="20" ry="10" fill="#fb7185" opacity="0.4"/><ellipse cx="54" cy="34" rx="20" ry="10" fill="#fb7185" opacity="0.4"/>
     ${mouth(m.m, 54, t)}
+    ${armsLayer(p, { sleeve: '#fbbf24', skin: SK }, 'body')}
   </g>`;
 }
