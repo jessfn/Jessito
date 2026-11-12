@@ -192,3 +192,4 @@ if(process.argv[1]===fileURLToPath(import.meta.url)){
   (async()=>{for(let f=a;f<b;f++){if(process.env.DBG)console.error("f",f);const px=renderPng(f/FPS).pixels;if(!ff.stdin.write(Buffer.from(px.buffer,px.byteOffset,px.length)))await new Promise(r=>ff.stdin.once('drain',r));if((f-a)%90===0)console.error('part',i,f-a,'/',b-a)}ff.stdin.end()})()}
 }
 export {SHOTS};
+export {camera,focusBlur,shakeAmp,quakeLvl,nz,opState,LINES,EVT,POSX,WHOL,HEADROT,DURL,Ls,Le,exprNew,look,blinkAt,speakerAt,FPS,W,H,TL,NAMES,hud,caption,title,endcard,hook,creatureLayer,rubble,sceneWorld,frame as frame2d};

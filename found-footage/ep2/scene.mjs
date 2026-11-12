@@ -67,3 +67,4 @@ export function creature(x,y,sc,ph,rot=0,squash=0){const lg=(i,side)=>{const a=p
 // neighbours rushing past (silhouettes)
 export function rushers(t,cx,cy){if(t<EV.rush-.5||t>EV.rush+3.5)return'';const u=(t-EV.rush+.5)/4;let s='';for(let i=0;i<5;i++){const x=3400-u*5200-i*260,y=1500-(i%2)*30;s+=`<g transform="translate(${x.toFixed(0)},${y})"><ellipse cx="0" cy="10" rx="80" ry="14" fill="#000" fill-opacity=".4"/><rect x="-30" y="-330" width="60" height="330" rx="26" fill="#05060a"/><circle cx="0" cy="-390" r="42" fill="#05060a"/><path d="M-28,-300 L-80,-${200+Math.sin(t*20+i)*40} M28,-300 L80,-${240+Math.cos(t*20+i)*40}" stroke="#05060a" stroke-width="22" stroke-linecap="round"/></g>`}return s}
 export function stairBlur(t){return''}
+export const getLand=()=>LAND;
