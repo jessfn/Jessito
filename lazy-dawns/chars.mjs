@@ -54,11 +54,18 @@ export function handsToTargets(h) {
   }
 }
 const plainHand = (col, ang, side = 1) => `<g transform="rotate(${ang})"><g transform="scale(${side < 0 ? -1 : 1},1)"><ellipse cx="-30" cy="2" rx="12" ry="20" fill="${col}" stroke="${OUT}" stroke-width="5" transform="rotate(32 -30 2)"/><ellipse rx="33" ry="30" fill="${col}" stroke="${OUT}" stroke-width="6"/>${[-21, -7, 7, 21].map((x, i) => `<rect x="${x - 7}" y="14" width="14" height="${[30, 38, 40, 32][i]}" rx="7" fill="${col}" stroke="${OUT}" stroke-width="4.5"/>`).join('')}<path d="M-16,12 q16,8 32,0" stroke="#000" stroke-opacity="0.18" stroke-width="3" fill="none"/></g></g>`;
+const mixC = (hex, k) => { const A = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)); return '#' + A.map((v) => Math.max(0, Math.round(v * (1 - k))).toString(16).padStart(2, '0')).join(''); };
+function taperSeg(a, b, wa, wb, col, grow = 0) {
+  const dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy) || 1, nx = -dy / d, ny = dx / d, ra = wa / 2 + grow, rb = wb / 2 + grow;
+  return `<path d="M${a.x + nx * ra},${a.y + ny * ra} L${b.x + nx * rb},${b.y + ny * rb} L${b.x - nx * rb},${b.y - ny * rb} L${a.x - nx * ra},${a.y - ny * ra}Z" fill="${col}" ${grow ? `stroke="${col}" stroke-width="2" stroke-linejoin="round"` : ''}/><circle cx="${a.x}" cy="${a.y}" r="${ra}" fill="${col}"/><circle cx="${b.x}" cy="${b.y}" r="${rb}" fill="${col}"/>`;
+}
 function limbSvg(side, T, sleeve, skin, withHand = true) {
   const { S, E, H } = armIK(side, T);
-  const seg = (a, b, w, col) => `<path d="M${a.x},${a.y} L${b.x},${b.y}" stroke="${OUT}" stroke-width="${w + 10}" stroke-linecap="round"/><path d="M${a.x},${a.y} L${b.x},${b.y}" stroke="${col}" stroke-width="${w}" stroke-linecap="round"/>`;
+  const outline = (a, b, wa, wb) => taperSeg(a, b, wa, wb, OUT, 5);
   const ang = Math.atan2(H.y - E.y, H.x - E.x) * 180 / Math.PI - 90;
-  return `<g>${seg(S, E, 54, sleeve)}${seg(E, H, 42, skin)}<ellipse cx="${(E.x + S.x) / 2}" cy="${(E.y + S.y) / 2}" rx="8" ry="26" fill="#fff" opacity="0.12" transform="rotate(${Math.atan2(E.y - S.y, E.x - S.x) * 180 / Math.PI - 90} ${(E.x + S.x) / 2} ${(E.y + S.y) / 2})"/>${withHand ? `<g transform="translate(${H.x},${H.y})">${plainHand(skin, ang, side)}</g>` : ''}<circle cx="${S.x}" cy="${S.y}" r="34" fill="${sleeve}" stroke="${OUT}" stroke-width="6"/></g>`;
+  const upAng = Math.atan2(E.y - S.y, E.x - S.x) * 180 / Math.PI - 90, mid = { x: (S.x + E.x) / 2, y: (S.y + E.y) / 2 };
+  const cuff = { x: S.x + (E.x - S.x) * 0.78, y: S.y + (E.y - S.y) * 0.78 };
+  return `<g>${outline(S, E, 62, 50)}${outline(E, H, 46, 36)}${taperSeg(E, H, 46, 36, skin)}<ellipse cx="${(E.x + H.x) / 2}" cy="${(E.y + H.y) / 2}" rx="7" ry="22" fill="#000" opacity="0.1" transform="rotate(${Math.atan2(H.y - E.y, H.x - E.x) * 180 / Math.PI - 90} ${(E.x + H.x) / 2} ${(E.y + H.y) / 2})"/>${taperSeg(S, E, 62, 50, sleeve)}<ellipse cx="${mid.x}" cy="${mid.y}" rx="8" ry="26" fill="#fff" opacity="0.16" transform="rotate(${upAng} ${mid.x} ${mid.y})"/><g transform="translate(${cuff.x},${cuff.y}) rotate(${upAng})"><rect x="-27" y="-7" width="54" height="14" rx="7" fill="${mixC(sleeve, 0.22)}" stroke="${OUT}" stroke-width="3.5"/></g>${withHand ? `<g transform="translate(${H.x},${H.y})">${plainHand(skin, ang, side)}</g>` : ''}<circle cx="${S.x}" cy="${S.y}" r="34" fill="${sleeve}" stroke="${OUT}" stroke-width="6"/><circle cx="${S.x - 8}" cy="${S.y - 9}" r="9" fill="#fff" opacity="0.18"/></g>`;
 }
 // mode 'body': dibuja los brazos libres; mode 'tool': dibuja el brazo que sostiene la herramienta (la mano la dibuja la herramienta)
 function armsLayer(p, spec, mode) {

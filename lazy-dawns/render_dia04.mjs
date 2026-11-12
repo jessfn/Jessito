@@ -60,7 +60,7 @@ function roomSvg() {
   <rect x="0" y="1090" width="${W}" height="300" fill="#be185d" opacity="0.88"/><rect x="0" y="1078" width="${W}" height="24" fill="#fff" stroke="${OUT}" stroke-width="6"/>
   <rect x="0" y="1380" width="${W}" height="540" fill="url(#floor)"/>${checker}<rect x="0" y="1376" width="${W}" height="22" fill="#fce7f3" stroke="${OUT}" stroke-width="5"/>
   <!-- letrero -->
-  <g transform="translate(540,250)"><rect x="-380" y="-64" width="760" height="128" rx="34" fill="#fff" stroke="${OUT}" stroke-width="8"/><rect x="-362" y="-48" width="724" height="96" rx="24" fill="#ec4899"/>
+  <g transform="translate(540,150) scale(0.82)"><rect x="-380" y="-64" width="760" height="128" rx="34" fill="#fff" stroke="${OUT}" stroke-width="8"/><rect x="-362" y="-48" width="724" height="96" rx="24" fill="#ec4899"/>
     <text x="30" y="26" font-family="Anton" font-size="74" text-anchor="middle" fill="#fff" stroke="${OUT}" stroke-width="8" paint-order="stroke" letter-spacing="3">SALÓN RAPUNZEL</text>
     <g transform="translate(-300,0)"><path d="M0,-36 C20,-20 -20,0 0,20 C20,36 -16,50 0,60" stroke="#fde047" stroke-width="12" fill="none" stroke-linecap="round" transform="scale(1,0.8)"/><circle cx="0" cy="-34" r="12" fill="#fde047" stroke="${OUT}" stroke-width="3"/></g></g>
   <!-- espejo grande -->
@@ -101,32 +101,35 @@ function chairFront() {
 }
 
 // ---------------- personajes en el mundo ----------------
-const LZ = { x: 540, S: 0.62 };
-const MARI = { x: 150, y: 930, s: 0.8 }, VERO = { x: 765, y: 880, s: 0.92 }, MEMO = { x: 1040, y: 930, s: 0.78 };
-const lazyFy = (t) => lerp(1480, 1380, smooth((t - T.sit) / 0.55));
+const LZ = { x: 540, S: 0.68 }; const K = LZ.S / 0.62; // K: escala de efectos/herramientas respecto al tamano original
+const MARI = { x: 135, y: 888, s: 0.72 }, VERO = { x: 925, y: 847, s: 0.78 }, MEMO = { x: 905, y: 1330, s: 0.5 };
+const lazyFy = (t) => lerp(1500, 1382, smooth((t - T.sit) / 0.55));
 const lazyHeadWorld = (t) => { const py = lazyFy(t) - 830 * LZ.S; return { x: 540, y: py - 215 * LZ.S }; };
 // colocar una herramienta de un personaje de modo que su extremo de trabajo quede en (tx,ty)
-function toolPose(ch, tipX, tipY, len, theta) { const r = theta * Math.PI / 180, ox = tipX - len * -Math.sin(r), oy = tipY - len * Math.cos(r); return { toolX: (ox - ch.x) / ch.s, toolY: (oy - ch.y) / ch.s, toolR: theta, toolS: 1 / ch.s * 0.92 * ch.s }; }
+function toolPose(ch, tipX, tipY, len, theta) { const r = theta * Math.PI / 180, wl = len * ch.s, ox = tipX - wl * -Math.sin(r), oy = tipY - wl * Math.cos(r); return { toolX: (ox - ch.x) / ch.s, toolY: (oy - ch.y) / ch.s, toolR: theta, toolS: 1 / ch.s * 0.92 * ch.s }; }
+// Puntos de trabajo SIEMPRE sobre el cabello (nunca sobre la cara). Coordenadas relativas a la cabeza en unidades S=0.62 (se escalan con K).
+const hairPt = (t, dx, dy) => { const h = lazyHeadWorld(t); return { x: h.x + dx * K, y: h.y + dy * K }; };
 function veroState(t) {
-  let mood = 'happy', tool = 'none', o = {}; const hh = lazyHeadWorld(t), Hx = hh.x, Hy = hh.y;
-  if (t >= L.l3.start) mood = 'happy';
-  if (t >= L.l5.start) { mood = 'focus'; }
-  if (t >= T.combA && t < T.combStuck + 0.25) { tool = 'comb'; o = toolPose(VERO, Hx + 40, Hy - 70 + (t < T.combStuck ? Math.sin(t * 5) * 14 : 0), 198, 80); }
+  let mood = 'happy', tool = 'none', o = {};
+  const at = (dx, dy, len, th) => { const p = hairPt(t, dx, dy); return toolPose(VERO, p.x, p.y, len, th); };
+  if (t >= L.l5.start) mood = 'focus';
+  if (t >= T.combA && t < T.combStuck + 0.25) { tool = 'comb'; o = at(85, -150 + (t < T.combStuck ? Math.sin(t * 5) * 12 : 0), 198, 85); }          // peine entra por arriba del cabello
   if (t >= T.combStuck) mood = 'shock';
-  if (t >= L.l8.start) { mood = 'calm'; }
-  if (t >= T.washA && t < T.washB) { tool = 'none'; mood = 'happy'; }
-  if (t >= T.cutA && t < T.cutB) { tool = 'scissors'; mood = 'focus'; o = toolPose(VERO, Hx - 80 + Math.sin(t * 3) * 20, Hy + 130, 236, 82); }
-  if (t >= T.keratA && t < T.dryA) { tool = 'brush'; mood = 'happy'; o = toolPose(VERO, Hx + 40, Hy + 40, 258, 80); }
-  if (t >= T.dryA && t < T.ironA) { tool = 'dryer'; o = toolPose(VERO, Hx + 100, Hy - 20, 270, 78); }
-  if (t >= T.ironA && t < T.greenA - 3.6) { tool = 'iron'; mood = 'focus'; const k = clamp((t - T.straightA) / (T.straightB - T.straightA)); o = toolPose(VERO, Hx - 150, Hy + 130 + k * 260, 280, 86); }
+  if (t >= L.l8.start) mood = 'calm';
+  if (t >= T.washA && t < T.washB) mood = 'happy';
+  if (t >= T.cutA && t < T.cutB) { tool = 'scissors'; mood = 'focus'; o = at(170, 10 + Math.sin(t * 3) * 14, 236, 88); }                     // tijeras cortan las puntas del lado
+  if (t >= T.keratA && t < T.dryA) { tool = 'brush'; mood = 'happy'; o = at(150, -70, 258, 82); }                                              // cepillo con keratina sobre el pelo
+  if (t >= T.dryA && t < T.ironA) { tool = 'dryer'; o = at(150, -115, 270, 78); }                                                              // secadora hacia el pelo (no la cara)
+  if (t >= T.ironA && t < T.straightB + 0.2) { tool = 'iron'; mood = 'focus'; const k = clamp((t - T.straightA) / (T.straightB - T.straightA)); o = at(208, 120 + k * 260, 280, 90); } // plancha en los mechones del lado
   if (t >= T.straightB) { tool = 'none'; mood = 'proud'; }
-  if (t >= L.l16.start) { mood = 'shock'; tool = 'none'; }
-  if (t >= T.greenA) { mood = 'scream'; }
-  if (t >= L.l19.start) { mood = 'calm'; tool = 'neutral'; o = toolPose(VERO, Hx + 120, Hy - 120, 150, 40); }
-  if (t >= T.neutA) { tool = 'bottle'; mood = 'focus'; o = toolPose(VERO, Hx + 60, Hy - 60 + Math.sin(t * 4) * 20, 150, 70); }
+  if (t >= T.bottleA + 0.6 && t < T.greenA) { tool = 'bottleG'; mood = 'focus'; o = at(72, -168, -44, -90); }                                  // aplica el tinte en la raiz (la botella equivocada)
+  if (t >= L.l16.start) { mood = 'shock'; }
+  if (t >= T.greenA) { mood = 'scream'; tool = 'none'; }
+  if (t >= L.l19.start && t < T.neutA) { mood = 'calm'; tool = 'neutral'; o = { toolX: -150, toolY: 20, toolR: 15, toolS: 0.9 }; }
+  if (t >= T.neutA && t < T.neutB) { tool = 'bottle'; mood = 'focus'; o = at(72, -168 + Math.sin(t * 4) * 8, -44, -90); }                    // neutralizador en la raiz
   if (t >= T.neutB) { tool = 'none'; mood = 'proud'; }
   if (t >= L.l21.start) { mood = 'happy'; }
-  if (t >= T.tapeA && t < T.growB + 0.5) { tool = 'tape'; mood = 'focus'; const k = clamp((t - T.growA) / (T.growB - T.growA)); o = toolPose(VERO, Hx + 200 - k * 20, Hy + 330 + k * 60, 320, 0); }
+  if (t >= T.tapeA && t < T.growB + 0.5) { tool = 'tape'; mood = 'focus'; const k = clamp((t - T.growA) / (T.growB - T.growA)); o = at(214, 380 + k * 40, 320, 0); }
   if (t >= T.growB + 0.5) { tool = 'none'; mood = 'proud'; }
   if (t >= T.mirrorStart) { mood = 'happy'; tool = 'none'; }
   if (t >= L.l26.start) mood = 'amused';
@@ -137,11 +140,11 @@ function memoState(t) {
   let mood = 'happy', tool = 'none', o = {}; const x = lerp(1250, MEMO.x, ease((t - T.memoIn) / 0.7));
   if (t >= L.l7.start) mood = 'grin';
   if (t >= L.l8.start) mood = 'worry';
-  if (t >= T.bottleA) { tool = 'bottleG'; mood = 'happy'; o = { toolX: -210, toolY: -10, toolR: 20, toolS: 0.9 }; }
+  if (t >= T.bottleA && t < T.bottleA + 0.6) { tool = 'bottleG'; mood = 'happy'; o = { toolX: 170, toolY: -20, toolR: 15, toolS: 0.9, toolSide: 1 }; } // se la pasa a Vero
   if (t >= L.l15.start) { mood = 'worry'; }
   if (t >= L.l16.start) { mood = 'shock'; }
-  if (t >= T.greenA) { mood = 'shock'; tool = 'bottleG'; }
-  if (t >= T.neutA) { tool = 'none'; mood = 'worry'; }
+  if (t >= T.greenA) { mood = 'shock'; }
+  if (t >= T.neutA) { mood = 'worry'; }
   if (t >= T.mirrorStart) mood = 'happy';
   const hands = (mood === 'shock' || mood === 'worry') ? 'cheeks' : 'none';
   return { x, mood, tool, hands, ...o };
@@ -177,29 +180,24 @@ const camKF = [[0, 1.0, 540, 900], [T.slateEnd, 1.0, 540, 900], [T.slateEnd + 1.
   [L.l14.start, 1.5, 860, 930], [L.l15.end, 1.5, 860, 930], [L.l16.start, 1.55, 760, 900], [T.greenA - 0.2, 1.45, 540, 900], [T.greenA + 0.2, 1.7, 540, 840], [L.l18.start, 1.5, 330, 930], [L.l18.end, 1.45, 540, 900],
   [L.l19.start, 1.5, 760, 900], [T.neutA, 1.55, 560, 880], [T.neutB, 1.5, 540, 900], [L.l21.start, 1.5, 720, 900], [T.growA, 1.35, 540, 960], [T.growB, 1.35, 540, 960], [T.mirrorStart - 0.3, 1.45, 540, 900], [T.mirrorStart + 0.5, 1.5, 540, 880], [T.mirrorEnd, 1.5, 540, 880],
   [L.l24.start, 1.5, 330, 930], [L.l25.start, 1.45, 540, 900], [L.l26.start, 1.5, 330, 930], [L.l26.end, 1.5, 330, 930], [T.vote - 0.2, 1.3, 540, 900], [T.vote + 0.5, 1.0, 540, 900], [9999, 1.0, 540, 900]];
-function camAt(t) {
-  let i = 0; while (i < camKF.length - 1 && camKF[i + 1][0] <= t) i++;
-  const a = camKF[i], b = camKF[Math.min(i + 1, camKF.length - 1)]; const u = smooth((t - a[0]) / Math.max(1e-3, b[0] - a[0]));
-  let [z, fx, fy] = [lerp(a[1], b[1], u), lerp(a[2], b[2], u), lerp(a[3], b[3], u)];
-  z = Math.max(z, 1.0);
-  fx = clamp(fx, 540 / z, 1080 - 540 / z); fy = clamp(fy, SAFE.cy / z, H - (H - SAFE.cy) / z);
-  const sh = win(t, T.sit + 0.3, T.sit + 0.7, 0.02, 0.3) * 6 + win(t, T.greenA - 0.05, T.greenA + 0.6, 0.02, 0.4) * 10 + win(t, T.combStuck, T.combStuck + 0.4, 0.02, 0.3) * 6;
-  return { z, x: fx + Math.sin(t * 61) * sh, y: fy + Math.cos(t * 53) * sh };
+function camAt(t) { // encuadre fijo 9:16 completo: no se acerca ni se recorta nada
+  const sh = win(t, T.sit + 0.3, T.sit + 0.7, 0.02, 0.3) * 4 + win(t, T.greenA - 0.05, T.greenA + 0.6, 0.02, 0.4) * 6 + win(t, T.combStuck, T.combStuck + 0.4, 0.02, 0.3) * 4;
+  return { z: 1 + sh * 0.004, x: 540 + Math.sin(t * 61) * sh * 0.5, y: 960 + Math.cos(t * 53) * sh * 0.5 };
 }
 const worldT = (cam) => `translate(540,${SAFE.cy}) scale(${cam.z}) translate(${-cam.x},${-cam.y})`;
 
 // ---------------- efectos de pelo y herramientas ----------------
 function showerFx(t) { const a = win(t, T.washA, T.washB, 0.3, 0.5); if (a <= 0) return ''; const hh = lazyHeadWorld(t);
   return `<g opacity="${a}"><rect x="${hh.x - 12}" y="${hh.y - 420}" width="24" height="170" fill="#9ca3af" stroke="${OUT}" stroke-width="5"/><ellipse cx="${hh.x}" cy="${hh.y - 240}" rx="74" ry="22" fill="url(#chrome)" stroke="${OUT}" stroke-width="6"/>
-    ${[...Array(26)].map((_, i) => { const ph = ((t * 1.8 + i * 0.173) % 1), x = hh.x + (i - 13) * 11, y = hh.y - 220 + ph * 330; return `<path d="M${x},${y} l-3,24" stroke="#7cc8ff" stroke-width="5" stroke-linecap="round" opacity="${0.9 - ph * 0.5}"/>`; }).join('')}</g>`; }
+    ${[...Array(26)].map((_, i) => { const ph = ((t * 1.8 + i * 0.173) % 1), x = hh.x + (i - 13) * 8.5, y = hh.y - 220 + ph * (130 + Math.abs(i - 13) * 2); return `<path d="M${x},${y} l-3,24" stroke="#7cc8ff" stroke-width="5" stroke-linecap="round" opacity="${0.9 - ph * 0.5}"/>`; }).join('')}</g>`; }
 function steamFx(t) { const a = win(t, T.ironA, T.straightB + 0.4, 0.3, 0.6) + win(t, T.dryA, T.ironA, 0.3, 0.3) * 0.5; if (a <= 0) return ''; const hh = lazyHeadWorld(t); const ik = clamp((t - T.straightA) / (T.straightB - T.straightA));
-  return `<g opacity="${clamp(a) * 0.85}">${[...Array(12)].map((_, i) => { const ph = ((t * 0.7 + i * 0.37) % 1); const x = hh.x - 150 + Math.sin(i * 2.1 + t * 2) * 50, y = hh.y + 150 + ik * 260 - ph * 260; return `<circle cx="${x}" cy="${y}" r="${24 + (i % 4) * 8 + ph * 18}" fill="#fff" opacity="${(1 - ph) * 0.55}" filter="url(#b10)"/>`; }).join('')}</g>`; }
+  return `<g opacity="${clamp(a) * 0.85}">${[...Array(12)].map((_, i) => { const ph = ((t * 0.7 + i * 0.37) % 1); const x = hh.x + 208 + Math.sin(i * 2.1 + t * 2) * 36, y = hh.y + 120 + ik * 260 - ph * 240; return `<circle cx="${x}" cy="${y}" r="${24 + (i % 4) * 8 + ph * 18}" fill="#fff" opacity="${(1 - ph) * 0.55}" filter="url(#b10)"/>`; }).join('')}</g>`; }
 function snippetsFx(t) { const a = win(t, T.cutA, T.cutB + 0.8, 0.1, 0.5); if (a <= 0) return ''; const hh = lazyHeadWorld(t);
   return [...Array(16)].map((_, i) => { const t0 = T.cutA + i * ((T.cutB - T.cutA) / 16), d = t - t0; if (d < 0 || d > 1.3) return ''; const x = hh.x + (i % 2 ? 1 : -1) * (120 + (i * 37) % 120) + Math.sin(d * 5 + i) * 18, y = hh.y + 60 + d * 360 + (i % 3) * 10;
     return `<g transform="translate(${x},${y}) rotate(${d * 200 + i * 40})" opacity="${1 - d / 1.3}"><path d="M-16,0 C-16,-18 8,-22 14,-8 C20,8 -4,16 -8,6" stroke="#1a1412" stroke-width="8" fill="none" stroke-linecap="round"/></g>`; }).join(''); }
 function combProp(t) { if (t < T.combStuck || t >= T.combOut) return ''; const hh = lazyHeadWorld(t); const tug = t > T.combStuck + 0.6 ? Math.sin(t * 28) * 3 : 0;
-  return `<g transform="translate(${hh.x + 70 + tug},${hh.y - 130}) rotate(-50) scale(0.8)"><g transform="translate(0,-40)">${(() => { return `<rect x="-14" y="-120" width="28" height="140" rx="12" fill="#ff7ab6" stroke="${OUT}" stroke-width="7"/><rect x="-90" y="10" width="180" height="30" rx="12" fill="#ff7ab6" stroke="${OUT}" stroke-width="7"/>${[...Array(12)].map((_, i) => `<rect x="${-84 + i * 15}" y="40" width="8" height="40" rx="3" fill="#ff7ab6" stroke="${OUT}" stroke-width="5"/>`).join('')}`; })()}</g></g>
-    <g transform="translate(${hh.x + 20},${hh.y - 150})">${[...Array(7)].map((_, i) => `<path d="M${-30 + i * 12},${i % 2 ? 6 : -4} q${(i - 3) * 6},-30 ${(i - 3) * 14},-46" stroke="#1a1412" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.9"/>`).join('')}</g>`; }
+  return `<g transform="translate(${hh.x + 86 + tug},${hh.y - 172}) rotate(-20) scale(0.8)"><g transform="translate(0,-10)"><rect x="-14" y="-120" width="28" height="130" rx="12" fill="#ff7ab6" stroke="${OUT}" stroke-width="7"/><rect x="-90" y="0" width="180" height="30" rx="12" fill="#ff7ab6" stroke="${OUT}" stroke-width="7"/>${[...Array(12)].map((_, i) => `<rect x="${-84 + i * 15}" y="30" width="8" height="40" rx="3" fill="#ff7ab6" stroke="${OUT}" stroke-width="5"/>`).join('')}</g></g>
+    <g transform="translate(${hh.x + 70},${hh.y - 168})">${[...Array(7)].map((_, i) => `<path d="M${-34 + i * 12},${i % 2 ? 4 : -4} q${(i - 3) * 6},-26 ${(i - 3) * 12},-40" stroke="#1a1412" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.9"/>`).join('')}</g>`; }
 function dyeFx(t) { const a = win(t, T.greenA, T.greenA + 3.0, 0.05, 0.6); if (a <= 0) return ''; const hh = lazyHeadWorld(t); const pk = pop(t, T.greenA, 0.25);
   return `<g opacity="${a}"><g transform="translate(${hh.x},${hh.y - 40}) scale(${pk})"><text x="0" y="-210" font-family="Anton" font-size="110" text-anchor="middle" fill="#7cf29a" stroke="${OUT}" stroke-width="12" paint-order="stroke">¡POOF!</text>${[...Array(8)].map((_, i) => `<circle cx="${Math.cos(i * 0.785) * 190}" cy="${Math.sin(i * 0.785) * 170}" r="${24 + (i % 3) * 8}" fill="#fff" opacity="0.8" filter="url(#b10)"/>`).join('')}</g>
     ${[...Array(10)].map((_, i) => { const ph = ((t - T.greenA) * 0.7 + i * 0.17) % 1, x = hh.x + (i % 2 ? 1 : -1) * (120 + (i * 29) % 140), y = hh.y + 130 + ph * 330; return `<path d="M${x},${y} q10,18 0,30 q-10,-12 0,-30Z" fill="#22c55e" stroke="${OUT}" stroke-width="3"/>`; }).join('')}</g>`; }
@@ -282,9 +280,11 @@ function frame(t) {
   const veroTool = `<g transform="translate(${VERO.x},${VERO.y}) scale(${VERO.s})">${drawStylist({ ...vs, t, part: 'tool' })}</g>`;
   const memoBody = es.x < 1180 ? `<g transform="translate(${es.x},${MEMO.y}) scale(${MEMO.s})">${drawMemo({ ...es, armL: msm.L, armR: msm.R, blink: blinkOf(t, 2.7), look: -0.7, t, part: 'body' })}</g>` : '';
   const memoTool = es.x < 1180 ? `<g transform="translate(${es.x},${MEMO.y}) scale(${MEMO.s})">${drawMemo({ ...es, t, part: 'tool' })}</g>` : '';
-  const icons = talkIcon(t, 'M', MARI.x + 120, MARI.y - 150) + talkIcon(t, 'V', VERO.x - 120, VERO.y - 160) + talkIcon(t, 'E', es.x - 110, MEMO.y - 140);
+  const icons = talkIcon(t, 'M', MARI.x + 100 * MARI.s / 0.8, MARI.y - 150 * MARI.s) + talkIcon(t, 'V', VERO.x - 100 * VERO.s / 0.8, VERO.y - 160 * VERO.s) + talkIcon(t, 'E', es.x - 90 * MEMO.s / 0.8, MEMO.y - 150 * MEMO.s);
+  const hhS = lazyHeadWorld(t);
   const fx = foamTowel(t) + showerFx(t) + steamFx(t) + snippetsFx(t) + combProp(t) + dyeFx(t) + growFx(t) + sparklesAll(t) + windFx(t);
-  const world = `<g transform="${worldT(cam)}"><image href="${roomPng}" width="${W}" height="${H}"/>${chairBack(seated)}${memoBody}${mari}${vero}${lazy}${seated ? chairFront() : ''}${memoTool}${veroTool}${icons}${fx}</g>`;
+  const fxScaled = `<g transform="translate(${hhS.x},${hhS.y}) scale(${K}) translate(${-hhS.x},${-hhS.y})">${fx}</g>`;
+  const world = `<g transform="${worldT(cam)}"><image href="${roomPng}" width="${W}" height="${H}"/><g transform="translate(540,1690) scale(${K}) translate(-540,-1660)">${chairBack(seated)}</g>${mari}${vero}${memoBody}${lazy}${seated ? `<g transform="translate(540,1690) scale(${K}) translate(-540,-1660)">${chairFront()}</g>` : ''}${memoTool}${veroTool}${icons}${fxScaled}</g>`;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${charDefs}
     <defs><filter id="b10"><feGaussianBlur stdDeviation="10"/></filter></defs>${world}
     ${mirrorOverlay(t)}

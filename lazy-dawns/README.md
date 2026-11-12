@@ -107,3 +107,15 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
 - Todos los personajes (Mari, Vero, Memo, Dr. Mendoza) tienen BRAZOS articulados (hombro-codo-mano con IK), no manos sueltas.
 - Sin personajes encimados: cada uno ocupa su lugar (Mari izquierda, Vero derecha, Memo al fondo derecha) y solo se superponen por profundidad
   detras de Lazy. Las herramientas las sostiene la mano del brazo que llega hasta ellas.
+
+## ENCUADRE 9:16 (regla permanente, decision del creador)
+- El video es 1080x1920 (9:16) y SIEMPRE se ve completo: NADA se corta ni se queda abajo. Prohibido acercar la camara (zoom) o recortar:
+  escenario, silla, pies y personajes enteros dentro del cuadro. Camara fija (solo un temblor minimo en sustos).
+- Los personajes se hacen grandes componiendo la escena para 9:16 (Lazy ~0.68 de escala, apoyo ~0.58-0.7), no con zoom.
+- Sin disenos malos: brazos afilados con mangas y puno, manos con pulgar interno, nada de tubos rigidos ni formas encimadas.
+
+## Logica de las acciones (regla permanente)
+- Cada herramienta trabaja en el lugar CORRECTO y NUNCA apunta a la cara salvo que sea un tratamiento facial (dia 2). En el pelo (dia 4): peine por arriba del cabello,
+  tijeras en las puntas del lado, secadora hacia el pelo desde arriba/lado, plancha en los mechones del lado, tinte/neutralizador en la raiz, extensiones junto a las cortinas de pelo.
+- Quien usa la herramienta debe poder ALCANZAR con el brazo el punto de trabajo (IK); si no alcanza, se reubica al personaje.
+- Antes de dar un video por bueno: revisar cuadros clave y verificar (1) nada cortado, (2) herramienta en el sitio logico, (3) manos/brazos correctos, (4) texto sin encimarse.
