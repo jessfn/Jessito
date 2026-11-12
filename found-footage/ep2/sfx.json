@@ -1,0 +1,22 @@
+{
+"stair_amb":["dark concrete emergency stairwell ambience, deep reverb, distant dripping, faint metallic hum, tense, realistic",20],
+"run_steps":["several people running down concrete stairs in a stairwell, loud echoing footsteps, breathless, realistic",12],
+"door_slam":["heavy metal fire door slamming in a concrete stairwell with echo, realistic",3],
+"neighbors_run":["panicked crowd of neighbors running down stairs and shouting, echoing in a stairwell, chaos, realistic",10],
+"scream_echo":["distant screams echoing through a concrete stairwell, terrified, realistic",8],
+"creature_click":["small many-legged creature skittering and clicking on concrete and ceiling, chittering insect-like clicks, creepy, realistic",8],
+"creature_screech":["small alien creature shrieking, high-pitched hiss and screech, horror movie, realistic",3],
+"extinguisher_hit":["metal fire extinguisher bashing something hard repeatedly, crunch and splat, realistic",4],
+"klaxon":["emergency building alarm klaxon blaring in a stairwell, distorted, realistic",12],
+"giant_step":["colossal footstep impact shaking a building, deep boom, dust and concrete debris falling, realistic",6],
+"groan":["building structure groaning and creaking under stress, concrete cracking, deep, realistic",8],
+"stairs_collapse":["concrete staircase collapsing, steel railing twisting, heavy debris crash, realistic",8],
+"wall_burst":["building wall exploding outward, bricks and glass shattering, huge crash, realistic",7],
+"monster_breath":["colossal creature breathing, deep rumbling exhale very close, horror movie, realistic",8],
+"breath_panic":["panicked breathing and whimper close to a microphone, realistic",8],
+"heartbeat":["tense heartbeat, close, realistic",8],
+"dust_fall":["dust and small concrete pieces falling in a stairwell, rumble, realistic",5],
+"child_whimper":["small child whimpering and sniffling quietly, realistic",5],
+"lock_door":["door opening slowly with a creak and chain rattle, realistic",3],
+"flashlight":["flashlight click on, short",1]
+}

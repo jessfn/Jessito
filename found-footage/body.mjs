@@ -25,16 +25,19 @@ export function elbow(sh,wr,side,fs=1){// 2-bone IK + pole point below the shoul
  const dx=wr[0]-sh[0],dy=wr[1]-sh[1];const d=Math.hypot(dx,dy);const k=d<18?18/d:1;const w=[sh[0]+dx*k,sh[1]+dy*k];
  const A=ik2(sh,w,102,88*fs,1)[1],B=ik2(sh,w,102,88*fs,-1)[1];const P=[sh[0]+side*60,sh[1]+200];
  const da=Math.hypot(A[0]-P[0],A[1]-P[1]),db=Math.hypot(B[0]-P[0],B[1]-P[1]);return da<=db?A:B}
+CAST.sofi=mk('Sofi',{hair:'long',skin:'#c98e6c',skin2:'#a8704f',hood:'#d9588a',hood2:'#a83c68',pants:'#3a4a6a',lashes:true,hs:1.7});CAST.sofi.hair='#150f10';CAST.sofi.hair2='#3a2a2e';CAST.sofi.hairStyle='long';
+CAST.tomas=mk('Tomas',{hair:'short',skin:'#e0a98a',skin2:'#c98a64',hood:'#55606e',hood2:'#3d4650',pants:'#2f3a4a'});CAST.tomas.hair='#2b1b14';CAST.tomas.hairStyle='short';
 export const DEF={L:{w:[146,422],hand:'relax'},R:{w:[354,422],hand:'relax'}};
 // pose: {L:{w,hand,prop},R:{...},head:{rot,dx,dy},breath,expr,blink,look,talk}
 export function body(st,pose={}){const ol=st.ol;const hs=st.hs;const k=0.97*hs;let o='';
  const br=(pose.breath||0)*2.2;const shL=[P.shL[0],P.shL[1]+br],shR=[P.shR[0],P.shR[1]+br];
  const L={...DEF.L,...(pose.L||{})},R={...DEF.R,...(pose.R||{})};
- const legL=limb(P.hipL,P.knL,56,46)+limb(P.knL,P.anL,46,34),legR=limb(P.hipR,P.knR,56,46)+limb(P.knR,P.anR,46,34);
+ const wk=pose.walk||{phase:0,amp:0};const lfL=Math.max(0,Math.sin(wk.phase))*28*wk.amp,lfR=Math.max(0,Math.sin(wk.phase+Math.PI))*28*wk.amp;const KNL=[P.knL[0],P.knL[1]-lfL*.5],ANL=[P.anL[0],P.anL[1]-lfL],KNR=[P.knR[0],P.knR[1]-lfR*.5],ANR=[P.anR[0],P.anR[1]-lfR];
+ const legL=limb(P.hipL,KNL,56,46)+limb(KNL,ANL,46,34),legR=limb(P.hipR,KNR,56,46)+limb(KNR,ANR,46,34);
  o+=grp(legL,st.pants,st,[150,420,140,290])+grp(legR,st.pants,st,[220,420,140,290]);
  o+=`<path d="M214,452 L212,560 M286,452 L288,555" stroke="${ol}" stroke-width="1.6" opacity=".5"/>`;
- o+=`<g transform="translate(${P.anL[0]},${P.anL[1]-2})">${withT(T(P.anL[0],P.anL[1]-2),()=>shoeV2(st,-1))}</g><g transform="translate(${P.anR[0]},${P.anR[1]-2})">${withT(T(P.anR[0],P.anR[1]-2),()=>shoeV2(st,1))}</g>`;
- o+=`<ellipse cx="${P.anL[0]}" cy="${P.anL[1]-6}" rx="22" ry="8" fill="${st.pants}" stroke="${ol}" stroke-width="${st.ow*1.4}"/><ellipse cx="${P.anR[0]}" cy="${P.anR[1]-6}" rx="22" ry="8" fill="${st.pants}" stroke="${ol}" stroke-width="${st.ow*1.4}"/>`;
+ o+=`<g transform="translate(${ANL[0]},${ANL[1]-2})">${withT(T(ANL[0],ANL[1]-2),()=>shoeV2(st,-1))}</g><g transform="translate(${ANR[0]},${ANR[1]-2})">${withT(T(ANR[0],ANR[1]-2),()=>shoeV2(st,1))}</g>`;
+ o+=`<ellipse cx="${ANL[0]}" cy="${ANL[1]-6}" rx="22" ry="8" fill="${st.pants}" stroke="${ol}" stroke-width="${st.ow*1.4}"/><ellipse cx="${ANR[0]}" cy="${ANR[1]-6}" rx="22" ry="8" fill="${st.pants}" stroke="${ol}" stroke-width="${st.ow*1.4}"/>`;
  o+=grp(`<path d="M184,${232+br} Q250,${214+br} 316,${232+br} Q326,330 300,448 Q250,462 200,448 Q174,330 184,${232+br}Z"/>`,st.hood,st,[170,215,160,250]);
  o+=`<path d="M214,${246+br} Q250,${284+br} 286,${246+br}" stroke="${ol}" stroke-width="${st.ow*1.2}" fill="none"/><path d="M240,268 v52 M262,268 v48" stroke="${st.shoe}" stroke-width="3" stroke-linecap="round"/><circle cx="240" cy="322" r="3" fill="${st.shoe}"/><circle cx="262" cy="318" r="3" fill="${st.shoe}"/><path d="M208,392 Q250,404 292,392 L298,440 Q250,452 202,440Z" fill="${st.hood2}" stroke="${ol}" stroke-width="${st.ow*1.1}"/>`;
  o+=grp(`<path d="M198,${238+br} Q204,${200+br} 250,${196+br} Q296,${200+br} 302,${238+br} Q250,${222+br} 198,${238+br}Z"/>`,st.hood,st,[190,190,120,60],{sd:3});

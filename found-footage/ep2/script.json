@@ -1,0 +1,128 @@
+[
+{
+"id": "l0",
+"who": "Tomas",
+"text": "Piso catorce. Las luces de emergencia siguen funcionando. Por ahora.",
+"say": "[whispers] Piso catorce. Las luces de emergencia siguen funcionando. [uneasy] Por ahora."
+},
+{
+"id": "a1",
+"who": "Beto",
+"text": "El elevador no responde. Está muerto.",
+"say": "[breathless] El elevador no responde. Está muerto."
+},
+{
+"id": "a2",
+"who": "Marta",
+"text": "Entonces, por las escaleras. Todos juntos. Nadie se separa.",
+"say": "[firm, controlled] Entonces, por las escaleras. Todos juntos. Nadie se separa."
+},
+{
+"id": "a3",
+"who": "Diego",
+"text": "Lucía, dame la mano. Tranquila. Estoy aquí.",
+"say": "[gently] Lucía, dame la mano. Tranquila. Estoy aquí."
+},
+{
+"id": "a4",
+"who": "Lucia",
+"text": "Escuchen... algo viene corriendo hacia nosotros.",
+"say": "[scared, whispering] Escuchen... algo viene corriendo hacia nosotros."
+},
+{
+"id": "a5",
+"who": "Vecino",
+"text": "¡Corran! ¡Sigan bajando! ¡No se detengan!",
+"say": "[screaming from far away] ¡Corran! ¡Sigan bajando! ¡No se detengan!"
+},
+{
+"id": "a6",
+"who": "Tomas",
+"text": "Piso once. Esa puerta está abierta.",
+"say": "[whispers] Piso once. Esa puerta está abierta."
+},
+{
+"id": "a7",
+"who": "Sofi",
+"text": "¿Hola? ¿Quién está ahí? Mi mamá me dijo que no abriera.",
+"say": "[whispering, frightened child] ¿Hola? ¿Quién está ahí? Mi mamá me dijo que no abriera."
+},
+{
+"id": "a8",
+"who": "Diego",
+"text": "Tranquila, pequeña. ¿Cómo te llamas?",
+"say": "[softly] Tranquila, pequeña. ¿Cómo te llamas?"
+},
+{
+"id": "a9",
+"who": "Sofi",
+"text": "Sofi. Hay algo en mi casa. Hace ruidos.",
+"say": "[trembling child] Sofi. Hay algo en mi casa. Hace ruidos."
+},
+{
+"id": "a10",
+"who": "Beto",
+"text": "¿Escuchan eso? Son como... patas. Muchas patas.",
+"say": "[whispers, terrified] ¿Escuchan eso? Son como... patas. Muchas patas."
+},
+{
+"id": "a11",
+"who": "Marta",
+"text": "Tomás, ilumina el techo. ¡Ahora!",
+"say": "[tense, urgent] Tomás, ilumina el techo. ¡Ahora!"
+},
+{
+"id": "a12",
+"who": "Lucia",
+"text": "¡Está en mi hombro! ¡Quítenmelo!",
+"say": "[screaming] ¡Está en mi hombro! ¡Quítenmelo!"
+},
+{
+"id": "a13",
+"who": "Marta",
+"text": "¡Ya lo tengo! ¡Ya lo tengo!",
+"say": "[panicked, breathless] ¡Ya lo tengo! ¡Ya lo tengo!"
+},
+{
+"id": "a14",
+"who": "Tomas",
+"text": "Eso no es de este mundo. Tenemos que irnos. Ya.",
+"say": "[shaken] Eso no es de este mundo. Tenemos que irnos. Ya."
+},
+{
+"id": "a15",
+"who": "Diego",
+"text": "Sofi, ven conmigo. No me sueltes.",
+"say": "[urgent] Sofi, ven conmigo. No me sueltes."
+},
+{
+"id": "a16",
+"who": "Beto",
+"text": "¡Se está cayendo todo! ¡Corran!",
+"say": "[screaming] ¡Se está cayendo todo! ¡Corran!"
+},
+{
+"id": "a17",
+"who": "Beto",
+"text": "¡Mi pierna! ¡Estoy atorado!",
+"say": "[screaming in pain] ¡Mi pierna! ¡Estoy atorado!"
+},
+{
+"id": "a18",
+"who": "Diego",
+"text": "¡Aguanta! ¡Te sacamos!",
+"say": "[panicked] ¡Aguanta! ¡Te sacamos!"
+},
+{
+"id": "a19",
+"who": "Lucia",
+"text": "Tomás... mira la ventana.",
+"say": "[whispers, terrified] Tomás... mira la ventana."
+},
+{
+"id": "a20",
+"who": "Tomas",
+"text": "No... no puede ser.",
+"say": "[breathless whisper] No... no puede ser."
+}
+]

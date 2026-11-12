@@ -79,6 +79,7 @@ function gripV2(st,prop='flash'){const ol=st.ol,ow=st.ow;
  let cyl=`<rect x="-14" y="-92" width="28" height="86" rx="7" fill="#2a2e36" stroke="${ol}" stroke-width="${ow*1.6}"/><rect x="-18" y="-114" width="36" height="26" rx="5" fill="#4a505c" stroke="${ol}" stroke-width="${ow*1.6}"/><ellipse cx="0" cy="-114" rx="16" ry="4" fill="#fffbe0" stroke="${ol}" stroke-width="${ow}"/><rect x="-14" y="-68" width="28" height="4" fill="#111" opacity=".6"/><path d="M-9,-90 L-9,-10" stroke="#fff" stroke-width="2" opacity=".18"/>`;
  if(prop==='cup')cyl=`<path d="M-17,-76 L17,-76 L12,-6 L-12,-6Z" fill="#c8323c" stroke="${ol}" stroke-width="${ow*1.6}" stroke-linejoin="round"/><ellipse cx="0" cy="-76" rx="17" ry="4.5" fill="#6a1a20" stroke="${ol}" stroke-width="${ow}"/><path d="M-14,-56 L14,-56" stroke="#fff" stroke-width="2" opacity=".25"/>`;
  if(prop==='bottle')cyl=`<path d="M-14,-70 L14,-70 L14,-10 Q14,-6 10,-6 L-10,-6 Q-14,-6 -14,-10Z" fill="#2f7d3f" stroke="${ol}" stroke-width="${ow*1.6}" stroke-linejoin="round"/><path d="M-14,-70 Q-14,-84 -6,-92 L-6,-112 L6,-112 L6,-92 Q14,-84 14,-70" fill="#2f7d3f" stroke="${ol}" stroke-width="${ow*1.6}" stroke-linejoin="round"/><rect x="-7" y="-118" width="14" height="8" rx="2" fill="#d9c25a" stroke="${ol}" stroke-width="${ow}"/><rect x="-14" y="-52" width="28" height="22" fill="#eee6c8" opacity=".9"/><path d="M-8,-68 L-8,-12" stroke="#fff" stroke-width="2.4" opacity=".25"/>`;
+ if(prop==='ext')cyl=`<path d="M-17,-84 L17,-84 L17,-12 Q17,-6 11,-6 L-11,-6 Q-17,-6 -17,-12Z" fill="#c4261e" stroke="${ol}" stroke-width="${ow*1.6}" stroke-linejoin="round"/><rect x="-9" y="-104" width="18" height="22" rx="4" fill="#2a2e36" stroke="${ol}" stroke-width="${ow*1.3}"/><path d="M-12,-110 L24,-118 L26,-108 L-6,-100Z" fill="#1a1d22" stroke="${ol}" stroke-width="${ow}"/><path d="M18,-106 Q40,-90 34,-60" stroke="#15171b" stroke-width="7" fill="none" stroke-linecap="round"/><rect x="-17" y="-60" width="34" height="26" fill="#f0ece0"/><path d="M-12,-76 L-12,-14" stroke="#fff" stroke-width="2.4" opacity=".3"/>`;
  if(prop==='phone')cyl=`<rect x="-17" y="-74" width="34" height="68" rx="6" fill="#15181d" stroke="${ol}" stroke-width="${ow*1.4}"/><rect x="-14" y="-70" width="28" height="60" rx="3" fill="#9fd0ff"/><path d="M-10,-64 L6,-64" stroke="#fff" stroke-width="2" opacity=".6"/>`;
  let r=grp(`<rect x="-23" y="-50" width="46" height="56" rx="16"/>`,st.skin,st,[-30,-60,60,70],{sd:3});
  r+=cyl;
@@ -138,15 +139,15 @@ const EX={neutral:{n:'Neutral',e:1,brow:[0,0],rot:0,pup:1,m:'neutral',look:[0,0]
  smile:{n:'Sonrisa',e:.72,brow:[-2,-3],rot:0,pup:1,m:'smile',look:[0,0],wr:'smile',flush:1}};
 function face(st,ex,op={}){const F=st.face,e=typeof ex==='string'?EX[ex]:ex,ol=st.ol,sk=st.skin;let s='';const bl=op.blink||0,tk=op.talk||0,lk=op.look||e.look||[0,0];const ow=st.ow*(st.k==2?1:.8);
  // back hair, ears
- s+=`<path d="${F.hairBack}" fill="${st.hair}" stroke="${ol}" stroke-width="${f(ow*2)}" stroke-linejoin="round"/>`;
- [-1,1].forEach(g=>s+=`<ellipse cx="${g*F.ear[0]}" cy="${F.ear[1]}" rx="7" ry="12" fill="${st.skin2==='x'?sk:sk}" stroke="${ol}" stroke-width="${f(ow*2)}"/>`);
- s+=`<path d="${F.path}" fill="${sk}" stroke="${ol}" stroke-width="${f(ow*2.2)}" stroke-linejoin="round"/>`;
+ if(!op.only)s+=`<path d="${F.hairBack}" fill="${st.hair}" stroke="${ol}" stroke-width="${f(ow*2)}" stroke-linejoin="round"/>`;
+ if(!op.only)[-1,1].forEach(g=>s+=`<ellipse cx="${g*F.ear[0]}" cy="${F.ear[1]}" rx="7" ry="12" fill="${st.skin2==='x'?sk:sk}" stroke="${ol}" stroke-width="${f(ow*2)}"/>`);
+ if(!op.only)s+=`<path d="${F.path}" fill="${sk}" stroke="${ol}" stroke-width="${f(ow*2.2)}" stroke-linejoin="round"/>`;
  // shading
  const fv=visibleBB(-64,-64,64,68,2);let sh0='';if(fv)sh0+=`<g clip-path="url(#face_${st.k})">`;
  if(!fv){}else if(st.shade==='grad')sh0+=`<rect x="-60" y="-60" width="120" height="125" fill="url(#sh_${st.k})"/><ellipse cx="0" cy="52" rx="30" ry="12" fill="#000" opacity=".12"/>`;
  else if(st.shade==='cel')sh0+=`<rect x="-60" y="-60" width="120" height="125" fill="url(#sh_${st.k})"/><path d="M-44,-20 Q-10,0 44,-18 L44,-60 L-44,-60Z" fill="#c07a8a" opacity=".16"/>`;
  else sh0+=`<path d="M30,-50 Q58,0 20,52 L60,60 L60,-60Z" fill="${st.skin2}" opacity=".45"/>`;
- if(fv)sh0+=`</g>`;s+=sh0;
+ if(fv)sh0+=`</g>`;if(!op.only)s+=sh0;
  // cheeks
  const ch=(e.flush?.5:.22);[-1,1].forEach(g=>s+=`<ellipse cx="${g*(F.eyeX+4)}" cy="${F.mouthY-9}" rx="10" ry="6" fill="#e0707a" opacity="${ch*(st.k==1?.8:1.3)}"/>`);
  // wrinkles
@@ -201,6 +202,7 @@ function face(st,ex,op={}){const F=st.face,e=typeof ex==='string'?EX[ex]:ex,ol=s
  s+=m;
  if(e.sweat)s+=`<path d="M38,-34 Q44,-22 38,-17 Q32,-22 38,-34Z" fill="#9fd8ff" stroke="${ol}" stroke-width="1.2"/>`;
  if(e.tear)s+=`<path d="M-24,12 Q-18,26 -24,32 Q-30,26 -24,12Z" fill="#9fd8ff" stroke="${ol}" stroke-width="1"/><path d="M-28,6 Q-22,8 -28,12" stroke="#9fd8ff" stroke-width="2" fill="none"/>`;
+ if(op.only)return s;
  // front hair
  if(st.hairStyle&&st.hairStyle!=='beanie'){s+=`<path d="${F.hairFront}" fill="${st.hair}" stroke="${ol}" stroke-width="${f(ow*2)}" stroke-linejoin="round"/>`;(F.hairLines||[]).forEach(l=>s+=`<path d="${l}" stroke="${st.hair2}" stroke-width="3" fill="none" stroke-linecap="round" opacity=".8"/>`)}
  else if(st.k==2){s+=`<path d="${F.hairFront.split('Z')[0]}Z" fill="#2f7a8c" stroke="${ol}" stroke-width="${f(ow*2)}" stroke-linejoin="round"/><rect x="-56" y="-36" width="112" height="16" rx="6" fill="#215a68" stroke="${ol}" stroke-width="${f(ow*2)}"/>`;for(let x=-48;x<=48;x+=12)s+=`<path d="M${x},-34 v12" stroke="${ol}" stroke-width="1.6" opacity=".6"/>`;s+=`<path d="M-40,-20 Q-30,-6 -24,-12M40,-20 Q30,-6 24,-12" stroke="${ol}" stroke-width="0" />`;s+=`<path d="M-48,-20 Q-44,-8 -36,-10 L-36,-20Z M48,-20 Q44,-8 36,-10 L36,-20Z" fill="${st.hair}" stroke="${ol}" stroke-width="${f(ow)}"/>`}
