@@ -1,11 +1,11 @@
 import {Resvg} from '@resvg/resvg-js';import fs from 'fs';import {spawn,spawnSync} from 'child_process';import path from 'path';import {fileURLToPath} from 'url';
-import {CAST,body,defs} from '../body.mjs';
+import {CAST,body,defs,elbow} from '../body.mjs';
 import {clamp,sm,lerp,defsScene,backdrop,rooftop,T_BLACKOUT,giantLeg} from './scene.mjs';
 const HERE=path.dirname(fileURLToPath(import.meta.url));const BUILD=path.join(HERE,'../build/ep1');
 const W=1080,H=1920,FPS=30,DUR=136;
 const script=JSON.parse(fs.readFileSync(path.join(HERE,'script.json'),'utf8'));
 const START={l1:11.0,l2:16.0,l3:20.0,l4:25.0,l5:27.6,l6:31.4,l7:34.0,l8:38.0,l9:42.2,l10:45.5,l11:52.5,l12:55.6,l13:59.2,l14:69.0,l15:70.8,l16:73.6,l17:83.0,l18:85.0,l19:88.8,l20:94.5,l21:97.0,l22:105.0,l23:109.5,l24:112.6,l25:117.0};
-export {START};
+export {START,KF,kfAt};
 const NAMES={Tomas:'TOMÁS (cámara)',Beto:'BETO',Diego:'DIEGO',Marta:'MARTA',Lucia:'LUCÍA'};
 const POSX={beto:700,diego:1100,marta:1500,lucia:1900};
 const WHOKEY={Beto:'beto',Diego:'diego',Marta:'marta',Lucia:'lucia'};
@@ -29,11 +29,15 @@ const EXPR={
  lucia:[[0,'smile'],[45.5,'smile'],[52,'smile'],[67.2,'neutral'],[80,'fear'],[94,'fear'],[116,'surprise']]};
 const REL={L:{w:[146,422],hand:'relax'},R:{w:[354,422],hand:'relax'}};
 const KF={
- beto:[[0,{...REL,R:{w:[398,248],hand:'grip',prop:'bottle'}}],[59,{...REL,R:{w:[404,170],hand:'grip',prop:'bottle'}}],[65,{...REL,R:{w:[398,250],hand:'grip',prop:'bottle'}}],[75,{...REL,R:{w:[386,330],hand:'grip',prop:'bottle'}}],[93,{L:{w:[212,206],hand:'open'},R:{w:[288,206],hand:'open'}}]],
- diego:[[0,{L:{w:[132,252],hand:'grip',prop:'cup'},R:REL.R}],[24.8,{L:{w:[132,252],hand:'grip',prop:'cup'},R:{w:[408,330],hand:'open'}}],[32,{L:{w:[132,252],hand:'grip',prop:'cup'},R:REL.R}],[52,{L:{w:[132,252],hand:'grip',prop:'cup'},R:{w:[286,178],hand:'open'}}],[56,{L:{w:[132,252],hand:'grip',prop:'cup'},R:REL.R}],[80,{L:{w:[150,350],hand:'grip',prop:'cup'},R:{w:[300,300],hand:'open'}}],[93,{L:{w:[206,250],hand:'open'},R:{w:[300,250],hand:'open'}}],[105,{L:{w:[206,250],hand:'open'},R:{w:[424,210],hand:'open'}}]],
- marta:[[0,{L:{w:[262,332],hand:'relax'},R:{w:[238,336],hand:'relax'}}],[37,REL],[60,{L:{w:[262,332],hand:'relax'},R:{w:[238,336],hand:'relax'}}],[78,{L:REL.L,R:{w:[424,206],hand:'open'}}],[93,{L:{w:[214,208],hand:'open'},R:{w:[286,208],hand:'open'}}],[109,{L:{w:[214,208],hand:'open'},R:{w:[350,262],hand:'open'}}]],
- lucia:[[0,{L:REL.L,R:{w:[364,254],hand:'grip',prop:'cup'}}],[45,{L:{w:[116,300],hand:'open'},R:{w:[364,254],hand:'grip',prop:'cup'}}],[67.5,{L:REL.L,R:{w:[372,330],hand:'grip',prop:'cup'}}],[80,{L:{w:[214,206],hand:'open'},R:{w:[286,206],hand:'open'}}]]};
-function kfAt(arr,t){let i=0;while(i+1<arr.length&&arr[i+1][0]<=t)i++;const cur=arr[i][1],prev=i>0?arr[i-1][1]:cur;const u=sm((t-arr[i][0])/.55);const out={};for(const s of ['L','R']){const a=prev[s],b=cur[s];out[s]={w:[lerp(a.w[0],b.w[0],u),lerp(a.w[1],b.w[1],u)],hand:u>.3?b.hand:a.hand,prop:u>.3?b.prop:a.prop}}return out}
+ beto:[[0,{...REL,R:{w:[398,248],hand:'grip',prop:'bottle'}}],[59,{...REL,R:{w:[404,170],hand:'grip',prop:'bottle'}}],[65,{...REL,R:{w:[398,250],hand:'grip',prop:'bottle'}}],[75,{...REL,R:{w:[360,324],hand:'grip',prop:'bottle',fs:.55,rot:6}}],[93,{L:{e:[118,322],w:[134,214],hand:'open'},R:{e:[382,322],w:[366,214],hand:'open'}}]],
+ diego:[[0,{L:{w:[132,252],hand:'grip',prop:'cup'},R:REL.R}],[24.8,{L:{w:[132,252],hand:'grip',prop:'cup'},R:{w:[382,326],hand:'open'}}],[32,{L:{w:[132,252],hand:'grip',prop:'cup'},R:REL.R}],[52,{L:{w:[132,252],hand:'grip',prop:'cup'},R:{w:[286,178],hand:'open',front:1}}],[56,{L:{w:[132,252],hand:'grip',prop:'cup'},R:REL.R}],[80,{L:{w:[152,330],hand:'grip',prop:'cup',fs:.55,rot:-4},R:{w:[300,300],hand:'open'}}],[93,{L:{e:[168,332],w:[224,238],hand:'open',front:1},R:{e:[332,332],w:[276,238],hand:'open',front:1}}],[105,{L:{e:[168,332],w:[224,238],hand:'open',front:1},R:{w:[452,200],hand:'point'}}]],
+ marta:[[0,{L:{w:[262,332],hand:'relax'},R:{w:[238,336],hand:'relax'}}],[37,REL],[60,{L:{w:[262,332],hand:'relax'},R:{w:[238,336],hand:'relax'}}],[78,{L:REL.L,R:{w:[452,196],hand:'point'}}],[93,{L:{e:[166,334],w:[226,240],hand:'open',front:1},R:{e:[334,334],w:[274,240],hand:'open',front:1}}],[109,{L:{e:[166,334],w:[226,240],hand:'open',front:1},R:{w:[350,262],hand:'open'}}]],
+ lucia:[[0,{L:REL.L,R:{w:[364,254],hand:'grip',prop:'cup'}}],[45,{L:{w:[116,300],hand:'open'},R:{w:[364,254],hand:'grip',prop:'cup'}}],[67.5,{L:REL.L,R:{w:[352,326],hand:'grip',prop:'cup',fs:.55,rot:4}}],[80,{L:{e:[116,290],w:[160,168],hand:'open',front:1},R:{e:[384,290],w:[340,168],hand:'open',front:1}}]]};
+const SH={L:[186,240],R:[314,240]};
+const ease=x=>{x=clamp(x);const c1=1.1,c3=c1+1;return 1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2)};
+function polar(sh,a,b,u){const ra=Math.hypot(a[0]-sh[0],a[1]-sh[1]),rb=Math.hypot(b[0]-sh[0],b[1]-sh[1]);let ta=Math.atan2(a[1]-sh[1],a[0]-sh[0]),tb=Math.atan2(b[1]-sh[1],b[0]-sh[0]);let d=tb-ta;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;const th=ta+d*u,rr=ra+(rb-ra)*u;return[sh[0]+Math.cos(th)*rr,sh[1]+Math.sin(th)*rr]}
+function kfAt(arr,t){let i=0;while(i+1<arr.length&&arr[i+1][0]<=t)i++;const cur=arr[i][1],prev=i>0?arr[i-1][1]:cur;const uu=clamp((t-arr[i][0])/.6);const u=ease(uu);const out={};for(const s of ['L','R']){const a=prev[s],b=cur[s];const pick=uu>.3?b:a;const side=s==='L'?-1:1;out[s]={w:polar(SH[s],a.w,b.w,u),hand:pick.hand,prop:pick.prop,fs:lerp(a.fs||1,b.fs||1,u),rot:pick.rot,front:pick.front};
+ if(a.e||b.e){const ea=a.e||elbow(SH[s],a.w,side,a.fs||1),eb=b.e||elbow(SH[s],b.w,side,b.fs||1);out[s].e=polar(SH[s],ea,eb,u)}}return out}
 function exprAt(arr,t){let e=arr[0][1];for(const [ti,ex] of arr)if(t>=ti)e=ex;return e}
 function blinkAt(seed,t){const per=3.1;const k=Math.floor(t/per+seed);const jit=((Math.sin(k*12.9898+seed*78.2)*43758.5453)%1+1)%1;const t0=(k-seed)*per+jit*1.2;const d=t-t0;return d>=0&&d<.14?Math.sin(d/.14*Math.PI):0}
 function look(who,t){const sp=speakerAt(t);const mx=POSX[who];if(t>78.4&&t<83&&who!=='x')return[.9,-.6];if(t>100&&t<104.8)return[.4,-.7];if(t>112.4&&t<117)return[.5,-.6];if(sp&&sp.who!=='Tomas'&&WHOKEY[sp.who]!==who)return[clamp((POSX[WHOKEY[sp.who]]-mx)/500,-1,1),.1];return[0,.15]}

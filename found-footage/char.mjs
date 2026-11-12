@@ -84,8 +84,8 @@ function gripV2(st,prop='flash'){const ol=st.ol,ow=st.ow;
  return r}
 function ik2(b,t,l1,l2,sg){let dx=t[0]-b[0],dy=t[1]-b[1];let d=Math.min(Math.hypot(dx,dy),l1+l2-0.01);const a=Math.atan2(dy,dx),c=Math.acos((l1*l1+d*d-l2*l2)/(2*l1*d));const t1=a+sg*c;const k=[b[0]+Math.cos(t1)*l1,b[1]+Math.sin(t1)*l1];const t2=Math.atan2(t[1]-k[1],t[0]-k[0]);return[b,k,[k[0]+Math.cos(t2)*l2,k[1]+Math.sin(t2)*l2]]}
 function handProf(pose,st){const ol=st.ol;let r='';
- const spec=pose==='point'?{c:[[2,3,3],[62,78,50],[66,80,52],[68,82,54]],th:'tuck'}:pose==='pinch'?{c:[[34,40,28],[52,66,44],[58,70,46],[62,74,48]],th:'pinch'}:{c:[[10,16,12],[14,22,16],[18,24,18],[22,26,18]],th:'free'};
- const L=[[17,12,9.5],[19,13,10],[17,12,9.5],[13,9,7.5]],W=[[10,9.2,8],[10.5,9.5,8.2],[10,9.2,8],[9,8.2,7.2]];
+ const spec=pose==='point'?{c:[[2,3,3],[62,78,50],[66,80,52],[68,82,54]],th:'tuck'}:pose==='pinch'?{c:[[34,40,28],[52,66,44],[58,70,46],[62,74,48]],th:'pinch'}:{c:[[6,10,8],[9,14,10],[12,17,12],[15,19,12]],th:'free'};
+ const L=[[17,12,9.5],[19,13,10],[17,12,9.5],[13,9,7.5]],W=[[10,9.2,8],[10.5,9.5,8.2],[10,9.2,8],[9,8.2,7.2]].map(r=>r.map(v=>v*1.3));
  const base=[[44,-10],[44,-7],[44,-3.5],[43,0]];
  const chains=[];for(let i=0;i<4;i++){const pts=[base[i].slice()];let a=-4+i*2,p=base[i].slice();for(let j=0;j<3;j++){a+=spec.c[i][j];const q=a*Math.PI/180;p=[p[0]+Math.cos(q)*L[i][j],p[1]+Math.sin(q)*L[i][j]];pts.push(p.slice())}chains.push(pts)}
  let thp;const tb=[12,6];
@@ -93,14 +93,14 @@ function handProf(pose,st){const ol=st.ol;let r='';
  else if(spec.th==='tuck'){thp=[tb,[tb[0]+20,tb[1]+10],[tb[0]+30,tb[1]+24]]}
  else{thp=[tb,[tb[0]+19,tb[1]-12],[tb[0]+31,tb[1]-18]]}
  const palm=`<path d="M0,-10 Q18,-18 44,-13 L46,2 Q42,14 26,17 Q10,20 0,12Z"/><ellipse cx="17" cy="8" rx="17" ry="10"/>`;
- r+=grp(palm,st.skin,st,[-10,-30,70,60],{sd:2.5});
+ r+=grp(palm,st.skin,st,[-10,-30,70,60],{sd:2.5,ow:3});
  for(let i=3;i>=0;i--){const ch=chains[i];let sh='';for(let j=0;j<3;j++)sh+=limb(ch[j],ch[j+1],W[i][j],W[i][j+1]??W[i][j]*.9);
-  r+=grp(sh,st.skin,st,[20,-30,60,80],{sd:2.2});
+  r+=grp(sh,st.skin,st,[20,-30,60,80],{sd:2.2,ow:2.3});
   const e=ch[3],pv=ch[2],ang=Math.atan2(e[1]-pv[1],e[0]-pv[0])*180/Math.PI;
   r+=`<g transform="translate(${f(e[0])},${f(e[1])}) rotate(${f(ang)})"><rect x="-6.4" y="-3.4" width="5.8" height="6.6" rx="2.4" fill="#f9dccb" stroke="${ol}" stroke-width=".8"/></g>`;
   for(let j=1;j<3;j++){const q=ch[j];r+=`<path d="M${f(q[0]-2)},${f(q[1]-4)} q2,4 0,8" stroke="${ol}" stroke-width="1" fill="none" opacity=".6"/>`}}
  let sh2='';for(let j=0;j<2;j++)sh2+=limb(thp[j],thp[j+1],[13,11.5][j],[11.5,10][j]);
- r+=grp(sh2,st.skin,st,[0,-20,70,80],{sd:2.4});
+ r+=grp(sh2,st.skin,st,[0,-20,70,80],{sd:2.4,ow:2.6});
  const te=thp[2],tp=thp[1],ta=Math.atan2(te[1]-tp[1],te[0]-tp[0])*180/Math.PI;
  r+=`<g transform="translate(${f(te[0])},${f(te[1])}) rotate(${f(ta)})"><rect x="-7" y="-3.8" width="6.6" height="7.4" rx="2.6" fill="#f9dccb" stroke="${ol}" stroke-width=".8"/></g>`;
  if(spec.th==='pinch'){const k=chains[0][3];r+=`<g transform="translate(${f(k[0]+2)},${f(k[1]-1)}) rotate(20)"><rect x="-2" y="-2" width="34" height="4.5" rx="2" fill="#c9ccd2" stroke="${ol}" stroke-width="1.2"/><circle cx="36" cy="0" r="8" fill="none" stroke="#c9ccd2" stroke-width="4"/><circle cx="36" cy="0" r="10" fill="none" stroke="${ol}" stroke-width=".9"/><path d="M12,2 v6 M18,2 v4 M24,2 v7" stroke="#c9ccd2" stroke-width="3"/></g>`}
