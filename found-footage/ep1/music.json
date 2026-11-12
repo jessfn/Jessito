@@ -1,0 +1,9 @@
+{
+"intro":["dark eerie found-footage horror ambient intro, low drone, distant metallic textures, tension, no vocals",10000],
+"party":["upbeat modern latin pop electronic instrumental dance party track, warm bass, light percussion, bright synths, 118 bpm, no vocals",60000],
+"piano":["tender emotional solo piano with soft strings, nostalgic farewell between friends, slow and gentle, no vocals",30000],
+"blackout":["dark cinematic horror ambient underscore after a city blackout, deep sub drones, sparse eerie high tones, slow building dread, no melody, no vocals",45000],
+"dread":["cinematic horror tension build, pulsing low strings ostinato, heartbeat percussion, rising intensity, disaster movie, no vocals",45000],
+"climax":["massive cinematic disaster climax, huge orchestral hits, chaotic taiko percussion, brass stabs, rumbling bass, giant monster attack, no vocals",30000],
+"ending":["ominous sparse ending ambience, low drone and slow heartbeat pulse, unresolved, found footage horror, no vocals",20000]
+}

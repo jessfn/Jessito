@@ -12,10 +12,24 @@ const S={
  skin:'#f9d4bc',skin2:'#e5a98f',ol:'#2b1a2d',ow:2.2,hood:'#8d3b55',hood2:'#6a2a42',pants:'#2a2c4a',shoe:'#f4eef0',sole:'#7a6a8a',hair:'#2f2757',hair2:'#5a4aa0',
  shade:'cel',hs:1.08,face:{path:'M-40,-8 Q-43,-50 0,-52 Q43,-50 40,-8 Q38,32 12,52 Q0,60 -12,52 Q-38,32 -40,-8Z',eyeX:18,eyeY:2,eyeW:15,eyeH:15,iris:11,browY:-22,brow:3,noseY:20,mouthY:38,ear:[41,6],kind:'anime',wr:false,hairBack:'M-52,0 Q-62,-60 0,-68 Q62,-60 52,0 Q58,40 48,66 L32,58 L-32,58 L-48,66 Q-58,40 -52,0Z',hairFront:'M-50,-8 Q-54,-64 0,-68 Q54,-64 50,-8 Q44,-36 30,-32 Q26,-12 10,-30 Q0,-12 -10,-28 Q-24,-12 -32,-30 Q-44,-28 -50,-8Z',hairLines:['M-34,-50 Q-14,-60 6,-56','M14,-58 Q34,-52 42,-38'],pin:true}}};
 // ---------- primitives ----------
+
+let CTM=[1,0,0,1,0,0];const CW=1080,CH=1920;
+export const setCTM=m=>{CTM=m};export const getCTM=()=>CTM;
+export const mul=(a,b)=>[a[0]*b[0]+a[2]*b[1],a[1]*b[0]+a[3]*b[1],a[0]*b[2]+a[2]*b[3],a[1]*b[2]+a[3]*b[3],a[0]*b[4]+a[2]*b[5]+a[4],a[1]*b[4]+a[3]*b[5]+a[5]];
+export const T=(tx,ty,rotDeg=0,sx=1,sy=1)=>{const r=rotDeg*Math.PI/180,co=Math.cos(r),si=Math.sin(r);return[co*sx,si*sx,-si*sy,co*sy,tx,ty]};
+export function withT(m,fn){const old=CTM;CTM=mul(old,m);try{return fn()}finally{CTM=old}}
+export function visibleBB(x0,y0,x1,y1,margin=8){const pts=[[x0,y0],[x1,y0],[x1,y1],[x0,y1]].map(([x,y])=>[CTM[0]*x+CTM[2]*y+CTM[4],CTM[1]*x+CTM[3]*y+CTM[5]]);const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]);return Math.max(...xs)>-margin&&Math.min(...xs)<CW+margin&&Math.max(...ys)>-margin&&Math.min(...ys)<CH+margin}
+function shapesBB(sh){let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;const up=(x,y)=>{if(isNaN(x)||isNaN(y))return;x0=Math.min(x0,x);y0=Math.min(y0,y);x1=Math.max(x1,x);y1=Math.max(y1,y)};
+ for(const m of sh.matchAll(/<polygon points="([^"]+)"/g))m[1].trim().split(/\s+/).forEach(p=>{const [x,y]=p.split(',').map(Number);up(x,y)});
+ for(const m of sh.matchAll(/<circle cx="([^"]+)" cy="([^"]+)" r="([^"]+)"/g)){const cx=+m[1],cy=+m[2],r=+m[3];up(cx-r,cy-r);up(cx+r,cy+r)}
+ for(const m of sh.matchAll(/<rect x="([^"]+)" y="([^"]+)" width="([^"]+)" height="([^"]+)"/g)){up(+m[1],+m[2]);up(+m[1]+ +m[3],+m[2]+ +m[4])}
+ for(const m of sh.matchAll(/<ellipse cx="([^"]+)" cy="([^"]+)" rx="([^"]+)" ry="([^"]+)"/g)){const R=Math.max(+m[3],+m[4]);up(+m[1]-R,+m[2]-R);up(+m[1]+R,+m[2]+R)}
+ for(const m of sh.matchAll(/<path d="([^"]+)"/g)){const n=(m[1].match(/-?[0-9.]+/g)||[]).map(Number);for(let i=0;i+1<n.length;i+=2)up(n[i],n[i+1])}
+ return[x0,y0,x1,y1]}
 function limb(a,b,w1,w2){const dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy)||1,nx=-dy/L,ny=dx/L;
  const p=[[a[0]+nx*w1/2,a[1]+ny*w1/2],[b[0]+nx*w2/2,b[1]+ny*w2/2],[b[0]-nx*w2/2,b[1]-ny*w2/2],[a[0]-nx*w1/2,a[1]-ny*w1/2]];
  return `<polygon points="${p.map(q=>f(q[0])+','+f(q[1])).join(' ')}"/><circle cx="${f(a[0])}" cy="${f(a[1])}" r="${f(w1/2)}"/><circle cx="${f(b[0])}" cy="${f(b[1])}" r="${f(w2/2)}"/>`}
-function grp(shapes,fill,st,bb,opts={}){const id=uid();const ow=opts.ow??st.ow;
+function grp(shapes,fill,st,bb,opts={}){const id=uid();const ow=opts.ow??st.ow;{const b=shapesBB(shapes);if(b[0]<1e8&&!visibleBB(b[0]-ow-14,b[1]-ow-14,b[2]+ow+14,b[3]+ow+14,2))return''}
  let s=`<g stroke="${st.ol}" stroke-width="${f(2*ow)}" stroke-linejoin="round" fill="${st.ol}">${shapes}</g><g fill="${fill}">${shapes}</g>`;
  if(st.shade==='flat'&&!opts.noShade){const i2=uid();s+=`<clipPath id="${i2}">${shapes}</clipPath><g clip-path="url(#${i2})"><rect x="${bb[0]}" y="${bb[1]}" width="${bb[2]}" height="${bb[3]}" fill="#1a0f2a" opacity=".30"/><g fill="${fill}" transform="translate(-${opts.sd??5},-${(opts.sd??5)*.8})">${shapes}</g></g>`}
  if(st.shade!=='flat'&&!opts.noShade){s+=`<clipPath id="${id}">${shapes}</clipPath><rect x="${bb[0]}" y="${bb[1]}" width="${bb[2]}" height="${bb[3]}" fill="url(#sh_${st.k})" clip-path="url(#${id})"/>`}
@@ -111,6 +125,16 @@ const EX={neutral:{n:'Neutral',e:1,brow:[0,0],rot:0,pup:1,m:'neutral',look:[0,0]
  surprise:{n:'Sorpresa',e:1.5,brow:[-11,-11],rot:0,pup:.75,m:'o',look:[0,0],wr:'fore'},
  anger:{n:'Enojo',e:.8,brow:[8,-5],rot:11,pup:1,m:'grit',look:[0,0],wr:'anger',flush:1},
  sad:{n:'Tristeza',e:.85,brow:[-8,3],rot:-9,pup:1.05,m:'sad',look:[0,2],tear:1},
+ amused:{n:'Divertido',e:.8,brow:[-3,-2],rot:0,pup:1,m:'grin',look:[0,0]},
+ laugh:{n:'Risa',e:.5,brow:[-4,-3],rot:0,pup:1,m:'laugh',look:[0,0],wr:'smile',flush:1},
+ cryLaugh:{n:'Risa y llanto',e:.45,brow:[-5,0],rot:-3,pup:1,m:'laugh',look:[0,1],wr:'smile',flush:1,tear:1},
+ smirk:{n:'Sarcasmo',e:.85,brow:[-1,3],rot:2,pup:1,m:'smirk',look:[0,0]},
+ annoyed:{n:'Fastidio',e:.7,brow:[5,-1],rot:7,pup:1,m:'flat',look:[0,0],wr:'anger'},
+ worry:{n:'Preocupación',e:1.1,brow:[-7,3],rot:-7,pup:.95,m:'wavy',look:[0,0]},
+ tender:{n:'Ternura',e:.8,brow:[-3,1],rot:-3,pup:1.05,m:'soft',look:[0,1]},
+ disbelief:{n:'Incredulidad',e:1.2,brow:[-6,-3],rot:0,pup:.9,m:'flat',look:[0,0]},
+ shock:{n:'Shock',e:1.5,brow:[-11,-11],rot:0,pup:.6,m:'o',look:[0,0],wr:'fore'},
+ scream:{n:'Grito',e:1.3,brow:[-9,-4],rot:-4,pup:.55,m:'scream',look:[0,0],sweat:1,wr:'fore'},
  smile:{n:'Sonrisa',e:.72,brow:[-2,-3],rot:0,pup:1,m:'smile',look:[0,0],wr:'smile',flush:1}};
 function face(st,ex,op={}){const F=st.face,e=typeof ex==='string'?EX[ex]:ex,ol=st.ol,sk=st.skin;let s='';const bl=op.blink||0,tk=op.talk||0,lk=op.look||e.look||[0,0];const ow=st.ow*(st.k==2?1:.8);
  // back hair, ears
@@ -118,11 +142,11 @@ function face(st,ex,op={}){const F=st.face,e=typeof ex==='string'?EX[ex]:ex,ol=s
  [-1,1].forEach(g=>s+=`<ellipse cx="${g*F.ear[0]}" cy="${F.ear[1]}" rx="7" ry="12" fill="${st.skin2==='x'?sk:sk}" stroke="${ol}" stroke-width="${f(ow*2)}"/>`);
  s+=`<path d="${F.path}" fill="${sk}" stroke="${ol}" stroke-width="${f(ow*2.2)}" stroke-linejoin="round"/>`;
  // shading
- s+=`<g clip-path="url(#face_${st.k})">`;
- if(st.shade==='grad')s+=`<rect x="-60" y="-60" width="120" height="125" fill="url(#sh_${st.k})"/><ellipse cx="0" cy="52" rx="30" ry="12" fill="#000" opacity=".12"/>`;
- else if(st.shade==='cel')s+=`<rect x="-60" y="-60" width="120" height="125" fill="url(#sh_${st.k})"/><path d="M-44,-20 Q-10,0 44,-18 L44,-60 L-44,-60Z" fill="#c07a8a" opacity=".16"/>`;
- else s+=`<path d="M30,-50 Q58,0 20,52 L60,60 L60,-60Z" fill="${st.skin2}" opacity=".45"/>`;
- s+=`</g>`;
+ const fv=visibleBB(-64,-64,64,68,2);let sh0='';if(fv)sh0+=`<g clip-path="url(#face_${st.k})">`;
+ if(!fv){}else if(st.shade==='grad')sh0+=`<rect x="-60" y="-60" width="120" height="125" fill="url(#sh_${st.k})"/><ellipse cx="0" cy="52" rx="30" ry="12" fill="#000" opacity=".12"/>`;
+ else if(st.shade==='cel')sh0+=`<rect x="-60" y="-60" width="120" height="125" fill="url(#sh_${st.k})"/><path d="M-44,-20 Q-10,0 44,-18 L44,-60 L-44,-60Z" fill="#c07a8a" opacity=".16"/>`;
+ else sh0+=`<path d="M30,-50 Q58,0 20,52 L60,60 L60,-60Z" fill="${st.skin2}" opacity=".45"/>`;
+ if(fv)sh0+=`</g>`;s+=sh0;
  // cheeks
  const ch=(e.flush?.5:.22);[-1,1].forEach(g=>s+=`<ellipse cx="${g*(F.eyeX+4)}" cy="${F.mouthY-9}" rx="10" ry="6" fill="#e0707a" opacity="${ch*(st.k==1?.8:1.3)}"/>`);
  // wrinkles
@@ -135,14 +159,14 @@ function face(st,ex,op={}){const F=st.face,e=typeof ex==='string'?EX[ex]:ex,ol=s
   s+=`<g transform="translate(${cx},${cy}) rotate(${f(-g*e.rot*-1*-1)})">`;
   const up=h*(F.kind==='anime'?1.0:1),lo=h*(e.n==='Sonrisa'?.15:.7)*(e.n==='Sonrisa'?1:1);
   const eyePath=`M${-w},0 Q0,${f(-2*up)} ${w},0 Q0,${f(e.n==='Sonrisa'?2*lo+8*.0:2*lo)} ${-w},0Z`;
-  const cid=uid();
-  s+=`<clipPath id="${cid}"><path d="${eyePath}"/></clipPath><path d="${eyePath}" fill="#f4f0ea" stroke="none"/>`;
+  const cid=uid();const ev=withT(T(cx,cy,-g*e.rot),()=>visibleBB(-w-10,-2*up-10,w+10,2*lo+10,2));
+  s+=(ev?`<clipPath id="${cid}"><path d="${eyePath}"/></clipPath>`:'')+`<path d="${eyePath}" fill="#f4f0ea" stroke="none"/>`;
   const ir=F.iris*(F.kind==='real'?1:1)*(e.n==='Miedo'?1.0:1),px=lk[0]*3.4,py=lk[1]*2.6;
-  s+=`<g clip-path="url(#${cid})">`;
+  const sv=s;s='';s+=`<g clip-path="url(#${cid})">`;
   if(F.kind==='real'){s+=`<circle cx="${px}" cy="${py}" r="${ir}" fill="#6b4a2c"/><circle cx="${px}" cy="${py}" r="${ir*.62}" fill="#3a2514"/><circle cx="${px}" cy="${py}" r="${ir*.62*e.pup}" fill="#050403"/><circle cx="${px-2}" cy="${py-2}" r="1.8" fill="#fff"/><path d="M${-w},${-up*.2} Q0,${-2*up-3} ${w},${-up*.2} L${w},-20 L${-w},-20Z" fill="#000" opacity=".22"/>`}
   else if(F.kind==='toon'){s+=`<circle cx="${px*1.2}" cy="${py}" r="${ir*e.pup*1.05}" fill="#1a1210"/><circle cx="${px*1.2-2.2}" cy="${py-2.4}" r="2.4" fill="#fff"/>`}
   else{s+=`<ellipse cx="${px}" cy="${py+1}" rx="${ir}" ry="${ir*1.2}" fill="#7a4fd0"/><ellipse cx="${px}" cy="${py+5}" rx="${ir*.85}" ry="${ir*.6}" fill="#b08aff" opacity=".8"/><ellipse cx="${px}" cy="${py+1}" rx="${ir*.5*e.pup}" ry="${ir*.65*e.pup}" fill="#150a30"/><circle cx="${px-4}" cy="${py-4}" r="3.6" fill="#fff"/><circle cx="${px+4}" cy="${py+6}" r="1.8" fill="#fff"/>`}
-  s+=`</g>`;
+  s+=`</g>`;if(ev)s=sv+s;else s=sv;
   s+=`<path d="M${-w},0 Q0,${f(-2*up)} ${w},0" stroke="${ol}" stroke-width="${f(F.kind==='toon'?4.2:F.kind==='anime'?4:2.6)}" fill="none" stroke-linecap="round"/>`;
   if(F.kind!=='toon')s+=`<path d="M${-w},0 Q0,${f(2*lo)} ${w},0" stroke="${ol}" stroke-width="1.1" fill="none" opacity=".7"/>`;
   if(F.kind==='real'||F.kind==='anime'||st.lashes){s+=`<path d="M${g*w},0 l${g*5},-3 M${g*(w-3)},${f(-up*.8)} l${g*5},-5" stroke="${ol}" stroke-width="1.6" stroke-linecap="round"/>`}
@@ -166,7 +190,14 @@ function face(st,ex,op={}){const F=st.face,e=typeof ex==='string'?EX[ex]:ex,ol=s
  if(e.m==='o')m=`<ellipse cx="0" cy="${my+2}" rx="${F.kind==='toon'?9:7}" ry="${F.kind==='toon'?12:10}" fill="${dark}" stroke="${mk}" stroke-width="${F.kind==='toon'?3.4:1.6}"/><ellipse cx="0" cy="${my+8}" rx="4" ry="3" fill="#a04048"/>`;
  if(e.m==='fear')m=`<path d="M${-mw-1},${my} Q0,${my-6} ${mw+1},${my} Q${mw-2},${my+17} 0,${my+17} Q${-mw+2},${my+17} ${-mw-1},${my}Z" fill="${dark}" stroke="${mk}" stroke-width="${F.kind==='toon'?3.4:1.6}" stroke-linejoin="round"/><path d="M${-mw+2},${my-1} Q0,${my-4} ${mw-2},${my-1} L${mw-3},${my+4} Q0,${my+2} ${-mw+3},${my+4}Z" fill="${tooth}"/>`;
  if(e.m==='grit')m=`<path d="M${-mw},${my-1} Q0,${my-5} ${mw},${my-1} L${mw-1},${my+8} Q0,${my+11} ${-mw+1},${my+8}Z" fill="${tooth}" stroke="${mk}" stroke-width="${F.kind==='toon'?3.4:1.6}" stroke-linejoin="round"/><path d="M${-mw+2},${my+3} Q0,${my+5} ${mw-2},${my+3}M-8,${my-3} v10M-3,${my-4} v12M3,${my-4} v12M8,${my-3} v10" stroke="${mk}" stroke-width="1.1" fill="none"/>`;
- if(tk>0.04&&['neutral','smile','sad','frown'].includes(e.m)){const wd=(e.m==='smile'?mw+2:mw-2)*(0.6+0.4*tk),op2=2+11*tk;m=`<path d="M${-wd},${my} Q0,${my-2} ${wd},${my} Q${wd*.8},${my+op2*1.5} 0,${my+op2*1.5} Q${-wd*.8},${my+op2*1.5} ${-wd},${my}Z" fill="${dark}" stroke="${mk}" stroke-width="${F.kind==='toon'?3.4:1.6}" stroke-linejoin="round"/>`+(tk>.3?`<path d="M${-wd+3},${my+.5} Q0,${my-1} ${wd-3},${my+.5} L${wd-4},${my+3.5} Q0,${my+2} ${-wd+4},${my+3.5}Z" fill="${tooth}"/>`:'')+`<ellipse cx="0" cy="${my+op2*1.2}" rx="${wd*.45}" ry="${op2*.3}" fill="#a04048"/>`}
+ if(e.m==='grin')m=`<path d="M${-mw},${my-1} Q0,${my+11} ${mw},${my-1}" stroke="${mk}" stroke-width="${F.kind==='toon'?4:2.4}" fill="none" stroke-linecap="round"/><path d="M${-mw},${my-1} l-3,-3 M${mw},${my-1} l3,-3" stroke="${mk}" stroke-width="2" stroke-linecap="round"/>`;
+ if(e.m==='smirk')m=`<path d="M${-mw+2},${my+2} Q2,${my+4} ${mw+2},${my-5}" stroke="${mk}" stroke-width="${F.kind==='toon'?4:2.4}" fill="none" stroke-linecap="round"/><path d="M${mw+2},${my-5} l3,-3" stroke="${mk}" stroke-width="2" stroke-linecap="round"/>`;
+ if(e.m==='flat')m=`<path d="M${-mw+4},${my+1} L${mw-4},${my}" stroke="${mk}" stroke-width="${F.kind==='toon'?4:2.4}" fill="none" stroke-linecap="round"/>`;
+ if(e.m==='soft')m=`<path d="M${-mw+5},${my} Q0,${my+7} ${mw-5},${my}" stroke="${mk}" stroke-width="${F.kind==='toon'?4:2.4}" fill="none" stroke-linecap="round"/>`;
+ if(e.m==='wavy')m=`<path d="M${-mw+3},${my+3} Q${-mw/2},${my-2} 0,${my+3} Q${mw/2},${my+8} ${mw-3},${my+2}" stroke="${mk}" stroke-width="${F.kind==='toon'?4:2.4}" fill="none" stroke-linecap="round"/>`;
+ if(e.m==='laugh')m=`<path d="M${-mw-3},${my-3} Q0,${my+22} ${mw+3},${my-3} Q0,${my+3} ${-mw-3},${my-3}Z" fill="${dark}" stroke="${mk}" stroke-width="${F.kind==='toon'?3.4:1.6}" stroke-linejoin="round"/><path d="M${-mw-1},${my-2} Q0,${my+3} ${mw+1},${my-2} L${mw-2},${my+3} Q0,${my+7} ${-mw+2},${my+3}Z" fill="${tooth}"/><ellipse cx="0" cy="${my+12}" rx="${mw*.45}" ry="4.5" fill="#a04048"/>`;
+ if(e.m==='scream')m=`<ellipse cx="0" cy="${my+4}" rx="${F.kind==='toon'?12:10}" ry="${F.kind==='toon'?17:15}" fill="${dark}" stroke="${mk}" stroke-width="${F.kind==='toon'?3.4:1.6}"/><path d="M-9,${my-8} Q0,${my-11} 9,${my-8} L8,${my-2} Q0,${my-4} -8,${my-2}Z" fill="${tooth}"/><ellipse cx="0" cy="${my+14}" rx="6" ry="4.5" fill="#a04048"/>`;
+ if(tk>0.04&&['neutral','smile','sad','frown','grin','smirk','flat','soft','wavy'].includes(e.m)){const wd=(e.m==='smile'?mw+2:mw-2)*(0.6+0.4*tk),op2=2+11*tk;m=`<path d="M${-wd},${my} Q0,${my-2} ${wd},${my} Q${wd*.8},${my+op2*1.5} 0,${my+op2*1.5} Q${-wd*.8},${my+op2*1.5} ${-wd},${my}Z" fill="${dark}" stroke="${mk}" stroke-width="${F.kind==='toon'?3.4:1.6}" stroke-linejoin="round"/>`+(tk>.3?`<path d="M${-wd+3},${my+.5} Q0,${my-1} ${wd-3},${my+.5} L${wd-4},${my+3.5} Q0,${my+2} ${-wd+4},${my+3.5}Z" fill="${tooth}"/>`:'')+`<ellipse cx="0" cy="${my+op2*1.2}" rx="${wd*.45}" ry="${op2*.3}" fill="#a04048"/>`}
  s+=m;
  if(e.sweat)s+=`<path d="M38,-34 Q44,-22 38,-17 Q32,-22 38,-34Z" fill="#9fd8ff" stroke="${ol}" stroke-width="1.2"/>`;
  if(e.tear)s+=`<path d="M-24,12 Q-18,26 -24,32 Q-30,26 -24,12Z" fill="#9fd8ff" stroke="${ol}" stroke-width="1"/><path d="M-28,6 Q-22,8 -28,12" stroke="#9fd8ff" stroke-width="2" fill="none"/>`;
@@ -178,7 +209,7 @@ function face(st,ex,op={}){const F=st.face,e=typeof ex==='string'?EX[ex]:ex,ol=s
   if(st.k==3)s+=`<path d="M-8,-50 Q4,-62 8,-48" stroke="#9a86f0" stroke-width="3" fill="none" opacity=".6"/><g transform="translate(-34,-34) rotate(-20)"><rect x="-9" y="-2.5" width="18" height="5" rx="2.5" fill="#ffd36a" stroke="${ol}" stroke-width="1.2"/><rect x="-2.5" y="-9" width="5" height="18" rx="2.5" fill="#ffd36a" stroke="${ol}" stroke-width="1.2"/></g>`}
  return s}
 const shoeV2=(st,dir)=>{const ol=st.ol,w=st.ow*1.5;const up=`<path d="M-18,-8 L18,-8 L20,14 Q22,22 40,26 Q58,30 58,42 L58,50 L-21,50 Q-23,20 -18,-8Z"/>`;
- let r=`<g transform="scale(${dir},1)">`+grp(up,st.shoe,st,[-30,-20,100,80],{ow:w,sd:4});
+ let r=`<g transform="scale(${dir},1)">`+withT(T(0,0,0,dir,1),()=>grp(up,st.shoe,st,[-30,-20,100,80],{ow:w,sd:4}));
  r+=`<path d="M-18,-8 Q0,-14 18,-8 Q0,0 -18,-8Z" fill="#23232f" stroke="${ol}" stroke-width="${st.ow}"/><rect x="-9" y="-6" width="18" height="30" rx="8" fill="#e4dfd2" stroke="${ol}" stroke-width="${st.ow*.7}" transform="rotate(18 0 4)"/>`;
  for(let i=0;i<4;i++){const x=2+i*9,y=6+i*5;r+=`<path d="M${x-8},${y+4} L${x+8},${y-4}" stroke="${ol}" stroke-width="${st.ow*1.2}" stroke-linecap="round"/><circle cx="${x-8}" cy="${y+4}" r="1.8" fill="${ol}"/><circle cx="${x+8}" cy="${y-4}" r="1.8" fill="${ol}"/>`}
  r+=`<path d="M30,34 Q44,24 58,38 L58,50 L30,50Z" fill="${st.hood}" opacity=".0"/><ellipse cx="46" cy="40" rx="15" ry="11" fill="none" stroke="${ol}" stroke-width="${st.ow*.8}" stroke-dasharray="3 2.5" opacity=".7"/><path d="M-4,38 Q18,26 36,40" stroke="${st.hood}" stroke-width="5" fill="none" stroke-linecap="round"/>`;

@@ -1,4 +1,4 @@
-import {S,limb,grp,defs,hand,handSkin,handProf,gripV2,shoeV2,ik2,face,uid,f} from './char.mjs';
+import {S,limb,grp,defs,hand,handSkin,handProf,gripV2,shoeV2,ik2,face,uid,f,withT,T,visibleBB} from './char.mjs';
 export const P={head:[250,126],shL:[186,240],shR:[314,240],hipL:[224,440],hipR:[276,440],knL:[218,572],knR:[286,566],anL:[212,694],anR:[292,692]};
 const base=S[2];
 const FACE=(o)=>({...base.face,...o});
@@ -33,7 +33,7 @@ export function body(st,pose={}){const ol=st.ol;const hs=st.hs;const k=0.97*hs;l
  const legL=limb(P.hipL,P.knL,56,46)+limb(P.knL,P.anL,46,34),legR=limb(P.hipR,P.knR,56,46)+limb(P.knR,P.anR,46,34);
  o+=grp(legL,st.pants,st,[150,420,140,290])+grp(legR,st.pants,st,[220,420,140,290]);
  o+=`<path d="M214,452 L212,560 M286,452 L288,555" stroke="${ol}" stroke-width="1.6" opacity=".5"/>`;
- o+=`<g transform="translate(${P.anL[0]},${P.anL[1]-2})">${shoeV2(st,-1)}</g><g transform="translate(${P.anR[0]},${P.anR[1]-2})">${shoeV2(st,1)}</g>`;
+ o+=`<g transform="translate(${P.anL[0]},${P.anL[1]-2})">${withT(T(P.anL[0],P.anL[1]-2),()=>shoeV2(st,-1))}</g><g transform="translate(${P.anR[0]},${P.anR[1]-2})">${withT(T(P.anR[0],P.anR[1]-2),()=>shoeV2(st,1))}</g>`;
  o+=`<ellipse cx="${P.anL[0]}" cy="${P.anL[1]-6}" rx="22" ry="8" fill="${st.pants}" stroke="${ol}" stroke-width="${st.ow*1.4}"/><ellipse cx="${P.anR[0]}" cy="${P.anR[1]-6}" rx="22" ry="8" fill="${st.pants}" stroke="${ol}" stroke-width="${st.ow*1.4}"/>`;
  o+=grp(`<path d="M184,${232+br} Q250,${214+br} 316,${232+br} Q326,330 300,448 Q250,462 200,448 Q174,330 184,${232+br}Z"/>`,st.hood,st,[170,215,160,250]);
  o+=`<path d="M214,${246+br} Q250,${284+br} 286,${246+br}" stroke="${ol}" stroke-width="${st.ow*1.2}" fill="none"/><path d="M240,268 v52 M262,268 v48" stroke="${st.shoe}" stroke-width="3" stroke-linecap="round"/><circle cx="240" cy="322" r="3" fill="${st.shoe}"/><circle cx="262" cy="318" r="3" fill="${st.shoe}"/><path d="M208,392 Q250,404 292,392 L298,440 Q250,452 202,440Z" fill="${st.hood2}" stroke="${ol}" stroke-width="${st.ow*1.1}"/>`;
@@ -42,7 +42,7 @@ export function body(st,pose={}){const ol=st.ol;const hs=st.hs;const k=0.97*hs;l
  const nk=`<path d="M231,170 L269,170 Q271,198 284,${228+br} Q250,${238+br} 216,${228+br} Q229,198 231,170Z"/>`;
  o+=grp(nk,st.skin,st,[210,160,80,90],{sd:4});
  const hy=P.head[1]-(hs-1)*27+(pose.head?.dy||0);
- {const cn=uid();o+=`<clipPath id="${cn}">${nk}</clipPath><g clip-path="url(#${cn})"><ellipse cx="250" cy="${hy+54*k+6}" rx="${34*k}" ry="${16*k}" fill="#1a0f2a" opacity=".22"/></g><path d="M238,196 Q243,212 246,228 M262,196 Q257,212 254,228" stroke="${ol}" stroke-width="1.6" fill="none" opacity=".4" stroke-linecap="round"/>`}
+ if(visibleBB(205,155,295,245,2)){const cn=uid();o+=`<clipPath id="${cn}">${nk}</clipPath><g clip-path="url(#${cn})"><ellipse cx="250" cy="${hy+54*k+6}" rx="${34*k}" ry="${16*k}" fill="#1a0f2a" opacity=".22"/></g><path d="M238,196 Q243,212 246,228 M262,196 Q257,212 254,228" stroke="${ol}" stroke-width="1.6" fill="none" opacity=".4" stroke-linecap="round"/>`}
  o+=grp(`<path d="M202,${230+br} Q250,${270+br} 298,${230+br} Q304,${218+br} 292,${214+br} Q250,${244+br} 208,${214+br} Q196,${218+br} 202,${230+br}Z"/>`,st.hood2,st,[190,200,120,80],{sd:3});
  const arm=(sh0,wr,side,A)=>{const lift=Math.max(0,Math.min(1,(sh0[1]-wr[1]+20)/170))*9;const sh=[sh0[0]+side*lift*.3,sh0[1]-lift];const el=A.e?[A.e[0]+side*lift*.3,A.e[1]-lift*.5]:elbow(sh,wr,side,A.fs||1);let r=grp(limb(sh,el,50,42)+limb(el,wr,42,34),st.hood,st,[Math.min(sh[0],wr[0])-70,Math.min(sh[1],wr[1])-70,Math.abs(wr[0]-sh[0])+140,Math.abs(wr[1]-sh[1])+160]);
   r+=`<path d="M${el[0]-8},${el[1]+8} q8,6 4,14M${el[0]+6},${el[1]-10} q-6,6 -4,14" stroke="${ol}" stroke-width="1.5" fill="none" opacity=".5"/>`;
@@ -50,15 +50,15 @@ export function body(st,pose={}){const ol=st.ol;const hs=st.hs;const k=0.97*hs;l
   r+=grp(limb(wr,[wr[0]+dir[0]*9,wr[1]+dir[1]*9],38,38),st.hood2,st,[wr[0]-50,wr[1]-50,100,100],{noShade:true});
   const hw=[wr[0]+dir[0]*8,wr[1]+dir[1]*8];
   const faceZone=wr[1]<290&&wr[0]>150&&wr[0]<350&&!!A.front;
-  if(A.hand==='grip')r+=`<g transform="translate(${f(hw[0])},${f(hw[1])}) rotate(${f(A.rot!==undefined?A.rot*(side<0?-1:1):fa+90)}) scale(${side<0?-1:1},1)">${gripV2(st,A.prop||'flash')}</g>`;
-  else if(A.hand==='open'){const sd=faceZone?(side<0?1:-1):(side<0?-1:1);r+=hand(hw,fa,1.0,sd,handSkin('open',st))}
-  else if(A.hand==='point'){const flip=Math.cos(fa*Math.PI/180)<0;r+=hand(hw,fa,1.12,flip?-1:1,handProf('point',st))}
-  else{r+=hand(hw,fa,1.2,side<0?-1:1,handProf('free',st))}
+  if(A.hand==='grip')r+=(()=>{const R0=A.rot!==undefined?A.rot*(side<0?-1:1):fa+90;return `<g transform="translate(${f(hw[0])},${f(hw[1])}) rotate(${f(R0)}) scale(${side<0?-1:1},1)">${withT(T(hw[0],hw[1],R0,side<0?-1:1,1),()=>gripV2(st,A.prop||'flash'))}</g>`})();
+  else if(A.hand==='open'){const sd=faceZone?(side<0?1:-1):(side<0?-1:1);r+=hand(hw,fa,1.0,sd,withT(T(hw[0],hw[1],fa,1.0,sd),()=>handSkin('open',st)))}
+  else if(A.hand==='point'){const flip=Math.cos(fa*Math.PI/180)<0;{const sd=flip?-1:1;r+=hand(hw,fa,1.12,sd,withT(T(hw[0],hw[1],fa,1.12,1.12*sd),()=>handProf('point',st)))}}
+  else{{const sd=side<0?-1:1;r+=hand(hw,fa,1.2,sd,withT(T(hw[0],hw[1],fa,1.2,1.2*sd),()=>handProf('free',st)))}}
   return r};
  let late='';
  {const a=arm(shL,L.w,-1,L);if(L.front)late+=a;else o+=a}
  {const a=arm(shR,R.w,1,R);if(R.front)late+=a;else o+=a}
  const hd=pose.head||{};
- o+=`<g transform="translate(${P.head[0]+(hd.dx||0)},${hy}) rotate(${hd.rot||0}) scale(${f(k)})">${face(st,pose.expr||'neutral',{blink:pose.blink,look:pose.look,talk:pose.talk})}</g>`+late;
+ o+=`<g transform="translate(${P.head[0]+(hd.dx||0)},${hy}) rotate(${hd.rot||0}) scale(${f(k)})">${withT(T(P.head[0]+(hd.dx||0),hy,hd.rot||0,k,k),()=>face(st,pose.expr||'neutral',{blink:pose.blink,look:pose.look,talk:pose.talk}))}</g>`+late;
  return o}
 export {defs};
