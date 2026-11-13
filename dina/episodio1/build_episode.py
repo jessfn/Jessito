@@ -59,6 +59,10 @@ for i,c in enumerate(chunks):
     end=T[c['lid']]+dur[c['lid']]+0.25
     c['t1']=round(min(end, nxt) if nxt and nxt<end+0.4 and chunks[i+1]['lid']==c['lid'] else end,3)
 
+# card times from word timing
+cw=[w for c in chunks if c['lid']=='L9' for w in c['words']]
+cardT=[next(w['t0'] for w in cw if 'dientes' in w['w'].lower()), next(w['t0'] for w in cw if 'baño' in w['w'].lower())]
+print('cardT',cardT)
 # ---- audio mix ----
 total=int((T['END']+0.5)*SR)
 mix=np.zeros(total,dtype=np.float32); voice=np.zeros(total,dtype=np.float32)
@@ -152,8 +156,8 @@ def whoosh(at,d=0.6,up=True):
     y=y*np.sin(np.pi*x/d)**2; put(mix,at,y.astype(np.float32),0.5)
 for at in (T['S1']-0.2,T['S2']-0.15,T['S3']-0.15,T['S4']-0.1,T['S5']-0.1): whoosh(at)
 # ding for choices
-for f,fr in zip((0.46,0.64,0.83),(76,79,83)):
-    put(mix,T['L9']+dur['L9']*f-0.1,tone(mf(fr),0.6,'sine',0.4),0.35)
+for ct,fr in zip(cardT,(76,83)):
+    put(mix,ct-0.1,tone(mf(fr),0.6,'sine',0.4),0.35)
 put(mix,T['S5']+0.2,tone(mf(88),0.6,'sine',0.4),0.3)
 
 # ---- SFX ----
@@ -193,8 +197,8 @@ for i,tt in enumerate((0.3,0.52,0.74,0.96,1.18,1.40)): put(mix,tt,slam()*0.5,0.4
 put(mix,T['S2']-0.5,riser(0.6),0.35); put(mix,T['S2']+0.12,slam(),0.65); put(mix,T['S2']+0.12,sparkle(),0.35)
 put(mix,T['S3']+0.05,boing2(),0.5); put(mix,T['S3']+0.05,slam()*0.6,0.4)
 put(mix,T['S4']+0.1,slam(),0.55); put(mix,T['S4']+0.1,sparkle(),0.3)
-for f in (0.46,0.64,0.83): put(mix,T['L9']+dur['L9']*f-0.18,pop(1100),0.4)
-put(mix,T['L9']+dur['L9']*0.83+0.1,tada(),0.35)
+for ct in cardT: put(mix,ct-0.1,pop(1100),0.4)
+put(mix,cardT[1]+0.25,tada(),0.35)
 put(mix,T['S5']+0.15,riser(0.35),0.3); put(mix,T['S5']+0.35,slam()*0.7,0.5); put(mix,T['END']-3.0,slam()*0.6,0.4)
 put(mix,T['S5']+0.55,pop(900),0.4); put(mix,T['S5']+0.8,pop(1100),0.4)
 put(mix,T['L10']+dur['L10']*0.9,click(),0.8); put(mix,T['L10']+dur['L10']*0.9+0.15,heart(),0.5)
@@ -220,7 +224,7 @@ body=body.replace('<g transform="translate(0,52)">','')  # unused
 body=re.sub(r'<g transform="translate\(450,196\)"><use href="#headFace"/>.*?<use href="#headB"/></g>',
    '<g id="dinaHead" transform="translate(450,196)"></g>',body,flags=re.S)
 body=body.replace('<g id="dina" transform="translate(0,52)">','<g id="dina" transform="translate(0,52)">')
-data={'chunks':chunks,'T':T,'dur':dur,'env':env,'lines':[[a,b,d] for a,b,c,d in lines],'FPS':FPS}
+data={'cardT':cardT,'chunks':chunks,'T':T,'dur':dur,'env':env,'lines':[[a,b,d] for a,b,c,d in lines],'FPS':FPS}
 tpl=open('episode_template.html').read()
 html=tpl.replace('__DEFS__',defs2).replace('__BODY__',body).replace('__DATA__',json.dumps(data,ensure_ascii=False))
 open('episode.html','w').write(html)

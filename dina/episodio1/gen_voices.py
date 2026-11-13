@@ -9,8 +9,8 @@ LINES=[
  ('L6','dina',ANA,"¡Ahhh! ¡Qué sueño tan padre! Estaba cantando frente a miles de personas."),
  ('L7','dina',ANA,"Pero... mírame. Así nunca lo voy a lograr."),
  ('L8','dina',ANA,"¡No! Voy a cambiar. Pero no puedo sola... ¡necesito tu ayuda!"),
- ('L9','dina',ANA,"Día uno: ¿qué cambio primero? ¿Mis dientes, mi baño, o mi cabello?"),
- ('L10','narr',DANI,"Comenta tu elección y sigue a Dina para ver qué pasa en el día dos."),
+ ('L9','dina',ANA,"Día uno: ¿qué cambio primero? ¿Mis dientes... o mi baño?"),
+ ('L10','narr',DANI,"Comenta A o B y sigue a Dina para ver qué pasa en el día dos."),
 ]
 for lid,who,vid,text in LINES:
     out=f'audio/{lid}.mp3'
