@@ -140,6 +140,7 @@ function operatorHand(t,tgt){const S=opState(t,tgt);const st=CAST.tomas;const a=
  if(S.on){const dx=S.bx-ox,dy=S.by-oy,L=Math.hypot(dx,dy),nx=-dy/L,ny=dx/L;s=`<polygon points="${(ox+nx*10).toFixed(0)},${(oy+ny*10).toFixed(0)} ${(S.bx+nx*330).toFixed(0)},${(S.by+ny*330).toFixed(0)} ${(S.bx-nx*330).toFixed(0)},${(S.by-ny*330).toFixed(0)} ${(ox-nx*10).toFixed(0)},${(oy-ny*10).toFixed(0)}" fill="#e8f2ff" fill-opacity=".16"/>`+s}
  if(t>=EVT.black-.9&&t<EVT.black){const u=clamp((t-EVT.black+.9)/.4);setCTM(T(540,980,-8,8*u+.1,8*u+.1));const hp=handSkin('open',st);setCTM([1,0,0,1,0,0]);s+=`<g transform="translate(540,980) rotate(-8) scale(${(8*u+.1).toFixed(2)})"><g transform="translate(-30,-30)">${hp}</g></g>`}
  return {svg:s,bx:S.bx,by:S.by,on:S.on}}
+function opMode(t){if(t>=EVT.cutE&&t<EVT.cutF&&!(t>=EVT.pierce&&t<EVT.doorBreak+1.2))return {m:'flash'};const win=[[EVT.crack1+.3,EVT.crack1+2.4,'steady'],[EVT.attack-.2,EVT.attack+2.2,'shield'],[EVT.eyeWin+2.4,EVT.eyeWin+3.9,'shield'],[EVT.pierce,EVT.doorBreak+1.2,'shield'],[EVT.dead-.2,EVT.black,'shield']];for(const [a,b,m] of win)if(t>=a&&t<b)return {m,u:clamp(Math.min((t-a)/.25,(b-t)/.25))};return {m:'none'}}
 // ---- scene composition
 const w2s=(x,y)=>[CAMM[0]*x+CAMM[2]*y+CAMM[4],CAMM[1]*x+CAMM[3]*y+CAMM[5]];
 const f1=n=>(+n).toFixed(1);
@@ -208,7 +209,9 @@ function sceneWorld(t,tn){const [cx,cy,z,rot,sk]=camera(t);const blur=process.en
  const tg=[540,900];const op=operatorHand(t,[tg[0],tg[1]]);
  w+=`<rect width="${W}" height="${H}" fill="${tint}" fill-opacity="${(tintA+.03*Math.sin(t*5)).toFixed(3)}"/>`;
  w+=`<defs><radialGradient id="dk" gradientUnits="userSpaceOnUse" cx="540" cy="960" r="1200"><stop offset="0" stop-color="#02040a" stop-opacity="0"/><stop offset=".6" stop-color="#02040a" stop-opacity="${(dark*.5).toFixed(2)}"/><stop offset="1" stop-color="#02040a" stop-opacity="${(dark+.3).toFixed(2)}"/></radialGradient></defs><rect width="${W}" height="${H}" fill="url(#dk)"/>`;
- if(showHand)w+=op.svg;
+ const om=opMode(t);if(om.m==='flash')w+=op.svg;else if(om.m==='steady'){const st=CAST.tomas;const sw=Math.sin(t*2.1)*10;setCTM(T(780+sw,1760,-70,3.2,3.2));const hh=handSkin('open',st);setCTM([1,0,0,1,0,0]);const sl=limbS([1010,2150],[800+sw,1800],170,120);setCTM([1,0,0,1,0,0]);w+=grpS(sl,st.hood,st,[600,1600,700,700],{ow:5,sd:8})+`<g transform="translate(${(780+sw).toFixed(1)},1760) rotate(-70) scale(3.2 3.2)">${hh}</g>`}
+ else if(om.m==='shield'){const st=CAST.tomas;const u=om.u;const big=(t>=EVT.dead-.2)?8*sstep((t-EVT.dead+.2)/1.8):4.2*u;const tr=Math.sin(t*36)*8*u;setCTM(T(560+tr,1040,-95,big+.1,big+.1));const hp=handSkin('open',st);setCTM([1,0,0,1,0,0]);w+=`<g transform="translate(${(560+tr).toFixed(1)},1040) rotate(-95) scale(${(big+.1).toFixed(2)})"><g transform="translate(-30,-30)">${hp}</g></g>`}
+
  // lens dust specks + occasional autofocus hunting overlay
  for(let i=0;i<7;i++){const dx=(rn(i)*1000+60),dy=(rn(i+5)*1700+100);w+=`<circle cx="${f1(dx)}" cy="${f1(dy)}" r="${f1(5+rn(i+2)*10)}" fill="#fff" fill-opacity="${(.05+.04*rn(i+7)).toFixed(2)}"/>`}
  let fl=0;for(const [ft,k] of [[EVT.snap,.6],[EVT.attack,.7],[EVT.eyeWin+2.6,.7],[EVT.pierce,.4],[EVT.doorBreak,.9]]){if(t>=ft&&t<ft+.5)fl=Math.max(fl,Math.exp(-(t-ft)/.12)*k)}
