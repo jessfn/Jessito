@@ -60,13 +60,13 @@ export function makeDirector({ L, T, DUR }) {
   const saccAt = (t) => { let i = 0; while (i < sacc.length - 1 && sacc[i + 1].t <= t) i++; const a = sacc[i], p = sacc[Math.max(0, i - 1)]; const u = smooth((t - a.t) / 0.06); return { x: lerp(p.x, a.x, u), y: lerp(p.y, a.y, u) }; };
   const gazeKF = [[0, 0, 0]], yawKF = [[0, 0]];
   Object.keys(L).forEach((id) => { const l = L[id]; const gx = l.who === 'T' ? 0.7 : 0; gazeKF.push([l.start - 0.12, gx, 0.05]); yawKF.push([l.start - 0.12, gx * 0.3]); });
-  gazeKF.push([T.neonA, 0.8, 0], [T.runA, 0, 0], [T.runA + 4, 0, 0.05]); yawKF.push([T.runA, 0]);
+  gazeKF.push([T.neonA, 0.8, 0], [T.runA, 0, 0], [T.envA, 0.7, 0.05], [T.hookA, 0, 0.2]); yawKF.push([T.runA, 0]);
   gazeKF.sort((a, b) => a[0] - b[0]); yawKF.sort((a, b) => a[0] - b[0]); gazeKF.push([DUR, 0, 0]); yawKF.push([DUR, 0]);
   const kfAt = (K, t, n) => { let i = 0; while (i < K.length - 1 && K[i + 1][0] <= t) i++; const a = K[i], b = K[Math.min(i + 1, K.length - 1)]; const u = smooth((t - a[0]) / Math.max(1e-3, Math.min(0.3, b[0] - a[0]))); return Array.from({ length: n }, (_, k) => lerp(a[1 + k], b[1 + k], u)); };
   gazeKF.forEach((g) => { if (Math.hypot(g[1], g[2]) > 0.5) blinkStarts.push(g[0] + 0.02); });
 
   const emoScript = [[0, 'neutral'], [T.slateEnd, 'hopeful'], [L.l2.start, 'awkward'], [T.sceneB, 'surprise'], [L.l3.start + 0.3, 'hopeful'], [L.l4.start + 0.2, 'awkward'], [L.l5.start + 0.2, 'relaxed'], [L.l6.start + 0.3, 'hopeful'], [T.neonA, 'surprise'], [T.neonA + 0.6, 'wince'],
-    [L.l8.start + 0.2, 'scared'], [L.l8.end, 'relaxed'], [L.l9.start + 0.2, 'hopeful'], [L.l10.start + 0.2, 'touched'], [T.curtainOpen - 0.2, 'scared'], [T.curtainOpen + 0.2, 'radiant'], [T.runA, 'proud'], [L.l13.start + 0.2, 'radiant'], [L.l13.end - 0.6, 'proud'],
+    [L.l8.start + 0.2, 'scared'], [L.l8.end, 'relaxed'], [L.l9.start + 0.2, 'hopeful'], [L.l10.start + 0.2, 'touched'], [T.curtainOpen - 0.2, 'scared'], [T.curtainOpen + 0.2, 'radiant'], [T.runA, 'proud'], [L.l13.start + 0.2, 'happy'], [T.envB, 'hopeful'],
     [L.l14.start + 0.2, 'thinking'], [T.hookA, 'surprise'], [L.l15.start + 0.2, 'wince'], [W('l15', 'Comenta') - 0.1, 'happy']];
   emoScript.sort((a, b) => a[0] - b[0]);
   const emoAt = (t) => { let i = 0; while (i < emoScript.length - 1 && emoScript[i + 1][0] <= t) i++;

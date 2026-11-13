@@ -139,3 +139,7 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
 ## Rizos (decision del creador)
 - Los rizos largos y bonitos NO van en el dia 6: son una OPCION de votacion (dia 7: maquillaje vs rizos). Mientras tanto Lazy conserva su pelo largo y lacio.
 - Sistema listo: hair.mjs -> hairRinglets (rl=1, len=1) + hairCurly reducido; usar si ganan los rizos.
+
+## Vestuario (decision del creador, dia 6)
+- Desde el dia 6 Lazy se viste SIEMPRE con el vestido de satin esmeralda con cinturon dorado, aretes, collar y tacones (outfit.kind='gown', prog=1, jewel=1). Ya no usa la ropa rota.
+- La PASARELA se descarto del dia 6: queda para mas adelante. Final del dia 6: terraza de noche (plates3d 'terrace'), mensajero con sobre dorado/invitacion misteriosa.

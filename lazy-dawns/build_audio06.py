@@ -57,14 +57,11 @@ add('cloth_cut', w('l9', 'cortar') - 0.1, 0.9); add('sew_machine', w('l9', 'cose
 add('sparkle', T['jewelA'], 0.6); add('ding', T['jewelA'] + 0.3, 0.5); add('heel_step', T['heelsA'], 0.8)
 add('curtain', T['curtainA'] - 0.1, 0.9); add('heartbeat', T['curtainA'], 0.4, 2.0); add('curtain', T['curtainOpen'] - 0.25, 0.9); add('spotlight', T['curtainOpen'], 0.8); add('shine', T['curtainOpen'] + 0.2, 0.8); add('wow', T['curtainOpen'] + 0.3, 0.7); add('sparkle', T['curtainOpen'] + 0.5, 0.6)
 add('cheer', T['curtainOpen'] + 0.8, 0.6, 4.0)
-add('whoosh', T['runA'] - 0.2, 0.6); add('spotlight', T['runA'], 0.7)
-t0 = T['runA']
-while t0 < DUR: add('runway_amb', t0, 0.4, 10.0); t0 += 10.0
-for k in range(3): add('heels', T['runWalkA'] + k * 3.0, 0.9, 3.5)
-add('paparazzi', T['runWalkA'] + 1.0, 0.8, 3.5); add('paparazzi', T['runWalkA'] + 4.5, 0.8, 3.5); add('cheer', T['runWalkA'] + 3.0, 0.5, 4.0)
+add('whoosh', T['runA'] - 0.2, 0.6); add('city_night', T['runA'], 0.5, 10.0)
+add('heels', T['runWalkA'], 0.9, 3.5); add('bell_boutique', T['envA'] - 0.2, 0.7); add('rustle', T['envA'] + 0.8, 0.6); add('sparkle', T['envB'], 0.6); add('whoosh', T['hookA'] - 0.2, 0.6)
 add('rise', T['hookA'] - 0.4, 0.4); add('gasp', T['hookA'] - 0.1, 0.6, 1.4); add('ding', T['hookA'], 0.6)
 add('whoosh', T['vote'], 0.5); add('pop', T['optA'], 0.6); add('pop', T['optB'], 0.6); add('ding', T['cta1'], 0.55); add('ding', T['cta2'], 0.55)
-for t0 in (T['measureA'] - 0.1, T['sewA'] - 0.1, T['jewelA'] - 0.1, T['runWalkA'] + 2.6): add('pop', t0 + 0.05, 0.5)
+for t0 in (T['measureA'] - 0.1, T['sewA'] - 0.1, T['jewelA'] - 0.1, T['envA']): add('pop', t0 + 0.05, 0.5)
 inp = ['-i', 'build/dia06/voces.wav', '-i', 'build/dia06/musica.wav', '-stream_loop', '-1', '-i', S + 'salon_amb.mp3']
 fc = ["[1:a]volume=0.5[m0]", f"[2:a]atrim=0:{D},asetpts=PTS-STARTPTS,volume=0.0,adelay=1600|1600[amb]"]; labs = []
 for k, (f, t, v, dur) in enumerate(ev):

@@ -94,6 +94,36 @@ if (scene_name === 'limo') {
   // charcos con reflejo de luz
   for (const [x, z, w] of [[-1, -4, 3], [3, -8, 4], [0, 0, 2.4]]) add(Cyl(w / 2, w / 2, 0.02, 40), M(0x1b2340, 0.02, 0.9), x, 0.02, z, sc, false);
 }
+
+if (scene_name === 'terrace') {
+  sc.background = new THREE.Color(0x0a0e26); sc.fog = new THREE.Fog(0x101638, 16, 60);
+  cam.position.set(0, 2.6, 11); cam.lookAt(0, 2.2, -4);
+  // piso de madera de la terraza
+  const deck = tex((c, w, h) => { for (let i = 0; i < 12; i++) { c.fillStyle = i % 2 ? '#5a3a24' : '#684428'; c.fillRect(0, i * h / 12, w, h / 12 - 3); c.fillStyle = 'rgba(0,0,0,.35)'; c.fillRect(0, (i + 1) * h / 12 - 3, w, 3); } }, 512, 512); deck.wrapS = deck.wrapT = THREE.RepeatWrapping; deck.repeat.set(6, 10);
+  add(Box(40, 0.3, 40), M(0xffffff, 0.55, 0, { map: deck }), 0, -0.15, 6, sc, false).receiveShadow = true;
+  // barandal de vidrio con marco dorado
+  const gold = M(0xd4a24c, 0.25, 0.9); add(Box(20, 0.12, 0.12), gold, 0, 1.4, -8); add(Box(20, 0.08, 0.08), gold, 0, 0.1, -8); add(Box(20, 1.3, 0.04), M(0x9fd0ff, 0.05, 0.1, { transparent: true, opacity: 0.18 }), 0, 0.75, -8, sc, false);
+  for (let i = -5; i <= 5; i++) add(Box(0.08, 1.4, 0.08), gold, i * 1.9, 0.7, -8, sc, false);
+  // ciudad al fondo con ventanas
+  const bTex = (seed) => tex((c, w, h) => { c.fillStyle = '#0e1330'; c.fillRect(0, 0, w, h); let s = seed; for (let i = 0; i < 14; i++) for (let j = 0; j < 36; j++) { s = (s * 16807) % 2147483647; c.fillStyle = s % 3 ? 'rgba(255,214,130,.95)' : 'rgba(50,60,110,.8)'; c.fillRect(i * w / 14 + 5, j * h / 36 + 4, w / 14 - 10, h / 36 - 8); } }, 512, 1024);
+  for (let i = 0; i < 16; i++) { const h = 10 + ((i * 37) % 26), w = 4 + (i % 3) * 1.4, x = -34 + i * 4.6, z = -30 - (i % 4) * 6; add(Box(w, h, 4), M(0xffffff, 0.5, 0.1, { map: bTex(i * 53 + 7), emissive: 0xffffff, emissiveMap: bTex(i * 53 + 7), emissiveIntensity: 0.55 }), x, h / 2 - 2, z, sc, false); }
+  // luna
+  const moon = add(Sph(2.2), M(0xfff6d0, 0.9, 0, { emissive: 0xfff0b0, emissiveIntensity: 1.4 }), -9, 17, -45, sc, false); glow(-9, 17, -45, 14, 0xffeeb0, 0.55);
+  // guirnaldas de luces
+  for (let k = 0; k < 3; k++) { const y0 = 5.6 - k * 0.5; for (let i = 0; i <= 18; i++) { const x = -9 + i, y = y0 - Math.sin(i / 18 * Math.PI) * 0.8 - k * 0.2; add(Sph(0.09), M(0xffffff, 0.2, 0, { emissive: 0xffd98a, emissiveIntensity: 3 }), x, y, -2 - k * 1.8, sc, false); glow(x, y, -2 - k * 1.8, 1.1, 0xffd98a, 0.75); } }
+  // postes y plantas
+  for (const x of [-9.4, 9.4]) add(Cyl(0.07, 0.07, 6), M(0x2a2a2f, 0.5, 0.8), x, 3, -2, sc, false);
+  const plant = (x, z, s) => { add(Cyl(0.45 * s, 0.35 * s, 0.8 * s), M(0xc2410c, 0.7), x, 0.4 * s, z); for (let i = 0; i < 9; i++) { const a = i / 9 * 6.28; const l = add(Sph(0.5 * s), M(0x15803d, 0.7), x + Math.cos(a) * 0.35 * s, 1.1 * s + (i % 3) * 0.3 * s, z + Math.sin(a) * 0.35 * s); l.scale.set(0.9, 1.4, 0.9); } };
+  plant(-6.8, -5, 1.2); plant(6.8, -5.5, 1.3); plant(-7.4, 3, 1.1); plant(7.2, 2.5, 1);
+  // sofas y mesita con velas
+  add(Box(4.2, 0.7, 1.4), M(0x1f2937, 0.6), -5.2, 0.35, -3.4); add(Box(4.2, 1.1, 0.35), M(0x1f2937, 0.6), -5.2, 0.9, -4.0);
+  add(Cyl(0.7, 0.7, 0.6, 32), gold, 5.4, 0.3, -3.4); for (const dx of [-0.3, 0, 0.3]) { add(Cyl(0.07, 0.07, 0.3), M(0xfff5e0, 0.5), 5.4 + dx, 0.75, -3.4, sc, false); add(Sph(0.07), M(0xffd98a, 0.2, 0, { emissive: 0xffa040, emissiveIntensity: 4 }), 5.4 + dx, 0.95, -3.4, sc, false); glow(5.4 + dx, 0.95, -3.4, 0.7, 0xffb050, 0.9); }
+  // pared de la boutique con puerta de vidrio iluminada (izquierda)
+  add(Box(0.3, 7, 14), M(0x3a1f2e, 0.7), -10, 3.5, 2); add(Box(0.15, 3.6, 2.4), M(0xfff0d0, 0.3, 0, { emissive: 0xffd49a, emissiveIntensity: 1.4 }), -9.8, 1.9, 4); glow(-9, 2, 4, 6, 0xffd49a, 0.5);
+  sc.add(new THREE.AmbientLight(0x4a5aa0, 0.8)); sc.add(new THREE.HemisphereLight(0x6a7ac8, 0x241a14, 0.6));
+  spot(0, 9, 6, 0, 0.3, 0, 0xffe6c0, 150, 0.7, 0.8); spot(-6, 7, 4, -4, 0.3, -2, 0xffd49a, 70, 0.8, 0.9); spot(6, 7, 4, 4, 0.3, -2, 0xffd49a, 70, 0.8, 0.9);
+  cone(0, 4.5, 3, 9, 3.2, 0xffe6c0, 0.05);
+}
 r.render(sc, cam);
 window.__done = true;
 </script></body></html>
