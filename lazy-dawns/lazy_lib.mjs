@@ -17,23 +17,26 @@ export function defs(mode) {
 }
 
 
-export function hand(cx, cy, side, O, skinB, soft) {
+export function hand(cx, cy, side, O, skinB, soft, curl = 0.3, spread = 0.15, tt = 0) {
   const nail = (len, chip) => `<path d="M-9,${len - 16} Q-12,${len + 12} -5,${len + 36} Q3,${len + 44} 10,${len + 32} Q13,${len + 8} 9,${len - 16}Z" fill="#d7a1b6" ${O ? 'stroke="#12090a" stroke-width="3"' : ''}/>
     <path d="M-7,${len + 14} Q0,${len + 30} 8,${len + 14} Q6,${len + 38} 0,${len + 40} Q-6,${len + 36} -7,${len + 14}Z" fill="#2a1608" opacity="0.75"/>
     ${chip ? `<path d="M-10,${len + 6} l7,6 l-6,7 l8,6 l-9,2Z" fill="#8a4e2b"/>` : ''}<path d="M-5,${len - 6} q1,18 3,30" stroke="#fff" stroke-opacity="0.45" stroke-width="3" fill="none"/>`;
-  const f = (dx, dy, len, rot, i) => `<g transform="translate(${dx},${dy}) rotate(${rot})"><rect x="-13" y="0" width="26" height="${len}" rx="13" fill="${skinB}" ${O}/>
-    ${nail(len, i % 2 === 0)}<path d="M-8,${len - 4} h16" stroke="#2a1608" stroke-width="3" opacity="0.7"/>
-    <path d="M-9,${len * 0.5} h18" stroke="#000" stroke-opacity="0.25" stroke-width="3"/></g>`;
   const sd = side;
+  // cada dedo: [dx, dy, largo base, rot base, factor de curvatura] (menique se curva mas y se cierra primero; indice flota)
+  const FING = [[-36, 34, 52, -14, 1.15], [-12, 44, 62, -4, 0.85], [12, 44, 66, 4, 0.95], [36, 34, 54, 14, 1.0]];
+  const f = ([dx, dy, len0, rot0, kc], i) => { const cv = clamp01(curl * kc + 0.07 * Math.sin(tt * 1.3 + i * 1.7)); const len = len0 * (1 - 0.42 * cv); const rot = (rot0 + (i - 1.5) * 9 * spread) * sd * (1 - 0.15 * cv);
+    return `<g transform="translate(${dx * sd},${dy}) rotate(${rot})"><rect x="-13" y="0" width="26" height="${len}" rx="13" fill="${skinB}" ${O}/>${nail(len, i % 2 === 0)}<path d="M-8,${len - 4} h16" stroke="#2a1608" stroke-width="3" opacity="0.7"/><path d="M-9,${len * 0.5} h18" stroke="#000" stroke-opacity="${0.18 + 0.25 * cv}" stroke-width="3"/>${cv > 0.35 ? `<path d="M-10,${len * 0.2} h20" stroke="#000" stroke-opacity="0.2" stroke-width="3"/>` : ''}</g>`; };
+  const th = 38 - 18 * spread;
   return `<g transform="translate(${cx},${cy})">
     <ellipse cx="0" cy="0" rx="60" ry="54" fill="${skinB}" ${O}/>
-    ${f(-36 * sd, 34, 52, -14 * sd, 0)}${f(-12 * sd, 44, 62, -4 * sd, 1)}${f(12 * sd, 44, 66, 4 * sd, 2)}${f(36 * sd, 34, 54, 14 * sd, 3)}
-    <g transform="translate(${-48 * sd},-4) rotate(${38 * sd})"><rect x="-13" y="-6" width="26" height="52" rx="13" fill="${skinB}" ${O}/>${nail(46, true)}</g>
+    ${FING.map(f).join('')}
+    <g transform="translate(${(52 + 10 * spread) * -sd},-4) rotate(${th * sd})"><rect x="-13" y="-6" width="26" height="${52 - 12 * curl}" rx="13" fill="${skinB}" ${O}/>${nail(44 - 12 * curl, true)}</g>
     ${soft ? `<ellipse cx="-14" cy="-16" rx="30" ry="16" fill="#fff" opacity="0.14"/>` : ''}
     <path d="M-30,-8 q12,10 24,0 M2,-10 q12,10 24,0" stroke="#000" stroke-opacity="0.25" stroke-width="3" fill="none"/>
     <ellipse cx="14" cy="26" rx="20" ry="9" fill="#3b2412" opacity="0.28"/>
   </g>`;
 }
+const clamp01 = (x) => Math.min(1, Math.max(0, x));
 export function foot(cx, O, skinB, soft, strapCol) {
   const toes = [-58, -30, -2, 24, 48].map((x, i) => `<g><circle cx="${cx + x}" cy="${676 - (i === 0 ? 0 : Math.abs(i - 2) * -2 + 4)}" r="${i === 0 ? 20 : 15 - i * 0.6}" fill="${skinB}" ${O}/>
     <ellipse cx="${cx + x}" cy="${684}" rx="${i === 0 ? 10 : 8}" ry="5" fill="#d9bfa0" ${O ? 'stroke="#12090a" stroke-width="2"' : ''}/><ellipse cx="${cx + x}" cy="${686}" rx="6" ry="2.5" fill="#2a1608" opacity="0.55"/></g>`).join('');

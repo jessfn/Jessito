@@ -1,0 +1,13 @@
+{
+ "fuente": "BVH de caminata (smoothWalk.bvh, repo publico jong1-choi/Character_LOD en GitHub). Solo se midieron valores (no se redistribuye el archivo; licencia no especificada).",
+ "cuadros": 101, "fps": 30,
+ "periodo_zancada_s": 1.0,
+ "cadera_flexion_rango_deg": 44.3,
+ "hombro_balanceo_rango_deg": [25.7, 22.2],
+ "codo_flexion_rango_deg": [17.5, 13.0], "codo_flexion_base_deg": [8.8, 26.2],
+ "rodilla_flexion_rango_deg": 32.3,
+ "muneca_rango_deg": 16.2,
+ "cabeza_rango_deg": 10,
+ "torsion_torso_deg": 6,
+ "giro_pelvis_deg": [11.9, 8.8, 3.6]
+}

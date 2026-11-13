@@ -2,7 +2,7 @@
 const OUT = '#12090a';
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 const lerp = (a, b, k) => a + (b - a) * k;
-export const HAIR_DEFAULT = { s: 0, len: 0.5, green: 0, cut: 0, foam: 0, frizz: 0, wet: 0, shine: 0.3, sway: 0 };
+export const HAIR_DEFAULT = { rl: 0, s: 0, len: 0.5, green: 0, cut: 0, foam: 0, frizz: 0, wet: 0, shine: 0.3, sway: 0 };
 const mixHex = (a, b, k) => { const A = [1, 3, 5].map((i) => parseInt(a.slice(i, i + 2), 16)), B = [1, 3, 5].map((i) => parseInt(b.slice(i, i + 2), 16)); return '#' + A.map((v, i) => Math.round(v + (B[i] - v) * k).toString(16).padStart(2, '0')).join(''); };
 function cols(h) { const g = h.green || 0, w = h.wet || 0;
   return { base: mixHex(mixHex('#1a1412', '#14ad3a', g), '#000000', w * 0.3), mid: mixHex('#3a2f2c', '#4fe06a', g), hi: mixHex('#a39a98', '#d6ffd9', g), dark: mixHex('#050303', '#0a5a1d', g) }; }
@@ -51,4 +51,16 @@ export function hairCurtains(h, yaw = 0) {
     return `<path d="${panel}" transform="translate(${m * 22},14) scale(1.0)" fill="${c.dark}" stroke="${OUT}" stroke-width="7" stroke-linejoin="round" opacity="0.95"/><path d="${panel}" fill="url(#${m < 0 ? 'hxSm' : 'hxS'})" stroke="${OUT}" stroke-width="7" stroke-linejoin="round"/>${strands}${gloss}`;
   };
   return `<g opacity="${s}" transform="translate(${yaw * 10},0)">${side(-1)}${side(1)}</g>`;
+}
+
+// Rizos largos y definidos: mechones en espiral (cuerdas onduladas con bucles), con brillo y sombra.
+export function hairRinglets(h, yaw = 0, t = 0) {
+  const rl = clamp(h.rl || 0); if (rl <= 0.01) return '';
+  const c = cols(h), L = clamp(h.len ?? 0.5), yEnd = 130 + 560 * L, sw = (h.sway || 0), sh = h.shine ?? 0.5;
+  const strand = (x0, m, col, ph, lam, amp) => { const pts = []; for (let y = 6; y <= yEnd; y += 6) { const u = y / yEnd; const x = x0 + m * (u * 26) + amp * (0.6 + 0.5 * u) * Math.sin((y / lam) * Math.PI * 2 + ph) + sw * 24 * u * u * m; pts.push([x, y]); }
+    const d = 'M' + pts.map((p) => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' L');
+    const loops = pts.filter((_, i) => i % 6 === 3).map(([x, y], i) => `<circle cx="${x}" cy="${y}" r="${15 - 3 * (y / yEnd)}" fill="${c.mid}" opacity="0.55"/>`).join('');
+    return `<path d="${d}" stroke="${OUT}" stroke-width="${44 - 8 * col}" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="${rl}"/><path d="${d}" stroke="url(#hxC)" stroke-width="${34 - 7 * col}" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="${rl}"/><path d="${d}" stroke="${c.dark}" stroke-width="${10 - 2 * col}" fill="none" stroke-linecap="round" transform="translate(7,0)" opacity="${0.5 * rl}"/><path d="${d}" stroke="${c.hi}" stroke-width="${4 + 3 * sh}" fill="none" stroke-linecap="round" transform="translate(-9,-3)" opacity="${(0.25 + 0.5 * sh) * rl}"/><g opacity="${rl}">${loops}</g>`; };
+  const side = (m) => [3, 2, 1, 0].map((col) => strand(m * (190 + col * 36), m, col, col * 1.7 + (m > 0 ? 0.8 : 0), 78 + col * 9, 20 - col * 2)).join('');
+  return `<g transform="translate(${yaw * 10},0)">${side(-1)}${side(1)}</g>`;
 }

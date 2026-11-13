@@ -1,0 +1,12 @@
+import { Resvg } from '@resvg/resvg-js';
+import { writeFileSync } from 'node:fs';
+import { defs } from './lazy_lib.mjs';
+import { drawLazy } from './rig.mjs';
+import { execSync } from 'node:child_process';
+const base = () => ({ yaw: 0, pitch: 0, roll: 0, bob: 0, sway: 0, breath: 0, shoulders: 0, flare: 0, squint: 0, tears: 0, tearT: 1, gaze: { x: 0, y: 0 }, lid: { l: 1, r: 1 }, blink: { l: 0, r: 0 }, brow: { l: { r: 0, i: 0 }, r: { r: 0, i: 0 } }, mouth: { open: 0.25, wide: 0.5, smile: 0.8, asym: 0, press: 0, teeth: { clean: 1, braces: 0, crooked: 0 } }, armL: { rot1: 4, rot2: 6, w: 0, curl: 0.3 }, armR: { rot1: -4, rot2: -6, w: 0, curl: 0.3 }, skin: { acne: 0.03, glow: 0.9, mask: 0, dry: 0, foam: 0, patch: 0, red: 0 }, hair: { s: 1, len: 1, shine: 0.9 }, browStyle: { k: 1 }, makeup: { mole: 1 } });
+const S = [['original', null], ['neon', { kind: 'neon', prog: 1, jewel: 0 }], ['tela 50%', { kind: 'gown', prog: 0.5, jewel: 0 }], ['vestido', { kind: 'gown', prog: 1, jewel: 1 }], ['rizos largos', 'curls']];
+S.forEach(([n, of], i) => { const p = base(); if (of === 'curls') { p.hair = { rl: 1, s: 0, len: 1, shine: 0.9 }; p.outfit = { kind: 'gown', prog: 1, jewel: 1 }; } else p.outfit = of;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1700">${defs('e3d')}<rect width="100%" height="100%" fill="#d8c7f0"/><g transform="translate(500,520) scale(0.95)">${drawLazy(p)}</g><text x="500" y="60" font-family="Inter" font-weight="800" font-size="40" text-anchor="middle" fill="#12090a">${n}</text></svg>`;
+  writeFileSync(`build/o_${i}.png`, new Resvg(svg, { font: { loadSystemFonts: true, defaultFontFamily: 'Inter' } }).render().asPng()); });
+execSync('ffmpeg -y -loglevel error -i build/o_0.png -i build/o_1.png -i build/o_2.png -i build/o_3.png -i build/o_4.png -filter_complex "[0]crop=1000:1450:0:100[a];[1]crop=1000:1450:0:100[b];[2]crop=1000:1450:0:100[c];[3]crop=1000:1450:0:100[d];[4]crop=1000:1450:0:100[e];[a][b][c][d][e]hstack=5,scale=2000:-1" build/outfit_test.png');
+console.log('ok');

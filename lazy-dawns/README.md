@@ -135,3 +135,7 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
 - Sin Mari. Nuevos: Karla (cejista, voz Bella) y Chispa (gato). Puerta con campana (se abre y suena), cejas de uniceja -> separadas, arqueadas y finas tipo modelo,
   imprevisto del gato, retoque, comparacion ANTES/DESPUES de cejas, gancho: el lunar se ve enorme. Duracion 1:29 (limite 1:30). Siguiente voto: MAQUILLAJE vs ROPA.
 - Regla de logica: lo que se nombra se ve (puerta/campana, cera, pinza, gato), con su sonido. El codo de quien trabaja sobre la cara va hacia ABAJO (no cruza su propia cara).
+
+## Rizos (decision del creador)
+- Los rizos largos y bonitos NO van en el dia 6: son una OPCION de votacion (dia 7: maquillaje vs rizos). Mientras tanto Lazy conserva su pelo largo y lacio.
+- Sistema listo: hair.mjs -> hairRinglets (rl=1, len=1) + hairCurly reducido; usar si ganan los rizos.

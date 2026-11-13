@@ -1,0 +1,92 @@
+[
+ {
+  "id": "l1",
+  "who": "N",
+  "text": "Día seis. Ustedes eligieron ropa... y hoy, todo cambia.",
+  "pad": 0.3
+ },
+ {
+  "id": "l2",
+  "who": "N",
+  "text": "Una limusina me llevó a Maison Dawns, la boutique más elegante de la ciudad.",
+  "pad": 0.15
+ },
+ {
+  "id": "l3",
+  "who": "T",
+  "text": "Bienvenida, Lazy. Soy Dante. Hoy el mundo va a mirarte.",
+  "pad": 0.2
+ },
+ {
+  "id": "l4",
+  "who": "N",
+  "text": "Primero, Dante me miró de pies a cabeza, como un artista frente a su lienzo.",
+  "pad": 0.2
+ },
+ {
+  "id": "l5",
+  "who": "N",
+  "text": "Dante tomó mis medidas, una por una, para diseñar algo solo para mí.",
+  "pad": 0.2
+ },
+ {
+  "id": "l6",
+  "who": "T",
+  "text": "Nada estándar. Un vestido que presuma tu presencia.",
+  "pad": 0.2
+ },
+ {
+  "id": "l7",
+  "who": "N",
+  "text": "Pero su asistente trajo un traje neón, con plumas, lentejuelas... y demasiado de todo.",
+  "pad": 0.25
+ },
+ {
+  "id": "l8",
+  "who": "T",
+  "text": "¡Absolutamente no! Eso es un circo. Llévatelo.",
+  "pad": 0.15
+ },
+ {
+  "id": "l9",
+  "who": "N",
+  "text": "Entonces tomó una tela de satén esmeralda, y empezó a cortar, coser y ajustar.",
+  "pad": 0.25
+ },
+ {
+  "id": "l10",
+  "who": "N",
+  "text": "Aretes dorados, un collar y tacones altos. Cada detalle contaba.",
+  "pad": 0.2
+ },
+ {
+  "id": "l11",
+  "who": "N",
+  "text": "Cuando abrí la cortina, me quedé sin aliento: un vestido largo, elegante, que brillaba con cada paso.",
+  "pad": 0.3
+ },
+ {
+  "id": "l12",
+  "who": "T",
+  "text": "Ahora, a la pasarela. Las luces ya te aguardan.",
+  "pad": 0.15
+ },
+ {
+  "id": "l13",
+  "who": "N",
+  "text": "Caminé por la pasarela, y los flashes no pararon.",
+  "pad": 0.25
+ },
+ {
+  "id": "l14",
+  "who": "T",
+  "text": "Te ves increíble. Pero todavía falta algo...",
+  "pad": 0.25
+ },
+ {
+  "id": "l15",
+  "who": "N",
+  "text": "Uy. ¿Qué arreglamos mañana: maquillaje o rizos? Comenta tu elección, y sígueme para ver el día siete.",
+  "pad": 0.35
+ }
+]

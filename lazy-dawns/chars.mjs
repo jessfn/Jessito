@@ -172,6 +172,10 @@ function salonTool(kind, o = {}) {
     case 'pencilW': return `<g><rect x="-9" y="0" width="18" height="170" rx="6" fill="#f8fafc" ${O}/><path d="M-9,170 L0,214 L9,170Z" fill="#f4d9a8" stroke="${OUT}" stroke-width="5" stroke-linejoin="round"/><path d="M-3,200 L0,214 L3,200Z" fill="#fff" stroke="${OUT}" stroke-width="2"/></g>`;
     case 'ruler': return `<g><rect x="-14" y="0" width="28" height="210" rx="6" fill="#fde68a" ${O}/>${[...Array(14)].map((_, i) => `<path d="M${-14},${14 + i * 14} h${i % 2 ? 9 : 16}" stroke="${OUT}" stroke-width="3"/>`).join('')}<rect x="-14" y="196" width="28" height="14" fill="#f59e0b"/></g>`;
     case 'spoolie': return `<g><rect x="-9" y="0" width="18" height="130" rx="9" fill="#a78bfa" ${O}/><rect x="-14" y="130" width="28" height="68" rx="12" fill="#1f2937" stroke="${OUT}" stroke-width="5"/>${[...Array(9)].map((_, i) => `<path d="M-14,${136 + i * 7} h-8 M14,${136 + i * 7} h8" stroke="#1f2937" stroke-width="4" stroke-linecap="round"/>`).join('')}</g>`;
+    case 'tape': return `<g><rect x="-14" y="-8" width="28" height="60" rx="8" fill="#fde047" ${O}/><path d="M-80,20 Q0,70 80,20" stroke="#fde047" stroke-width="14" fill="none"/><path d="M-80,20 Q0,70 80,20" stroke="${OUT}" stroke-width="3" fill="none" stroke-dasharray="3 10"/></g>`;
+    case 'hanger': return `<g><path d="M0,0 L0,24 Q-40,34 -90,66 L90,66 Q40,34 0,24" fill="none" stroke="#9ca3af" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/><path d="M0,24 q14,-12 14,-26 q0,-14 -14,-14" stroke="#9ca3af" stroke-width="9" fill="none" stroke-linecap="round"/><g transform="translate(0,60)"><path d="M-96,0 L96,0 L170,290 Q0,320 -170,290Z" fill="url(#neonG)" stroke="${OUT}" stroke-width="6" stroke-linejoin="round"/>${[...Array(12)].map((_, i) => `<circle cx="${-130 + (i * 53) % 260}" cy="${20 + (i * 37) % 250}" r="7" fill="${['#fff', '#ffe14d', '#ff2bd6'][i % 3]}" stroke="${OUT}" stroke-width="2"/>`).join('')}</g></g>`;
+    case 'needleT': return `<g><rect x="-5" y="0" width="10" height="150" rx="5" fill="#e5e7eb" ${O}/><path d="M-4,0 q-30,-30 0,-60" stroke="#ff4d8d" stroke-width="5" fill="none"/><circle cx="0" cy="12" r="6" fill="none" stroke="${OUT}" stroke-width="3"/></g>`;
+    case 'fabric': return `<g><path d="M-60,0 Q-70,60 -50,120 L50,120 Q70,60 60,0Z" fill="url(#gownG)" stroke="${OUT}" stroke-width="6" stroke-linejoin="round"/><path d="M-30,10 Q-20,70 -30,110 M10,8 Q20,70 14,112" stroke="#fff" stroke-opacity="0.4" stroke-width="7" fill="none"/></g>`;
     case 'bottleG': return `<g><rect x="-34" y="0" width="68" height="150" rx="22" fill="#22c55e" ${O}/><rect x="-18" y="-44" width="36" height="50" rx="8" fill="#f1f5f9" ${O}/><rect x="-30" y="48" width="60" height="64" rx="8" fill="#bbf7d0" ${O}/><text x="0" y="90" font-family="Anton" font-size="26" text-anchor="middle" fill="#14532d">VERDE</text></g>`;
     case 'bottleB': return `<g><rect x="-34" y="0" width="68" height="150" rx="22" fill="#1f2937" ${O}/><rect x="-18" y="-44" width="36" height="50" rx="8" fill="#f1f5f9" ${O}/><rect x="-30" y="48" width="60" height="64" rx="8" fill="#e5e7eb" ${O}/><text x="0" y="90" font-family="Anton" font-size="26" text-anchor="middle" fill="#111827">NEGRO</text></g>`;
     case 'bottle': return `<g><rect x="-34" y="0" width="68" height="150" rx="22" fill="#38bdf8" ${O}/><rect x="-18" y="-44" width="36" height="50" rx="8" fill="#f1f5f9" ${O}/><rect x="-30" y="48" width="60" height="64" rx="8" fill="#e0f2fe" ${O}/><text x="0" y="88" font-family="Anton" font-size="22" text-anchor="middle" fill="#0c4a6e">SERUM</text></g>`;
@@ -204,6 +208,56 @@ export function drawStylist(p) {
     ${armsLayer(p, { sleeve: '#d946ef', skin: SK }, 'body')}
   </g>`;
 }
+
+export function drawDante(p) {
+  const m = MOODS[p.mood || 'calm'], t = p.t || 0, bob = Math.sin(t * 1.9 + 3) * 2.5, blink = p.blink || 0;
+  const SK = '#c58b63', SKD = '#a8734e';
+  const tool = p.tool && p.tool !== 'none' ? `<g transform="translate(${toolAnchor(p).x},${toolAnchor(p).y}) rotate(${p.toolR ?? 70}) ${p.toolS ? `scale(${p.toolS})` : ''}">${salonTool(p.tool, { k: t })}${p.noHand ? '' : `<g transform="translate(0,${p.gripY ?? 4})">${gripHand(SK)}</g>`}</g>` : '';
+  if (p.part === 'tool') return `<g transform="translate(0,${bob})">${armsLayer(p, { sleeve: '#1f2937', skin: SK }, 'tool')}${tool}</g>`;
+  return `<g transform="translate(0,${bob})">
+    <rect x="-84" y="470" width="70" height="200" rx="26" fill="#111827" ${O}/><rect x="14" y="470" width="70" height="200" rx="26" fill="#111827" ${O}/>
+    <ellipse cx="-50" cy="684" rx="58" ry="24" fill="#d4a017" ${O}/><ellipse cx="50" cy="684" rx="58" ry="24" fill="#d4a017" ${O}/>
+    <path d="M-160,560 Q-150,170 -84,150 L84,150 Q150,170 160,560Z" fill="#1f2937" ${O}/><path d="M-90,270 L90,270 L110,560 L-110,560Z" fill="#111827" ${O}/><path d="M-90,270 Q0,300 90,270" fill="#111827" ${O}/><path d="M-60,150 L-50,270 M60,150 L50,270" stroke="#111827" stroke-width="14"/>
+    <rect x="-70" y="380" width="60" height="64" rx="10" fill="#1f2937" ${O}/><rect x="10" y="380" width="60" height="64" rx="10" fill="#1f2937" ${O}/><path d="M-50,380 v-34 M-36,380 v-40" stroke="#e5e7eb" stroke-width="7" stroke-linecap="round"/><path d="M30,380 v-40" stroke="#d4a017" stroke-width="12" stroke-linecap="round"/>
+    <path d="M-48,150 Q0,214 48,150" fill="${SKD}" ${O}/>
+    <rect x="-24" y="96" width="48" height="60" fill="${SKD}" ${O}/>
+    <circle cx="0" cy="-122" r="74" fill="#1a1412" ${O}/><path d="M-30,-170 Q-10,-130 -40,-100" stroke="#d4a017" stroke-width="16" fill="none" stroke-linecap="round"/><path d="M20,-176 Q40,-140 14,-110" stroke="#d4a017" stroke-width="12" fill="none" stroke-linecap="round" opacity="0.9"/>
+    <ellipse cx="0" cy="0" rx="102" ry="116" fill="${SK}" ${O}/><ellipse cx="-106" cy="10" rx="14" ry="24" fill="${SK}" ${O}/><ellipse cx="106" cy="10" rx="14" ry="24" fill="${SK}" ${O}/>
+    <circle cx="-110" cy="48" r="22" fill="none" stroke="#374151" stroke-width="7"/><circle cx="110" cy="48" r="22" fill="none" stroke="#374151" stroke-width="7"/>
+    <path d="M-104,-8 Q-112,-110 0,-114 Q112,-110 104,-8 Q70,-70 0,-76 Q-70,-70 -104,-8Z" fill="#1a1412" ${O}/>
+    ${eyes(40, -6, blink, p.look || 0, m.big, m.b)}<path d="M-76,-30 l-14,-10 M76,-30 l14,-10" stroke="${OUT}" stroke-width="6" stroke-linecap="round"/>
+    <ellipse cx="-58" cy="34" rx="22" ry="11" fill="#fb7185" opacity="0.5"/><ellipse cx="58" cy="34" rx="22" ry="11" fill="#fb7185" opacity="0.5"/>
+    ${(() => { const mm = mouth(m.m, 54, t); return mm.replace(/stroke="#12090a"/g, 'stroke="#12090a"').replace(/fill="#7a1f2a"/g, 'fill="#b91c1c"'); })()}<path d="M-26,64 Q0,82 26,64" stroke="#be123c" stroke-width="9" fill="none" stroke-linecap="round" opacity="0.65"/>
+    <path d="M-44,58 Q-24,40 0,52 Q24,40 44,58 Q24,66 0,60 Q-24,66 -44,58Z" fill="#1a1412" stroke="${OUT}" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M-26,150 L0,300 L26,150Z" fill="#fff" stroke="${OUT}" stroke-width="5"/><path d="M0,160 L-12,176 L0,194 L12,176Z" fill="#b91c1c" stroke="${OUT}" stroke-width="4"/>
+    ${armsLayer(p, { sleeve: '#1f2937', skin: SK }, 'body')}
+  </g>`;
+}
+
+
+export function drawPia(p) {
+  const m = MOODS[p.mood || 'calm'], t = p.t || 0, bob = Math.sin(t * 1.9 + 3) * 2.5, blink = p.blink || 0;
+  const SK = '#e0b08a', SKD = '#c4916b';
+  const tool = p.tool && p.tool !== 'none' ? `<g transform="translate(${toolAnchor(p).x},${toolAnchor(p).y}) rotate(${p.toolR ?? 70}) ${p.toolS ? `scale(${p.toolS})` : ''}">${salonTool(p.tool, { k: t })}${p.noHand ? '' : `<g transform="translate(0,${p.gripY ?? 4})">${gripHand(SK)}</g>`}</g>` : '';
+  if (p.part === 'tool') return `<g transform="translate(0,${bob})">${armsLayer(p, { sleeve: '#fb7185', skin: SK }, 'tool')}${tool}</g>`;
+  return `<g transform="translate(0,${bob})">
+    <rect x="-84" y="470" width="70" height="200" rx="26" fill="#7c3aed" ${O}/><rect x="14" y="470" width="70" height="200" rx="26" fill="#7c3aed" ${O}/>
+    <ellipse cx="-50" cy="684" rx="58" ry="24" fill="#22d3ee" ${O}/><ellipse cx="50" cy="684" rx="58" ry="24" fill="#22d3ee" ${O}/>
+    <path d="M-160,560 Q-150,170 -84,150 L84,150 Q150,170 160,560Z" fill="#fb7185" ${O}/><path d="M-90,270 L90,270 L110,560 L-110,560Z" fill="#7c3aed" ${O}/><path d="M-90,270 Q0,300 90,270" fill="#7c3aed" ${O}/><path d="M-60,150 L-50,270 M60,150 L50,270" stroke="#7c3aed" stroke-width="14"/>
+    <rect x="-70" y="380" width="60" height="64" rx="10" fill="#1f2937" ${O}/><rect x="10" y="380" width="60" height="64" rx="10" fill="#1f2937" ${O}/><path d="M-50,380 v-34 M-36,380 v-40" stroke="#e5e7eb" stroke-width="7" stroke-linecap="round"/><path d="M30,380 v-40" stroke="#22d3ee" stroke-width="12" stroke-linecap="round"/>
+    <path d="M-48,150 Q0,214 48,150" fill="${SKD}" ${O}/>
+    <rect x="-24" y="96" width="48" height="60" fill="${SKD}" ${O}/>
+    <circle cx="0" cy="-122" r="74" fill="#1a1412" ${O}/><path d="M-30,-170 Q-10,-130 -40,-100" stroke="#22d3ee" stroke-width="16" fill="none" stroke-linecap="round"/><path d="M20,-176 Q40,-140 14,-110" stroke="#22d3ee" stroke-width="12" fill="none" stroke-linecap="round" opacity="0.9"/>
+    <ellipse cx="0" cy="0" rx="102" ry="116" fill="${SK}" ${O}/><ellipse cx="-106" cy="10" rx="14" ry="24" fill="${SK}" ${O}/><ellipse cx="106" cy="10" rx="14" ry="24" fill="${SK}" ${O}/>
+    <circle cx="-110" cy="48" r="22" fill="none" stroke="#fde68a" stroke-width="7"/><circle cx="110" cy="48" r="22" fill="none" stroke="#fde68a" stroke-width="7"/>
+    <path d="M-104,-8 Q-112,-110 0,-114 Q112,-110 104,-8 Q70,-70 0,-76 Q-70,-70 -104,-8Z" fill="#1a1412" ${O}/>
+    ${eyes(40, -6, blink, p.look || 0, m.big, m.b)}<path d="M-76,-30 l-14,-10 M76,-30 l14,-10" stroke="${OUT}" stroke-width="6" stroke-linecap="round"/>
+    <ellipse cx="-58" cy="34" rx="22" ry="11" fill="#fb7185" opacity="0.5"/><ellipse cx="58" cy="34" rx="22" ry="11" fill="#fb7185" opacity="0.5"/>
+    ${(() => { const mm = mouth(m.m, 54, t); return mm.replace(/stroke="#12090a"/g, 'stroke="#12090a"').replace(/fill="#7a1f2a"/g, 'fill="#b91c1c"'); })()}<path d="M-26,64 Q0,82 26,64" stroke="#be123c" stroke-width="9" fill="none" stroke-linecap="round" opacity="0.65"/>
+    ${armsLayer(p, { sleeve: '#fb7185', skin: SK }, 'body')}
+  </g>`;
+}
+
 
 export function drawKarla(p) {
   const m = MOODS[p.mood || 'calm'], t = p.t || 0, bob = Math.sin(t * 1.9 + 3) * 2.5, blink = p.blink || 0;

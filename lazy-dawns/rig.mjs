@@ -1,13 +1,14 @@
 // Rig de Lazy Dawns: personaje articulado (cuello, hombros, codos, muñecas con IK), cara con parpadeo,
 // miradas, cejas, boca por visemas, mejillas/pliegues (pomulos, mandibula) y respiracion.
 import { hand, foot } from './lazy_lib.mjs';
-import { hairDefs, hairCurly, hairBehind, hairTop, hairCurtains, HAIR_DEFAULT } from './hair.mjs';
+import { hairDefs, hairCurly, hairBehind, hairTop, hairCurtains, hairRinglets, HAIR_DEFAULT } from './hair.mjs';
 
 const OUT = '#12090a';
 const O8 = `stroke="${OUT}" stroke-width="8" stroke-linejoin="round"`;
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 const lerp = (a, b, k) => a + (b - a) * k;
-const SKIN = 'url(#skin)', SKINB = 'url(#skinB)', SHIRT = 'url(#shirt)', PANTS = 'url(#pants)', HAIR = 'url(#hair)';
+let SHIRT = 'url(#shirt)';
+const SKIN = 'url(#skin)', SKINB = 'url(#skinB)', PANTS = 'url(#pants)', HAIR = 'url(#hair)';
 const LID = '#a1613a';
 
 // ---------- IK de 2 huesos (hombro -> codo -> mano) ----------
@@ -264,15 +265,50 @@ function armSvg(side, arm) {
       <path d="M-26,70 q-6,26 0,52 M10,66 q8,28 2,56" stroke="#000" stroke-opacity="0.12" stroke-width="5" fill="none" stroke-linecap="round"/>
       <g transform="translate(0,${L2}) rotate(${wrist})">
         <ellipse cx="0" cy="-4" rx="38" ry="10" fill="#ff7ab6" stroke="${OUT}" stroke-width="4"/>${[-24, -8, 8, 24].map((x) => `<circle cx="${x}" cy="-4" r="4.5" fill="#ffe14d" stroke="${OUT}" stroke-width="1.5"/>`).join('')}
-        <g transform="scale(0.95)">${hand(0, 34, side, O8, SKINB, true)}</g>
+        <g transform="scale(0.95)">${hand(0, 34, side, O8, SKINB, true, arm.curl ?? 0.3, arm.spread ?? 0.15, arm.tt || 0)}</g>
       </g>
     </g>
     ${sleeve}
   </g>`;
 }
 
+
+// ---------- ropa elegante / traje neon / joyas / tacones ----------
+const GOWN_PATH = 'M-78,-96 C-150,-92 -262,-52 -312,34 C-352,110 -368,190 -364,270 C-360,330 -346,380 -352,430 C-362,520 -396,640 -424,742 Q0,800 424,742 C396,640 362,520 352,430 C346,380 360,330 364,270 C368,190 352,110 312,34 C262,-52 150,-92 78,-96 Z';
+const OUTFIT_DEFS = `<defs>
+  <linearGradient id="gownG" x1="0" y1="0" x2="1" y2="0.2"><stop offset="0" stop-color="#064e3b"/><stop offset="0.22" stop-color="#10b981"/><stop offset="0.38" stop-color="#6ee7b7"/><stop offset="0.52" stop-color="#059669"/><stop offset="0.8" stop-color="#065f46"/><stop offset="1" stop-color="#022c22"/></linearGradient>
+  <linearGradient id="neonG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff2bd6"/><stop offset="0.5" stop-color="#fff200"/><stop offset="1" stop-color="#00f0ff"/></linearGradient>
+  <linearGradient id="goldG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff3b0"/><stop offset="0.5" stop-color="#d4a017"/><stop offset="1" stop-color="#8a6508"/></linearGradient>
+  <clipPath id="gownClip"><path d="${GOWN_PATH}"/></clipPath></defs>`;
+function jewelHead(of) {
+  const j = of && of.jewel ? clamp(of.jewel) : 0; if (j <= 0.02) return '';
+  const drop = (s) => `<g transform="translate(${s * 205},58)" opacity="${j}"><circle r="9" fill="url(#goldG)" stroke="${OUT}" stroke-width="3"/><path d="M0,9 L0,34" stroke="#d4a017" stroke-width="4"/><path d="M0,30 l-11,22 l11,16 l11,-16Z" fill="url(#goldG)" stroke="${OUT}" stroke-width="3" stroke-linejoin="round"/><circle cx="-3" cy="48" r="4" fill="#fff" opacity="0.9"/></g>`;
+  return `<g transform="translate(0,0)">${drop(-1)}${drop(1)}</g>`;
+}
+function outfitLayer(of, t) {
+  if (!of || !of.kind) return '';
+  const prog = of.prog ?? 1, neon = of.kind === 'neon', fill = neon ? 'url(#neonG)' : 'url(#gownG)';
+  const wipe = `<clipPath id="wipeClip"><rect x="-480" y="-130" width="960" height="${Math.max(0, 900 * clamp(prog))}"/></clipPath>`;
+  const sequins = neon ? '' : `<path d="M-340,70 C-200,200 40,330 350,420 L350,470 C60,380 -190,260 -352,128Z" fill="url(#goldG)" stroke="${OUT}" stroke-width="5" opacity="0.9"/>${[...Array(44)].map((_, i) => `<circle cx="${-330 + (i * 83) % 660}" cy="${-20 + (i * 47) % 740}" r="${2.5 + (i % 3)}" fill="#fff" opacity="${0.35 + (i % 4) * 0.12}"/>`).join('')}`;
+  const folds = neon ? '' : `${sequins}<g fill="none" stroke="#000" stroke-opacity="0.22" stroke-width="7" stroke-linecap="round"><path d="M-40,430 Q-120,600 -200,742"/><path d="M40,430 Q130,610 220,742"/><path d="M0,440 Q10,600 0,745"/><path d="M-200,430 Q-280,590 -340,730"/><path d="M200,430 Q290,590 350,730"/></g><g fill="none" stroke="#fff" stroke-opacity="0.32" stroke-width="12" stroke-linecap="round"><path d="M-120,440 Q-170,600 -250,740"/><path d="M110,436 Q150,590 190,738"/><path d="M-250,60 Q-300,200 -300,330"/></g><path d="M-300,60 Q-330,200 -320,330" stroke="#000" stroke-opacity="0.18" stroke-width="14" fill="none" filter="url(#blur8)"/><ellipse cx="170" cy="560" rx="210" ry="180" fill="#000" opacity="0.2" filter="url(#blur20)"/>`;
+  const neonStuff = neon ? `${[...Array(26)].map((_, i) => `<circle cx="${-300 + (i * 97) % 600}" cy="${-40 + (i * 61) % 760}" r="${9 + i % 3 * 4}" fill="${['#fff', '#ffe14d', '#ff4dd8', '#4df3ff'][i % 4]}" stroke="${OUT}" stroke-width="2.5"/>`).join('')}<path d="M-424,742 ${[...Array(14)].map((_, i) => `l${60},${i % 2 ? 24 : -24}`).join(' ')} L424,742 L424,700 L-424,700Z" fill="#ff2bd6" stroke="${OUT}" stroke-width="5" opacity="0.95"/>` : '';
+  const feathers = neon ? `<g>${[-1, 1].map((s) => [...Array(9)].map((_, i) => `<ellipse cx="${s * (250 + i * 8)}" cy="${-30 + i * 34}" rx="60" ry="22" fill="${['#ff2bd6', '#fff200', '#00f0ff'][i % 3]}" stroke="${OUT}" stroke-width="4" transform="rotate(${s * (30 + i * 6)} ${s * (250 + i * 8)} ${-30 + i * 34})"/>`).join('')).join('')}</g>` : '';
+  const belt = `<path d="M-346,392 Q0,430 346,392 L350,426 Q0,466 -350,426Z" fill="url(#goldG)" stroke="${OUT}" stroke-width="6"/><rect x="-34" y="396" width="68" height="46" rx="12" fill="url(#goldG)" stroke="${OUT}" stroke-width="6"/><circle cx="0" cy="419" r="9" fill="#10b981" stroke="${OUT}" stroke-width="3"/>`;
+  const neck = `<path d="M-96,-98 L0,60 L96,-98 Q0,-50 -96,-98Z" fill="${SKINB}" stroke="${OUT}" stroke-width="6" stroke-linejoin="round"/>`;
+  const necklace = of.jewel > 0.02 ? `<g opacity="${of.jewel}"><path d="M-84,-92 Q0,-6 84,-92" stroke="url(#goldG)" stroke-width="9" fill="none" stroke-linecap="round"/>${[-60, -30, 0, 30, 60].map((x) => `<circle cx="${x}" cy="${-72 + Math.abs(x) * -0.18 + 64 * (1 - Math.pow(x / 84, 2)) * 0.9 - 40}" r="7" fill="url(#goldG)" stroke="${OUT}" stroke-width="2.5"/>`).join('')}<path d="M0,-6 l-14,20 l14,22 l14,-22Z" fill="#10b981" stroke="${OUT}" stroke-width="4" stroke-linejoin="round"/><circle cx="-3" cy="14" r="3" fill="#fff"/></g>` : '';
+  const sparkle = prog > 0 && prog < 1 ? [...Array(7)].map((_, i) => { const y = -130 + 900 * prog, x = -380 + i * 126 + Math.sin(i * 2 + t * 8) * 20; return `<g transform="translate(${x},${y}) rotate(${t * 80 + i * 20}) scale(${0.7 + 0.3 * Math.sin(t * 9 + i)})"><path d="M0,-18 Q4,-4 18,0 Q4,4 0,18 Q-4,4 -18,0 Q-4,-4 0,-18Z" fill="#fff" stroke="${OUT}" stroke-width="3"/></g>`; }).join('') : '';
+  return `${wipe}<g clip-path="url(#wipeClip)"><path d="${GOWN_PATH}" fill="${fill}" ${O8}/><g clip-path="url(#gownClip)">${folds}${neonStuff}</g><path d="${GOWN_PATH}" fill="none" stroke="${OUT}" stroke-width="8" stroke-linejoin="round"/>${neck}${belt}${feathers}${necklace}</g>${sparkle}`;
+}
+function heelsLayer(of, p) {
+  if (!of || !of.kind || (of.prog ?? 1) < 0.9) return '';
+  const lift = p.heel || { l: 0, r: 0 }; const col = of.kind === 'neon' ? '#ff2bd6' : '#111827';
+  const heel = (x, up, s) => `<g transform="translate(${x},${748 - up})"><path d="M${-s * 56},0 C${-s * 70},-26 ${-s * 20},-52 ${s * 14},-34 L${s * 90},-6 Q${s * 110},6 ${s * 80},16 L${-s * 48},16 Q${-s * 70},10 ${-s * 56},0Z" fill="${col}" stroke="${OUT}" stroke-width="6" stroke-linejoin="round"/><path d="M${-s * 52},12 L${-s * 66},58 L${-s * 46},58 L${-s * 30},16Z" fill="url(#goldG)" stroke="${OUT}" stroke-width="5" stroke-linejoin="round"/><path d="M${-s * 30},-30 Q${s * 10},-44 ${s * 60},-12" stroke="#fff" stroke-opacity="0.35" stroke-width="5" fill="none"/></g>`;
+  return `<g>${heel(-130, lift.l, 1)}${heel(130, lift.r, -1)}</g>`;
+}
+
 export function drawLazy(p) {
   const br = p.breath || 0, sh = (p.shoulders || 0) * 14;
+  const of = p.outfit && p.outfit.kind ? p.outfit : null; const gownOn = of && (of.prog ?? 1) > 0.02; SHIRT = of && (of.prog ?? 1) >= 1 ? (of.kind === 'neon' ? 'url(#neonG)' : 'url(#gownG)') : 'url(#shirt)';
   const lg = p.legs || { l: {}, r: {} };
   const chest = `<g transform="translate(0,230) scale(${1 + 0.012 * br},${1 + 0.016 * br}) translate(0,-230)">
     <!-- cadera + panza -->
@@ -286,18 +322,19 @@ export function drawLazy(p) {
     <g clip-path="url(#shirtClip)">${STRIPES}${DOTS}${SHIRT_DETAIL}</g>
     <path d="${SHIRT_PATH()}" fill="none" stroke="${OUT}" stroke-width="8" stroke-linejoin="round"/>
     <path d="M-118,-96 Q0,-50 118,-96" fill="${SKINB}" stroke="${OUT}" stroke-width="8"/><path d="M-120,-100 Q0,-56 120,-100" stroke="#c95f12" stroke-width="16" fill="none"/>
+    ${gownOn ? outfitLayer(of, p.tearT || 0) : ''}
   </g>`;
   const rollY = -100;
   return `<g transform="rotate(${p.sway || 0} 0 770)">
-    ${SHADE_DEFS}<defs>${hairDefs({ ...HAIR_DEFAULT, ...(p.hair || {}) })}</defs>
+    ${SHADE_DEFS}${OUTFIT_DEFS}<defs>${hairDefs({ ...HAIR_DEFAULT, ...(p.hair || {}) })}</defs>
     <clipPath id="eyeClip"><ellipse rx="36" ry="40"/></clipPath>
     <ellipse cx="0" cy="780" rx="420" ry="46" fill="#000" opacity="0.4" filter="url(#blur20)"/>
-    <g transform="translate(0,${p.hop || 0})">${legSvg(-1, lg.l)}${legSvg(1, lg.r)}<g transform="translate(${p.lean || 0},0)">${chest}
-    <g transform="translate(0,${-sh * 0.4})">
+    <g transform="translate(0,${p.hop || 0})">${of && (of.prog ?? 1) >= 0.9 ? '' : legSvg(-1, lg.l) + legSvg(1, lg.r)}<g transform="translate(${p.lean || 0},0)">${chest}
+    ${heelsLayer(of, p)}<g transform="translate(0,${-sh * 0.4})">
       <path d="M-62,-150 C-70,-110 -86,-96 -110,-84 L110,-84 C86,-96 70,-110 62,-150Z" fill="${SKINB}" ${O8}/>
       <path d="M-40,-90 C-30,-70 30,-70 40,-90" stroke="#000" stroke-opacity="0.2" stroke-width="6" fill="none"/>
       <ellipse cx="0" cy="-60" rx="104" ry="24" fill="#000" opacity="0.18" filter="url(#blur8)"/>
-      <g transform="translate(0,${rollY}) rotate(${p.roll || 0}) translate(0,${-rollY}) translate(0,${-215 + (p.pitch || 0) * 10 + (p.bob || 0)})">${headSvg(p)}${hairCurtains({ ...HAIR_DEFAULT, ...(p.hair || {}) }, p.yaw || 0)}</g>
+      <g transform="translate(0,${rollY}) rotate(${p.roll || 0}) translate(0,${-rollY}) translate(0,${-215 + (p.pitch || 0) * 10 + (p.bob || 0)})">${headSvg(p)}${hairCurtains({ ...HAIR_DEFAULT, ...(p.hair || {}) }, p.yaw || 0)}${hairRinglets({ ...HAIR_DEFAULT, ...(p.hair || {}) }, p.yaw || 0, p.tearT || 0)}${jewelHead(p.outfit)}</g>
     </g>
     <g transform="translate(0,${-sh})">${armSvg(-1, p.armL)}${armSvg(1, p.armR)}</g>
   </g></g></g>`;
