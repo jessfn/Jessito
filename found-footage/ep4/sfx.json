@@ -1,0 +1,54 @@
+{
+ "train_arrive": [
+  "subway train arriving at a station with loud screeching brakes and a horn, rushing wind, realistic",
+  9
+ ],
+ "train_doors": [
+  "subway train doors opening with pneumatic hiss and warning chime, realistic",
+  4
+ ],
+ "station_amb": [
+  "empty subway station ambience at night, flickering lights buzz, distant dripping, deep reverb, eerie, realistic",
+  20
+ ],
+ "light_flicker": [
+  "fluorescent lights flickering and buzzing in a subway car, electric sparks, realistic",
+  5
+ ],
+ "ceiling_skitter": [
+  "many creatures skittering and clicking on a metal ceiling, creepy, realistic",
+  8
+ ],
+ "creatures_drop": [
+  "creatures dropping from a ceiling onto the floor with wet thuds and screeches, horror, realistic",
+  5
+ ],
+ "tunnel_amb": [
+  "dark subway tunnel ambience, deep echo, distant rumble, dripping water, wind, realistic",
+  20
+ ],
+ "footsteps_rails": [
+  "people running on gravel and rail tracks in a tunnel, echoing, realistic",
+  8
+ ],
+ "quake_rumble": [
+  "deep rumbling tremor with falling dust and debris in a tunnel, building up, realistic",
+  8
+ ],
+ "train_crush": [
+  "huge concrete ceiling collapsing and crushing a metal subway train car with screeching metal and sparks, massive impact, realistic",
+  8
+ ],
+ "door_bang": [
+  "person banging and pulling on a jammed metal maintenance door, panicked, echoing, realistic",
+  5
+ ],
+ "rifle_cock": [
+  "soldiers cocking assault rifles and shouting distant, tactical, realistic",
+  4
+ ],
+ "heartbeat": [
+  "slow heartbeat, deep, realistic",
+  8
+ ]
+}

@@ -46,7 +46,7 @@ function handSpec(pose){const open=pose==='open';const c=open?[3,5,5]:[10,18,14]
  fingers:[F(-14.5,[17,12,9.5],[10,9.2,8],-7,1),F(-5,[19,13,10],[10.5,9.5,8.2],-1,1.05),F(5,[17,12,9.5],[10,9.2,8],5,1.1),F(14.5,[13,9,7.5],[9,8.2,7.2],11,1.25)],
  thumb:{base:[12,-14],a:open?-48:-35,segs:[21,15],w:[12.5,10.5],curl:open?[-4,-8]:[-10,-14]}}}
 function chain(fg){const pts=[fg.base.slice()];let a=fg.a;let p=fg.base.slice();fg.segs.forEach((l,i)=>{a+=fg.curl[i]||0;const r=a*Math.PI/180;p=[p[0]+Math.cos(r)*l,p[1]+Math.sin(r)*l];pts.push(p.slice())});return pts}
-function handSkin(pose,st){const H=handSpec(pose);let sh='';
+function handSkinOld(pose,st){const H=handSpec(pose);let sh='';
  const pp=H.palm.map(p=>p.join(',')).join(' ');sh+=`<polygon points="${pp}"/><ellipse cx="16" cy="-8" rx="17" ry="11" transform="rotate(-25 16 -8)"/><circle cx="44" cy="-14.5" r="6"/><circle cx="44" cy="-5" r="6.2"/><circle cx="44" cy="5" r="6"/><circle cx="44" cy="14.5" r="5.4"/>`;
  const fl=[H.thumb,...H.fingers];fl.forEach(fg=>{const ch=chain(fg);for(let i=0;i<ch.length-1;i++)sh+=limb(ch[i],ch[i+1],fg.w[i]??fg.w[fg.w.length-1],fg.w[i+1]??fg.w[fg.w.length-1]*.9)});
  let s=grp(sh,st.skin,st,[-10,-40,80,80],{noShade:false,sd:2.2});s+=`<path d="M10,-2 Q22,6 38,2 M12,6 Q24,12 38,10" stroke="${st.skin2}" stroke-width="1.1" fill="none" opacity=".8" stroke-linecap="round"/><path d="M18,-14 Q24,-6 22,4" stroke="${st.skin2}" stroke-width="1" fill="none" opacity=".7"/>`;
@@ -55,6 +55,45 @@ function handSkin(pose,st){const H=handSpec(pose);let sh='';
   if(true)s+=`<g transform="translate(${f(e[0])},${f(e[1])}) rotate(${f(ang)})"><rect x="-6.4" y="-3.2" width="5.6" height="6.4" rx="2.4" fill="${st.k==3?'#ffc7d0':'#f6d3c4'}" stroke="${st.ol}" stroke-width=".7" opacity=".9"/></g>`;
   for(let i=1;i<ch.length-1;i++){const q=ch[i];s+=`<path d="M${f(q[0]-1)},${f(q[1]-4)} q2,4 0,8" stroke="${st.k==2?st.ol:st.skin2}" stroke-width="${st.k==2?1.1:1}" fill="none" opacity=".75"/>`}});
  return s}
+
+// ---- natural hand (thin outlines, separate tapered fingers, graduated curl, micro-motion)
+let HT=0;export const setHandTime=t=>{HT=t};
+const HP={
+ open:{c:[[4,7,6],[5,8,7],[7,10,8],[10,13,9]],sp:[-13,-4,6,17],th:{a:-40,c:[-3,-6]}},
+ relax:{c:[[14,24,14],[18,30,18],[24,34,20],[30,38,22]],sp:[-9,-2,5,12],th:{a:-26,c:[-8,-10]}},
+ free:{c:[[14,24,14],[18,30,18],[24,34,20],[30,38,22]],sp:[-9,-2,5,12],th:{a:-26,c:[-8,-10]}},
+ point:{c:[[0,3,3],[78,86,55],[82,88,58],[86,90,60]],sp:[-4,0,4,8],th:{a:-10,c:[10,22]}},
+ fist:{c:[[72,88,56],[78,92,58],[82,94,60],[86,96,60]],sp:[0,0,2,4],th:{a:8,c:[14,28]}},
+ pinch:{c:[[36,44,28],[52,66,44],[58,70,46],[62,74,48]],sp:[-6,0,4,8],th:{a:-18,c:[8,18]}}};
+function handNat(pose,st){const P=HP[pose]||HP.relax;const ol=st.ol;const ow=1.5;let r='';
+ const base=[[44,-12.5],[45,-4.2],[44.5,4],[42.5,11.5]],L=[[18,12.5,10],[20.5,13.5,10.5],[18,12.5,9.5],[14,9.5,8.5]],Wd=[[9.2,8.2,7],[9.8,8.6,7.2],[9,8,6.8],[8,7.2,6.2]];
+ const mv=(i)=>Math.sin(HT*1.1+i*1.7)*2.2+Math.sin(HT*2.3+i)*1.0;
+ const chains=[];for(let i=0;i<4;i++){const pts=[base[i].slice()];let a=P.sp[i];let p=base[i].slice();for(let j=0;j<3;j++){a+=P.c[i][j]+(P.c[i][j]>3?mv(i)*(j+1)*.5:mv(i)*.3);const q=a*Math.PI/180;p=[p[0]+Math.cos(q)*L[i][j],p[1]+Math.sin(q)*L[i][j]];pts.push(p.slice())}chains.push(pts)}
+ // forearm-side palm: heel narrower at wrist, soft arc across knuckles
+ const palm=`<path d="M-3,-9 Q8,-15 24,-17 Q38,-19 47,-17 Q52,-3 48,15 Q36,20 22,19 Q8,17 -3,10Z"/>`;
+ // thumb
+ const tb=[10,-12];let ta=P.th.a;const tp=[tb.slice()];let q0=tb.slice();[[20,11.5],[14,9.5]].forEach((l,j)=>{ta+=P.th.c[j]+mv(5)*.4;const rr=ta*Math.PI/180;q0=[q0[0]+Math.cos(rr)*l[0],q0[1]+Math.sin(rr)*l[0]];tp.push(q0.slice())});
+ const thenar=`<ellipse cx="16" cy="-5" rx="15" ry="10" transform="rotate(-20 16 -5)"/>`;
+ r+=grp(palm+thenar,st.skin,st,[-10,-34,70,70],{sd:2.2,ow:ow});
+ // tendons / palm lines (back of hand)
+ r+=`<path d="M26,-10 Q36,-9 44,-11 M27,-1 Q37,0 45,-2 M26,8 Q36,9 43,7" stroke="${st.skin2}" stroke-width=".9" fill="none" opacity=".55" stroke-linecap="round"/>`;
+ // knuckles
+ base.forEach((b,i)=>{r+=`<ellipse cx="${f(b[0]-1)}" cy="${f(b[1])}" rx="3" ry="4.4" fill="#fff" opacity=".13"/>`});
+ const fing=(ch,i,W)=>{let sh='';for(let j=0;j<3;j++)sh+=limb(ch[j],ch[j+1],W[j],W[j+1]??W[j]*.86);
+  let out=grp(sh,st.skin,st,[0,-40,80,90],{sd:1.8,ow:ow});
+  const e=ch[3],pv=ch[2],an=Math.atan2(e[1]-pv[1],e[0]-pv[0])*180/Math.PI;
+  out+=`<g transform="translate(${f(e[0])},${f(e[1])}) rotate(${f(an)})"><path d="M-7.2,-2.7 Q-7,-3.4 -4,-3.4 Q-0.6,-3.2 -0.4,0 Q-0.6,3.2 -4,3.4 Q-7,3.4 -7.2,2.7Z" fill="#f2d2c2" stroke="${ol}" stroke-width=".6" opacity=".92"/><path d="M-6.4,-1.6 Q-4,-2.4 -1.6,-1.4" stroke="#fff" stroke-width=".7" fill="none" opacity=".55"/></g>`;
+  for(let j=1;j<3;j++){const qn=ch[j];out+=`<path d="M${f(qn[0]-.8)},${f(qn[1]-W[j]*.42)} q1.3,${f(W[j]*.42)} 0,${f(W[j]*.84)}" stroke="${st.skin2}" stroke-width=".9" fill="none" opacity=".7"/>`}
+  return out};
+ // draw order: fingers pointing away first (pinky..index), thumb on top for relaxed, under for fist
+ for(const i of [3,2,1,0])r+=fing(chains[i],i,Wd[i].map(v=>v*.86));
+ let sh2='';for(let j=0;j<2;j++)sh2+=limb(tp[j],tp[j+1],[11.5,9.6][j],[9.6,8.2][j]);
+ r+=grp(sh2,st.skin,st,[0,-30,70,80],{sd:1.8,ow:ow});
+ const te=tp[2],tq=tp[1],tan=Math.atan2(te[1]-tq[1],te[0]-tq[0])*180/Math.PI;
+ r+=`<g transform="translate(${f(te[0])},${f(te[1])}) rotate(${f(tan)})"><path d="M-7.6,-3 Q-7,-3.8 -4,-3.8 Q-0.6,-3.4 -0.4,0 Q-0.6,3.4 -4,3.8 Q-7,3.8 -7.6,3Z" fill="#f2d2c2" stroke="${ol}" stroke-width=".6" opacity=".92"/></g>`;
+ return r}
+function handSkin(pose,st){return handNat(pose==='open'?'open':pose,st)}
+function handProf(pose,st){return handNat(pose,st)}
 function handSkel(pose,col){const H=handSpec(pose);let s='';const fl=[H.thumb,...H.fingers];
  fl.forEach(fg=>{const ch=chain(fg);const b0=fg===H.thumb?[6,-8]:[5,fg.base[1]*.55];
   s+=`<line x1="${b0[0]}" y1="${b0[1]}" x2="${ch[0][0]}" y2="${ch[0][1]}" stroke="${col}" stroke-width="5" stroke-linecap="round"/>`;
@@ -98,7 +137,7 @@ function gripV2(st,prop='flash'){const ol=st.ol,ow=st.ow;
  r+=`<path d="M-30,-22 q6,3 12,0" stroke="${ol}" stroke-width="1.2" fill="none" opacity=".7"/><g transform="translate(-8,-56) rotate(-62)"><rect x="-7" y="-4" width="9" height="8" rx="3.2" fill="#f9dccb" stroke="${ol}" stroke-width=".9"/></g>`;
  return r}
 function ik2(b,t,l1,l2,sg){let dx=t[0]-b[0],dy=t[1]-b[1];let d=Math.min(Math.hypot(dx,dy),l1+l2-0.01);const a=Math.atan2(dy,dx),c=Math.acos((l1*l1+d*d-l2*l2)/(2*l1*d));const t1=a+sg*c;const k=[b[0]+Math.cos(t1)*l1,b[1]+Math.sin(t1)*l1];const t2=Math.atan2(t[1]-k[1],t[0]-k[0]);return[b,k,[k[0]+Math.cos(t2)*l2,k[1]+Math.sin(t2)*l2]]}
-function handProf(pose,st){const ol=st.ol;let r='';
+function handProfOld(pose,st){const ol=st.ol;let r='';
  const spec=pose==='point'?{c:[[2,3,3],[62,78,50],[66,80,52],[68,82,54]],th:'tuck'}:pose==='pinch'?{c:[[34,40,28],[52,66,44],[58,70,46],[62,74,48]],th:'pinch'}:{c:[[6,10,8],[9,14,10],[12,17,12],[15,19,12]],th:'free'};
  const L=[[17,12,9.5],[19,13,10],[17,12,9.5],[13,9,7.5]],W=[[10,9.2,8],[10.5,9.5,8.2],[10,9.2,8],[9,8.2,7.2]].map(r=>r.map(v=>v*1.3));
  const base=[[44,-10],[44,-7],[44,-3.5],[43,0]];
@@ -219,4 +258,4 @@ const shoeV2=(st,dir)=>{const ol=st.ol,w=st.ow*1.5;const up=`<path d="M-18,-8 L1
  for(let x=-14;x<=56;x+=10)r+=`<path d="M${x},56 v5" stroke="${ol}" stroke-width="1.6" opacity=".6"/>`;
  r+=`<path d="M-20,8 Q-27,16 -22,30" stroke="${ol}" stroke-width="${st.ow}" fill="none"/></g>`;return r};
 
-export{S,limb,grp,defs,hand,handSkin,handProf,gripV2,shoeV2,ik2,face,EX,uid,f};
+export{handNat,S,limb,grp,defs,hand,handSkin,handProf,gripV2,shoeV2,ik2,face,EX,uid,f};

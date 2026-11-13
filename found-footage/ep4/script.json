@@ -1,0 +1,116 @@
+[
+ {
+  "id": "c0",
+  "who": "Diego",
+  "text": "¡Atrás! ¡Aléjense del borde!",
+  "say": "[shouting, urgent] ¡Atrás! ¡Aléjense del borde!"
+ },
+ {
+  "id": "c1",
+  "who": "Lucia",
+  "text": "¿Es un tren? ¿Con la ciudad en llamas?",
+  "say": "[whispering, scared] ¿Es un tren?... ¿Con la ciudad en llamas?"
+ },
+ {
+  "id": "c2",
+  "who": "Tomas",
+  "text": "Las puertas se están abriendo solas.",
+  "say": "[low voice, tense] Las puertas se están abriendo solas."
+ },
+ {
+  "id": "c3",
+  "who": "Marta",
+  "text": "Está vacío. Las luces de adentro parpadean.",
+  "say": "[tense] Está vacío. Las luces de adentro parpadean."
+ },
+ {
+  "id": "c4",
+  "who": "Beto",
+  "text": "Revisen si hay un conductor.",
+  "say": "[strained, in pain] Revisen si hay un conductor."
+ },
+ {
+  "id": "c5",
+  "who": "Tomas",
+  "text": "Hay una persona sentada al fondo. No se mueve.",
+  "say": "[whispering] Hay una persona sentada al fondo. No se mueve."
+ },
+ {
+  "id": "c6",
+  "who": "Lucia",
+  "text": "Señor... ¿puede oírnos?",
+  "say": "[hesitant, soft] Señor... ¿puede oírnos?"
+ },
+ {
+  "id": "c7",
+  "who": "Diego",
+  "text": "Lucía, aléjate. Algo se mueve en el techo.",
+  "say": "[alarmed, low] Lucía, aléjate. Algo se mueve en el techo."
+ },
+ {
+  "id": "c8",
+  "who": "Sofi",
+  "text": "¡Están colgando del techo!",
+  "say": "[screaming, terrified] ¡Están colgando del techo!"
+ },
+ {
+  "id": "c9",
+  "who": "Marta",
+  "text": "¡Al túnel! ¡Hay una escalera de mantenimiento!",
+  "say": "[shouting] ¡Al túnel! ¡Hay una escalera de mantenimiento!"
+ },
+ {
+  "id": "c10",
+  "who": "Diego",
+  "text": "Beto, apóyate en mí. No toquen el riel del centro, tiene corriente.",
+  "say": "[urgent] Beto, apóyate en mí. No toquen el riel del centro, tiene corriente."
+ },
+ {
+  "id": "c11",
+  "who": "Tomas",
+  "text": "La linterna casi no alumbra. Pero hay una puerta al fondo.",
+  "say": "[breathless] La linterna casi no alumbra. Pero hay una puerta al fondo."
+ },
+ {
+  "id": "c12",
+  "who": "Lucia",
+  "text": "Siento el suelo temblar.",
+  "say": "[scared, whispering] Siento el suelo temblar."
+ },
+ {
+  "id": "c13",
+  "who": "Beto",
+  "text": "Es el techo... ¡Se va a caer!",
+  "say": "[panicked] Es el techo... ¡Se va a caer!"
+ },
+ {
+  "id": "c14",
+  "who": "Marta",
+  "text": "¡Pegados a la pared!",
+  "say": "[screaming] ¡Pegados a la pared!"
+ },
+ {
+  "id": "c15",
+  "who": "Diego",
+  "text": "¡La puerta de mantenimiento! ¡Ábrela, Sofi!",
+  "say": "[shouting, urgent] ¡La puerta de mantenimiento! ¡Ábrela, Sofi!"
+ },
+ {
+  "id": "c16",
+  "who": "Sofi",
+  "text": "¡Está atascada! ¡No cede!",
+  "say": "[crying, desperate] ¡Está atascada! ¡No cede!"
+ },
+ {
+  "id": "c17",
+  "who": "Soldado",
+  "text": "¡Quietos! ¡Las manos donde pueda verlas!",
+  "say": "[shouting, authoritative military] ¡Quietos! ¡Las manos donde pueda verlas!"
+ },
+ {
+  "id": "c18",
+  "who": "Tomas",
+  "text": "Son soldados... ¡No disparen!",
+  "say": "[panicked, breathless] Son soldados... ¡No disparen!"
+ }
+]

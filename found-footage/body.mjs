@@ -62,6 +62,7 @@ export function body(st,pose={}){const ol=st.ol;const hs=st.hs;const k=0.97*hs;l
  {const a=arm(shL,L.w,-1,L);if(L.front)late+=a;else o+=a}
  {const a=arm(shR,R.w,1,R);if(R.front)late+=a;else o+=a}
  const hd=pose.head||{};
- o+=`<g transform="translate(${P.head[0]+(hd.dx||0)},${hy}) rotate(${hd.rot||0}) scale(${f(k)})">${withT(T(P.head[0]+(hd.dx||0),hy,hd.rot||0,k,k),()=>face(st,pose.expr||'neutral',{blink:pose.blink,look:pose.look,talk:pose.talk}))}</g>`+late;
+ const yw=Math.max(-1,Math.min(1,hd.yaw||0)),cyw=Math.cos(yw*1.0),sxs=k*cyw,hdx=(hd.dx||0)+yw*20*k,lkY=pose.look?[pose.look[0]+yw*1.4,pose.look[1]]:pose.look;
+ o+=`<g transform="translate(${P.head[0]+hdx},${hy}) rotate(${(hd.rot||0)+yw*3}) scale(${f(sxs)},${f(k)})">${withT(T(P.head[0]+hdx,hy,(hd.rot||0)+yw*3,sxs,k),()=>face(st,pose.expr||'neutral',{blink:pose.blink,look:lkY,talk:pose.talk}))}</g>`+late;
  return o}
 export {defs};
