@@ -1,0 +1,54 @@
+{
+ "stairs_run": [
+  "group of people running up a metal stairwell, echoing footsteps, panting, realistic",
+  10
+ ],
+ "roof_door": [
+  "heavy metal rooftop door slammed open with wind gust, realistic",
+  3
+ ],
+ "roof_wind": [
+  "strong wind on a rooftop at dawn, distant fires, ash, low rumble, eerie, realistic",
+  25
+ ],
+ "heli_land": [
+  "military helicopter approaching and hovering over a rooftop with loud rotor blades and wind, realistic",
+  14
+ ],
+ "winch": [
+  "helicopter winch cable lowering with metal whine and rope swinging, realistic",
+  6
+ ],
+ "monster_roar": [
+  "colossal monster roar, deep guttural and screeching layers, enormous, terrifying, reverberating across a city, cinematic",
+  9
+ ],
+ "monster_breath": [
+  "huge creature breathing heavily with wet rattling growl, deep, terrifying, close, cinematic",
+  10
+ ],
+ "building_crash": [
+  "huge building facade collapsing and crumbling as a giant creature climbs it, concrete and glass crashing, massive, cinematic",
+  10
+ ],
+ "monster_step": [
+  "very deep distant footstep thuds of a gigantic creature shaking the ground, sub bass rumble, cinematic",
+  8
+ ],
+ "glass_rain": [
+  "glass windows shattering and raining down from a skyscraper, realistic",
+  6
+ ],
+ "heartbeat": [
+  "slow heartbeat, deep, realistic",
+  8
+ ],
+ "radio_static": [
+  "military radio transmission static and squelch, short, realistic",
+  4
+ ],
+ "claw_scrape": [
+  "giant claws scraping and gripping concrete and steel with metal screeching, massive, realistic",
+  6
+ ]
+}

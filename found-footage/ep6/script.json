@@ -1,0 +1,92 @@
+[
+ {
+  "id": "g0",
+  "who": "Sargento",
+  "text": "¡Arriba, rápido! ¡El helicóptero llega en dos minutos!",
+  "say": "[shouting urgently, out of breath, running] ¡Arriba, rápido! ¡El helicóptero llega en dos minutos!"
+ },
+ {
+  "id": "g1",
+  "who": "Marta",
+  "text": "Beto, apóyate en mí. Ya casi llegamos.",
+  "say": "[strained, panting, encouraging] Beto, apóyate en mí... Ya casi llegamos."
+ },
+ {
+  "id": "g2",
+  "who": "Beto",
+  "text": "No puedo... mi pierna... ¡no puedo más!",
+  "say": "[gasping in pain, exhausted, voice cracking] No puedo... mi pierna... ¡no puedo más!"
+ },
+ {
+  "id": "g3",
+  "who": "Diego",
+  "text": "Yo te cargo. Sofi y Lucía, primero ustedes.",
+  "say": "[firm, urgent, determined] Yo te cargo. Sofi y Lucía, primero ustedes."
+ },
+ {
+  "id": "g4",
+  "who": "Sofi",
+  "text": "No quiero irme sin ustedes.",
+  "say": "[crying, trembling voice, small, pleading] No quiero irme sin ustedes..."
+ },
+ {
+  "id": "g5",
+  "who": "Lucia",
+  "text": "Lo prometo, Sofi. Nos vemos arriba.",
+  "say": "[tender, slowly, holding back tears, determined] Lo prometo, Sofi... Nos vemos arriba."
+ },
+ {
+  "id": "g6",
+  "who": "Radio",
+  "text": "Águila Uno a Puesto Cuatro. Aterrizo en la azotea. Tengo lugar para cuatro.",
+  "say": "[radio transmission, calm professional pilot, static, rotor noise] Águila Uno a Puesto Cuatro. Aterrizo en la azotea. Tengo lugar para cuatro."
+ },
+ {
+  "id": "g7",
+  "who": "Tomas",
+  "text": "Miren el humo... se está moviendo.",
+  "say": "[whispering, dread, slowly, trembling] Miren el humo... se está moviendo..."
+ },
+ {
+  "id": "g8",
+  "who": "Sargento",
+  "text": "Dios mío... eso no estaba en el informe.",
+  "say": "[horrified, very slowly, barely a whisper, voice shaking] Dios mío... eso no estaba en el informe."
+ },
+ {
+  "id": "g9",
+  "who": "Lucia",
+  "text": "¡Es enorme!",
+  "say": "[screaming in terror, high-pitched, breathless] ¡Es enorme!"
+ },
+ {
+  "id": "g10",
+  "who": "Beto",
+  "text": "¡Nos ha visto!",
+  "say": "[terrified, voice breaking, panic] ¡Nos ha visto!"
+ },
+ {
+  "id": "g11",
+  "who": "Radio",
+  "text": "¡Suban ya! ¡No puedo mantenerlo aquí!",
+  "say": "[radio transmission, shouting over rotor noise, urgent, static] ¡Suban ya! ¡No puedo mantenerlo aquí!"
+ },
+ {
+  "id": "g12",
+  "who": "Diego",
+  "text": "¡Suban! ¡Sujétense del cable!",
+  "say": "[screaming orders, desperate, loud] ¡Suban! ¡Sujétense del cable!"
+ },
+ {
+  "id": "g13",
+  "who": "Marta",
+  "text": "¡Diego, agárrate!",
+  "say": "[screaming desperately, crying] ¡Diego, agárrate!"
+ },
+ {
+  "id": "g14",
+  "who": "Tomas",
+  "text": "¡Se está acercando!",
+  "say": "[screaming in pure terror, breathless] ¡Se está acercando!"
+ }
+]
