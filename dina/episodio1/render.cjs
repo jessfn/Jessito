@@ -7,7 +7,7 @@ const srv=http.createServer((q,r)=>{const f=path.join(root,decodeURIComponent(q.
  const [mode,a,b,outdir0]=process.argv.slice(2);const outdir=outdir0||b;
  fs.mkdirSync(outdir,{recursive:true});
  const br=await chromium.launch({args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist']});
- const pg=await br.newPage({viewport:{width:720,height:1280},deviceScaleFactor:1});
+ const pg=await br.newPage({viewport:{width:720,height:1280},deviceScaleFactor:1.5});
  pg.on('console',m=>console.log('console:',m.text()));pg.on('pageerror',e=>console.log('pageerror:',e.message));
  await pg.goto('http://localhost:'+(process.env.PORT||8765)+'/episode.html');await pg.waitForTimeout(500);
  if(mode==='times'){for(const t of a.split(',')){await pg.evaluate(t=>render(t),parseFloat(t));await pg.screenshot({path:`${outdir}/t_${t}.png`});console.log('shot',t)}}

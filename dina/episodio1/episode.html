@@ -9,14 +9,14 @@ html,body{margin:0;background:#000;overflow:hidden}
 #dinaWrap{position:absolute;transform-origin:50% 100%}
 #sleepWrap{position:absolute;transform-origin:50% 50%}
 #annWrap{position:absolute;transform-origin:50% 100%}
-#cap{position:absolute;left:20px;right:20px;top:122px;text-align:center;font:italic 900 56px/1.02 'Mont';text-transform:uppercase;letter-spacing:-1px;display:none}
+#cap{position:absolute;left:20px;right:20px;top:190px;text-align:center;font:italic 900 56px/1.02 'Mont';text-transform:uppercase;letter-spacing:-1px;display:none}
 #cap .chip{display:inline-block;font:800 19px 'Pop';letter-spacing:3px;padding:6px 18px;border-radius:30px;color:#fff;margin-bottom:10px;transform:skewX(-8deg);border:3px solid #fff;box-shadow:0 5px 0 rgba(0,0,0,.5);font-style:normal}
 #cap .w{display:inline-block;margin:0 8px;color:#fff;-webkit-text-stroke:11px #1b0a3a;paint-order:stroke fill;filter:drop-shadow(0 6px 0 #ff2d8a) drop-shadow(0 12px 12px rgba(0,0,0,.5));transform-origin:50% 85%}
 #cap .w.act{color:#ffe14a}
 #flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
 #dreamTint{position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 220px 60px rgba(255,120,220,.55);opacity:0;background:radial-gradient(circle at 50% 45%,rgba(255,255,255,0) 40%,rgba(160,80,255,.25) 100%)}
 #vig{position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 200px 40px rgba(0,0,0,.55)}
-#topbar{position:absolute;left:24px;top:22px;right:24px;display:flex;justify-content:space-between;align-items:center}
+#topbar{position:absolute;left:24px;top:122px;right:24px;display:flex;justify-content:space-between;align-items:center}
 #brand{font:italic 900 26px 'Mont';letter-spacing:1px;background:linear-gradient(90deg,#ffe27a,#ff5ab0,#7af6ff,#ffe27a);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 3px 0 #1b0a3a) drop-shadow(0 0 6px rgba(255,90,176,.7))}
 #day{font:800 22px 'Pop';letter-spacing:2px;background:linear-gradient(90deg,#ff3d7f,#ff8a3c);color:#fff;border-radius:22px;padding:7px 20px;border:3px solid #fff;box-shadow:0 5px 0 #7a1240;transform-origin:100% 50%}
 .ttl{position:absolute;left:0;right:0;text-align:center;pointer-events:none}
@@ -30,13 +30,13 @@ html,body{margin:0;background:#000;overflow:hidden}
 .g3{--bg:linear-gradient(#fff 5%,#ffe14a 50%,#ff5a8a);--sh:#00b0ff}
 .g4{--bg:linear-gradient(#fff,#ff9ad0);--sh:#6a2dff}
 .pt{position:absolute;width:34px;height:34px;opacity:0;pointer-events:none;margin:-17px 0 0 -17px}
-#choices{position:absolute;left:0;right:0;top:290px;height:240px}
+#choices{position:absolute;left:0;right:0;top:360px;height:240px}
 .card{position:absolute;top:0;width:204px;height:240px;border-radius:30px;background:linear-gradient(160deg,#fff,#ffd9ee);border:6px solid #ff2d8a;box-shadow:0 12px 0 #5a0f3a,0 0 30px rgba(255,45,138,.7);text-align:center;opacity:0}
 .card .lt{position:absolute;left:-16px;top:-20px;width:58px;height:58px;border-radius:50%;background:linear-gradient(#ff5ab0,#ff2d8a);border:4px solid #fff;color:#fff;font:900 32px/52px 'Mont';font-style:italic}
 .card .nm{position:absolute;left:0;right:0;bottom:16px;font:italic 900 31px 'Mont';color:#4a0f3a;letter-spacing:-.5px}
 .card svg{position:absolute;left:32px;top:36px;width:140px;height:140px}
 #vs{position:absolute;left:310px;top:80px;width:100px;height:100px;border-radius:50%;background:linear-gradient(#ffe14a,#ff9a3c);border:6px solid #fff;box-shadow:0 8px 0 #7a3a00;font:italic 900 40px/88px 'Mont';text-align:center;color:#4a0f3a;opacity:0}
-#cta{position:absolute;left:0;right:0;top:190px}
+#cta{position:absolute;left:0;right:0;top:280px}
 .btn{position:absolute;left:40px;right:40px;height:130px;border-radius:70px;color:#fff;font:italic 900 31px/130px 'Mont';text-transform:uppercase;letter-spacing:-.5px;padding-left:126px;white-space:nowrap;border:6px solid #fff;box-shadow:0 12px 0 rgba(0,0,0,.45);opacity:0}
 .btn svg{position:absolute;left:26px;top:20px;width:84px;height:84px}
 </style></head><body>
@@ -298,7 +298,7 @@ function seeded(s){return()=>{s=(s*16807)%2147483647;return (s-1)/2147483646}}
 // ---------- THREE ----------
 const gl=document.getElementById('gl');
 const renderer=new THREE.WebGLRenderer({canvas:gl,antialias:true,preserveDrawingBuffer:true});
-renderer.setSize(W,H,false);renderer.outputEncoding=THREE.sRGBEncoding;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.setPixelRatio(1.5);renderer.setSize(W,H,false);renderer.outputEncoding=THREE.sRGBEncoding;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 const scene=new THREE.Scene();
 const camera=new THREE.PerspectiveCamera(58,W/H,0.1,60);
 function mk(w,h,fn,rep){const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');fn(x,w,h);const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.anisotropy=8;if(rep){t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(rep[0],rep[1]);}return t}
@@ -471,10 +471,10 @@ function animTitle(d,t,t0,t1,stag){const ks=d.querySelectorAll('.k');let any=fal
   const sc=(2.9-1.9*kin)*(1-0.5*out);const rot=(i%2?1:-1)*(16*(1-kin))+(i%2?1:-1)*Math.sin(t*2.4+i)*1.2;const y=-90*(1-kin)-50*out+Math.sin(t*3+i*.8)*3;
   k.style.opacity=vis?Math.min(1,a/0.08)*(1-out):0;k.style.transform=`translateY(${y}px) rotate(${rot}deg) scale(${sc})`});
  d.style.display=any?'block':'none'}
-titles.hook=mkTitle('hook',['¿Y SI TÚ DECIDES','SU CAMBIO?'],'g1',300,88);
+titles.hook=mkTitle('hook',['¿Y SI TÚ DECIDES','SU CAMBIO?'],'g1',360,84);
 titles.dream=mkTitle('dream',['EL SUEÑO'],'g2',470,128);
 titles.day1=mkTitle('day1',['DÍA 1'],'g3',500,170);
-titles.tease=mkTitle('tease',['DÍA 2 → ???'],'g4',84,62);
+titles.tease=mkTitle('tease',['DÍA 2 → ???'],'g4',195,58);
 const PT=[];const starSvg='<svg viewBox="0 0 40 40"><path d="M20,1 L25,15 L39,20 L25,25 L20,39 L15,25 L1,20 L15,15Z" fill="CC" stroke="#fff" stroke-width="2"/></svg>';
 const heartSvg='<svg viewBox="0 0 40 40"><path d="M20,36 C2,22 4,6 14,6 C18,6 20,10 20,12 C20,10 22,6 26,6 C36,6 38,22 20,36Z" fill="CC" stroke="#fff" stroke-width="2.5"/></svg>';
 for(let b=0;b<8;b++){PT[b]=[];for(let i=0;i<14;i++){const d=document.createElement('div');d.className='pt';$('stage').appendChild(d);PT[b].push(d)}}
@@ -528,9 +528,9 @@ function render(t){
  if(standOn){
   dinaWrap.style.display='block';
   const bob=Math.sin(t*2.6)*4;
-  let expr='neutral',amp=null,rot=0,jump=0,sx=1,hgt=800,bottom=1215,cx=360;
-  if(isStage){hgt=720;bottom=1005;cx=420;expr='happy';rot=Math.sin(t*5)*2.2;jump=-Math.abs(Math.sin(t*5.2))*26}
-  else if(sc===0){expr='neutral';amp=null;rot=Math.sin(t*1.3)*1;hgt=700;bottom=1235}
+  let expr='neutral',amp=null,rot=0,jump=0,sx=1,hgt=740,bottom=1170,cx=360;
+  if(isStage){hgt=700;bottom=1000;cx=420;expr='happy';rot=Math.sin(t*5)*2.2;jump=-Math.abs(Math.sin(t*5.2))*26}
+  else if(sc===0){expr='neutral';amp=null;rot=Math.sin(t*1.3)*1;hgt=660;bottom=1170}
   else if(sc>=3){
     const lid=sp&&sp[1]==='dina'?sp[0]:null;
     if(t<T.L7){expr=t<T.L6+1.6?'surp':'neutral'}
@@ -540,9 +540,9 @@ function render(t){
     else {expr='happy'}
     if(lid){amp=envAt(lid,t)}
     if(t<T.L6+0.5){const k=(t-T.S3)/0.6;jump=-Math.abs(Math.sin(Math.min(1,k)*Math.PI*2))*60*(1-Math.min(1,k))}
-    if(sc===3&&t>=T.L7&&t<T.L8){rot=Math.sin(t*1.4)*1.5;bottom=1230}
-    if(sc===4){hgt=700;bottom=1235}
-    if(sc===5){hgt=560;bottom=1240;jump=-Math.abs(Math.sin(t*4))*18;rot=Math.sin(t*3)*3}
+    if(sc===3&&t>=T.L7&&t<T.L8){rot=Math.sin(t*1.4)*1.5;bottom=1175}
+    if(sc===4){hgt=600;bottom=1170}
+    if(sc===5){hgt=420;bottom=1170;jump=-Math.abs(Math.sin(t*4))*18;rot=Math.sin(t*3)*3}
   }
   if(speakDina&&amp===null)amp=envAt(sp[0],t);
   placeDina(cx,bottom+jump+bob*0.4,hgt,rot,sx);
@@ -567,8 +567,8 @@ function render(t){
  animTitle(titles.tease,t,T.L10+DUR.L10-1.5,T.END+1,0.2);
  // particles
  burst(0,t,T.S2+0.12,360,560,'#9ff4ff');burst(1,t,T.S3+0.05,360,820,'#ffe14a');burst(2,t,T.S4+0.12,360,600,'#ff5ab0');
- DATA.cardT.forEach((ct,i)=>burst(3+i,t,ct-0.1,CX[i]+102,410,['#ff2d8a','#7af6ff'][i]));
- burst(6,t,T.L10+DUR.L10*0.9+0.15,560,255,'#ff2d8a',true);burst(7,t,T.S5+0.35,360,330,'#ffe14a');
+ DATA.cardT.forEach((ct,i)=>burst(3+i,t,ct-0.1,CX[i]+102,480,['#ff2d8a','#7af6ff'][i]));
+ burst(6,t,T.L10+DUR.L10*0.9+0.15,560,350,'#ff2d8a',true);burst(7,t,T.S5+0.35,360,430,'#ffe14a');
  // captions
  let ch=null;for(const c of DATA.chunks){if(t>=c.t0-0.02&&t<c.t1)ch=c}
  if(ch){cap.style.display='block';
@@ -577,7 +577,7 @@ function render(t){
   ws.forEach((el,i)=>{const w=ch.words[i];const k=eob((age-i*0.06)/0.2);const act=t>=w.t0&&t<w.t1+0.02;const pulse=act?1+0.14*Math.sin(Math.min(1,(t-w.t0)/0.12)*Math.PI*0.5):1;
    el.style.transform=`translateY(${(1-k)*40}px) scale(${((0.4+0.6*k)*pulse).toFixed(3)}) rotate(${((1-k)*-10+capRot).toFixed(2)}deg)`;el.style.opacity=Math.min(1,k*2.2).toFixed(2);el.classList.toggle('act',act)});
  }else{cap.style.display='none'}
- cap.style.top=(sc===5?'520px':'122px');
+ cap.style.top=(sc===5?'610px':'190px');
  // choices
  const chc=$('choices');chc.style.display=(sc===4)?'block':'none';
  if(sc===4){const vk=eob((t-(DATA.cardT[1]-0.1))/0.4);$('vs').style.opacity=Math.min(1,Math.max(0,(t-(DATA.cardT[1]-0.1))*8)).toFixed(2);$('vs').style.transform=`scale(${(0.2+0.8*vk).toFixed(3)}) rotate(${(Math.sin(t*4)*6).toFixed(1)}deg)`;DATA.cardT.forEach((ct,i)=>{const t0=ct-0.2;const k=eob((t-t0)/0.45);const c=$('card'+i);c.style.opacity=Math.min(1,(t-t0)*8).toFixed(2);const wig=Math.sin((t-t0)*5+i)*2.2*Math.min(1,(t-t0)/0.5);c.style.transform=`scale(${(0.2+0.8*k).toFixed(3)}) rotate(${((1-k)*-25+wig).toFixed(2)}deg) translateY(${Math.sin(t*3+i)*4}px)`})}
