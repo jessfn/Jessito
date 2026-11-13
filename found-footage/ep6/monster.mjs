@@ -17,15 +17,15 @@ export const defsMonster=`<defs>
 <radialGradient id="mSmoke"><stop offset="0" stop-color="#2a2226" stop-opacity=".85"/><stop offset="1" stop-color="#2a2226" stop-opacity="0"/></radialGradient>
 </defs>`;
 function veins(P,t,seed,col='#ff6a8a'){let s='';for(let k=0;k<5;k++){const o=(k-2)*26;const pts=P.map((p,i)=>[p[0]+o+Math.sin(i*1.7+seed+k)*14,p[1]]);const pulse=.45+.4*Math.sin(t*2.2+k+seed);s+=`<path d="${smooth(pts,false)}" stroke="${col}" stroke-width="${3+k%2*2}" fill="none" stroke-opacity="${pulse.toFixed(2)}" stroke-linecap="round"/>`}return s}
-function eye(cx,cy,r,t,look,seed=0){const lx=look[0]*r*.18,ly=look[1]*r*.14;const w=.5+.5*Math.sin(t*2+seed);let s=`<circle cx="${f(cx)}" cy="${f(cy)}" r="${f(r*2.4)}" fill="url(#mGlow)" fill-opacity=".55"/>`;
+function eye(cx,cy,r,t,look,seed=0,lidK=0,slant=0){const lx=look[0]*r*.18,ly=look[1]*r*.14;const w=.5+.5*Math.sin(t*2+seed);let s=`<circle cx="${f(cx)}" cy="${f(cy)}" r="${f(r*2.4)}" fill="url(#mGlow)" fill-opacity=".55"/>`;
  s+=`<ellipse cx="${f(cx)}" cy="${f(cy)}" rx="${f(r*1.18)}" ry="${f(r*.98)}" fill="#14080a" stroke="#050204" stroke-width="${f(r*.08)}"/>`;
  s+=`<ellipse cx="${f(cx)}" cy="${f(cy)}" rx="${f(r)}" ry="${f(r*.82)}" fill="url(#mEye)"/>`;
  // veins in the eyeball
  for(let k=0;k<9;k++){const a=k/9*6.28+seed,r0=r*.95;s+=`<path d="M${f(cx+Math.cos(a)*r0)},${f(cy+Math.sin(a)*r0*.8)} Q${f(cx+Math.cos(a+.3)*r*.6)},${f(cy+Math.sin(a+.3)*r*.5)} ${f(cx+Math.cos(a)*r*.38+lx)},${f(cy+Math.sin(a)*r*.3+ly)}" stroke="#7a0c0c" stroke-width="${f(r*.025)}" fill="none" opacity=".7"/>`}
  // slit pupil
  s+=`<ellipse cx="${f(cx+lx)}" cy="${f(cy+ly)}" rx="${f(r*.13*(1+.25*w))}" ry="${f(r*.62)}" fill="#050203"/><ellipse cx="${f(cx+lx-r*.08)}" cy="${f(cy+ly-r*.2)}" rx="${f(r*.07)}" ry="${f(r*.11)}" fill="#fff" fill-opacity=".85"/>`;
- // heavy upper lid
- s+=`<path d="M${f(cx-r*1.22)},${f(cy+r*.1)} Q${f(cx)},${f(cy-r*1.28)} ${f(cx+r*1.22)},${f(cy+r*.1)} Q${f(cx)},${f(cy-r*.55)} ${f(cx-r*1.22)},${f(cy+r*.1)}Z" fill="#1a1018" stroke="#050204" stroke-width="${f(r*.06)}"/>`;
+ // heavy upper lid (closes down and slants inward when hostile)
+ const sgn=cx<0?1:-1;s+=`<g transform="rotate(${f(slant*sgn*57.3)} ${f(cx)} ${f(cy)})"><path d="M${f(cx-r*1.3)},${f(cy+r*(.1+lidK*.55))} Q${f(cx)},${f(cy-r*1.28+r*lidK*1.5)} ${f(cx+r*1.3)},${f(cy+r*(.1+lidK*.55))} L${f(cx+r*1.3)},${f(cy-r*1.6)} L${f(cx-r*1.3)},${f(cy-r*1.6)}Z" fill="#1a1018" stroke="#050204" stroke-width="${f(r*.07)}"/></g>`;
  return s}
 function teethRing(cx,cy,rx,ry,n,len,open,seed){let s='';for(let i=0;i<n;i++){const a=i/n*6.28+seed;const x=cx+Math.cos(a)*rx,y=cy+Math.sin(a)*ry;const nx=-Math.cos(a),ny=-Math.sin(a);const L=len*(.7+.5*rn(i+seed*9));const bw=len*.14;const px=-ny,py=nx;s+=`<polygon points="${f(x+px*bw)},${f(y+py*bw)} ${f(x-px*bw)},${f(y-py*bw)} ${f(x+nx*L*.9*open)},${f(y+ny*L*.9*open)}" fill="#d8cfb8" stroke="#3a2a1a" stroke-width="2"/>`}return s}
 function mandible(cx,cy,ang,len,spread,t,seed){const a=ang+spread;const dx=Math.cos(a),dy=Math.sin(a);const P=[[cx,cy],[cx+dx*len*.4+Math.sin(seed)*10,cy+dy*len*.4],[cx+dx*len*.75,cy+dy*len*.75+len*.06],[cx+dx*len+Math.cos(a+1.4)*len*.18,cy+dy*len+Math.sin(a+1.4)*len*.18]];
@@ -34,7 +34,7 @@ function mandible(cx,cy,ang,len,spread,t,seed){const a=ang+spread;const dx=Math.
  for(let i=1;i<5;i++){const p=P[Math.min(3,i)];const q=[(P[0][0]+(P[3][0]-P[0][0])*i/5),(P[0][1]+(P[3][1]-P[0][1])*i/5)];const nx=-dy,ny=dx;s+=`<polygon points="${f(q[0]-nx*len*.05)},${f(q[1]-ny*len*.05)} ${f(q[0]+nx*len*.03)},${f(q[1]+ny*len*.03)} ${f(q[0]-nx*len*.17+dx*len*.05)},${f(q[1]-ny*len*.17+dy*len*.05)}" fill="#d8cfb8" stroke="#3a2a1a" stroke-width="2"/>`}
  s+=`<path d="${smooth(P.map((p,i)=>[p[0]+(i?-dy*8:0),p[1]+(i?dx*8:0)]),false)}" stroke="#ff9a6a" stroke-width="3" fill="none" opacity=".35"/>`;return s}
 // the head (local origin = base of skull, looking along +x then rotated by 'ang')
-export function head(t,o){const open=o.jaw||0,look=o.look||[0,0];const s0=1;let s=`<g>`;
+export function head(t,o){const open=o.jaw||0,look=o.look||[0,0];const MD={cold:[.38,.24],hunt:[.55,.36],rage:[.3,.55],pain:[.1,-.2],none:[0,0]}[o.mood||'none'];const lk=MD[0],sl=MD[1];const s0=1;let s=`<g>`;
  // skull
  s+=`<path d="${smooth([[-260,-40],[-230,-210],[-80,-300],[140,-260],[300,-150],[360,-20],[300,60],[120,120],[-120,110],[-250,70]])}" fill="url(#mSkin)" stroke="#050204" stroke-width="8" stroke-linejoin="round"/>`;
  // ridges and bone plates
@@ -44,7 +44,9 @@ export function head(t,o){const open=o.jaw||0,look=o.look||[0,0];const s0=1;let 
  // orange rim light from fires (top-right)
  s+=`<path d="M-80,-300 Q140,-270 300,-150 Q340,-90 360,-20" stroke="#ffa050" stroke-width="7" fill="none" opacity=".55"/>`;
  // eyes: big central + ring of smaller ones
- s+=eye(70,-110,70,t,look,0)+eye(-110,-150,34,t,look,1)+eye(190,-170,30,t,look,2)+eye(-30,-50,24,t,look,3)+eye(250,-80,24,t,look,4);
+ s+=eye(70,-110,70,t,look,0,lk,sl)+eye(-110,-150,34,t,look,1,lk,sl)+eye(190,-170,30,t,look,2,lk,sl)+eye(-30,-50,24,t,look,3,lk,sl)+eye(250,-80,24,t,look,4,lk,sl);
+ // heavy bone brow ridge shading the eyes (angled = hostile)
+ s+=`<path d="M-190,${-175+sl*60} Q0,${-210-sl*40} 330,${-125+sl*80} L330,-90 Q0,-150 -190,-130Z" fill="#120b14" stroke="#050204" stroke-width="6" opacity="${MD[0]||MD[1]?.85:0}"/>`;
  // mouth: lamprey-like maw ringed by mandibles; opens wide when roaring
  const mc=[345,10];const R0=70+open*210;
  s+=`<g transform="translate(${mc[0]},${mc[1]})">`;
@@ -98,7 +100,7 @@ export function colossus(t,o={}){const br=Math.sin(t*1.4)*.015,sw=(o.sway||0)+Ma
  s+=`<path d="${taper(neck,300,200)}" fill="url(#mSkin)" stroke="#050204" stroke-width="8"/>`;
  for(let k=1;k<7;k++){const u=k/7;const p=[neck[0][0]+(neck[3][0]-neck[0][0])*u,neck[0][1]+(neck[3][1]-neck[0][1])*u];s+=`<path d="M${f(p[0]-130+u*40)},${f(p[1]+14)} Q${f(p[0])},${f(p[1]-30)} ${f(p[0]+130-u*40)},${f(p[1]+14)}" stroke="#000" stroke-width="5" fill="none" opacity=".45"/>`}
  s+=veins([[neck[0][0],neck[0][1]],[neck[1][0],neck[1][1]],[neck[2][0],neck[2][1]],[neck[3][0],neck[3][1]]],t,4);
- s+=`<g transform="translate(${f(hx)},${f(hy)}) rotate(${f(ha*57.3)}) scale(${o.headScale||1.7})">${head(t,{jaw:o.jaw||0,look:o.look||[0,0]})}</g>`;
+ s+=`<g transform="translate(${f(hx)},${f(hy)}) rotate(${f(ha*57.3)}) scale(${o.headScale||1.7})">${head(t,{jaw:o.jaw||0,look:o.look||[0,0],mood:o.mood})}</g>`;
  s+=`</g>`;return s}
 export function smokeBlob(t,x,y,r,seed){return `<ellipse cx="${f(x+Math.sin(t*.3+seed)*30)}" cy="${f(y+Math.cos(t*.25+seed)*20)}" rx="${f(r)}" ry="${f(r*.5)}" fill="url(#mSmoke)"/>`}
 
@@ -119,3 +121,13 @@ export function faceFront(t,u){const cx=540,cy=980;const sc=.5+1.3*u;const sh=Ma
  s+=`</g>`;
  s+=`<rect width="1080" height="1920" fill="#ff2a1a" fill-opacity="${(.12+.08*Math.sin(t*30)).toFixed(2)}"/>`;
  return s}
+
+// chaser: long neck + head + two reaching claws, drawn from an anchor point toward the head position (world coords, already scaled by caller)
+export function chaser(t,o){const hx=o.hx,hy=o.hy;const bx=o.bx??hx+1500,by=o.by??hy+1400;let s='';
+ const neck=[[bx,by],[bx-(bx-hx)*.35,by-(by-hy)*.6-120],[bx-(bx-hx)*.75,by-(by-hy)*.9+80],[hx+60,hy+30]];
+ s+=`<path d="${taper(neck,420,240)}" fill="url(#mSkin)" stroke="#050204" stroke-width="10"/>`;
+ for(let k=1;k<9;k++){const u=k/9;const p=[neck[0][0]+(neck[3][0]-neck[0][0])*u,neck[0][1]+(neck[3][1]-neck[0][1])*u];s+=`<path d="M${f(p[0]-150)},${f(p[1]+20)} Q${f(p[0])},${f(p[1]-40)} ${f(p[0]+150)},${f(p[1]+20)}" stroke="#000" stroke-width="6" fill="none" opacity=".45"/>`}
+ s+=veins(neck,t,5);
+ // claws reaching forward
+ for(const sy of[-1,1]){const base=[hx+420,hy+380+sy*40];const wr=[hx-260,hy+260+sy*150+(o.reach||0)*sy*60];const P=[base,[ (base[0]+wr[0])/2,(base[1]+wr[1])/2-160],wr];s+=`<path d="${taper(P,160,60)}" fill="url(#mSkin2)" stroke="#050204" stroke-width="7"/>`;for(let k=0;k<3;k++){const a=Math.PI+(-.6+k*.55);const F1=[wr[0]+Math.cos(a)*170,wr[1]+Math.sin(a)*170];const F2=[F1[0]+Math.cos(a+.5)*130,F1[1]+Math.sin(a+.5)*130];s+=`<path d="${taper([wr,F1,F2],44,12)}" fill="url(#mSkin2)" stroke="#050204" stroke-width="5"/><polygon points="${f(F2[0]-8)},${f(F2[1]-6)} ${f(F2[0]+Math.cos(a+1)*60)},${f(F2[1]+Math.sin(a+1)*60)} ${f(F2[0]+10)},${f(F2[1]+6)}" fill="#e8dcc4" stroke="#3a2a1a" stroke-width="3"/>`}}
+ s+=`<g transform="translate(${f(hx)},${f(hy)}) rotate(${f((o.ang||0)*57.3)}) scale(${o.scale||1.5})">${head(t,{jaw:o.jaw||0,look:o.look||[-1,.2],mood:o.mood||'cold'})}</g>`;return s}

@@ -1,0 +1,70 @@
+{
+ "heli_flight": [
+  "military helicopter flying fast over a burning city, loud rotor and wind, explosions in the distance, realistic",
+  20
+ ],
+ "cable_wind": [
+  "strong wind roar and a steel cable swinging and creaking with strain, realistic",
+  10
+ ],
+ "monster_snap": [
+  "gigantic creature jaws snapping shut with a wet crunch and a distant scream fading, brutal, cinematic horror, realistic",
+  5
+ ],
+ "cable_snap": [
+  "steel cable snapping and whipping through the air, realistic",
+  3
+ ],
+ "rifle_burst": [
+  "assault rifle sustained burst of automatic gunfire echoing on a rooftop, realistic",
+  5
+ ],
+ "roof_crack": [
+  "concrete roof slab cracking and splitting with rumble and debris falling, realistic",
+  8
+ ],
+ "claw_pierce": [
+  "huge claws piercing and tearing through thick steel door with screeching metal and sparks, terrifying, realistic",
+  7
+ ],
+ "door_bend": [
+  "thick steel door bending and groaning under enormous pressure with rivets popping, realistic",
+  8
+ ],
+ "jets_flyby": [
+  "fighter jets roaring low overhead in a tight formation with sonic boom, realistic",
+  9
+ ],
+ "bomb_blast": [
+  "massive aerial bombardment explosion shockwave with sustained rumble and distant rolling blasts, cinematic",
+  12
+ ],
+ "tunnel_amb": [
+  "dark concrete service tunnel ambience, dripping water, faraway rumbling, echo, tense, realistic",
+  20
+ ],
+ "glass_facade": [
+  "glass skyscraper windows cracking and shattering in sequence with wind howling, rope creaking, realistic",
+  10
+ ],
+ "vhs_end": [
+  "old camcorder tape stopping with a mechanical click and electronic whine fading to silence, short, realistic",
+  3
+ ],
+ "laser_beep": [
+  "military laser designator targeting beeps, rhythmic electronic, short, realistic",
+  4
+ ],
+ "explosion_far": [
+  "distant explosions and fires roaring across a burning city, realistic",
+  12
+ ],
+ "ash_wind": [
+  "quiet dead city after bombing, soft wind carrying ash, a distant metal creak, eerie silence, realistic",
+  20
+ ],
+ "monster_growl": [
+  "colossal creature low guttural growl, slow, menacing, close, deep sub bass, cinematic horror",
+  8
+ ]
+}

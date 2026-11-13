@@ -1,0 +1,30 @@
+{
+ "chase": [
+  "frantic aerial chase score, relentless pounding drums and screaming strings, helicopter escape, no vocals",
+  50000
+ ],
+ "grief": [
+  "devastating slow grief underscore, solo cello and low piano, loss and shock, no vocals",
+  40000
+ ],
+ "dread7": [
+  "rooftop dread, throbbing sub bass pulse and dissonant strings, something enormous approaches, no vocals",
+  50000
+ ],
+ "descent": [
+  "urgent descent under fire, taiko drums and rising brass, adrenaline, no vocals",
+  40000
+ ],
+ "tunnel7": [
+  "hollow minimal tension, distant drones and heartbeat, farewell, no vocals",
+  45000
+ ],
+ "climax7": [
+  "overwhelming apocalyptic finale, choir-less orchestral hits, jets and bombs, no vocals",
+  35000
+ ],
+ "suspense": [
+  "unresolved suspense ending, single sustained low note with faint high whine and heartbeat, no vocals",
+  40000
+ ]
+}

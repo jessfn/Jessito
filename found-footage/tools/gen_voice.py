@@ -1,5 +1,5 @@
 import json,sys,os,subprocess,base64,time
-VOICES={"Tomas":"EQdYdxpkGKpMCC5nZMgi","Beto":"dcEM0WOwbt9XwI31mBIu","Diego":"4rOzDieCbHQQyo9tzqZv","Marta":"tMzxR2W7o3RLIY7zWBbG","Lucia":"ewn5JTa3lNPY8QVuZJi6","Sofi":"iFhPOZcajR7W3sDL39qJ","Vecino":"htFfPSZGJwjBv1CL0aMD","Altavoz":"htFfPSZGJwjBv1CL0aMD","Soldado":"htFfPSZGJwjBv1CL0aMD","Sargento":"htFfPSZGJwjBv1CL0aMD","Radio":"htFfPSZGJwjBv1CL0aMD"}
+VOICES={"Tomas":"EQdYdxpkGKpMCC5nZMgi","Beto":"dcEM0WOwbt9XwI31mBIu","Diego":"4rOzDieCbHQQyo9tzqZv","Marta":"tMzxR2W7o3RLIY7zWBbG","Lucia":"ewn5JTa3lNPY8QVuZJi6","Sofi":"iFhPOZcajR7W3sDL39qJ","Vecino":"htFfPSZGJwjBv1CL0aMD","Altavoz":"htFfPSZGJwjBv1CL0aMD","Soldado":"htFfPSZGJwjBv1CL0aMD","Sargento":"htFfPSZGJwjBv1CL0aMD","Radio":"htFfPSZGJwjBv1CL0aMD","Piloto":"htFfPSZGJwjBv1CL0aMD"}
 script,out=sys.argv[1],sys.argv[2]
 os.makedirs(out,exist_ok=True)
 lines=json.load(open(script))
