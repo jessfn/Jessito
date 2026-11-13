@@ -8,6 +8,9 @@ const CFG={
  diego:{skin:0xd9a07a,hood:0x8a6a3a,pants:0x2f3a4a,hair:'short',hc:0x241812,iris:'#4a3020',lip:0xa8584c},
  marta:{skin:0xc98e6c,hood:0xb8383e,pants:0x1f2432,hair:'long',hc:0x1c1416,iris:'#3a2415',lip:0x9a4a48,lashes:1},
  lucia:{skin:0xf1c4a3,hood:0xe0b43a,pants:0x3a4a6a,hair:'curly',hc:0x3b2218,iris:'#6a4a2a',lip:0xb85a60,lashes:1},
+ sgt:{skin:0xb98260,hood:0x55603f,pants:0x3b4230,hair:'short',hc:0x14100c,iris:'#2a1a10',lip:0x9a5a4a},
+ sol2:{skin:0xe0a98a,hood:0x55603f,pants:0x3b4230,hair:'short',hc:0x3a2418,iris:'#3a5a7a',lip:0xb05a50},
+ sol3:{skin:0x8a5a40,hood:0x4d5a3a,pants:0x363c2c,hair:'short',hc:0x0e0a08,iris:'#1a0e08',lip:0x7a4038},
  sofi:{skin:0xc98e6c,hood:0xd9588a,pants:0x3a4a6a,hair:'long',hc:0x150f10,iris:'#2a1a10',lip:0xb05a60,lashes:1,kid:1}};
 const EXP={
  neutral:{lid:.62,bi:0,bo:0,m:{w:.034,c:0,o:0}},amused:{lid:.5,bi:.002,bo:.004,m:{w:.042,c:.009,o:0}},

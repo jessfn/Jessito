@@ -95,11 +95,11 @@ export function makeChar2(name){const cfg=CFG[name];const root=new THREE.Group()
    const qFo=new THREE.Quaternion().setFromUnitVectors(restFo,wr.clone().sub(el).normalize());fo.quaternion.copy(qUp.clone().invert().multiply(qFo));
    const h=hands[i];const dir=wr.clone().sub(el).normalize();h.g.position.copy(wr).add(dir.clone().multiplyScalar(.055));
    const c=V(-side*.8,0,.2).normalize();let zc=c.clone().negate();zc.sub(dir.clone().multiplyScalar(zc.dot(dir)));if(zc.length()<.1)zc.set(0,0,1).sub(dir.clone().multiplyScalar(dir.z));zc.normalize();const xc=new THREE.Vector3().crossVectors(dir,zc).normalize();h.g.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(xc,dir,zc));
-   const P=(m.hands&&m.hands[i])||{hand:'relax'};const type=P.hand==='grip'?'grip':P.hand==='open'?'open':P.hand==='point'?'point':'relax';setHandPose(h,type,side);h.props.cup.visible=false;h.props.ext.visible=false}
+   const P=(m.hands&&m.hands[i])||{hand:'relax'};const type=P.hand==='grip'?'grip':P.hand==='open'?'open':P.hand==='point'?'point':'relax';setHandPose(h,type,side);h.props.cup.visible=false;h.props.ext.visible=false;const fg=m.fingers&&m.fingers[i];if(fg){h.fingers.forEach((segs,fi)=>segs.forEach((sg,j)=>{sg.rotation.x=-Math.min(1.7,(fg.f[fi][Math.min(j,2)]||0)*1.15)}));h.th.rotation.set(-.4-fg.th[0]*.35,0,-side*(.9-Math.min(1,fg.th[1])*.5));h.t2.rotation.x=-Math.min(1,fg.th[1]+fg.th[0]*.4)*.9}}
   for(let i=0;i<2;i++){const hip=V(...HP[i]);const an=m.an[i].clone();const kn=ik(hip,an,L_TH,L_SN,m.kn[i]);
    const th=i?thR:thL,sn=i?shR:shL;const rootQ=rootB.quaternion;const restTh=V(...KN[i]).sub(V(...HP[i])).normalize(),restSn=V(...AN[i]).sub(V(...KN[i])).normalize();
    const qT=new THREE.Quaternion().setFromUnitVectors(restTh,kn.clone().sub(hip).normalize());th.quaternion.copy(rootQ.clone().invert().multiply(qT));const qS=new THREE.Quaternion().setFromUnitVectors(restSn,an.clone().sub(kn).normalize());sn.quaternion.copy(qT.clone().invert().multiply(qS));
    shoes[i].position.set(an.x,Math.max(0,an.y-.1),an.z);shoes[i].quaternion.copy(m.footQ?m.footQ[i]:IDQ)}
   headG.quaternion.copy(m.headQ||IDQ);if(m.headPos)headG.position.copy(m.headPos);
   g.updateMatrixWorld(true);setFace(F,cfg,m.ex,m.st||{blink:0,talk:0,look:[0,0]})}
- return {root,update,updateM}}
+ return {root,update,updateM,headG,hands,bones}}
