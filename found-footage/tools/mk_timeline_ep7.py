@@ -43,7 +43,7 @@ ev['doorBreak']=end('j31')+1.2;S['j32']=ev['doorBreak']+3.0
 ev['cutF']=end('j32')+1.6;ev['jets']=ev['cutF']+.3;S['j33']=ev['cutF']+1.4
 ev['white']=end('j33')+2.2;ev['tunnelB']=ev['white']+1.8;ev['cabAfter']=ev['tunnelB']+3.2
 S['j34']=ev['cabAfter']+1.2;S['j35']=end('j34')+.9
-ev['dawn']=end('j35')+1.4;ev['sil']=ev['dawn']+4.5;ev['turn']=ev['sil']+4.0;ev['eyes']=ev['turn']+3.0;ev['dead']=ev['eyes']+3.0
+ev['dawn']=end('j35')+1.4;ev['mirror']=ev['dawn']+3.4;S['j36']=ev['mirror']+1.8;ev['reveal']=end('j36')+1.8;S['j37']=ev['reveal']+.9;ev['sil']=end('j37')+1.8;ev['turn']=ev['sil']+3.6;ev['eyes']=ev['turn']+3.0;ev['dead']=ev['eyes']+3.0
 ev['black']=ev['dead']+2.0;ev['endcard']=ev['black']+1.2
 dur=ev['endcard']+8
 json.dump({'start':{k:round(v,2) for k,v in S.items()},'ev':{k:round(v,2) for k,v in ev.items()},'dur':round(dur,2),'durs':{k:round(v,2) for k,v in D.items()}},open('ep7/timeline.json','w'))

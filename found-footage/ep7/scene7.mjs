@@ -174,3 +174,30 @@ export function alley(t,o){const cx=o.cx||2000;let s=sky(t,cx)+skyline(t,cx);
  // the colossus looming far behind, towering above the skyline
  s+=`<g transform="translate(${f(900-(cx-2000)*.1)},1300) scale(.55)" opacity=".8">`+colossus(t,{jaw:.05,look:[1,-.2],climb:t*.1,sway:Math.sin(t*.7)*.1,headAng:.1,headX:-60,headY:-780,headScale:1.7,mood:'hunt'})+`</g>`;
  return s}
+// ---------------- the mirror: the cameraman sees his own face (reflection drawn mirrored around x=cx)
+export function mirrorRoom(t,o){const cx=o.cx||1500,cy=o.cy||850,w=780,h=1180;let s=rect(-1500,-1500,8000,5000,'#0b0809');
+ // ruined room around the mirror: cracked plaster, fallen beams, rubble, dust shafts
+ s+=rect(-1500,-300,8000,1800,'#16110f');for(let k=-6;k<14;k++)s+=rect(k*300,-300,8,1800,'#000','fill-opacity=".35"');
+ for(let k=0;k<14;k++){const x=rn(k)*4200-600;s+=`<path d="M${f(x)},-200 q${f((rn(k+3)-.5)*80)},400 ${f((rn(k+5)-.5)*120)},${f(900+rn(k)*500)}" stroke="#050304" stroke-width="${f(4+rn(k)*6)}" fill="none" opacity=".7"/>`}
+ s+=`<polygon points="${cx+560},-200 ${cx+1200},-200 ${cx+900},900 ${cx+420},900" fill="#ffe9c8" fill-opacity="${(.08+.04*Math.sin(t*.8)).toFixed(2)}"/>`;
+ s+=rect(-1500,FL,8000,700,'#1a1412')+rect(-1500,FL,8000,8,'#000','fill-opacity=".6"');
+ for(let k=0;k<40;k++)s+=`<polygon points="${f(rn(k)*4400-500)},${f(FL+20+rn(k+3)*240)} ${f(rn(k)*4400-500+60+rn(k+2)*140)},${f(FL+4+rn(k+3)*240)} ${f(rn(k)*4400-500+90)},${f(FL+50+rn(k+3)*240)}" fill="#3a3234" stroke="#0a0708" stroke-width="3"/>`;
+ // mirror frame
+ s+=`<rect x="${cx-w/2-40}" y="${cy-h/2-40}" width="${w+80}" height="${h+80}" rx="22" fill="#2a1c14" stroke="#06040a" stroke-width="10"/><rect x="${cx-w/2-16}" y="${cy-h/2-16}" width="${w+32}" height="${h+32}" rx="14" fill="#5a3e28" stroke="#150d08" stroke-width="6"/>`;
+ return s}
+export function mirrorGlass(t,o,inner){const cx=o.cx||1500,cy=o.cy||850,w=780,h=1180;const rv=o.reveal||0;
+ // reflection: dim room + broken wall opening with ash sky behind him; the colossus rises behind when 'reveal' fires
+ let s=`<clipPath id="mirClip"><rect x="${cx-w/2}" y="${cy-h/2}" width="${w}" height="${h}" rx="6"/></clipPath><g clip-path="url(#mirClip)">`;
+ s+=`<g transform="translate(${2*cx},0) scale(-1,1)">`+rect(cx-w/2,cy-h/2,w,h,'#2a2226')+rect(cx-w/2,cy-h/2,w,h*.55,'url(#ashSky)','fill-opacity=".85"');
+ // skyline seen through the hole behind
+ for(let k=0;k<9;k++){const bx=cx-w/2+k*92,bh=180+rn(k+3)*260;s+=rect(bx,cy-h/2+h*.55-bh,92,bh,'#1c1618')+rect(bx,cy-h/2+h*.55-bh,6,bh,'#ffb87a','fill-opacity=".2"')}
+ s+=rect(cx-w/2,cy-h/2+h*.55,w,h*.45,'#241c1e');
+ if(rv>0){const sc=.42;s+=`<g transform="translate(${cx+160},${cy-h/2+h*.55+30}) scale(${sc})" opacity="${(rv*.95).toFixed(2)}">`+colossus(t,{jaw:.02,look:[0,.05],climb:0,sway:0,headAng:-.1,headX:-60,headY:-780,headScale:1.7,mood:'cold'})+`</g><circle cx="${cx+130}" cy="${cy-h/2+h*.55-330*rv}" r="${f(90*rv)}" fill="url(#redG7)" fill-opacity="${(.5*rv).toFixed(2)}"/>`}
+ s+=inner;
+ s+=`</g>`;
+ // glass: cracks, grime, glints, dust specks
+ s+=`<g>`;for(let k=0;k<6;k++){const x0=cx+(rn(k)-.5)*w*.7,y0=cy+(rn(k+4)-.5)*h*.6;let d=`M${f(x0)},${f(y0)}`,x=x0,y=y0;for(let j=0;j<5;j++){x+=(rn(k*7+j)-.5)*180;y+=(rn(k*3+j)-.3)*160;d+=` L${f(x)},${f(y)}`}s+=`<path d="${d}" stroke="#e8f4ff" stroke-width="${f(2+rn(k)*3)}" fill="none" opacity=".45"/>`}
+ s+=`<rect x="${cx-w/2}" y="${cy-h/2}" width="${w}" height="${h}" fill="#bfae9c" fill-opacity=".1"/><polygon points="${cx-w/2+60},${cy-h/2} ${cx-w/2+160},${cy-h/2} ${cx-w/2+20},${cy-h/2+260} ${cx-w/2},${cy-h/2+260}" fill="#fff" fill-opacity=".07"/>`;
+ for(let k=0;k<30;k++)s+=`<circle cx="${f(cx-w/2+rn(k)*w)}" cy="${f(cy-h/2+rn(k+3)*h)}" r="${f(2+rn(k+5)*4)}" fill="#fff" fill-opacity="${(.08+.1*rn(k+7)).toFixed(2)}"/>`;
+ s+=`</g></g>`;return s}
+export function camcorder(x,y,t,sc=1){return `<g transform="translate(${f(x)},${f(y)}) scale(${sc})"><rect x="-110" y="-62" width="190" height="124" rx="16" fill="#14161a" stroke="#050608" stroke-width="7"/><rect x="-96" y="-50" width="120" height="30" rx="6" fill="#2a2e34"/><circle cx="-14" cy="12" r="46" fill="#0a0b0e" stroke="#2a2e34" stroke-width="8"/><circle cx="-14" cy="12" r="26" fill="#1a2a3a"/><circle cx="-24" cy="2" r="9" fill="#9fd0ff" fill-opacity=".6"/><circle cx="60" cy="-44" r="9" fill="${Math.sin(t*3)>0?'#ff2a1a':'#4a0e0a'}"/><rect x="30" y="-30" width="40" height="22" rx="4" fill="#0a0b0e"/></g>`}

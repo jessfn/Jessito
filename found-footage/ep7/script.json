@@ -214,5 +214,17 @@
   "who": "Radio",
   "text": "Águila Uno, detecto una señal de video activa en el sector cuatro. Alguien sigue grabando.",
   "say": "[radio transmission, astonished, calm, static] Águila Uno, detecto una señal de video activa en el sector cuatro. Alguien sigue grabando."
+ },
+ {
+  "id": "j36",
+  "who": "Tomas",
+  "text": "Sigo vivo... todavía estoy grabando.",
+  "say": "[whispering, exhausted, trembling, slowly, hollow] Sigo vivo... todavía estoy grabando."
+ },
+ {
+  "id": "j37",
+  "who": "Tomas",
+  "text": "Detrás de mí... hay algo.",
+  "say": "[barely audible whisper, terrified, slowly, frozen] Detrás de mí... hay algo."
  }
 ]

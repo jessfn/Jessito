@@ -81,6 +81,7 @@ sfx('building_crash',E_['tunnelB'],.9,10,fade=.2);sfx('roof_crack',E_['tunnelB']
 sfx('cry_soft',E_['cabAfter']+.3,.7,8,fade=.5);sfx('radio_static',L('j35')-.3,.7,3)
 sfx('ash_wind',E_['dawn'],.8,loop_to=E_['black']-E_['dawn']+1,fade=1.2)
 sfx('monster_growl',E_['turn'],.8,8,fade=.5);sfx('heartbeat',E_['eyes']-1,.7,8,fade=1.0)
+sfx('heartbeat',E_['mirror'],.55,E_['reveal']-E_['mirror']+3,fade=1.0);sfx('monster_breath',E_['reveal']-.5,.7,8,fade=.6);sfx('glass_rain',E_['reveal'],.35,4,fade=.3)
 sfx('vhs_end',E_['dead']+.4,.9,3)
 # ---------- music
 M=np.zeros((N,2))

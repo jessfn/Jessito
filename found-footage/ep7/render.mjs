@@ -7,7 +7,7 @@ import {clamp,sm,lerp,defsScene,dust,setEV,speedAt} from '../ep3/scene.mjs';
 import {sky,skyline,heli,roofBack,roof,FLOOR} from '../ep6/scene6.mjs';
 import {defs6} from '../ep6/scene6.mjs';
 import {colossus,smokeBlob,chaser,head as mHead} from '../ep6/monster.mjs';
-import {defs7,defsDoor,aerial,cabin,landmark,cracks,designator,parapet,facade,monsterEyeWindow,tunnelDoor,deadCity,farSilhouette,bloodSpray,bloodStain,lensBlood,stairsCollapsed,edgeRope,alley} from './scene7.mjs';
+import {defs7,defsDoor,aerial,cabin,landmark,cracks,designator,parapet,facade,monsterEyeWindow,tunnelDoor,deadCity,farSilhouette,bloodSpray,bloodStain,lensBlood,stairsCollapsed,edgeRope,alley,mirrorRoom,mirrorGlass,camcorder} from './scene7.mjs';
 import {tower} from '../ep6/scene6.mjs';
 const HERE=path.dirname(fileURLToPath(import.meta.url));const BUILD=path.join(HERE,'../build/ep7');
 const TL=JSON.parse(fs.readFileSync(path.join(HERE,'timeline.json'),'utf8'));const W=1080,H=1920,FPS=30,DUR=Math.ceil(TL.dur);
@@ -33,7 +33,7 @@ function stepResp(tau,w,z){if(tau<=0)return 0;const wd=w*Math.sqrt(1-z*z);return
 function camera(t){const ch=s=>[s[1],s[2],s[3],s[4],s[6]];let tc=0;for(const c of CUTS)if(c<=t+1e-6)tc=Math.max(tc,c);const SH=SHOTS.filter(s=>s[0]>=tc-1e-6);let c=ch(SH[0]);for(let i=1;i<SH.length;i++){const sh=SH[i];let [w,z]=MODE[sh[5]];if(sh[4]>40){w=14;z=.7}const g=stepResp(t-sh[0]-(sh[5]==='c'?0:.28),w,z);if(g===0)continue;const A=ch(sh),B=ch(SH[i-1]);for(let k=0;k<5;k++)c[k]+=(A[k]-B[k])*g}return c}
 function focusBlur(t){let b=0;let tc=0;for(const c of CUTS)if(c<=t+1e-6)tc=Math.max(tc,c);const SH=SHOTS.filter(s=>s[0]>=tc-1e-6);for(let i=1;i<SH.length;i++){const sh=SH[i];if(!'wzc'.includes(sh[5]))continue;const tau=t-sh[0]-(sh[5]==='c'?0:.3);if(tau<0||tau>1.2)continue;const amp=sh[5]==='c'?9:sh[5]==='w'?6:3;b=Math.max(b,amp*Math.exp(-tau/.3))}for(const c of CUTS){if(c<=0)continue;if(t>=c-.12&&t<c)b=Math.max(b,16*(1-(c-t)/.12));if(t>=c&&t<c+.22)b=Math.max(b,16*Math.exp(-(t-c)/.09))}return b}
 const IMPULSES=[[EVT.lunge0,60],[EVT.snap,60],[EVT.attack,90],[EVT.shatter,70],[EVT.pierce,40],[EVT.doorBreak,90],[EVT.white,60]];
-function shakeAmp(t){const v=viewOf(t);let a=4.5+2*clamp((t-EVT.cam)/60,0,1);if(v==='roofA')a+=(t<EVT.lunge0+3?14:5);if(v==='tele')a+=4;if(v==='ext'||v==='cab')a+=10;if(v==='cabB')a+=7;if(v==='roof'&&t>=EVT.peek-3)a+=5+(t>=EVT.peek?5:0);if(v==='roof'&&t>=EVT.run)a+=10;if(v==='stairs')a+=6;if(v==='edge')a+=6;if(v==='facade')a+=8;if(v==='alley')a+=9;if(v==='tunnel'&&t>=EVT.pierce)a+=14;if(v==='cabF')a+=12+(t>=EVT.white-1?14:0);if(v==='tunnelB')a+=18*Math.exp(-(t-EVT.tunnelB)/1.5);if(v==='cabAfter')a+=5;if(v==='dead')a=2.2;
+function shakeAmp(t){const v=viewOf(t);let a=4.5+2*clamp((t-EVT.cam)/60,0,1);if(v==='roofA')a+=(t<EVT.lunge0+3?14:5);if(v==='tele')a+=4;if(v==='ext'||v==='cab')a+=10;if(v==='cabB')a+=7;if(v==='roof'&&t>=EVT.peek-3)a+=5+(t>=EVT.peek?5:0);if(v==='roof'&&t>=EVT.run)a+=10;if(v==='stairs')a+=6;if(v==='edge')a+=6;if(v==='facade')a+=8;if(v==='alley')a+=9;if(v==='tunnel'&&t>=EVT.pierce)a+=14;if(v==='cabF')a+=12+(t>=EVT.white-1?14:0);if(v==='tunnelB')a+=18*Math.exp(-(t-EVT.tunnelB)/1.5);if(v==='cabAfter')a+=5;if(v==='dead')a=2.2;if(v==='mirror')a=2.4+(t>=EVT.reveal?3:0);
  for(const [ti,m] of IMPULSES)if(t>ti)a+=m*Math.exp(-(t-ti)/.5);return a}
 const nz=(t,s)=>Math.sin(t*1.7*s+1)*.5+Math.sin(t*3.9*s+2)*.3+Math.sin(t*7.3*s+3)*.2;
 function quakeLvl(t){return clamp(shakeAmp(t)/40,0,1.4)}
@@ -56,7 +56,7 @@ const EXL={
  j23:A('worry','neutral','worry','worry','scream'),j24:A('worry','neutral','worry','worry','fear'),j25:A('worry','neutral','worry','worry','fear'),j26:A('worry','neutral','worry','worry','fear'),
  j27:A('worry','neutral','worry','worry','scream'),j28:A('worry','neutral','worry','worry','fear'),j29:A('worry','neutral','worry','worry','sad'),j30:A('worry','neutral','worry','worry','sad'),
  j31:A('worry','neutral','worry','worry','sad'),j32:A('worry','neutral','worry','worry','sad'),j33:A('shock','neutral','sad','sad','sad'),j34:A('sad','neutral','sad','sad','sad'),j35:A('shock','neutral','shock','shock','sad')};
-function exprNew(who,tn){const idx=WHOL.indexOf(who);let ex=who==='sgt'?'neutral':'fear';if(tn<START.j0)return ex;
+function exprNew(who,tn){if(who==='tomas')return tn<EVT.reveal?'sad':(tn<S_('j37')?'shock':'fear');const idx=WHOL.indexOf(who);let ex=who==='sgt'?'neutral':'fear';if(tn<START.j0)return ex;
  for(const l of LINES){if(!EXL[l.id])continue;const spk=WHOKEY[l.who]===who;const t0=l.t0+(spk?0:.25+.1*Math.max(0,idx));if(tn<t0)break;ex=EXL[l.id][who]||ex}
  if(who==='marta'&&tn>=EVT.attack&&tn<EVT.stairs)ex='scream';
  if(who==='sgt'&&tn>=EVT.peek)ex='fear';if(who==='sgt'&&tn>=EVT.attack-.8)ex='scream';
@@ -73,8 +73,8 @@ function viewOf(t){
  if(t<T7.tele)return 'roofA';if(t<S_('j3')-.2)return 'tele';if(t<T7.cutH)return 'roofA';
  if(t<T7.cutB)return EXTW.some(w=>t>=w[0]&&t<w[1])?'ext':'cab';
  if(t<T7.cutC)return 'cabB';if(t<T7.stairs)return 'roof';if(t<T7.rope)return 'stairs';if(t<T7.cutD)return 'edge';
- if(t<T7.alley)return 'facade';if(t<T7.cutE)return 'alley';if(t<T7.cutF)return 'tunnel';if(t<T7.tunnelB)return 'cabF';if(t<T7.cabAfter)return 'tunnelB';if(t<T7.dawn)return 'cabAfter';return 'dead'}
-const CUTS=[0,T7.tele,S_('j3')-.2,T7.cutH,S_('j5')-.1,T7.ext1,S_('j8')-.1,T7.close,T7.snap+1.4,T7.cutB,T7.cutC,T7.run,T7.stairs,T7.rope,T7.cutD,T7.alley,T7.cutE,T7.cutF,T7.tunnelB,T7.cabAfter,T7.dawn];
+ if(t<T7.alley)return 'facade';if(t<T7.cutE)return 'alley';if(t<T7.cutF)return 'tunnel';if(t<T7.tunnelB)return 'cabF';if(t<T7.cabAfter)return 'tunnelB';if(t<T7.dawn)return 'cabAfter';if(t>=T7.mirror&&t<T7.sil)return 'mirror';return 'dead'}
+const CUTS=[0,T7.tele,S_('j3')-.2,T7.cutH,S_('j5')-.1,T7.ext1,S_('j8')-.1,T7.close,T7.snap+1.4,T7.cutB,T7.cutC,T7.run,T7.stairs,T7.rope,T7.cutD,T7.alley,T7.cutE,T7.cutF,T7.tunnelB,T7.cabAfter,T7.dawn,T7.mirror,T7.sil];
 const REL={L:{w:[146,422],hand:'relax'},R:{w:[354,422],hand:'relax'}};
 const MOUTH=()=>({L:{e:[168,332],w:[224,238],hand:'open',front:1},R:{e:[332,332],w:[276,238],hand:'open',front:1}});
 const DEF2={L:{e:[118,322],w:[134,214],hand:'open'},R:{e:[382,322],w:[366,214],hand:'open'}};
@@ -101,6 +101,7 @@ function chars(t){const v=viewOf(t);const out={};
  else if(v==='facade'){const sw=Math.sin(t*1.4)*5;out.marta={x:1500,fy:FL-120,s:1.5,yaw:0,rot:sw,arms:HANGA,hang:1,sway:sw}}
  else if(v==='alley'){out.marta={x:alleyX(t),fy:FL,s:1.5,yaw:1.35,arms:{L:{w:[120,430],hand:'relax'},R:{w:[380,260],hand:'relax'}},rot:0,amp:1.4}}
  else if(v==='tunnel'){out.marta={x:1700,fy:FL,s:1.5,yaw:1.15,arms:PUSH,rot:-5,amp:0}}
+ else if(v==='mirror'){out.tomas={x:1500,fy:1340,s:.95,yaw:0,arms:{L:{w:[176,318],hand:'relax',front:1},R:{w:[330,330],hand:'relax'}},rot:0}}
  return out}
 function blinkAt(seed,t){const per=3.1;const k=Math.floor(t/per+seed);const jit=((Math.sin(k*12.9898+seed*78.2)*43758.5453)%1+1)%1;const t0=(k-seed)*per+jit*1.2;const d=t-t0;return d>=0&&d<.14?Math.sin(d/.14*Math.PI):0}
 const EXN=(n)=>EX[n]||EX.neutral;
@@ -112,8 +113,8 @@ function faceExpr(who,t,tn,talk,seed){const {cur,prev,tc}=exprChange(who,tn);con
  e.eL=1+Math.sin(t*.9+seed)*.06+(cur==='sad'?-.12:0)+(cur==='scream'||cur==='shock'?.1:0);e.eR=1+Math.sin(t*1.1+seed*1.3)*.06+(cur==='sad'?-.16:0)+(cur==='scream'||cur==='shock'?.12:0);
  e.bag=heavy?1:.15;e.well=(cur==='sad'||cur==='scream')?1:(cur==='fear'?.7:0);e.flare=(['scream','annoyed','fear'].includes(cur)?1:0)+Math.max(0,br)*.5;return e}
 function charSVG(who,t,shock,tn,L){const st=CAST[who];const sp=speakerAt(tn);
- const spk=sp&&(sp.who==='Sargento'?'sgt':WHOKEY[sp.who]);const talk=spk===who?clamp((sp.env[Math.floor((tn-sp.t0)*FPS)]||0)*1.8):0;
- const idx=who==='sgt'?5:WHOL.indexOf(who);const bl=blinkAt(idx*.37,t);
+ const spk=sp&&(sp.who==='Sargento'?'sgt':sp.who==='Tomas'?'tomas':WHOKEY[sp.who]);const talk=spk===who?clamp((sp.env[Math.floor((tn-sp.t0)*FPS)]||0)*1.8):0;
+ const idx=who==='sgt'?5:who==='tomas'?6:WHOL.indexOf(who);const bl=blinkAt(idx*.37,t);
  const sacc=(Math.sin(Math.floor(t*1.7+idx)*12.9898)*.5);
  const ex=exprNew(who,tn);
  const arms=L.arms;const pose={L:{...arms.L},R:{...arms.R}};
@@ -170,18 +171,18 @@ function opArms(t){const vv=viewOf(t);if(['ext','cab','cabB','cabF','cabAfter'].
  const c0=camera(t-.06),c2=camera(t+.06),c1=camera(t);const vx=(c2[0]-c0[0])/.12*c1[2],vy=(c2[1]-c0[1])/.12*c1[2];
  const swx=-clamp(vx*.04,-120,120)+Math.sin(t*1.3)*10+Math.sin(t*3.1)*5,swy=-clamp(vy*.03,-80,80)+Math.sin(t*1.7)*8;
  const run=(type==='swing');const bob=run?Math.sin(t*11)*150:0;const jit=(t>=EVT.attack-.5&&t<EVT.attack+4)||(t>=EVT.pierce&&t<EVT.doorBreak+2)?Math.sin(t*34)*9:0;
- let pose='open',hx,hy,rot,sc=3.3,from=[-220,2150];
- if(type==='brace'){pose='open';hx=180;hy=1620;rot=80}else if(type==='point'){pose='point';hx=300;hy=1260;rot=-72;sc=3.5}else if(type==='grip'){pose='fist';hx=210;hy=1320;rot=-88}
- else if(type==='swing'){pose='relax';hx=170;hy=1700;rot=95}else if(type==='reach'){pose='open';hx=430;hy=1120;rot=-58;sc=3.7}else{pose='open';hx=560;hy=1040;rot=-95;sc=4.2}
+ let pose='open',hx,hy,rot=0,sc=3.3,from=[-220,2150];
+ let adj=0;if(type==='brace'){pose='open';hx=230;hy=1560;adj=12}else if(type==='point'){pose='point';hx=330;hy=1230;sc=3.5}else if(type==='grip'){pose='fist';hx=220;hy=1330}
+ else if(type==='swing'){pose='relax';hx=190;hy=1680}else if(type==='reach'){pose='open';hx=440;hy=1110;sc=3.7}else{pose='open';hx=560;hy=1040;sc=4.2}
  const off=1-e;let X=hx+swx+jit,Y=hy+swy+bob+off*520;if(type==='shield'){X=560+swx*.4+jit;Y=1040+swy*.4+off*900;sc=(t>=EVT.dead-.2)?8*sstep((t-EVT.dead+.2)/1.8)+.1:sc*(.3+.7*e)}
  else{from=[-220+swx*.5,2150]}
- setCTM(T(X,Y,rot,sc,sc));const hh=handSkin(pose,st);setCTM([1,0,0,1,0,0]);let g='';
+ if(type!=='shield')rot=Math.atan2(Y-from[1],X-from[0])*180/Math.PI+adj;else rot=-95;const fl=(type==='shield')?1:-1;setCTM(T(X,Y,rot,sc,sc*fl));const hh=handSkin(pose,st);setCTM([1,0,0,1,0,0]);let g='';
  if(type!=='shield'){const sl=limbS(from,[X-Math.cos(rot*Math.PI/180)*60*sc/3,Y-Math.sin(rot*Math.PI/180)*60*sc/3],175,118);setCTM([1,0,0,1,0,0]);g+=grpS(sl,st.hood,st,[-300,Y-500,Math.max(X,0)+700,1200],{ow:5,sd:8})}
- g+=`<g transform="translate(${X.toFixed(1)},${Y.toFixed(1)}) rotate(${rot}) scale(${sc.toFixed(2)} ${sc.toFixed(2)})">${type==='shield'?`<g transform="translate(-30,-30)">${hh}</g>`:hh}</g>`;return g}
+ g+=`<g transform="translate(${X.toFixed(1)},${Y.toFixed(1)}) rotate(${rot.toFixed(1)}) scale(${sc.toFixed(2)} ${(sc*fl).toFixed(2)})">${type==='shield'?`<g transform="translate(-30,-30)">${hh}</g>`:hh}</g>`;return g}
 // ---- scene composition
 const w2s=(x,y)=>[CAMM[0]*x+CAMM[2]*y+CAMM[4],CAMM[1]*x+CAMM[3]*y+CAMM[5]];
 const f1=n=>(+n).toFixed(1);
-const STRAPS=[[0.3,'AZOTEA · EDIFICIO CENTRAL'],[EVT.cutH,'AEROCAM 02 · HELICÓPTERO ÁGUILA 1'],[EVT.cutB,'SOBRE EL DISTRITO NORTE'],[EVT.cutC,'AZOTEA · 12 MIN PARA EL BOMBARDEO'],[EVT.stairs,'ESCALERA DE SERVICIO'],[EVT.cutD,'FACHADA OESTE · 40 PISOS'],[EVT.alley,'CALLE · ACCESO A SERVICIOS'],[EVT.cutE,'TÚNEL DE SERVICIO'],[EVT.cutF,'ÁGUILA 1 · SOBRE LA BAHÍA'],[EVT.tunnelB,'TÚNEL DE SERVICIO · IMPACTO'],[EVT.cabAfter,'ÁGUILA 1 · 22 KM DEL SECTOR 4'],[EVT.dawn,'DISTRITO CENTRO · 07:03']];
+const STRAPS=[[0.3,'AZOTEA · EDIFICIO CENTRAL'],[EVT.cutH,'AEROCAM 02 · HELICÓPTERO ÁGUILA 1'],[EVT.cutB,'SOBRE EL DISTRITO NORTE'],[EVT.cutC,'AZOTEA · 12 MIN PARA EL BOMBARDEO'],[EVT.stairs,'ESCALERA DE SERVICIO'],[EVT.cutD,'FACHADA OESTE · 40 PISOS'],[EVT.alley,'CALLE · ACCESO A SERVICIOS'],[EVT.cutE,'TÚNEL DE SERVICIO'],[EVT.cutF,'ÁGUILA 1 · SOBRE LA BAHÍA'],[EVT.tunnelB,'TÚNEL DE SERVICIO · IMPACTO'],[EVT.cabAfter,'ÁGUILA 1 · 22 KM DEL SECTOR 4'],[EVT.dawn,'DISTRITO CENTRO · 07:03'],[EVT.mirror,'CENTRO COMERCIAL · PLANTA BAJA']];
 function strap(t){for(const [t0,tx] of STRAPS){if(t>=t0&&t<t0+3.6){const a=clamp(Math.min((t-t0)/.4,(t0+3.6-t)/.5));if(t<EVT.cam&&t0>1)continue;return `<g opacity="${a.toFixed(2)}"><rect x="60" y="350" width="${Math.min(940,tx.length*21+60)}" height="52" fill="#000" fill-opacity=".55"/><text x="80" y="388" font-family="DejaVu Sans Mono" font-size="30" font-weight="700" fill="#ffd54a">${tx}</text></g>`}}return''}
 const specks=(x,y,seed,n=16,r=70)=>{let s='';for(let i=0;i<n;i++){const a=rn(seed+i)*6.28,d=rn(seed+i*3)*r;s+=`<circle cx="${f1(x+Math.cos(a)*d)}" cy="${f1(y+Math.sin(a)*d*1.3)}" r="${f1(2+rn(seed+i*5)*7)}" fill="#8a0c14" fill-opacity=".9"/>`}return s};
 function monRoofA(t){const lu=sstep((t-(EVT.lunge0-.5))/.7),lv=sstep((t-EVT.monLeaves)/2.8);let hx=lerp(3900,2500,lu),hy=lerp(420,820,lu);
@@ -276,6 +277,11 @@ function sceneWorld(t,tn){const [cx,cy,z,rot,sk]=camera(t);const blur=process.en
   w+=bloodStain(1800,FL+60,260,71,1)+bloodStain(1500,FL+90,140,81,1);
   w+=`<ellipse cx="2000" cy="${FL-40}" rx="1400" ry="${f1(300+200*Math.max(0,1-u/2))}" fill="#e8dccf" fill-opacity="${(.35*Math.max(0,1-u/3)).toFixed(2)}"/>`;
   tint='#ffb07a';tintA=.08;dark=.5}
+ else if(view==='mirror'){const rv=sstep((t-EVT.reveal)/1.2);
+  let inner='';if(L.tomas)inner=charSVG('tomas',t,q,tn,L.tomas)+camcorder(1500-100,745+250,t,.72)+specks(1500,742,91,14,46)+`<path d="M1478,740 q-6,40 4,90" stroke="#7a0a10" stroke-width="8" fill="none" opacity=".85"/><path d="M1530,700 q8,30 -2,70" stroke="#7a0a10" stroke-width="6" fill="none" opacity=".7"/>`;
+  w+=mirrorRoom(t,{cx:1500,cy:850})+mirrorGlass(t,{cx:1500,cy:850,reveal:rv},inner);
+  for(let k=0;k<20;k++){const x=((rn(k)*3800+t*20)%3800)-400,y=((rn(k+3)*1800+t*40*(.5+rn(k+5)))%1800)-100;w+=`<circle cx="${f1(x)}" cy="${f1(y)}" r="${f1(2+rn(k+4)*4)}" fill="#cfc7bd" fill-opacity=".4"/>`}
+  tint='#ffb07a';tintA=.06;dark=.35}
  else{w+=deadCity(t,{cx});w+=farSilhouette(t,{x:3900,y:1340,sc:.3+.12*sstep((t-EVT.sil)/10),turnT:EVT.turn,eyesT:EVT.eyes});
   for(let k=0;k<4;k++)w+=smokeBlob(t,2800+k*500,1250,420,k);tint='#ffb87a';tintA=.06;dark=.2}
  w+=`</g>`;
@@ -337,7 +343,9 @@ const SHOTS=[
  [EVT.cutF,1400,900,.7,0,'s',0],[S_('j33')-.3,2650,700,.8,-2,'n',0],[EVT.white-1.4,2650,600,.9,0,'w',0],
  [EVT.tunnelB,1700,820,.9,0,'w',0],
  [EVT.cabAfter,1400,900,.7,0,'s',0],[S_('j34')-.3,1230,900,1.75,2,'n',0],[S_('j35')-.3,520,1000,1.1,0,'n',0],
- [EVT.dawn,2000,900,.6,0,'s',0],[EVT.sil,2700,700,.9,0,'s',0],[EVT.sil+3.5,3300,900,1.2,0,'n',0],[EVT.turn,3800,900,1.9,0,'z',0],[EVT.eyes,3900,780,2.4,0,'z',0]];
+ [EVT.dawn,2000,900,.6,0,'s',0],[EVT.dawn+1.8,2200,850,.75,2,'n',0],
+ [EVT.mirror,1500,850,.8,0,'s',0],[EVT.mirror+2.0,1500,790,1.1,0,'s',0],[S_('j36')-.4,1500,700,1.55,0,'n',0],[EVT.reveal-.4,1500,800,1.25,0,'z',0],[S_('j37')-.3,1560,720,1.8,0,'n',0],
+ [EVT.sil,2700,700,.9,0,'s',0],[EVT.sil+2.8,3300,900,1.2,0,'n',0],[EVT.turn,3800,900,1.9,0,'z',0],[EVT.eyes,3900,780,2.4,0,'z',0]];
 // street run: the camera follows Marta toward the service entrance
 for(let tt=EVT.alley;tt<EVT.cutE-.5;tt+=1.4){const mx=700+Math.min(Math.max(tt-EVT.alley,0),13)*270;SHOTS.push([tt,mx+380,820,tt<S_('j26')-.2?.9:1.15,((tt*7)%5)-2,'w',0])}
 SHOTS.sort((x,y)=>x[0]-y[0]);
