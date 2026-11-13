@@ -130,3 +130,47 @@ export function farSilhouette(t,o){// distant colossus standing motionless in th
  s+=`<ellipse cx="${x}" cy="${y-880*sc*1.2}" rx="${400*sc*3}" ry="${160*sc*3}" fill="#6a5a52" fill-opacity=".35"/>`;
  if(eyes>0)s+=`<g opacity="${eyes.toFixed(2)}"><circle cx="${x-60*sc*5}" cy="${y-1020*sc*1.1}" r="${90*sc*3}" fill="url(#redG7)"/></g>`;
  return s}
+// ---------------- blood (stylised horror): spray, stains and lens splatter
+export function bloodSpray(t,t0,x,y,dx,dy,seed,n=34,len=1.4){const u=(t-t0)/len;if(u<0||u>1)return'';let s='';for(let i=0;i<n;i++){const a=Math.atan2(dy,dx)+(rn(seed+i)-.5)*1.5,sp=300+rn(seed+i*3)*900;const px=x+Math.cos(a)*sp*u*1.2,py=y+Math.sin(a)*sp*u*1.2+500*u*u;const r=(5+rn(seed+i*5)*14)*(1-.5*u);s+=`<circle cx="${f(px)}" cy="${f(py)}" r="${f(r)}" fill="#8a0c14" fill-opacity="${(.9*(1-u*.6)).toFixed(2)}"/><line x1="${f(px)}" y1="${f(py)}" x2="${f(px-Math.cos(a)*40*(1-u))}" y2="${f(py-Math.sin(a)*40*(1-u)+10)}" stroke="#a00f1a" stroke-width="${f(r*.7)}" stroke-opacity="${(.7*(1-u)).toFixed(2)}"/>`}
+ s+=`<circle cx="${f(x)}" cy="${f(y)}" r="${f(120*Math.min(1,u*4)*(1-u*.3))}" fill="#7a0a10" fill-opacity="${(.7*(1-u)).toFixed(2)}"/>`;return s}
+export function bloodStain(x,y,r,seed,grow=1){let pts=[];for(let k=0;k<14;k++){const a=k/14*6.28;const rr=r*grow*(.65+rn(seed+k)*.7);pts.push([x+Math.cos(a)*rr*1.4,y+Math.sin(a)*rr*.5])}
+ let d='M'+pts.map(p=>f(p[0])+','+f(p[1])).join(' L')+'Z';let s=`<path d="${d}" fill="#5a060c" fill-opacity=".92" stroke="#2a0306" stroke-width="3"/><path d="${d}" fill="#a00f1a" fill-opacity=".35" transform="translate(-6,-4) scale(.9)" style="transform-origin:${f(x)}px ${f(y)}px"/>`;
+ for(let k=0;k<5;k++){const dx=x+(rn(seed+k*7)-.5)*r*2.4;s+=`<circle cx="${f(dx)}" cy="${f(y+r*.3*rn(seed+k))}" r="${f(4+rn(seed+k*3)*9)}" fill="#7a0a10"/>`}return s}
+export function lensBlood(t,t0,seed,O={}){const u=t-t0;if(u<0)return'';const fade=clamp(1-(u-O.hold||6)/5);if(fade<=0)return'';const cx0=O.cx??540,cy0=O.cy??900;let s='';
+ for(let i=0;i<22;i++){const x=cx0+(rn(seed+i)-.5)*900,y=cy0+(rn(seed+i*3)-.5)*1100;const r=14+rn(seed+i*5)*58;const drip=Math.min(1,u/3)*(40+rn(seed+i*7)*260)*(.4+.6*rn(seed+i));
+  s+=`<ellipse cx="${f(x)}" cy="${f(y)}" rx="${f(r)}" ry="${f(r*.9)}" fill="#7a0810" fill-opacity="${(.75*fade).toFixed(2)}"/><path d="M${f(x-r*.18)},${f(y)} L${f(x-r*.12)},${f(y+drip)} Q${f(x)},${f(y+drip+r*.4)} ${f(x+r*.12)},${f(y+drip)} L${f(x+r*.18)},${f(y)}Z" fill="#7a0810" fill-opacity="${(.7*fade).toFixed(2)}"/>`}
+ s+=`<rect width="1080" height="1920" fill="#5a0508" fill-opacity="${(.12*fade).toFixed(2)}"/>`;return s}
+// ---------------- collapsed stairwell seen from the roof door
+export function stairsCollapsed(t,o){let s=rect(-1500,-1500,9000,5000,'#05060a');
+ // door frame + interior shaft
+ s+=rect(300,520,900,1000,'#0a0c10','stroke="#1a1c20" stroke-width="30"');
+ for(let k=0;k<9;k++){const y=700+k*120;s+=`<path d="M320,${y} L${f(500+rn(k)*300)},${f(y+30+rn(k+2)*90)}" stroke="#2a2e34" stroke-width="${f(14+rn(k)*10)}"/>`}
+ // twisted rebar + broken steps hanging, fire glow far below
+ for(let k=0;k<12;k++){const x=360+rn(k)*780,y0=560+rn(k+3)*300;s+=`<path d="M${f(x)},${f(y0)} q${f((rn(k+5)-.5)*120)},${f(80+rn(k)*160)} ${f((rn(k+7)-.5)*80)},${f(240+rn(k+2)*200)}" stroke="#6a4a3a" stroke-width="${f(5+rn(k)*6)}" fill="none"/>`}
+ s+=`<polygon points="360,1180 700,1120 640,1260 400,1300" fill="#1a1c20" stroke="#050608" stroke-width="6"/><polygon points="820,1000 1160,1060 1120,1180 840,1140" fill="#1a1c20" stroke="#050608" stroke-width="6"/>`;
+ s+=`<ellipse cx="750" cy="1500" rx="520" ry="260" fill="url(#orangeG7)" fill-opacity="${(.7+.2*Math.sin(t*6)).toFixed(2)}"/>`;
+ for(let i=0;i<30;i++){const x=340+rn(i)*820,y=((rn(i+3)*1000+t*(200+rn(i)*300))%1000);s+=`<circle cx="${f(x)}" cy="${f(1500-y)}" r="${f(2+rn(i+5)*5)}" fill="#ffb060" fill-opacity=".7"/>`}
+ s+=`<circle cx="750" cy="470" r="22" fill="#ff2a1a" fill-opacity="${(Math.sin(t*5)>0?.95:.2).toFixed(2)}"/><circle cx="750" cy="470" r="420" fill="url(#redG7)" fill-opacity="${(Math.sin(t*5)>0?.4:.08).toFixed(2)}"/>`;
+ s+=rect(-1500,FL,9000,600,'#14171a')+rect(-1500,FL,9000,8,'#000','fill-opacity=".6"');
+ // roof floor lit by the fire from the shaft
+ s+=`<ellipse cx="760" cy="${FL+30}" rx="900" ry="70" fill="url(#orangeG7)" fill-opacity=".35"/>`;
+ return s}
+// ---------------- roof edge with the rope anchor (before the facade descent)
+export function edgeRope(t,o){let s='';const p=o.p||0;
+ s+=rect(2800,FL-160,1400,180,'#2a2e34','stroke="#0a0b0d" stroke-width="8"')+rect(2800,FL-160,1400,14,'#fff','fill-opacity=".12"');
+ // anchor point: the antenna base + rope tied and thrown over the edge
+ s+=`<rect x="2740" y="${FL-120}" width="130" height="130" fill="#14161a" stroke="#06080a" stroke-width="6"/><circle cx="2805" cy="${FL-55}" r="22" fill="#6a717c"/>`;
+ s+=`<path d="M2805,${FL-55} Q3000,${FL-40} 3180,${FL-170} L3200,${FL+260+p*500}" stroke="#14170f" stroke-width="12" fill="none"/><path d="M2805,${FL-55} Q3000,${FL-40} 3180,${FL-170} L3200,${FL+260+p*500}" stroke="#c9a23a" stroke-width="4" fill="none"/>`;
+ return s}
+// ---------------- street run toward the service entrance
+export function alley(t,o){const cx=o.cx||2000;let s=sky(t,cx)+skyline(t,cx);
+ const par=d=>`<g transform="translate(${f((cx-2000)*d)},0)">`;
+ s+=par(.55);for(let k=0;k<10;k++){const x=-300+k*520,h=800+rn(k)*900;s+=rect(x,1380-h,420+rn(k+3)*140,h,'#0c0810')+rect(x,1380-h,10,h,'#ffb060','fill-opacity=".22"');for(let r=0;r<h/110;r++)if(rn(k*9+r)<.18)s+=rect(x+30,1380-h+40+r*110,46,60,'#ffb060','fill-opacity=".65"');if(rn(k+9)<.4)s+=`<ellipse cx="${f(x+210)}" cy="${f(1380-h+60)}" rx="260" ry="120" fill="url(#orangeG7)" fill-opacity="${(.6*flick(t,k)).toFixed(2)}"/>`}s+='</g>';
+ s+=rect(-1500,1380,9000,900,'#14101a')+rect(-1500,1380,9000,10,'#000','fill-opacity=".5"');
+ for(let k=0;k<7;k++){const x=300+k*620+rn(k)*80;s+=rect(x,FL-120,300,120,'#3a2218','stroke="#0a0508" stroke-width="5"')+rect(x+40,FL-190,200,80,'#2a1810')+`<circle cx="${f(x+150)}" cy="${FL-100}" r="220" fill="url(#orangeG7)" fill-opacity="${(.7*flick(t,k+5)).toFixed(2)}"/>`}
+ for(let k=0;k<40;k++)s+=`<polygon points="${f(rn(k)*5600-300)},${f(1440+rn(k+3)*300)} ${f(rn(k)*5600-300+50+rn(k+2)*120)},${f(1420+rn(k+3)*300)} ${f(rn(k)*5600-300+80)},${f(1480+rn(k+3)*300)}" fill="#3a3234" stroke="#0a0708" stroke-width="3"/>`;
+ // service entrance on the right: bunker door + sign + green light
+ const dx=4000;s+=rect(dx-60,520,640,990,'#1a1d22','stroke="#06080a" stroke-width="8"')+rect(dx,880,520,630,'#0a0c10','stroke="#2a2e34" stroke-width="14"')+rect(dx+30,910,460,600,'url(#steelD)','stroke="#06080a" stroke-width="6"')+txt(dx+260,820,'ACCESO SERVICIO',46,'#e9eef5','letter-spacing="4"')+`<circle cx="${dx+260}" cy="760" r="20" fill="#3dff7a"/><circle cx="${dx+260}" cy="760" r="240" fill="url(#redG7)" fill-opacity="0"/><path d="M${dx+110},700 l-90,0 l35,-35 m-35,35 l35,35" stroke="#59ff8f" stroke-width="10" fill="none" transform="translate(150,0)"/>`;
+ // the colossus looming far behind, towering above the skyline
+ s+=`<g transform="translate(${f(900-(cx-2000)*.1)},1300) scale(.55)" opacity=".8">`+colossus(t,{jaw:.05,look:[1,-.2],climb:t*.1,sway:Math.sin(t*.7)*.1,headAng:.1,headX:-60,headY:-780,headScale:1.7,mood:'hunt'})+`</g>`;
+ return s}

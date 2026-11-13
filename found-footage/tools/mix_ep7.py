@@ -50,28 +50,32 @@ def hit1(name,t,g=1,dur=None,fade=.05):
     place(S,load(f'{B1}/sfx/{name}.mp3'),t,g,0,dur,fade)
 E_=E;cam=E_['cam']
 def L(a):return S_[a]
-# A: chase
-sfx('heli_flight',0.0,.9,loop_to=E_['cutB']+2,fade=.5);sfx('cable_wind',0,.6,loop_to=E_['cutB'],fade=.5)
-sfx('monster_growl',E_['mon0']+.5,.8,8,fade=.3);sfx('heartbeat',E_['mon0'],.6,10,fade=1.0)
-sfx('monster_roar',E_['close']-.2,.9,9);sfx('monster_snap',E_['snap']-.1,1.0,5);subboom(E_['snap'],1.0,2.0);sfx('cable_snap',E_['snap']+.1,.7,3);tinnitus(E_['snap']+.3,.06)
-# B: cabin flyover
-sfx('heli_flight',E_['cutB'],.7,loop_to=E_['cutC']-E_['cutB']+1,fade=.6)
-sfx('explosion_far',E_['cutB'],.5,loop_to=E_['cutC']-E_['cutB'],fade=1.0)
-sfx('radio_static',L('h10')-.5,.8,3)
-# C: rooftop
-sfx('roof_wind',E_['cutC'],.8,loop_to=E_['cutD']-E_['cutC']+1,fade=.8)
-sfx('roof_crack',E_['crack1'],.9,8);sfx('laser_beep',E_['peek']-1,.5,4);sfx('monster_breath',E_['peek'],.8,loop_to=E_['attack']-E_['peek'],fade=1.0)
-sfx('rifle_burst',E_['attack']-1.2,.9,5);sfx('monster_roar',E_['attack']-.1,1.0,9);subboom(E_['attack'],1.0,2.2);sfx('claw_scrape',E_['attack']+.2,.9,6);sfx('building_crash',E_['attack']+.3,.8,10)
-# D: facade
-sfx('glass_facade',E_['cutD'],.8,loop_to=E_['cutE']-E_['cutD']+1,fade=.6);sfx('explosion_far',E_['cutD'],.5,loop_to=E_['cutE']-E_['cutD'],fade=1.0)
-sfx('monster_growl',E_['eyeWin']-.3,.9,8);sfx('glass_rain',E_['eyeWin']+2.5,1.0,6);subboom(E_['eyeWin']+2.6,.9,1.8)
-# E: tunnel + door
-sfx('tunnel_amb',E_['cutE'],.8,loop_to=E_['cutF']-E_['cutE']+1,fade=.6);sfx('stairs_run',E_['cutE'],.6,6,fade=.3)
-sfx('door_bend',L('h25'),.8,loop_to=E_['pierce']-L('h25'),fade=1.0);sfx('claw_pierce',E_['pierce'],1.0,7);sfx('door_bend',E_['pierce']+1,.9,8)
-sfx('building_crash',E_['doorBreak'],1.0,10);sfx('monster_roar',E_['doorBreak']+.2,1.0,9);subboom(E_['doorBreak'],1.0,2.4)
+# 1) roof (continuity): the colossus smashes the roof and leaves
+sfx('roof_wind',0,.7,loop_to=E_['cutH']+1,fade=.5);sfx('monster_roar',E_['lunge0']-.2,1.0,9);sfx('building_crash',E_['lunge0'],.9,10);subboom(E_['lunge0']+.1,1.0,2.0)
+sfx('monster_step',E_['monLeaves'],.8,8,fade=.4);sfx('heli_flight',E_['tele']-1,.6,loop_to=E_['cutH']-E_['tele']+2,fade=1.0);sfx('heartbeat',E_['tele'],.5,8,fade=1.0)
+# 2) helicopter chase + Diego's death
+sfx('heli_flight',E_['cutH'],.9,loop_to=E_['cutB']-E_['cutH']+2,fade=.5);sfx('cable_wind',E_['cutH'],.6,loop_to=E_['snap']-E_['cutH'],fade=.5)
+sfx('monster_growl',E_['cutH']+2,.8,8,fade=.3);sfx('heartbeat',E_['cutH']+2,.6,10,fade=1.0)
+sfx('monster_roar',E_['close']-.2,.9,9);sfx('monster_snap',E_['snap']-.15,1.0,5);sfx('flesh_crunch',E_['snap'],1.0,3);sfx('blood_splat',E_['snap']+.1,1.0,4);subboom(E_['snap'],1.0,2.0);sfx('cable_snap',E_['snap']+.1,.7,3);tinnitus(E_['snap']+.3,.06)
+sfx('heli_flight',E_['cutB'],.6,loop_to=E_['cutC']-E_['cutB']+1,fade=.6);sfx('explosion_far',E_['cutB'],.5,loop_to=E_['cutC']-E_['cutB'],fade=1.0);sfx('radio_static',L('j13')-.5,.8,3)
+# 3) roof II: return of the colossus, the sergeant's sacrifice
+sfx('roof_wind',E_['cutC'],.8,loop_to=E_['stairs']-E_['cutC']+1,fade=.8);sfx('roof_crack',E_['peek']-4,.8,8)
+sfx('laser_beep',E_['peek']-1,.5,4);sfx('monster_breath',E_['peek'],.8,loop_to=E_['attack']-E_['peek'],fade=1.0)
+sfx('rifle_burst',E_['attack']-1.2,.9,5);sfx('monster_roar',E_['attack']-.1,1.0,9);subboom(E_['attack'],1.0,2.2);sfx('claw_scrape',E_['attack']+.2,.9,6)
+sfx('flesh_crunch',E_['attack']+.5,1.0,3);sfx('blood_splat',E_['attack']+.6,1.0,4);sfx('body_drop',E_['attack']+1.4,.8,3)
+sfx('stairs_run',E_['run'],.7,5,fade=.3);sfx('building_crash',E_['stairs']-.5,.7,10,fade=.3)
+sfx('cable_wind',E_['rope'],.6,6)
+# 4) facade + street
+sfx('glass_facade',E_['cutD'],.8,loop_to=E_['alley']-E_['cutD']+1,fade=.6);sfx('explosion_far',E_['cutD'],.5,loop_to=E_['cutE']-E_['cutD'],fade=1.0)
+sfx('monster_growl',E_['eyeWin']-.3,.9,8);sfx('glass_rain',E_['shatter'],1.0,6);subboom(E_['shatter']+.1,.9,1.8)
+sfx('stairs_run',E_['alley'],.7,loop_to=E_['cutE']-E_['alley'],fade=.3);sfx('monster_step',E_['alley'],.8,loop_to=E_['cutE']-E_['alley'],fade=.5)
+# 5) tunnel + Marta's sacrifice
+sfx('tunnel_amb',E_['cutE'],.8,loop_to=E_['cutF']-E_['cutE']+1,fade=.6)
+sfx('door_bend',L('j28'),.8,loop_to=E_['pierce']-L('j28'),fade=1.0);sfx('claw_pierce',E_['pierce'],1.0,7);sfx('door_bend',E_['pierce']+1,.9,8)
+sfx('building_crash',E_['doorBreak'],1.0,10);sfx('monster_roar',E_['doorBreak']+.2,1.0,9);sfx('flesh_crunch',E_['doorBreak']+.3,1.0,3);sfx('blood_splat',E_['doorBreak']+.4,1.0,4);subboom(E_['doorBreak'],1.0,2.4)
 sfx('heartbeat',E_['doorBreak']+1.5,.6,8,fade=1.0)
-# F: jets, bombing, dead city
-sfx('jets_flyby',E_['jets'],1.0,9);sfx('radio_static',L('h29')-.3,.7,3);sfx('bomb_blast',E_['white']-1.4,1.0,12);subboom(E_['white'],1.0,3.0);tinnitus(E_['white']+1.0,.09,4.0)
+# 6) jets, bombing, dead city
+sfx('jets_flyby',E_['jets'],1.0,9);sfx('radio_static',L('j33')-.3,.7,3);sfx('bomb_blast',E_['white']-1.4,1.0,12);subboom(E_['white'],1.0,3.0);tinnitus(E_['white']+1.0,.09,4.0)
 sfx('ash_wind',E_['dawn'],.8,loop_to=E_['black']-E_['dawn']+1,fade=1.2)
 sfx('monster_growl',E_['turn'],.8,8,fade=.5);sfx('heartbeat',E_['eyes']-1,.7,8,fade=1.0)
 sfx('vhs_end',E_['dead']+.4,.9,3)
@@ -79,10 +83,11 @@ sfx('vhs_end',E_['dead']+.4,.9,3)
 M=np.zeros((N,2))
 def mus(name,t,g,dur=None,fade=1.0,filt=None):
     x=load(f'{B}/music/{name}.mp3',filt);place(M,x,t,g,0,dur,fade)
-mus('chase',0.4,.8,E_['cutB']-.4,fade=1.0)
+mus('dread7',0.3,.8,E_['cutH']-.3,fade=1.0)
+mus('chase',E_['cutH']-.3,.85,E_['cutB']-E_['cutH']+.6,fade=1.0)
 mus('grief',E_['cutB']-.3,.75,E_['cutC']-E_['cutB']+.3,fade=1.5)
 mus('dread7',E_['cutC']-.3,.8,E_['attack']-E_['cutC']+.6,fade=1.5)
-mus('descent',E_['cutD']-.3,.85,E_['cutE']-E_['cutD']+.3,fade=1.0)
+mus('descent',E_['attack']+1.0,.85,E_['cutE']-E_['attack']-.7,fade=1.0)
 mus('tunnel7',E_['cutE']-.3,.75,E_['cutF']-E_['cutE']+.3,fade=1.5)
 mus('climax7',E_['cutF']-.3,.95,E_['white']-E_['cutF']+1.2,fade=.8)
 mus('suspense',E_['dawn']-.5,.7,E_['black']-E_['dawn']+1.0,fade=2.0)
@@ -93,7 +98,7 @@ for i in range(0,N,step):
     v=env[i:i+step].max();c=max(v,c*rel**step);e2[i:i+step]=c
 env=np.clip(e2/0.12,0,1)
 dip=np.ones(N)
-for tb in (E_['snap'],E_['attack'],E_['doorBreak'],E_['white']):
+for tb in (E_['lunge0'],E_['snap'],E_['attack'],E_['shatter'],E_['doorBreak'],E_['white']):
     a=int((tb-.4)*SR);b=int(tb*SR);dip[a:b]=.15
 dip=np.convolve(dip,np.ones(int(.06*SR))/int(.06*SR),'same')
 S=S/max(1e-9,np.abs(S).max())*0.8

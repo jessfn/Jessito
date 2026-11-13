@@ -1,182 +1,206 @@
 [
  {
-  "id": "h0",
+  "id": "j0",
+  "who": "Sargento",
+  "text": "¡Al suelo! ¡Cúbranse!",
+  "say": "[shouting urgently, loud, adrenaline] ¡Al suelo! ¡Cúbranse!"
+ },
+ {
+  "id": "j1",
+  "who": "Marta",
+  "text": "¡Diego! ¡Se lo lleva!",
+  "say": "[screaming in horror, voice breaking] ¡Diego! ¡Se lo lleva!"
+ },
+ {
+  "id": "j2",
+  "who": "Tomas",
+  "text": "Va tras el helicóptero... lo está persiguiendo.",
+  "say": "[whispering, terrified, shaking] Va tras el helicóptero... lo está persiguiendo."
+ },
+ {
+  "id": "j3",
+  "who": "Sargento",
+  "text": "Nos dio un minuto. Marta, el designador. Tomás, graba todo.",
+  "say": "[calm, fast, authoritative, low] Nos dio un minuto. Marta, el designador. Tomás, graba todo."
+ },
+ {
+  "id": "j4",
   "who": "Diego",
-  "text": "¡No miren abajo! ¡Sigan subiendo!",
-  "say": "[screaming over wind and rotors, straining, terrified] ¡No miren abajo! ¡Sigan subiendo!"
+  "text": "¡Está detrás de mí! ¡Súbanme, por favor!",
+  "say": "[screaming over rotors, gasping, terrified] ¡Está detrás de mí! ¡Súbanme, por favor!"
  },
  {
-  "id": "h1",
-  "who": "Lucia",
-  "text": "¡Diego, dame la mano!",
-  "say": "[screaming, desperate, reaching] ¡Diego, dame la mano!"
- },
- {
-  "id": "h2",
+  "id": "j5",
   "who": "Beto",
-  "text": "¡Casi lo alcanzo! ¡Un poco más!",
-  "say": "[straining, gasping, yelling over rotors] ¡Casi lo alcanzo! ¡Un poco más!"
+  "text": "¡Agárrate de mi mano! ¡Un poco más!",
+  "say": "[straining, shouting over rotors] ¡Agárrate de mi mano! ¡Un poco más!"
  },
  {
-  "id": "h3",
+  "id": "j6",
+  "who": "Lucia",
+  "text": "¡Ya casi, Diego! ¡Ya casi!",
+  "say": "[screaming desperately, crying, reaching] ¡Ya casi, Diego! ¡Ya casi!"
+ },
+ {
+  "id": "j7",
   "who": "Piloto",
-  "text": "¡Algo nos sigue! ¡Está pegado a la cola!",
-  "say": "[shouting over rotors, panicked pilot, radio headset] ¡Algo nos sigue! ¡Está pegado a la cola!"
+  "text": "¡Está encima! ¡Ya no puedo subir más!",
+  "say": "[panicked pilot shouting over rotor noise, headset] ¡Está encima! ¡Ya no puedo subir más!"
  },
  {
-  "id": "h4",
+  "id": "j8",
   "who": "Sofi",
-  "text": "¡Diego, atrás! ¡Atrás!",
-  "say": "[screaming, crying, hysterical, high-pitched] ¡Diego, atrás! ¡Atrás!"
+  "text": "¡Diego, cuidado!",
+  "say": "[screaming, hysterical, crying, high-pitched] ¡Diego, cuidado!"
  },
  {
-  "id": "h5",
+  "id": "j9",
   "who": "Diego",
-  "text": "No... no, no... ¡No me suelten!",
-  "say": "[voice trembling, whispering in horror, then screaming] No... no, no... ¡No me suelten!"
+  "text": "No me suelten... ¡no me suelten!",
+  "say": "[voice trembling, whispering in horror, then screaming] No me suelten... ¡no me suelten!"
  },
  {
-  "id": "h6",
+  "id": "j10",
   "who": "Lucia",
   "text": "¡DIEGO!",
   "say": "[screaming at the top of her lungs, devastated, voice breaking] ¡DIEGO!"
  },
  {
-  "id": "h7",
+  "id": "j11",
   "who": "Beto",
   "text": "¡No! ¡No, no, no!",
-  "say": "[sobbing, rage, voice cracking] ¡No! ¡No, no, no!"
+  "say": "[sobbing, rage, voice cracking, screaming] ¡No! ¡No, no, no!"
  },
  {
-  "id": "h8",
+  "id": "j12",
   "who": "Piloto",
-  "text": "Lo siento. No pude hacer nada.",
-  "say": "[grim, voice tight, trembling, slowly] Lo siento... No pude hacer nada."
+  "text": "Lo perdimos... Central, lo perdimos.",
+  "say": "[grim, voice tight and trembling, slowly, in shock] Lo perdimos... Central, lo perdimos."
  },
  {
-  "id": "h9",
-  "who": "Sofi",
-  "text": "¿Y Marta? ¿Y los demás?",
-  "say": "[sobbing, small voice, pleading] ¿Y Marta?... ¿Y los demás?"
- },
- {
-  "id": "h10",
+  "id": "j13",
   "who": "Radio",
-  "text": "Central confirma: bombardeo total del sector en doce minutos.",
-  "say": "[radio transmission, cold, calm, static] Central confirma: bombardeo total del sector en doce minutos."
+  "text": "Águila Uno, evacúe el sector. Bombardeo total en doce minutos. Hay un láser activo en una azotea. Manténgalo.",
+  "say": "[radio transmission, cold flat military, static] Águila Uno, evacúe el sector. Bombardeo total en doce minutos. Hay un láser activo en una azotea. Manténgalo."
  },
  {
-  "id": "h11",
-  "who": "Beto",
-  "text": "Doce minutos... ¿y los que se quedaron?",
-  "say": "[shaken, hollow, slowly] Doce minutos... ¿y los que se quedaron?"
+  "id": "j14",
+  "who": "Sofi",
+  "text": "¡Marta y los demás siguen ahí!",
+  "say": "[sobbing, pleading, small voice] ¡Marta y los demás siguen ahí!"
  },
  {
-  "id": "h12",
-  "who": "Piloto",
-  "text": "Hay una señal láser en una azotea. Alguien marcará el objetivo.",
-  "say": "[serious, quiet, slowly] Hay una señal láser en una azotea... Alguien marcará el objetivo."
- },
- {
-  "id": "h13",
-  "who": "Marta",
-  "text": "Desde aquí se ve todo el distrito. Esto va a arder.",
-  "say": "[breathless, awed, quiet horror] Desde aquí se ve todo el distrito... Esto va a arder."
- },
- {
-  "id": "h14",
+  "id": "j15",
   "who": "Sargento",
-  "text": "El designador necesita tres minutos. Ustedes vayan abajo.",
-  "say": "[firm, calm, slowly, authoritative] El designador necesita tres minutos. Ustedes vayan abajo."
+  "text": "Designador listo. Dos minutos para fijar el objetivo.",
+  "say": "[serious, measured, low voice, slowly] Designador listo. Dos minutos para fijar el objetivo."
  },
  {
-  "id": "h15",
-  "who": "Marta",
-  "text": "No te vamos a dejar aquí.",
-  "say": "[determined, shaky, voice cracking] No te vamos a dejar aquí."
- },
- {
-  "id": "h16",
+  "id": "j16",
   "who": "Tomas",
-  "text": "Sargento... el techo se está agrietando.",
-  "say": "[whispering, terrified, trembling] Sargento... el techo se está agrietando..."
+  "text": "Marta... mira el humo. Viene de vuelta.",
+  "say": "[barely a whisper, frozen with fear, trembling] Marta... mira el humo... Viene de vuelta."
  },
  {
-  "id": "h17",
+  "id": "j17",
+  "who": "Marta",
+  "text": "No puede ser... ya regresó.",
+  "say": "[breathless, shaky, horrified] No puede ser... ya regresó."
+ },
+ {
+  "id": "j18",
   "who": "Sargento",
-  "text": "Es una orden. Salgan. Yo me quedo.",
-  "say": "[calm, resigned, quiet, gentle] Es una orden. Salgan. Yo me quedo."
+  "text": "Escúchenme. Bajen por la escalera de servicio. Yo me quedo a marcar el objetivo.",
+  "say": "[calm, resigned, gentle but firm, slowly] Escúchenme. Bajen por la escalera de servicio. Yo me quedo a marcar el objetivo."
  },
  {
-  "id": "h18",
-  "who": "Tomas",
-  "text": "Está ahí... en el borde. Nos mira.",
-  "say": "[barely a whisper, frozen with fear] Está ahí... en el borde... Nos mira."
+  "id": "j19",
+  "who": "Marta",
+  "text": "No vamos a dejarte aquí.",
+  "say": "[determined, shaky, voice cracking, tears] No vamos a dejarte aquí."
  },
  {
-  "id": "h19",
+  "id": "j20",
   "who": "Sargento",
-  "text": "No se muevan... no respiren.",
-  "say": "[extremely quiet, slowly, tense whisper] No se muevan... no respiren."
+  "text": "Es una orden. Que alguien cuente lo que pasó aquí.",
+  "say": "[quiet, firm, gentle, final, slowly] Es una orden. Que alguien cuente lo que pasó aquí."
  },
  {
-  "id": "h20",
+  "id": "j21",
+  "who": "Tomas",
+  "text": "Está en el borde... nos mira.",
+  "say": "[whispering, frozen with terror] Está en el borde... nos mira."
+ },
+ {
+  "id": "j22",
   "who": "Sargento",
-  "text": "¡CORRAN!",
-  "say": "[screaming orders, loud, final] ¡CORRAN!"
+  "text": "No respiren... ahora, ¡corran!",
+  "say": "[extremely quiet whisper, then screaming] No respiren... ahora... ¡corran!"
  },
  {
-  "id": "h21",
+  "id": "j23",
   "who": "Marta",
-  "text": "¡El cristal! ¡Salten al cable!",
-  "say": "[screaming, urgent, panicked] ¡El cristal! ¡Salten al cable!"
+  "text": "¡La escalera se cayó! ¡Por la fachada, a la cuerda!",
+  "say": "[screaming, panicked, urgent] ¡La escalera se cayó! ¡Por la fachada, a la cuerda!"
  },
  {
-  "id": "h22",
+  "id": "j24",
   "who": "Tomas",
-  "text": "No me suelten... no me suelten.",
-  "say": "[panting, crying, terrified, breathless] No me suelten... no me suelten..."
+  "text": "No me sueltes, Marta. No me sueltes.",
+  "say": "[panting, crying, terrified, breathless] No me sueltes, Marta... No me sueltes."
  },
  {
-  "id": "h23",
+  "id": "j25",
   "who": "Marta",
-  "text": "El túnel de servicio. Ahí abajo. ¡Muévete!",
-  "say": "[panting, urgent, commanding] El túnel de servicio. Ahí abajo. ¡Muévete!"
+  "text": "Abajo hay un túnel de servicio. Ahí el bombardeo no llega.",
+  "say": "[panting, urgent, commanding] Abajo hay un túnel de servicio. Ahí el bombardeo no llega."
  },
  {
-  "id": "h24",
+  "id": "j26",
   "who": "Tomas",
-  "text": "Cierra la puerta, Marta.",
-  "say": "[breathless, whispering, terrified] Cierra la puerta, Marta."
+  "text": "Allí... el letrero de servicio.",
+  "say": "[breathless, gasping, pointing] Allí... el letrero de servicio."
  },
  {
-  "id": "h25",
+  "id": "j27",
   "who": "Marta",
-  "text": "Yo la sostengo. Tú sigue. Graba todo. Que alguien lo vea.",
-  "say": "[shaky, calm, brave, tears in voice, slowly] Yo la sostengo. Tú sigue. Graba todo... Que alguien lo vea."
+  "text": "¡Entra! ¡Cierra la puerta!",
+  "say": "[screaming, panicked, urgent] ¡Entra! ¡Cierra la puerta!"
  },
  {
-  "id": "h26",
+  "id": "j28",
+  "who": "Tomas",
+  "text": "Marta, no va a aguantar.",
+  "say": "[whispering, terrified, shaking] Marta... no va a aguantar."
+ },
+ {
+  "id": "j29",
+  "who": "Marta",
+  "text": "Yo la sostengo. Tú sigue y graba todo.",
+  "say": "[shaky, calm, brave, tears in voice, slowly] Yo la sostengo. Tú sigue... y graba todo."
+ },
+ {
+  "id": "j30",
   "who": "Tomas",
   "text": "Marta... por favor...",
   "say": "[crying, pleading, broken voice] Marta... por favor..."
  },
  {
-  "id": "h27",
+  "id": "j31",
   "who": "Marta",
   "text": "Vete.",
   "say": "[whispering, gentle, final, slowly] Vete."
  },
  {
-  "id": "h28",
+  "id": "j32",
   "who": "Tomas",
   "text": "Si alguien encuentra esta cinta... esto fue lo que pasó.",
   "say": "[whispering, devastated, hollow, slowly, exhausted] Si alguien encuentra esta cinta... esto fue lo que pasó."
  },
  {
-  "id": "h29",
+  "id": "j33",
   "who": "Radio",
-  "text": "Todas las unidades, bombardeo en cinco. Cuatro.",
-  "say": "[radio transmission, flat military countdown, static] Todas las unidades, bombardeo en cinco... Cuatro..."
+  "text": "Todas las unidades. Bombardeo en cinco. Cuatro.",
+  "say": "[radio transmission, flat military countdown, static] Todas las unidades. Bombardeo en cinco... cuatro..."
  }
 ]
