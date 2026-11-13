@@ -64,6 +64,7 @@ export function shelter(t,o){let s='';const al=o.alarm||0;
   s+=`<polygon points="${bx+80},${FL-360} ${bx+330},${FL-360} ${bx+300},${FL-110} ${bx+110},${FL-110}" fill="#0a0e0c" fill-opacity=".35"/>`}
  // crates (RACIONES)
  for(const [cx,cy,cw,ch,n] of [[3340,FL-250,260,250,'RACIONES'],[3340,FL-480,230,230,'AGUA'],[3600,FL-210,220,210,'MEDICINA']]){s+=rect(cx,cy,cw,ch,'#6a5a3a','stroke="#1b150a" stroke-width="6"')+rect(cx,cy,cw,14,'#fff','fill-opacity=".12"')+rect(cx+10,cy+ch*.42,cw-20,40,'#d8d2c0','fill-opacity=".85"')+txt(cx+cw/2,cy+ch*.42+30,n,24,'#1b150a');s+=rect(cx,cy+ch-14,cw,14,'#000','fill-opacity=".35"')}
+ s+=`<g transform="translate(700,0)">`;
  // command center wall: monitors + sign + wall map
  s+=rect(3060,520,980,720,'#171b1f','stroke="#06080a" stroke-width="10"');
  s+=rect(3100,300,900,110,'#0b2a46','stroke="#03101c" stroke-width="6"')+txt(3550,378,'CENTRO DE MANDO',64,'#cfe9ff','letter-spacing="8"');
@@ -86,6 +87,7 @@ export function shelter(t,o){let s='';const al=o.alarm||0;
  }
  // ceiling camera over the table
  {const cx=3560,cy=480;s+=rect(cx-8,330,16,120,'#14171a')+`<ellipse cx="${cx}" cy="${cy}" rx="50" ry="34" fill="#1e2226" stroke="#06080a" stroke-width="6"/><ellipse cx="${cx}" cy="${cy+10}" rx="26" ry="18" fill="#05070a"/><circle cx="${cx+30}" cy="${cy-6}" r="8" fill="${Math.sin(t*5)>0?'#ff2a1a':'#4a0e0a'}"/><circle cx="${cx+30}" cy="${cy-6}" r="60" fill="url(#redGl5)" fill-opacity="${(.35*(Math.sin(t*5)>0?1:.1)).toFixed(2)}"/>`}
+ s+=`</g>`;
  // floor
  s+=rect(-1500,FL,9000,900,'url(#bkFloor)')+rect(-1500,FL,9000,10,'#000','fill-opacity=".6"');
  for(let k=-4;k<22;k++)s+=`<polygon points="${k*300},${FL} ${k*300+6},${FL} ${k*300+(k-6)*55},2300 ${k*300+(k-6)*55-8},2300" fill="#000" fill-opacity=".28"/>`;
@@ -96,7 +98,7 @@ export function shelter(t,o){let s='';const al=o.alarm||0;
  if((o.doorU||0)<1)s+=`<ellipse cx="900" cy="${FL+60}" rx="520" ry="34" fill="#f4f9ff" fill-opacity="${(.3*(1-(o.doorU||0))).toFixed(2)}"/>`;
  return s}
 // foreground table (drawn over characters standing behind it): table, radio, cap, keys, lamp
-export function table(t,o){let s='';const x0=3480,w=620,y=FL-470;
+export function table(t,o){let s='<g transform="translate(700,0)">';const x0=3480,w=620,y=FL-470;
  s+=rect(x0,y,w,26,'#5a6068','stroke="#06080a" stroke-width="6"')+rect(x0,y,w,8,'#fff','fill-opacity=".18"')+rect(x0+20,y+26,16,444,'#4a5058')+rect(x0+w-36,y+26,16,444,'#4a5058')+rect(x0+30,y+26,w-60,12,'#000','fill-opacity=".3"');
  s+=`<ellipse cx="${x0+w/2}" cy="${FL+8}" rx="${w*.62}" ry="20" fill="#000" fill-opacity=".5"/>`;
  // radio (blinks when active)
@@ -111,4 +113,4 @@ export function table(t,o){let s='';const x0=3480,w=620,y=FL-470;
  const p=clamp(o.place||0);if(p>0){const dy=(1-p)*-60;
   s+=`<g transform="translate(${x0+330},${y+dy})"><path d="M-60,0 Q-60,-52 0,-54 Q60,-52 60,0Z" fill="#1f3a6a" stroke="#06080a" stroke-width="5"/><path d="M40,-4 Q110,-8 118,10 Q70,16 40,6Z" fill="#162a50" stroke="#06080a" stroke-width="5"/><rect x="-22" y="-40" width="44" height="26" rx="5" fill="#e8d9b0" stroke="#06080a" stroke-width="3"/><text x="0" y="-21" font-family="Inter" font-weight="900" font-size="15" fill="#14100a" text-anchor="middle">PORTERO</text></g>`;
   s+=`<g transform="translate(${x0+470},${y-4+dy})"><circle cx="0" cy="-16" r="20" fill="none" stroke="#d6d9df" stroke-width="6"/><rect x="-6" y="0" width="12" height="46" rx="4" fill="#e8c24a" stroke="#0a0a0c" stroke-width="3" transform="rotate(-70)"/><rect x="-6" y="0" width="12" height="40" rx="4" fill="#a9adb4" stroke="#0a0a0c" stroke-width="3" transform="rotate(-100)"/><rect x="14" y="-28" width="62" height="30" rx="6" fill="#b8281f" stroke="#0a0a0c" stroke-width="3"/><text x="45" y="-6" font-family="Inter" font-weight="900" font-size="22" fill="#fff" text-anchor="middle">3</text></g>`}
- return s}
+ s+='</g>';return s}

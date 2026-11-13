@@ -8,7 +8,7 @@ import {shelter,table,defs5} from './scene5.mjs';
 const HERE=path.dirname(fileURLToPath(import.meta.url));const BUILD=path.join(HERE,'../build/ep5');
 const TL=JSON.parse(fs.readFileSync(path.join(HERE,'timeline.json'),'utf8'));const W=1080,H=1920,FPS=30,DUR=Math.ceil(TL.dur);
 const script=JSON.parse(fs.readFileSync(path.join(HERE,'script.json'),'utf8'));
-const START=TL.start;
+const START=TL.start;const S_=id=>START[id];
 const inv=tn=>tn;const EVT=TL.ev;const DURL=TL.durs;const Ls=id=>START[id],Le=id=>START[id]+DURL[id];
 const NAMES={Tomas:'TOMÁS (cámara)',Beto:'BETO',Diego:'DIEGO',Marta:'MARTA',Lucia:'LUCÍA',Sofi:'SOFI',Sargento:'SARGENTO',Radio:'RADIO'};
 const WHOKEY={Beto:'beto',Diego:'diego',Marta:'marta',Lucia:'lucia',Sofi:'sofi'};
@@ -21,16 +21,6 @@ function speakerAt(t){return LINES.find(l=>t>=l.t0&&t<l.t0+l.dur+.15)}
 
 
 
-// ---- camera shots [t,cx,cy,zoom,rot,mode,skew]
-const S_=id=>START[id];
-const SHOTS=[[0,1550,800,.78,0,'s',0],[1.2,1250,740,1.25,-2,'w',0],[3.0,1500,800,.8,0,'w',0],[7.4,1500,800,.7,0,'s',0],
- [S_('e1')-.1,1230,700,1.7,2,'n',0],[EVT.check-.2,1450,800,1.0,-2,'n',0],[EVT.check+1.5,1000,760,1.5,2,'s',0],[S_('e3')-.1,1690,720,1.7,-2,'n',0],
- [S_('e4')-.1,2050,720,1.6,2,'n',0],[EVT.close-1.2,800,900,1.05,-2,'w',0],[EVT.walk-3.2,1900,800,.85,0,'w',0],[EVT.walk+1.5,2800,800,.85,0,'s',0],
- [S_('e5')-.2,3500,430,1.5,3,'z',0],[S_('e6')-.2,2750,850,1.2,-2,'n',0],[S_('e6')+1.2,2450,780,1.6,2,'n',0],[S_('e7')-.1,3130,760,1.8,2,'n',0],
- [S_('e8')-.1,3700,760,1.6,-2,'n',0],[EVT.place-.5,3800,1050,2.0,0,'s',0],[S_('e9')-.1,3130,720,1.9,3,'w',0],[S_('e10')-.1,3200,760,1.6,-1,'n',0],
- [EVT.radio-.2,3650,1000,1.8,0,'s',0],[S_('e12')-.1,3560,820,1.2,-2,'n',0],[EVT.map-.2,3560,880,1.5,0,'s',0],[S_('e13')-.1,3700,740,1.7,2,'n',0],
- [S_('e14')-.1,2870,740,1.7,-2,'n',0],[S_('e15')-.1,3700,760,1.9,1,'s',0],[EVT.knock-.3,700,900,1.1,-3,'w',0],[S_('e16')+1.6,3000,800,.8,3,'w',0],[S_('e17')-.1,3500,760,1.5,0,'w',0]];
-SHOTS.sort((x,y)=>x[0]-y[0]);
 const MODE={s:[3.2,.92],n:[8,.72],w:[16,.5],c:[55,.9],p:[2.4,.95],z:[12,.6]};
 function stepResp(tau,w,z){if(tau<=0)return 0;const wd=w*Math.sqrt(1-z*z);return 1-Math.exp(-z*w*tau)*(Math.cos(wd*tau)+(z/Math.sqrt(1-z*z))*Math.sin(wd*tau))}
 function camera(t){const ch=s=>[s[1],s[2],s[3],s[4],s[6]];let c=ch(SHOTS[0]);for(let i=1;i<SHOTS.length;i++){const sh=SHOTS[i];let [w,z]=MODE[sh[5]];if(sh[4]>40){w=14;z=.7}const g=stepResp(t-sh[0]-(sh[5]==='c'?0:.28),w,z);if(g===0)continue;const A=ch(sh),B=ch(SHOTS[i-1]);for(let k=0;k<5;k++)c[k]+=(A[k]-B[k])*g}return c}
@@ -56,16 +46,16 @@ const HEADROT={laugh:-7,cryLaugh:-6,sad:4,worry:2,tender:3,annoyed:-2,fear:-2,sh
 const sstep=x=>{x=clamp(x);return x*x*(3-2*x)};
 const J=EVT;
 const WK=S_('e4')+.3,WK2=WK+4.8;
-const FORM={lucia:800,sofi:1030,diego:1230,beto:1450,marta:1690};
-const FIN={lucia:2450,diego:2650,beto:2870,sofi:3130,marta:3330};
+const FORM={lucia:790,sofi:1130,diego:1470,beto:1770,marta:2070};
+const FIN={lucia:2300,diego:2640,beto:2940,sofi:3300,marta:3620};
 function xOf(who,t){
- if(who==='sgt'){const a=2050;if(t<J.check)return a;if(t<J.check+2)return lerp(a,1900,sstep((t-J.check)/2));if(t<WK)return lerp(1900,a,sstep((t-J.check-5)/1.5)) ;if(t<WK2)return lerp(a,3700,sstep((t-WK)/(WK2-WK)));return 3700}
- if(who==='sol2'){return lerp(2300,2150,sstep((t-WK)/2))}
- if(who==='sol3'){if(t<WK-.2)return 2550;if(t<J.close)return lerp(2550,800,sstep((t-WK+.2)/(J.close-WK-.1)));if(t<J.knock)return 800;return lerp(800,1000,sstep((t-J.knock)/1.4))}
+ if(who==='sgt'){const a=2700;if(t<J.check)return a;if(t<J.check+2)return lerp(a,2000,sstep((t-J.check)/2));if(t<WK)return lerp(2000,a,sstep((t-J.check-5)/1.5)) ;if(t<WK2)return lerp(a,4400,sstep((t-WK)/(WK2-WK)));return 4400}
+ if(who==='sol2'){return lerp(3050,2800,sstep((t-WK)/2))}
+ if(who==='sol3'){if(t<WK-.2)return 3400;if(t<J.close)return lerp(3400,820,sstep((t-WK+.2)/(J.close-WK-.1)));if(t<J.knock)return 820;return lerp(820,1100,sstep((t-J.knock)/1.4))}
  let x=FORM[who];
  if(t>=WK){const u=sstep((t-WK)/(WK2-WK));x=lerp(FORM[who],FIN[who],u)}
- if(who==='marta'&&t>=S_('e10')-.5)x=lerp(FIN.marta,3260,sstep((t-S_('e10')+.5)/1.2));
- if(who==='sofi'&&t>=S_('e10')-.5)x=lerp(FIN.sofi,3140,sstep((t-S_('e10')+.5)/1.2));
+ if(who==='marta'&&t>=S_('e10')-.5)x=lerp(FIN.marta,3580,sstep((t-S_('e10')+.5)/1.2));
+ if(who==='sofi'&&t>=S_('e10')-.5)x=lerp(FIN.sofi,3350,sstep((t-S_('e10')+.5)/1.2));
  if(who==='sofi'&&t<S_('e8'))x=x;
  return x}
 function velX(who,t){return(xOf(who,t+.08)-xOf(who,t-.08))/.16}
@@ -77,12 +67,12 @@ const MOUTH=()=>({L:{e:[168,332],w:[224,238],hand:'open',front:1},R:{e:[332,332]
 const HOLD={L:{w:[100,430],hand:'relax'},R:REL.R};
 const AIM={L:{w:[-40,272],hand:'relax'},R:{w:[114,282],hand:'relax'}};
 const KF={
- beto:[[0,UP],[WK-1,{L:{w:[40,232],hand:'relax'},R:{w:[460,232],hand:'relax'}}],[S_('e14')-.1,{L:{w:[40,232],hand:'relax'},R:{w:[560,230],hand:'point'}}],[Le('e14')+.4,{L:{w:[40,232],hand:'relax'},R:{w:[460,232],hand:'relax'}}]],
+ beto:[[0,UP],[WK-1,{L:{w:[40,232],hand:'relax'},R:{w:[460,232],hand:'relax'}}],[S_('e14')-.5,{L:{w:[40,232],hand:'relax'},R:{w:[560,230],hand:'point'}}],[Le('e14')+.4,{L:{w:[40,232],hand:'relax'},R:{w:[460,232],hand:'relax'}}]],
  diego:[[0,UP],[S_('e3')+1.5,UPH],[S_('e4'),{L:REL.L,R:{w:[400,430],hand:'relax'}}],[S_('e8'),{L:{w:[120,400],hand:'relax'},R:{w:[400,430],hand:'relax'}}]],
- sofi:[[0,UP],[S_('e4'),{L:{w:[134,330],hand:'open'},R:REL.R}],[S_('e7')-.1,MOUTH()],[Le('e7')+.3,{L:{w:[134,330],hand:'open'},R:REL.R}],[S_('e9')-.2,MOUTH()],[S_('e10')+.6,{L:{w:[400,300],hand:'open'},R:{w:[350,260],hand:'open'}}]],
- lucia:[[0,UP],[S_('e3')+1.5,UPH],[S_('e4'),{L:REL.L,R:{w:[350,440],hand:'relax'}}],[S_('e6')-.1,{L:REL.L,R:{w:[480,300],hand:'point'}}],[Le('e6')+.3,{L:REL.L,R:{w:[350,440],hand:'relax'}}],[J.knock,MOUTH()]],
- marta:[[0,UP],[S_('e3')-.1,{L:UP.L,R:{w:[420,300],hand:'open'}}],[S_('e4'),HOLD],[S_('e10')+.5,{L:{w:[100,300],hand:'open'},R:{w:[100,330],hand:'open'}}],[Le('e10')+.5,HOLD]],
- sgt:[[0,AIM],[S_('e4')-.2,REL],[S_('e8')+.5,{L:REL.L,R:{w:[380,420],hand:'open'}}],[J.place-.3,{L:REL.L,R:{w:[300,440],hand:'open'}}],[S_('e12')-.1,{L:REL.L,R:{w:[430,180],hand:'point'}}],[Le('e12')+.4,REL],[S_('e17')-.2,{L:REL.L,R:{w:[470,200],hand:'point'}}]],
+ sofi:[[0,UP],[S_('e4'),{L:{w:[134,330],hand:'open'},R:REL.R}],[S_('e7')-.5,MOUTH()],[Le('e7')+.3,{L:{w:[134,330],hand:'open'},R:REL.R}],[S_('e9')-.2,MOUTH()],[S_('e10')+.6,{L:{w:[400,300],hand:'open'},R:{w:[350,260],hand:'open'}}]],
+ lucia:[[0,UP],[S_('e3')+1.5,UPH],[S_('e4'),{L:REL.L,R:{w:[350,440],hand:'relax'}}],[S_('e6')-.5,{L:REL.L,R:{w:[480,300],hand:'point'}}],[Le('e6')+.3,{L:REL.L,R:{w:[350,440],hand:'relax'}}],[J.knock,MOUTH()]],
+ marta:[[0,UP],[S_('e3')-.5,{L:UP.L,R:{w:[420,300],hand:'open'}}],[S_('e4'),HOLD],[S_('e10')+.5,{L:{w:[100,300],hand:'open'},R:{w:[100,330],hand:'open'}}],[Le('e10')+.5,HOLD]],
+ sgt:[[0,AIM],[S_('e4')-.2,REL],[S_('e8')+.5,{L:REL.L,R:{w:[380,420],hand:'open'}}],[J.place-.3,{L:REL.L,R:{w:[300,440],hand:'open'}}],[S_('e12')-.5,{L:REL.L,R:{w:[430,180],hand:'point'}}],[Le('e12')+.4,REL],[S_('e17')-.2,{L:REL.L,R:{w:[470,200],hand:'point'}}]],
  sol2:[[0,AIM],[S_('e4')-.2,REL]],
  sol3:[[0,AIM],[S_('e4')-.2,{L:{w:[40,260],hand:'open'},R:REL.R}],[J.close+.8,REL],[J.knock-.2,AIM]]};
 const SH={L:[186,240],R:[314,240]};
@@ -139,7 +129,7 @@ function charSVG(who,t,shock,tn){const st=CAST[who];const isS=SOL.includes(who);
  pose.head={rot:(HEADROT[ex]||0)+Math.sin(t*.9+idx)*1.6+(talk>.2?Math.sin(t*9+idx)*1.2:0)+(who==='sofi'&&t>S_('e9')?5:0),dx:0,yaw:0,dy:Math.sin(t*1.9+idx)*1.2+(ex==='shock'||ex==='scream'?-4:0)+Math.abs(Math.sin(phase))*-5*amp};
  let s=who==='sofi'?1.05:1.5,x=xOf(who,t),fy=FL;let rot=sway+(who==='beto'?9+Math.sin(phase)*2*amp:0);let yoff=-Math.abs(Math.sin(phase))*9*amp*(who==='sofi'?.6:1);
  const Mch=mul(mul(T(x-250*s,fy-752*s+yoff,0,s,s),T(250,752)),mul(T(0,0,rot,1,1),T(-250,-752)));setCTM(mul(CAMM,Mch));const bd=body(st,pose);setCTM([1,0,0,1,0,0]);
- let extra='';if(isS){extra=helmet(x,544+yoff,yaw)+rifleSVG(who,t,x)}
+ let extra='';if(isS){extra=rifleSVG(who,t,x)}
  return `<ellipse cx="${x}" cy="${fy+10}" rx="${190*s/1.5}" ry="${28*s/1.5}" fill="#000" opacity=".5"/><g transform="translate(${x-250*s},${fy-752*s+yoff}) scale(${s}) rotate(${rot.toFixed(2)} 250 752)">${bd}</g>${extra}`}
 
 // ---- overlays (Reels safe zones: top 230, bottom 330, right 120)
@@ -188,7 +178,7 @@ function sceneWorld(t,tn){const [cx,cy,z,rot,sk]=camera(t);const blur=process.en
  w+=table(t,{radio:t>=EVT.radio&&t<Le('e11')+.6?1:0,place:sstep((t-EVT.place)/.6)});
  w+=dust(t,q*.4);
  w+=`</g>`;
- let tgt=[1500,850];if(t<S_('e4'))tgt=[2050,780];else if(t>=EVT.walk-3&&t<EVT.walk+2)tgt=[1900,820];
+ let tgt=[1700,850];if(t<S_('e4'))tgt=[2400,780];else if(t>=EVT.walk-3&&t<EVT.walk+2)tgt=[2200,820];
  const tw=w2s(tgt[0],tgt[1]);const op=operatorHand(t,[tw[0],tw[1]]);
  const aE=.42+.18*al;
  w+=`<defs><radialGradient id="dk" gradientUnits="userSpaceOnUse" cx="${op.bx.toFixed(0)}" cy="${op.by.toFixed(0)}" r="1100"><stop offset="0" stop-color="#02040a" stop-opacity="0"/><stop offset=".3" stop-color="#02040a" stop-opacity="${(aE*.12).toFixed(2)}"/><stop offset=".65" stop-color="#02040a" stop-opacity="${(aE*.7).toFixed(2)}"/><stop offset="1" stop-color="#02040a" stop-opacity="${aE.toFixed(2)}"/></radialGradient></defs><rect width="${W}" height="${H}" fill="url(#dk)"/>`;
@@ -217,6 +207,23 @@ function renderPng(t){const P=frame(t,'parts');const opt={font:{loadSystemFonts:
  const b=new Resvg(P.base,opt).render();const px=Uint8ClampedArray.from(b.pixels);const rad=Math.max(1,Math.round(P.blur*1.3));boxBlur(px,W,H,rad);boxBlur(px,W,H,Math.max(1,Math.round(rad*.7)));
  const o=new Resvg(P.overlay,opt).render().pixels;for(let i=0;i<px.length;i+=4){const a=o[i+3]/255;if(a>0){px[i]=o[i]*a+px[i]*(1-a);px[i+1]=o[i+1]*a+px[i+1]*(1-a);px[i+2]=o[i+2]*a+px[i+2]*(1-a)}}
  return{pixels:Buffer.from(px.buffer),asPng:()=>new Resvg(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><rect width="1" height="1"/></svg>`).render().asPng()}}
+// ---- camera shots (cinematic coverage): [t,cx,cy,zoom,rot,mode,skew]
+const SHOTS=[
+ [0,3000,820,.62,0,'s',0],[1.2,1500,760,1.25,-2,'w',0],[3.0,2000,820,.58,0,'w',0],[7.4,2100,860,.52,0,'s',0],
+ [S_('e1')-.5,1470,780,1.55,2,'n',0],
+ [EVT.check-.3,1800,820,.85,-2,'n',0],[EVT.check+1.6,1250,780,1.0,2,'s',0],
+ [S_('e3')-.5,2070,760,1.5,-2,'n',0],
+ [S_('e4')-.5,2620,780,1.2,2,'n',0],[EVT.close-1.3,720,880,.95,-2,'w',0],
+ [EVT.walk-1.8,1800,830,.62,0,'w',0],[EVT.walk+1.5,2650,830,.62,0,'s',0],
+ [S_('e5')-.2,4260,430,1.15,3,'z',0],
+ [S_('e6')-.2,2400,800,1.2,-2,'n',0],[S_('e6')+1.2,2300,760,1.65,2,'n',0],
+ [S_('e7')-.5,3300,900,1.7,2,'n',0],
+ [S_('e8')-.5,4300,780,1.5,-2,'n',0],[EVT.place-.5,4480,1060,2.0,0,'s',0],
+ [S_('e9')-.5,3330,880,1.9,3,'w',0],[S_('e10')-.5,3450,820,1.45,-1,'n',0],
+ [EVT.radio-.2,4380,1000,1.7,0,'s',0],[S_('e12')-.5,4350,820,1.0,-2,'n',0],[EVT.map-.2,4520,880,1.25,0,'s',0],
+ [S_('e13')-.5,4380,760,1.5,2,'n',0],[S_('e14')-.5,2940,780,1.5,-2,'n',0],[S_('e15')-.5,4380,780,1.7,1,'s',0],
+ [EVT.knock-.3,620,900,1.0,-3,'w',0],[S_('e16')+1.6,2700,840,.62,3,'w',0],[S_('e17')-.5,4250,800,1.2,0,'w',0]];
+SHOTS.sort((x,y)=>x[0]-y[0]);
 if(process.argv[1]===fileURLToPath(import.meta.url)){
  const mode=process.argv[2];
  if(mode==='preview'){for(const a of process.argv.slice(3)){const t=parseFloat(a);const t0=Date.now();{const rp=renderPng(t);spawnSync('ffmpeg',['-y','-v','error','-f','rawvideo','-pix_fmt','rgba','-s',`${W}x${H}`,'-i','-',path.join(BUILD,`prev_${a}.png`)],{input:Buffer.from(rp.pixels.buffer?rp.pixels:rp.pixels),maxBuffer:1e8})}console.log(a,Date.now()-t0,'ms')}}

@@ -5,7 +5,7 @@ const FACE=(o)=>({...base.face,...o});
 const HAIR={
  beanie:{hairStyle:'beanie'},
  short:{hairStyle:'short',face:FACE({hairBack:'M-52,-6 Q-58,10 -50,24 L-44,4Z M52,-6 Q58,10 50,24 L44,4Z',hairFront:'M-54,-8 Q-60,-72 0,-76 Q60,-72 54,-8 Q50,-30 30,-36 Q14,-48 -4,-34 Q-24,-42 -40,-30 Q-50,-22 -54,-8Z',hairLines:['M-30,-54 Q-10,-64 14,-58','M10,-62 Q34,-56 44,-40']})},
- long:{hairStyle:'long',face:FACE({hairBack:'M-56,-10 Q-68,-72 0,-76 Q68,-72 56,-10 Q72,50 60,104 L34,92 L-34,92 L-60,104 Q-72,50 -56,-10Z',hairFront:'M-55,-8 Q-60,-76 0,-78 Q60,-76 55,-8 Q46,-40 14,-46 Q-8,-30 -30,-24 Q-46,-20 -55,-8Z',hairLines:['M-34,-58 Q-10,-70 18,-62','M26,-60 Q42,-48 46,-30']})},
+ long:{hairStyle:'long',face:FACE({hairBack:'M-56,-10 Q-68,-72 0,-76 Q68,-72 56,-10 Q66,22 58,52 L38,42 L-38,42 L-58,52 Q-66,22 -56,-10Z',hairFront:'M-55,-8 Q-60,-76 0,-78 Q60,-76 55,-8 Q46,-40 14,-46 Q-8,-30 -30,-24 Q-46,-20 -55,-8Z',hairLines:['M-34,-58 Q-10,-70 18,-62','M26,-60 Q42,-48 46,-30']})},
  curly:{hairStyle:'curly',face:FACE({hairBack:'M-62,-20 Q-80,-4 -62,24 Q-52,10 -50,-10Z M62,-20 Q80,-4 62,24 Q52,10 50,-10Z M-30,-62 Q-50,-84 -20,-84 Q0,-96 20,-84 Q50,-84 30,-62Z',hairFront:'M-56,-10 Q-70,-50 -44,-64 Q-36,-86 -10,-78 Q0,-92 14,-78 Q40,-86 46,-62 Q70,-48 56,-10 Q44,-36 30,-34 Q16,-24 0,-34 Q-16,-24 -30,-34 Q-44,-34 -56,-10Z',hairLines:['M-30,-62 Q-10,-70 6,-62','M16,-64 Q34,-60 40,-48']})}
 };
 export function mk(name,o){const h=HAIR[o.hair||'beanie'];return {...base,k:2,name,...o,hairStyle:h.hairStyle,face:h.face||base.face}}
@@ -39,6 +39,8 @@ export function body(st,pose={}){const ol=st.ol;const hs=st.hs;const k=0.97*hs;l
  o+=`<path d="M214,452 L212,560 M286,452 L288,555" stroke="${ol}" stroke-width="1.6" opacity=".5"/>`;
  const dL=Math.abs(Y)>.45?sg:-1,dR=Math.abs(Y)>.45?sg:1,shS=1+.45*sY;o+=`<g transform="translate(${ANL[0]},${ANL[1]-2}) scale(${shS.toFixed(3)},1)">${withT(T(ANL[0],ANL[1]-2,0,shS,1),()=>shoeV2(st,dL))}</g><g transform="translate(${ANR[0]},${ANR[1]-2}) scale(${shS.toFixed(3)},1)">${withT(T(ANR[0],ANR[1]-2,0,shS,1),()=>shoeV2(st,dR))}</g>`;
  o+=`<ellipse cx="${ANL[0]}" cy="${ANL[1]-6}" rx="22" ry="8" fill="${st.pants}" stroke="${ol}" stroke-width="${st.ow*1.4}"/><ellipse cx="${ANR[0]}" cy="${ANR[1]-6}" rx="22" ry="8" fill="${st.pants}" stroke="${ol}" stroke-width="${st.ow*1.4}"/>`;
+
+ if(st.hairStyle==='long'){const hc=st.hair,ol2=ol;const bh=`<path d="M192,158 Q172,230 164,306 Q160,372 190,392 Q250,404 310,392 Q340,372 336,306 Q328,230 308,158 Z" fill="${hc}" stroke="${ol2}" stroke-width="${st.ow*1.6}" stroke-linejoin="round"/><path d="M186,230 Q178,300 182,372 M314,230 Q322,300 318,372 M206,250 Q200,320 204,384 M294,250 Q300,320 296,384" stroke="${st.hair2||hc}" stroke-width="3.5" fill="none" opacity=".8" stroke-linecap="round"/>`;o+=`<g transform="translate(250,0) scale(${cB.toFixed(3)},1) translate(-250,0)">${bh}</g>`}
  const farIdx=o.length;o+=`<g transform="translate(250,0) scale(${cB.toFixed(3)},1) translate(-250,0)">`;
  o+=grp(`<path d="M184,${232+br} Q250,${214+br} 316,${232+br} Q326,330 300,448 Q250,462 200,448 Q174,330 184,${232+br}Z"/>`,st.hood,st,[170,215,160,250]);
  o+=`<path d="M214,${246+br} Q250,${284+br} 286,${246+br}" stroke="${ol}" stroke-width="${st.ow*1.2}" fill="none"/><path d="M240,268 v52 M262,268 v48" stroke="${st.shoe}" stroke-width="3" stroke-linecap="round"/><circle cx="240" cy="322" r="3" fill="${st.shoe}"/><circle cx="262" cy="318" r="3" fill="${st.shoe}"/><path d="M208,392 Q250,404 292,392 L298,440 Q250,452 202,440Z" fill="${st.hood2}" stroke="${ol}" stroke-width="${st.ow*1.1}"/>`;
@@ -49,6 +51,8 @@ export function body(st,pose={}){const ol=st.ol;const hs=st.hs;const k=0.97*hs;l
  const hy=P.head[1]-(hs-1)*27+(pose.head?.dy||0);
  if(visibleBB(205,155,295,245,2)){const cn=uid();o+=`<clipPath id="${cn}">${nk}</clipPath><g clip-path="url(#${cn})"><ellipse cx="250" cy="${hy+54*k+6}" rx="${34*k}" ry="${16*k}" fill="#1a0f2a" opacity=".22"/></g><path d="M238,196 Q243,212 246,228 M262,196 Q257,212 254,228" stroke="${ol}" stroke-width="1.6" fill="none" opacity=".4" stroke-linecap="round"/>`}
  o+=grp(`<path d="M202,${230+br} Q250,${270+br} 298,${230+br} Q304,${218+br} 292,${214+br} Q250,${244+br} 208,${214+br} Q196,${218+br} 202,${230+br}Z"/>`,st.hood2,st,[190,200,120,80],{sd:3});
+
+ if(st.hairStyle==='long'){const hc=st.hair;o+=`<path d="M214,${176+br} Q196,${250+br} 190,${326+br} Q198,${352+br} 214,${338+br} Q226,${290+br} 236,${214+br} Z" fill="${hc}" stroke="${ol}" stroke-width="${st.ow*1.3}" stroke-linejoin="round"/><path d="M286,${176+br} Q304,${250+br} 310,${326+br} Q302,${352+br} 286,${338+br} Q274,${290+br} 264,${214+br} Z" fill="${hc}" stroke="${ol}" stroke-width="${st.ow*1.3}" stroke-linejoin="round"/><path d="M208,${240+br} Q202,${290+br} 204,${326+br} M292,${240+br} Q298,${290+br} 296,${326+br}" stroke="${st.hair2||hc}" stroke-width="3" fill="none" opacity=".8" stroke-linecap="round"/>`}
  o+=`</g>`;
  const arm=(sh0,wr,side,A)=>{const lift=Math.max(0,Math.min(1,(sh0[1]-wr[1]+20)/170))*9;const sh=[sh0[0]+side*lift*.3,sh0[1]-lift];const el=A.e?[A.e[0]+side*lift*.3,A.e[1]-lift*.5]:elbow(sh,wr,side,A.fs||1);let r=grp(limb(sh,el,50,42)+limb(el,wr,42,34),st.hood,st,[Math.min(sh[0],wr[0])-70,Math.min(sh[1],wr[1])-70,Math.abs(wr[0]-sh[0])+140,Math.abs(wr[1]-sh[1])+160]);
   r+=`<path d="M${el[0]-8},${el[1]+8} q8,6 4,14M${el[0]+6},${el[1]-10} q-6,6 -4,14" stroke="${ol}" stroke-width="1.5" fill="none" opacity=".5"/>`;
@@ -72,6 +76,6 @@ export function body(st,pose={}){const ol=st.ol;const hs=st.hs;const k=0.97*hs;l
  return o}
 export {defs};
 
-CAST.sgt=mk('Sargento',{hair:'short',skin:'#b98260',skin2:'#966448',hood:'#55603f',hood2:'#3f4a2e',pants:'#3b4230'});CAST.sgt.hair='#14100c';CAST.sgt.hair2='#2a221a';CAST.sgt.hairStyle='short';
-CAST.sol2=mk('Soldado',{hair:'short',skin:'#e0a98a',skin2:'#c98a64',hood:'#55603f',hood2:'#3f4a2e',pants:'#3b4230'});CAST.sol2.hair='#3a2418';CAST.sol2.hair2='#5a3a28';CAST.sol2.hairStyle='short';
-CAST.sol3=mk('Soldado',{hair:'short',skin:'#8a5a40',skin2:'#6a4430',hood:'#4d5a3a',hood2:'#3a4630',pants:'#363c2c'});CAST.sol3.hair='#0e0a08';CAST.sol3.hair2='#241a14';CAST.sol3.hairStyle='short';
+CAST.sgt=mk('Sargento',{hair:'short',skin:'#b98260',skin2:'#966448',hood:'#55603f',hood2:'#3f4a2e',pants:'#3b4230'});CAST.sgt.hair='#14100c';CAST.sgt.hair2='#2a221a';CAST.sgt.hairStyle='short';CAST.sgt.helmet=1;
+CAST.sol2=mk('Soldado',{hair:'short',skin:'#e0a98a',skin2:'#c98a64',hood:'#55603f',hood2:'#3f4a2e',pants:'#3b4230'});CAST.sol2.hair='#3a2418';CAST.sol2.hair2='#5a3a28';CAST.sol2.hairStyle='short';CAST.sol2.helmet=1;
+CAST.sol3=mk('Soldado',{hair:'short',skin:'#8a5a40',skin2:'#6a4430',hood:'#4d5a3a',hood2:'#3a4630',pants:'#363c2c'});CAST.sol3.hair='#0e0a08';CAST.sol3.hair2='#241a14';CAST.sol3.hairStyle='short';CAST.sol3.helmet=1;

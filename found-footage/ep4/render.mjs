@@ -21,15 +21,15 @@ function speakerAt(t){return LINES.find(l=>t>=l.t0&&t<l.t0+l.dur+.15)}
 
 // ---- camera shots [t,cx,cy,zoom,rot,mode,skew]
 const S_=id=>START[id];
-const SHOTS=[[0,2350,800,.75,0,"s",0],[1.0,2250,820,1.25,-2,"w",0],[3.1,1230,950,.85,0,"w",0],[7.4,1230,900,.7,0,'s',0],
- [S_('c1')-.1,800,720,1.7,2,'n',0],[S_('c2')-.2,1900,900,1.0,-3,'n',0],[EVT.doors,2150,880,1.7,0,'s',0],
- [S_('c3')-.1,1690,720,1.7,2,'n',0],[S_('c4')-.1,1450,760,1.7,-2,'n',0],[S_('c5')-.3,2300,780,2.3,0,'z',0],
- [S_('c6')-.1,900,760,1.5,1,'n',0],[S_('c7')-.1,1230,720,1.4,-2,'n',0],[EVT.creat+.8,2100,380,1.6,-4,'w',0],
- [S_('c8')-.1,1030,720,1.9,3,'w',0],[EVT.drop-.1,1600,900,.8,-5,'w',0],[S_('c9')-.1,1690,760,1.5,2,'n',0],
- [EVT.jump,1230,900,.8,0,'w',0],[S_('c10')-.1,1230,760,1.6,-2,'n',0],[EVT.third-.2,1230,1420,1.9,0,'s',0],[S_('c11')-.2,1230,800,.9,2,'n',0],
- [S_('c12')-.1,800,760,1.6,3,'n',0],[EVT.tremor,1230,820,.85,-3,'w',0],[S_('c13')-.1,1450,760,1.7,-3,'w',0],[S_('c14')-.1,1690,720,1.5,3,'w',0],
- [EVT.crush-1.2,1950,640,.6,-2,'w',0],[EVT.crush+1.6,1230,900,.8,3,'w',0],[S_('c15')-.1,1230,760,1.3,-2,'n',0],[S_('c15')+1.8,700,900,1.1,2,'s',0],
- [S_('c16')-.1,1030,800,1.7,3,'n',0],[EVT.open-.2,700,900,.85,0,'w',0],[S_('c17')-.1,800,900,1.2,-2,'w',0],[S_('c18')-.1,1230,760,1.3,0,'w',0]];
+const SHOTS=[[0,1950,820,.8,0,"s",0],[1.0,1550,780,1.3,-2,"w",0],[3.1,1380,950,.65,0,"w",0],[7.4,1380,900,.6,0,'s',0],
+ [S_('c1')-.5,700,720,1.6,2,'n',0],[S_('c2')-.2,1900,900,1.0,-3,'n',0],[EVT.doors,2150,880,1.7,0,'s',0],
+ [S_('c3')-.5,2040,720,1.6,2,'n',0],[S_('c4')-.5,1710,760,1.6,-2,'n',0],[S_('c5')-.3,2300,780,2.3,0,'z',0],
+ [S_('c6')-.5,800,760,1.4,1,'n',0],[S_('c7')-.5,1380,720,1.3,-2,'n',0],[EVT.creat+.8,2100,380,1.6,-4,'w',0],
+ [S_('c8')-.5,1040,720,1.8,3,'w',0],[EVT.drop-.1,1600,900,.8,-5,'w',0],[S_('c9')-.5,2040,760,1.4,2,'n',0],
+ [EVT.jump,1380,900,.65,0,'w',0],[S_('c10')-.5,1380,760,1.5,-2,'n',0],[EVT.third-.2,1230,1420,1.9,0,'s',0],[S_('c11')-.5,1380,800,.7,2,'n',0],
+ [S_('c12')-.5,700,760,1.5,3,'n',0],[EVT.tremor,1230,820,.85,-3,'w',0],[S_('c13')-.5,1710,760,1.6,-3,'w',0],[S_('c14')-.5,2040,720,1.4,3,'w',0],
+ [EVT.crush-1.2,1950,640,.6,-2,'w',0],[EVT.crush+1.6,1380,900,.65,3,'w',0],[S_('c15')-.5,1380,760,1.2,-2,'n',0],[S_('c15')+1.8,700,900,1.1,2,'s',0],
+ [S_('c16')-.5,1040,800,1.6,3,'n',0],[EVT.open-.2,700,900,.85,0,'w',0],[S_('c17')-.5,800,900,1.0,-2,'w',0],[S_('c18')-.5,1380,760,1.1,0,'w',0]];
 SHOTS.sort((x,y)=>x[0]-y[0]);
 const MODE={s:[3.2,.92],n:[8,.72],w:[16,.5],c:[55,.9],p:[2.4,.95],z:[12,.6]};
 function stepResp(tau,w,z){if(tau<=0)return 0;const wd=w*Math.sqrt(1-z*z);return 1-Math.exp(-z*w*tau)*(Math.cos(wd*tau)+(z/Math.sqrt(1-z*z))*Math.sin(wd*tau))}
@@ -55,7 +55,7 @@ function exprNew(who,tn){const idx=WHOL.indexOf(who);let ex='worry';if(tn<START.
 const HEADROT={laugh:-7,cryLaugh:-6,sad:4,worry:2,tender:3,annoyed:-2,fear:-2,shock:-3,scream:-4,smirk:2,disbelief:-3};
 const sstep=x=>{x=clamp(x);return x*x*(3-2*x)};
 const J=EVT;
-const FORM={lucia:800,sofi:1030,diego:1230,beto:1450,marta:1690};
+const FORM={lucia:700,sofi:1040,diego:1380,beto:1710,marta:2040};
 function xOf(who,t){let x=FORM[who];
  if(t<3.2){const u=sstep((t-1.0)/2);x+=(who==='lucia'||who==='sofi'?-30:40)*u*0}
  if(t>=J.drop&&t<J.jump){const u=sstep((t-J.drop)/1.2);x-=60*u*(who==='beto'||who==='marta'?-1:1)*.0-40*u}
@@ -113,7 +113,7 @@ function hud(t){const el=Math.max(0,t-EVT.cam);const hh=String(Math.floor(el/360
 const rng=s=>{let x=s>>>0;return()=>(x=(x*1664525+1013904223)>>>0)/4294967296};
 function glitch(inner,t,amt){const r=rng(Math.floor(t*30)*7919);const dx=(r()-.5)*70*amt;let s=`<g transform="translate(${dx.toFixed(0)},0)">${inner}</g>`;const cols=['#ff2a3a','#2af0ff','#ffffff','#ff2a3a'];for(let i=0;i<Math.round(3+amt*6);i++){const y=Math.floor(r()*(H-60)),h=6+Math.floor(r()*40*amt+4);s+=`<rect x="0" y="${y}" width="${W}" height="${h}" fill="${cols[i%4]}" fill-opacity="${(.15+r()*.35).toFixed(2)}"/>`;if(r()<.5)s+=`<rect x="${Math.floor(r()*500)}" y="${y+h}" width="${Math.floor(200+r()*500)}" height="${Math.floor(3+r()*10)}" fill="#fff" fill-opacity="${(.3+r()*.4).toFixed(2)}"/>`}return s}
 function title(t){const u=t-4.7;const ser=`<text x="540" y="300" text-anchor="middle" font-family="Inter" font-weight="700" font-size="32" letter-spacing="16" fill="#ffffff" fill-opacity=".75">CLOVERFIELD</text>`;const fl=u<.4?(Math.sin(u*90)>0?1:.2):1;const g=(u>.3&&u<.55)||(u>2.1)?10:2;
- const T=(x,fill,op)=>`<text x="${x}" y="900" text-anchor="middle" font-family="Inter" font-weight="900" font-size="64" letter-spacing="14" fill="${fill}" fill-opacity="${op}">CAPÍTULO 5</text>`;
+ const T=(x,fill,op)=>`<text x="${x}" y="900" text-anchor="middle" font-family="Inter" font-weight="900" font-size="64" letter-spacing="14" fill="${fill}" fill-opacity="${op}">CAPÍTULO 4</text>`;
  return `<rect width="${W}" height="${H}" fill="#05070a"/>${ser}<g opacity="${fl}">${T(540-g,'#ff2a3a',.7)}${T(540+g,'#2af0ff',.6)}${T(540,'#fff',1)}<rect x="470" y="935" width="140" height="6" fill="#ff2a3a"/><text x="540" y="1080" text-anchor="middle" font-family="Inter" font-weight="900" font-size="128" letter-spacing="4" fill="#fff" stroke="#000" stroke-width="3">EL METRO</text></g>`}
 function endcard(t){const u=t-EVT.endcard;const fade=clamp(u/.6);return `<rect width="${W}" height="${H}" fill="#05070a"/><g opacity="${fade}"><text x="540" y="520" text-anchor="middle" font-family="DejaVu Sans Mono" font-size="38" fill="#9aa4ae">// CINTA 4 — FIN DEL REGISTRO</text><text x="540" y="700" text-anchor="middle" font-family="Inter" font-weight="900" font-size="58" fill="#ff2a3a" letter-spacing="6">PRÓXIMO CAPÍTULO</text><text x="540" y="800" text-anchor="middle" font-family="Inter" font-weight="900" font-size="70" fill="#fff">CAPÍTULO 5 | LOS SOLDADOS</text>${u>2?`<text x="540" y="1000" text-anchor="middle" font-family="Inter" font-weight="800" font-size="50" fill="#ffd54a">¿SON ALIADOS O PELIGRO?</text><text x="540" y="1100" text-anchor="middle" font-family="Inter" font-weight="800" font-size="50" fill="#fff">A) NOS VAN A AYUDAR</text><text x="540" y="1180" text-anchor="middle" font-family="Inter" font-weight="800" font-size="50" fill="#fff">B) NO CONFÍES EN NADIE</text>`:''}${u>4?`<text x="540" y="1400" text-anchor="middle" font-family="Inter" font-weight="900" font-size="52" fill="#2af0ff">COMENTA TU ELECCIÓN</text><text x="540" y="1480" text-anchor="middle" font-family="Inter" font-weight="900" font-size="42" fill="#fff">SÍGUEME PARA EL CAPÍTULO 5</text>`:''}</g>`}
 // ---- operator hand (the person filming)
