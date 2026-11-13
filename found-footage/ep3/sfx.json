@@ -1,0 +1,90 @@
+{
+"slab_scrape": [
+"heavy concrete slab scraping and lifting with metal creak, rubble shifting, realistic",
+5
+],
+"pain_groan": [
+"man groaning in pain, short, breathless, realistic",
+4
+],
+"battery_beep": [
+"electronic low battery warning beep, two beeps",
+2
+],
+"door_push": [
+"heavy fire door being pushed open with a long creak and echo, realistic",
+4
+],
+"lobby_amb": [
+"empty building lobby ambience, distant fire alarm, flickering light buzz, big reverb, tense, realistic",
+20
+],
+"chain_rattle": [
+"heavy chain and padlock rattling against glass doors, realistic",
+4
+],
+"keys_jingle": [
+"ring of keys jingling being picked up from a desk, realistic",
+3
+],
+"padlock_open": [
+"padlock unlocking with a click and a heavy chain falling to the floor, realistic",
+3
+],
+"glass_doors": [
+"glass double doors swinging open with a door bell chime and a gust of wind, realistic",
+4
+],
+"street_amb": [
+"burning city street at night ambience, distant sirens, fire crackling, helicopters far away, ash wind, realistic",
+20
+],
+"fire_big": [
+"large fire roaring and crackling, burning building, realistic",
+14
+],
+"sirens": [
+"police and ambulance sirens passing in a city at night with doppler, realistic",
+12
+],
+"car_alarm": [
+"car alarm blaring on a quiet destroyed street, realistic",
+8
+],
+"heli_low": [
+"military helicopter flying low overhead at night, loud rotor thump, realistic",
+10
+],
+"megaphone": [
+"loudspeaker static squeal and feedback burst, short, realistic",
+3
+],
+"bus_groan": [
+"overturned bus metal groaning and creaking, realistic",
+6
+],
+"drain_skitter": [
+"many small creatures skittering and chittering out of a metal storm drain, creepy, realistic",
+8
+],
+"hydrant": [
+"burst fire hydrant spraying water onto asphalt, realistic",
+10
+],
+"run_street": [
+"several people running breathlessly on asphalt with debris crunching, realistic",
+10
+],
+"bus_crush": [
+"colossal foot crushing a bus, metal tearing and glass shattering, massive impact, realistic",
+7
+],
+"subway_rumble": [
+"subway tunnel deep rumble and wind blowing from below, realistic",
+8
+],
+"stair_clicks": [
+"creature clicking and scraping behind a metal door, distant, creepy, realistic",
+6
+]
+}

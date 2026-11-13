@@ -1,0 +1,128 @@
+[
+{
+"id": "b0",
+"who": "Beto",
+"text": "¡No siento la pierna! ¡No siento la pierna!",
+"say": "[screaming in pain] ¡No siento la pierna! ¡No siento la pierna!"
+},
+{
+"id": "b1",
+"who": "Marta",
+"text": "Diego, la losa. Usa el extintor como palanca.",
+"say": "[tense, commanding] Diego, la losa. Usa el extintor como palanca."
+},
+{
+"id": "b2",
+"who": "Diego",
+"text": "Uno, dos, tres... ¡Ahora!",
+"say": "[straining] Uno, dos, tres... ¡Ahora!"
+},
+{
+"id": "b3",
+"who": "Beto",
+"text": "Ya salió... pero no puedo apoyarla. Está rota.",
+"say": "[breathless, in pain] Ya salió... pero no puedo apoyarla. Está rota."
+},
+{
+"id": "b4",
+"who": "Marta",
+"text": "Te cargamos. Lucía, lleva a Sofi. Tomás, alumbra el camino.",
+"say": "[decisive] Te cargamos. Lucía, lleva a Sofi. Tomás, alumbra el camino."
+},
+{
+"id": "b5",
+"who": "Tomas",
+"text": "La batería de la linterna se está acabando.",
+"say": "[worried] La batería de la linterna se está acabando."
+},
+{
+"id": "b6",
+"who": "Marta",
+"text": "Usa la luz de mi teléfono.",
+"say": "[urgent] Usa la luz de mi teléfono."
+},
+{
+"id": "b7",
+"who": "Lucia",
+"text": "Piso uno. Esa puerta dice vestíbulo.",
+"say": "[whispers] Piso uno. Esa puerta dice vestíbulo."
+},
+{
+"id": "b8",
+"who": "Diego",
+"text": "La puerta de la calle tiene una cadena con candado.",
+"say": "[uneasy] La puerta de la calle tiene una cadena con candado."
+},
+{
+"id": "b9",
+"who": "Sofi",
+"text": "Mi papá es el portero. Las llaves están en su escritorio.",
+"say": "[small frightened voice] Mi papá es el portero. Las llaves están en su escritorio."
+},
+{
+"id": "b10",
+"who": "Lucia",
+"text": "Aquí. El llavero con el número tres.",
+"say": "[nervous] Aquí. El llavero con el número tres."
+},
+{
+"id": "b11",
+"who": "Marta",
+"text": "Rápido. Algo se arrastra en las escaleras.",
+"say": "[whispers, tense] Rápido. Algo se arrastra en las escaleras."
+},
+{
+"id": "b12",
+"who": "Diego",
+"text": "Cuando abra, todos a la derecha, sin parar.",
+"say": "[determined] Cuando abra, todos a la derecha, sin parar."
+},
+{
+"id": "b13",
+"who": "Tomas",
+"text": "Dios mío... la ciudad se está quemando.",
+"say": "[awestruck whisper] Dios mío... la ciudad se está quemando."
+},
+{
+"id": "b14",
+"who": "Altavoz",
+"text": "Ciudadanos: diríjanse al puente del sur. Evacuación en el sector cuatro.",
+"say": "[loudspeaker, calm authoritative] Ciudadanos: diríjanse al puente del sur. Evacuación en el sector cuatro."
+},
+{
+"id": "b15",
+"who": "Beto",
+"text": "Ahí hay un autobús volcado. Pasemos por debajo.",
+"say": "[weak, gasping] Ahí hay un autobús volcado. Pasemos por debajo."
+},
+{
+"id": "b16",
+"who": "Marta",
+"text": "No. Mira ese letrero: el metro. Ahí abajo estaremos a salvo.",
+"say": "[decisive] No. Mira ese letrero: el metro. Ahí abajo estaremos a salvo."
+},
+{
+"id": "b17",
+"who": "Lucia",
+"text": "¡Del desagüe! ¡Algo está saliendo del desagüe!",
+"say": "[screaming] ¡Del desagüe! ¡Algo está saliendo del desagüe!"
+},
+{
+"id": "b18",
+"who": "Diego",
+"text": "¡Al metro! ¡Corran! ¡Ya!",
+"say": "[shouting] ¡Al metro! ¡Corran! ¡Ya!"
+},
+{
+"id": "b19",
+"who": "Tomas",
+"text": "Un helicóptero... nos está iluminando.",
+"say": "[breathless] Un helicóptero... nos está iluminando."
+},
+{
+"id": "b20",
+"who": "Sofi",
+"text": "¡Es enorme!",
+"say": "[screaming child] ¡Es enorme!"
+}
+]
