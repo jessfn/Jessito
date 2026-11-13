@@ -1,7 +1,7 @@
 import {Resvg} from '@resvg/resvg-js';import fs from 'fs';import {spawn,spawnSync} from 'child_process';import path from 'path';import {fileURLToPath} from 'url';
 import {CAST,body,defs,elbow} from '../body.mjs';
 import {limb as limbS,grp as grpS,hand as handW,handSkin,gripV2 as gripS} from '../char.mjs';
-import {setCTM,mul,T,setHandTime} from '../char.mjs';
+import {setCTM,mul,T,setHandTime,EX} from '../char.mjs';
 let CAMM=[1,0,0,1,0,0];let BLURV=0;
 import {clamp,sm,lerp,defsScene,dust,setEV,speedAt} from '../ep3/scene.mjs';
 import {shelter,table,defs5} from './scene5.mjs';
@@ -15,7 +15,8 @@ const WHOKEY={Beto:'beto',Diego:'diego',Marta:'marta',Lucia:'lucia',Sofi:'sofi'}
 const FL=1510;
 // ---- envelopes
 function envelope(id){const r=spawnSync('ffmpeg',['-v','error','-i',path.join(BUILD,'voz_t',id+'.mp3'),'-f','s16le','-ac','1','-ar','8000','-'],{maxBuffer:1e8});const b=r.stdout;const n=Math.floor(b.length/2);const hop=Math.round(8000/FPS);const out=[];let mx=1e-6;for(let i=0;i+hop<=n;i+=hop){let s=0;for(let j=0;j<hop;j++){const v=b.readInt16LE((i+j)*2)/32768;s+=v*v}const e=Math.sqrt(s/hop);out.push(e);mx=Math.max(mx,e)}const nn=out.map(v=>v/mx);return nn.map((v,i)=>Math.max(v,(nn[i-1]||0)*.55))}
-const LINES=script.map(l=>({...l,t0:START[l.id],env:envelope(l.id)}));LINES.forEach(l=>l.dur=l.env.length/FPS);
+function zcrEnv(id){const r=spawnSync('ffmpeg',['-v','error','-i',path.join(BUILD,'voz_t',id+'.mp3'),'-f','s16le','-ac','1','-ar','8000','-'],{maxBuffer:1e8});const b=r.stdout;const n=Math.floor(b.length/2);const hop=Math.round(8000/FPS);const out=[];for(let i=0;i+hop<=n;i+=hop){let z=0,prev=0;for(let j=0;j<hop;j++){const v=b.readInt16LE((i+j)*2);if(j&&((v>0)!==(prev>0))&&Math.abs(v)>300)z++;prev=v}out.push(z/hop)}return out}
+const LINES=script.map(l=>({...l,t0:START[l.id],env:envelope(l.id)}));LINES.forEach(l=>{l.dur=l.env.length/FPS;l.zc=zcrEnv(l.id)});
 function speakerAt(t){return LINES.find(l=>t>=l.t0&&t<l.t0+l.dur+.15)}
 
 
@@ -115,6 +116,17 @@ function rifleSVG(who,t,x){const aim=aimAmt(who,t);const hy=785;let s='';const d
  else{const x1=x-60;s+=`<g transform="rotate(62 ${x1} 900)"><rect x="${x1-100}" y="880" width="190" height="20" rx="6" fill="#14171a" stroke="#050607" stroke-width="3"/><rect x="${x1+40}" y="868" width="60" height="34" rx="8" fill="#2a2e30" stroke="#050607" stroke-width="3"/></g>`}
  return s}
 function helmet(x,y,yaw){const ox=yaw*8;return `<g><path d="M${x+ox-82},${y-12} Q${x+ox-86},${y-100} ${x+ox},${y-108} Q${x+ox+86},${y-100} ${x+ox+82},${y-12} Q${x+ox},${y-34} ${x+ox-82},${y-12}Z" fill="#4a5532" stroke="#14170e" stroke-width="6"/><path d="M${x+ox-60},${y-70} Q${x+ox},${y-92} ${x+ox+60},${y-70}" stroke="#fff" stroke-width="4" fill="none" opacity=".15"/><rect x="${x+ox-82}" y="${y-30}" width="164" height="12" rx="5" fill="#2a3220"/></g>`}
+const EXN=(n)=>EX[n]||EX.neutral;
+function exprChange(who,tn){let cur=exprNew(who,tn),tc=0;let prev=cur;for(let tt=tn;tt>Math.max(0,tn-3);tt-=.1){const e=exprNew(who,tt);if(e!==cur){prev=e;tc=tt+.1;break}else tc=Math.max(0,tt)}return {cur,prev,tc}}
+function faceExpr(who,t,tn,talk,seed){const {cur,prev,tc}=exprChange(who,tn);const a=EXN(prev),b=EXN(cur);const u=sstep((tn-tc)/.3);
+ const mix=(x,y)=>x+(y-x)*u;const e={...b,e:mix(a.e,b.e),brow:[mix(a.brow[0],b.brow[0]),mix(a.brow[1],b.brow[1])],rot:mix(a.rot,b.rot),pup:mix(a.pup,b.pup)};
+ const sd=(seed%3)-1;const br=Math.sin(t*1.9+seed);
+ e.bL=Math.sin(t*.7+seed)*.9+(['worry','sad','fear'].includes(cur)?-1.6*sd-1.0:0)-talk*2.2;e.bR=Math.sin(t*.8+seed*2)*.9+(['worry','sad','fear'].includes(cur)?1.6*sd-1.0:0)-talk*2.2*(.6+.4*Math.sin(t*5+seed));
+ e.eL=1+Math.sin(t*.9+seed)*.05+(cur==='sad'?-.1:0);e.eR=1+Math.sin(t*1.1+seed*1.3)*.05+(cur==='sad'?-.14:0);
+ e.bag=['sad','worry','fear','shock'].includes(cur)?.8:.15;
+ e.well=(cur==='sad'||(cur==='scream'&&who==='sofi'))?1:(cur==='fear'?.5:0);
+ e.flare=(['scream','annoyed','fear'].includes(cur)?.8:0)+Math.max(0,br)*.4;
+ return e}
 function charSVG(who,t,shock,tn){const st=CAST[who];const isS=SOL.includes(who);const pose=kfAt(KF[who],t);const sp=speakerAt(tn);
  const spk=sp&&(sp.who==='Sargento'?'sgt':WHOKEY[sp.who]);const talk=spk===who?clamp((sp.env[Math.floor((tn-sp.t0)*FPS)]||0)*1.7):0;
  const idx=isS?5+SOL.indexOf(who):WHOL.indexOf(who);const bl=blinkAt(idx*.37,t);
@@ -123,7 +135,7 @@ function charSVG(who,t,shock,tn){const st=CAST[who];const isS=SOL.includes(who);
  const amp=ampOf(who,t);const phase=t*6.2+idx*.9;
  for(const s of ['L','R']){pose[s].w=[pose[s].w[0]+Math.sin(t*1.3+idx+(s==='L'?0:2))*2.5,pose[s].w[1]+Math.sin(t*1.7+idx*3)*2.5+Math.sin(phase+(s==='L'?0:Math.PI))*10*amp+(t<S_('e4')&&!isS?Math.sin(t*11+idx+(s==='L'?0:1))*3:0)]}
  const ex=exprNew(who,tn);pose.walk={phase,amp};
- pose.expr=ex;pose.blink=bl;pose.look=[lk[0]*.5,lk[1]];pose.talk=talk;pose.breath=br;pose.byaw=yaw;
+ const sacc=(Math.sin(Math.floor(t*1.7+idx)*12.9898)*.5);const zc=spk===who&&sp&&sp.zc?sp.zc[Math.floor((tn-sp.t0)*FPS)]||0:0;pose.vis=talk>.08?clamp((zc-.12)/.12,-1,1):0;pose.mdy=((ex==='sad'||ex==='fear'||ex==='scream')&&(who==='sofi'||t>0))?Math.sin(t*37+idx)*(talk>.1?.7:1.3)*(ex==='sad'?1:.6):0;pose.expr=faceExpr(who,t,tn,talk,idx+1);pose.blink=bl;pose.look=[lk[0]*.5+sacc*.35,lk[1]+Math.sin(t*2.3+idx)*.12];pose.talk=talk;pose.breath=br;pose.byaw=yaw;
  pose.head={rot:(HEADROT[ex]||0)+Math.sin(t*.9+idx)*1.6+(talk>.2?Math.sin(t*9+idx)*1.2:0)+(who==='sofi'&&t>S_('e9')?5:0),dx:0,yaw:0,dy:Math.sin(t*1.9+idx)*1.2+(ex==='shock'||ex==='scream'?-4:0)+Math.abs(Math.sin(phase))*-5*amp};
  let s=who==='sofi'?1.05:1.5,x=xOf(who,t),fy=FL;let rot=sway+(who==='beto'?9+Math.sin(phase)*2*amp:0);let yoff=-Math.abs(Math.sin(phase))*9*amp*(who==='sofi'?.6:1);
  const Mch=mul(mul(T(x-250*s,fy-752*s+yoff,0,s,s),T(250,752)),mul(T(0,0,rot,1,1),T(-250,-752)));setCTM(mul(CAMM,Mch));const bd=body(st,pose);setCTM([1,0,0,1,0,0]);
@@ -168,7 +180,7 @@ function sceneWorld(t,tn){const [cx,cy,z,rot,sk]=camera(t);const blur=process.en
  const rr=(rot+sr)*Math.PI/180,cs=Math.cos(rr),sn=Math.sin(rr);const cor=[[-540,-960],[540,-960],[540,960],[-540,960]].map(([px,py])=>[cx+(px*cs+py*sn)/z,cy+(-px*sn+py*cs)/z]);const vx0=Math.min(...cor.map(c=>c[0])),vx1=Math.max(...cor.map(c=>c[0])),vy0=Math.min(...cor.map(c=>c[1])),vy1=Math.max(...cor.map(c=>c[1]));
  const al=t>=EVT.alarm?clamp((t-EVT.alarm)/.5):0;
  const doorU=t<S_('e4')?0:sstep((t-EVT.close+.8)/1.2);const dent=t>=EVT.knock?clamp((t-EVT.knock)/5):0;
- w+=shelter(t,{doorU,dent,alarm:al,mapU:sstep((t-EVT.map)/1.2)});
+ w+=`<g transform="translate(${((cx-1900)*0.09).toFixed(1)},0)">`+shelter(t,{doorU,dent,alarm:al,mapU:sstep((t-EVT.map)/1.2)})+`</g>`;
  // flashlight scan of arms by the sergeant
  if(t>=EVT.check&&t<EVT.check+5.5){const u=clamp((t-EVT.check)/5);const hx=xOf('sgt',t)-90,hy=790;const tx=lerp(1700,800,u),ty=680;w+=`<polygon points="${hx},${hy} ${tx-130},${ty-110} ${tx+130},${ty+160}" fill="#fff6d8" fill-opacity=".28"/><ellipse cx="${tx}" cy="${ty+30}" rx="150" ry="210" fill="url(#whiteGl5)" fill-opacity=".35"/><circle cx="${hx}" cy="${hy}" r="14" fill="#fff"/>`}
  const order=['sol3','sol2','sgt','sofi','lucia','beto','marta','diego'];

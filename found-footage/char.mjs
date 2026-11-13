@@ -194,7 +194,7 @@ function face(st,ex,op={}){const F=st.face,e=typeof ex==='string'?EX[ex]:ex,ol=s
   if(e.wr==='anger'){[-4,4].forEach(x=>s+=`<path d="M${x},-30 l0,8" stroke="#7a4a38" stroke-width="1.3" opacity=".7"/>`);s+=`<path d="M-22,22 Q-17,30 -14,38M22,22 Q17,30 14,38" stroke="#8a5a45" stroke-width="1.2" fill="none" opacity=".6"/>`}
   if(e.wr==='smile'){s+=`<path d="M-24,22 Q-20,32 -18,37M24,22 Q20,32 18,37" stroke="#8a5a45" stroke-width="1.3" fill="none" opacity=".6"/>`}}
  // eyes
- [-1,1].forEach(g=>{const w=F.eyeW,h=F.eyeH*e.e*(1-bl*.93);const cx=g*F.eyeX,cy=F.eyeY;const rot=e.rot*(-g)*-1;
+ [-1,1].forEach(g=>{const w=F.eyeW,h=F.eyeH*e.e*(g<0?(e.eL||1):(e.eR||1))*(1-bl*.93);const cx=g*F.eyeX,cy=F.eyeY;const rot=e.rot*(-g)*-1;
   const sad=e.n==='Tristeza'?1:0;
   s+=`<g transform="translate(${cx},${cy}) rotate(${f(-g*e.rot*-1*-1)})">`;
   const up=h*(F.kind==='anime'?1.0:1),lo=h*(e.n==='Sonrisa'?.15:.7)*(e.n==='Sonrisa'?1:1);
@@ -212,18 +212,20 @@ function face(st,ex,op={}){const F=st.face,e=typeof ex==='string'?EX[ex]:ex,ol=s
   if(F.kind==='real'||F.kind==='anime'||st.lashes){s+=`<path d="M${g*w},0 l${g*5},-3 M${g*(w-3)},${f(-up*.8)} l${g*5},-5" stroke="${ol}" stroke-width="1.6" stroke-linecap="round"/>`}
   if(e.n==='Sonrisa'&&F.kind!=='toon')s+=`<path d="M${-w},2 Q0,${f(2*lo+8)} ${w},2" stroke="${st.skin2}" stroke-width="1.2" fill="none" opacity=".7"/>`;
   s+=`</g>`;
+  if(e.bag){s+=`<path d="M${f(g*(F.eyeX-w*.9))},${F.eyeY+w*.45} Q${f(g*F.eyeX)},${F.eyeY+w*.45+4+e.bag*3} ${f(g*(F.eyeX+w*.9))},${F.eyeY+w*.45}" stroke="${st.skin2}" stroke-width="1.4" fill="none" opacity="${(.35+.3*e.bag).toFixed(2)}"/>`}
+  if(e.well){s+=`<ellipse cx="${f(g*F.eyeX)}" cy="${F.eyeY+h*.55}" rx="${f(w*.78)}" ry="${f(1.6+e.well*1.6)}" fill="#cdeaff" opacity="${(.35+.3*e.well).toFixed(2)}"/><circle cx="${f(g*F.eyeX-2)}" cy="${F.eyeY+h*.5}" r="1.5" fill="#fff" opacity=".8"/>`}
   // brows
-  const bi=F.browY+e.brow[0],bo=F.browY+e.brow[1]+(F.kind==='anime'?0:0);const x1=g*7,x2=g*(F.eyeX+15);
+  const bm=(g<0?(e.bL||0):(e.bR||0));const bi=F.browY+e.brow[0]+bm,bo=F.browY+e.brow[1]+bm*.6;const x1=g*7,x2=g*(F.eyeX+15);
   const my=(bi+bo)/2-3.5;
   s+=`<path d="M${x1},${bi} Q${(x1+x2)/2},${my-1} ${x2},${bo}" stroke="${F.kind==='real'?st.hair:'#1c1210'}" stroke-width="${F.brow}" fill="none" stroke-linecap="round"/>`;
   if(F.kind==='real')s+=`<path d="M${x1},${bi} Q${(x1+x2)/2},${my-1} ${x2},${bo}" stroke="#000" stroke-width="1" fill="none" opacity=".35" transform="translate(0,-1)"/>`;
  });
  // nose
- if(F.kind==='real')s+=`<path d="M-3,-6 Q-5,${F.noseY-4} -9,${F.noseY} Q-4,${F.noseY+4} 0,${F.noseY+2} Q4,${F.noseY+4} 9,${F.noseY} Q5,${F.noseY-4} 3,-6" stroke="#8a5a45" stroke-width="1.4" fill="none" opacity=".75"/><ellipse cx="-5" cy="${F.noseY+1}" rx="2" ry="1.2" fill="#3a2018" opacity=".8"/><ellipse cx="5" cy="${F.noseY+1}" rx="2" ry="1.2" fill="#3a2018" opacity=".8"/>`;
+ if(F.kind==='real')s+=`<path d="M-3,-6 Q-5,${F.noseY-4} -9,${F.noseY} Q-4,${F.noseY+4} 0,${F.noseY+2} Q4,${F.noseY+4} 9,${F.noseY} Q5,${F.noseY-4} 3,-6" stroke="#8a5a45" stroke-width="1.4" fill="none" opacity=".75"/><ellipse cx="${-5-(e.flare||0)}" cy="${F.noseY+1}" rx="${2+(e.flare||0)*.5}" ry="1.2" fill="#3a2018" opacity=".8"/><ellipse cx="${5+(e.flare||0)}" cy="${F.noseY+1}" rx="${2+(e.flare||0)*.5}" ry="1.2" fill="#3a2018" opacity=".8"/>`;
  else if(F.kind==='toon')s+=`<path d="M-4,${F.noseY-2} Q0,${F.noseY+5} 5,${F.noseY-1}" stroke="${ol}" stroke-width="3" fill="none" stroke-linecap="round"/>`;
  else s+=`<path d="M-2,${F.noseY-1} l2,3 l2,-1" stroke="#b07a70" stroke-width="1.6" fill="none" stroke-linecap="round"/>`;
  // mouth
- const my=F.mouthY,mw=F.kind==='toon'?17:14,mk=ol;const dark='#3a0f14',tooth='#f8f4ee',lip='#b25a56';let m='';
+ const my=F.mouthY+(op.mdy||0),mw=F.kind==='toon'?17:14,mk=ol;const dark='#3a0f14',tooth='#f8f4ee',lip='#b25a56';let m='';
  if(e.m==='neutral')m=F.kind==='real'?`<path d="M${-mw},${my} Q-6,${my-3} 0,${my-1.5} Q6,${my-3} ${mw},${my} Q0,${my+7} ${-mw},${my}Z" fill="${lip}" stroke="${mk}" stroke-width="1"/><path d="M${-mw},${my} Q0,${my+1.5} ${mw},${my}" stroke="#5a2420" stroke-width="1.4" fill="none"/>`:`<path d="M${-mw+3},${my} Q0,${my+3} ${mw-3},${my}" stroke="${mk}" stroke-width="${F.kind==='toon'?4:2.4}" fill="none" stroke-linecap="round"/>`;
  if(e.m==='smile')m=`<path d="M${-mw-2},${my-3} Q0,${my+16} ${mw+2},${my-3} Q0,${my+2} ${-mw-2},${my-3}Z" fill="${dark}" stroke="${mk}" stroke-width="${F.kind==='toon'?3.4:1.6}" stroke-linejoin="round"/><path d="M${-mw+1},${my-1.5} Q0,${my+4} ${mw-1},${my-1.5} L${mw-3},${my+3} Q0,${my+7} ${-mw+3},${my+3}Z" fill="${tooth}"/>`;
  if(e.m==='frown'||e.m==='sad')m=`<path d="M${-mw+2},${my+5} Q0,${my-4} ${mw-2},${my+5}" stroke="${mk}" stroke-width="${F.kind==='toon'?4:2.4}" fill="none" stroke-linecap="round"/>`+(F.kind==='real'?`<path d="M-4,${my+9} Q0,${my+11} 4,${my+9}" stroke="${st.skin2}" stroke-width="1.4" fill="none"/>`:'');
@@ -237,7 +239,7 @@ function face(st,ex,op={}){const F=st.face,e=typeof ex==='string'?EX[ex]:ex,ol=s
  if(e.m==='wavy')m=`<path d="M${-mw+3},${my+3} Q${-mw/2},${my-2} 0,${my+3} Q${mw/2},${my+8} ${mw-3},${my+2}" stroke="${mk}" stroke-width="${F.kind==='toon'?4:2.4}" fill="none" stroke-linecap="round"/>`;
  if(e.m==='laugh')m=`<path d="M${-mw-3},${my-3} Q0,${my+22} ${mw+3},${my-3} Q0,${my+3} ${-mw-3},${my-3}Z" fill="${dark}" stroke="${mk}" stroke-width="${F.kind==='toon'?3.4:1.6}" stroke-linejoin="round"/><path d="M${-mw-1},${my-2} Q0,${my+3} ${mw+1},${my-2} L${mw-2},${my+3} Q0,${my+7} ${-mw+2},${my+3}Z" fill="${tooth}"/><ellipse cx="0" cy="${my+12}" rx="${mw*.45}" ry="4.5" fill="#a04048"/>`;
  if(e.m==='scream')m=`<ellipse cx="0" cy="${my+4}" rx="${F.kind==='toon'?12:10}" ry="${F.kind==='toon'?17:15}" fill="${dark}" stroke="${mk}" stroke-width="${F.kind==='toon'?3.4:1.6}"/><path d="M-9,${my-8} Q0,${my-11} 9,${my-8} L8,${my-2} Q0,${my-4} -8,${my-2}Z" fill="${tooth}"/><ellipse cx="0" cy="${my+14}" rx="6" ry="4.5" fill="#a04048"/>`;
- if(tk>0.04&&['neutral','smile','sad','frown','grin','smirk','flat','soft','wavy'].includes(e.m)){const wd=(e.m==='smile'?mw+2:mw-2)*(0.6+0.4*tk),op2=2+11*tk;m=`<path d="M${-wd},${my} Q0,${my-2} ${wd},${my} Q${wd*.8},${my+op2*1.5} 0,${my+op2*1.5} Q${-wd*.8},${my+op2*1.5} ${-wd},${my}Z" fill="${dark}" stroke="${mk}" stroke-width="${F.kind==='toon'?3.4:1.6}" stroke-linejoin="round"/>`+(tk>.3?`<path d="M${-wd+3},${my+.5} Q0,${my-1} ${wd-3},${my+.5} L${wd-4},${my+3.5} Q0,${my+2} ${-wd+4},${my+3.5}Z" fill="${tooth}"/>`:'')+`<ellipse cx="0" cy="${my+op2*1.2}" rx="${wd*.45}" ry="${op2*.3}" fill="#a04048"/>`}
+ if(tk>0.04&&['neutral','smile','sad','frown','grin','smirk','flat','soft','wavy'].includes(e.m)){const vis=op.vis||0;const wd=(e.m==='smile'?mw+2:mw-2)*(0.6+0.4*tk)*(1+.38*vis),op2=(2+11*tk)*(vis<0?1.12:1-.18*vis);m=`<path d="M${-wd},${my} Q0,${my-2} ${wd},${my} Q${wd*.8},${my+op2*1.5} 0,${my+op2*1.5} Q${-wd*.8},${my+op2*1.5} ${-wd},${my}Z" fill="${dark}" stroke="${mk}" stroke-width="${F.kind==='toon'?3.4:1.6}" stroke-linejoin="round"/>`+(tk>.3?`<path d="M${-wd+3},${my+.5} Q0,${my-1} ${wd-3},${my+.5} L${wd-4},${my+3.5} Q0,${my+2} ${-wd+4},${my+3.5}Z" fill="${tooth}"/>`:'')+`<ellipse cx="0" cy="${my+op2*1.2}" rx="${wd*.45}" ry="${op2*.3}" fill="#a04048"/>`}
  s+=m;
  if(e.sweat)s+=`<path d="M38,-34 Q44,-22 38,-17 Q32,-22 38,-34Z" fill="#9fd8ff" stroke="${ol}" stroke-width="1.2"/>`;
  if(e.tear)s+=`<path d="M-24,12 Q-18,26 -24,32 Q-30,26 -24,12Z" fill="#9fd8ff" stroke="${ol}" stroke-width="1"/><path d="M-28,6 Q-22,8 -28,12" stroke="#9fd8ff" stroke-width="2" fill="none"/>`;
