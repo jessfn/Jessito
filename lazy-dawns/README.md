@@ -130,3 +130,8 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
   delineado suave, pestanas largas y gloss rosado (NO labial rojo clasico). Imprevisto: base demasiado clara (fantasma) -> se busca el tono que combina con su piel morena.
 - Duracion < 2 min (1:58). Comparacion ANTES/DESPUES en el espejo. Voces: Dra. Valentina (Alice), Nina (Sarah), Mari (Laura), narrador Jessica. Siguiente voto: ROPA vs GIMNASIO.
 - Profesionales alcanzan la cara con el brazo: se sientan tras una mesa (cintura oculta) para que el brazo IK llegue a la cara.
+
+## Dia 5 = CEJAS (el de maquillaje se descarto; el voto real fue cejas)
+- Sin Mari. Nuevos: Karla (cejista, voz Bella) y Chispa (gato). Puerta con campana (se abre y suena), cejas de uniceja -> separadas, arqueadas y finas tipo modelo,
+  imprevisto del gato, retoque, comparacion ANTES/DESPUES de cejas, gancho: el lunar se ve enorme. Duracion 1:29 (limite 1:30). Siguiente voto: MAQUILLAJE vs ROPA.
+- Regla de logica: lo que se nombra se ve (puerta/campana, cera, pinza, gato), con su sonido. El codo de quien trabaja sobre la cara va hacia ABAJO (no cruza su propia cara).

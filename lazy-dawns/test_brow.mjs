@@ -1,0 +1,12 @@
+import { Resvg } from '@resvg/resvg-js';
+import { writeFileSync } from 'node:fs';
+import { execSync } from 'node:child_process';
+import { defs } from './lazy_lib.mjs';
+import { drawLazy } from './rig.mjs';
+const base = () => ({ yaw: 0, pitch: 0, roll: 0, bob: 0, sway: 0, breath: 0, shoulders: 0, flare: 0, squint: 0, tears: 0, tearT: 1, gaze: { x: 0, y: 0 }, lid: { l: 1, r: 1 }, blink: { l: 0, r: 0 }, brow: { l: { r: 0, i: 0 }, r: { r: 0, i: 0 } }, mouth: { open: 0.2, wide: 0.4, smile: 0.6, asym: 0, press: 0, teeth: { clean: 1, braces: 0, crooked: 0 } }, armL: { t: { x: -392, y: 335 }, w: 0 }, armR: { t: { x: 392, y: 335 }, w: 0 }, skin: { acne: 0.03, glow: 0.9, mask: 0, dry: 0, foam: 0, patch: 0, red: 0 }, hair: { s: 1, len: 1, shine: 0.9 } });
+const S = [['uniceja', { k: 0 }], ['depilada roja', { k: 0.6, red: 1 }], ['modelo', { k: 1 }], ['izq corta', { kl: 1, kr: 1, shortL: 1 }]];
+S.forEach(([n, b], i) => { const p = base(); p.browStyle = b; p.makeup = { mole: 1 };
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1500">${defs('e3d')}<rect width="100%" height="100%" fill="#f4c8dc"/><g transform="translate(500,560) scale(1.15)"><g transform="translate(0,215)">${drawLazy(p)}</g></g><text x="500" y="60" font-family="Inter" font-weight="800" font-size="38" text-anchor="middle" fill="#12090a">${n}</text></svg>`;
+  writeFileSync(`build/b_${i}.png`, new Resvg(svg, { font: { loadSystemFonts: true, defaultFontFamily: 'Inter' } }).render().asPng()); });
+execSync('ffmpeg -y -loglevel error -i build/b_0.png -i build/b_1.png -i build/b_2.png -i build/b_3.png -filter_complex "[0]crop=640:420:180:190[a];[1]crop=640:420:180:190[b];[2]crop=640:420:180:190[c];[3]crop=640:420:180:190[d];[a][b][c][d]hstack=4,scale=1900:-1" build/brow_test.png');
+console.log('ok');

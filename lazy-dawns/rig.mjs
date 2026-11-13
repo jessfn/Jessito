@@ -54,12 +54,14 @@ function eyeSvg(x, open, blink, squint, gx, gy, tear, tearT, side) {
     <ellipse cy="50" rx="38" ry="${16 + squint * 8}" fill="#2a1208" opacity="${0.62 + squint * 0.15}"/>
   </g>`;
 }
-function browSvg(side, r, i) {
-  const dy = -r * 24;
-  const o = { x: side * 132, y: -62 + dy + i * 12 };
-  const a = { x: side * 70, y: -108 + dy - i * 6 };
-  const n = { x: side * 6, y: -62 + dy - i * 28 };
-  return `<path d="M${o.x},${o.y} Q${a.x},${a.y} ${n.x},${n.y} L${n.x},${n.y + 20} Q${a.x},${a.y + 30} ${o.x},${o.y + 6}Z" fill="#0f0a08" stroke="${OUT}" stroke-width="5" stroke-linejoin="round"/>`;
+function browSvg(side, r, i, k = 0, shortF = 0) {
+  const dy = -r * 24, th = lerp(22, 13, k);
+  let o = { x: side * 132, y: -58 + dy + i * 12 + 8 * k };
+  const a = { x: side * lerp(70, 86, k), y: -108 - 20 * k + dy - i * 6 };
+  const n = { x: side * lerp(6, 46, k), y: -62 + dy - i * 28 + 4 * k };
+  if (shortF > 0) o = { x: o.x + (a.x - o.x) * shortF * 0.7, y: o.y + (a.y - o.y) * shortF * 0.7 };
+  const stray = k < 0.7 ? [0.2, 0.45, 0.7].map((u, j) => `<path d="M${lerp(o.x, a.x, u)},${lerp(o.y, a.y, u) - 14} l${side * (3 + j)},-${12 + j * 3}" stroke="#0f0a08" stroke-width="3.5" stroke-linecap="round" opacity="${(1 - k / 0.7) * 0.8}"/>`).join('') : '';
+  return `<path d="M${o.x},${o.y} Q${a.x},${a.y} ${n.x},${n.y} L${n.x},${n.y + th} Q${a.x},${a.y + th * 1.4} ${o.x},${o.y + 6}Z" fill="#0f0a08" stroke="${OUT}" stroke-width="${lerp(5, 4, k)}" stroke-linejoin="round"/>${stray}`;
 }
 function mouthSvg(m, yaw) {
   const open = clamp(m.open, 0, 1), wide = m.wide, smile = m.smile, asym = m.asym || 0, press = m.press || 0;
@@ -189,8 +191,7 @@ function headSvg(p) {
       </g>
       ${makeupSvg(p.makeup, 1 - clamp(p.blink.l))}${pimplesSvg(sk.acne)}${patchesSvg(sk.acne, sk.patch)}${foamSvg(sk.foam, p.tearT || 0)}${maskSvg(sk.mask, sk.dry)}
       ${eyeSvg(-78, p.lid.l, p.blink.l, squint, p.gaze.x, p.gaze.y, p.tears, p.tearT, 1)}${eyeSvg(78, p.lid.r, p.blink.r, squint, p.gaze.x, p.gaze.y, p.tears, p.tearT, -1)}
-      ${browSvg(-1, brL.r, brL.i)}${browSvg(1, brR.r, brR.i)}
-      <ellipse cx="0" cy="${-70 + (brL.r + brR.r) * -10}" rx="18" ry="12" fill="#0f0a08"/>
+      ${(() => { const bs = p.browStyle || {}; const kl = bs.kl ?? bs.k ?? 0, kr = bs.kr ?? bs.k ?? 0, rd = bs.red || 0; return `${rd > 0.02 ? [-1, 1].map((s) => `<ellipse cx="${s * 76}" cy="-84" rx="72" ry="22" fill="#ff5a5a" opacity="${0.35 * rd}" filter="url(#blur8)"/>`).join('') : ''}${browSvg(-1, brL.r, brL.i, kl, bs.shortL || 0)}${browSvg(1, brR.r, brR.i, kr, bs.shortR || 0)}<ellipse cx="0" cy="${-70 + (brL.r + brR.r) * -10}" rx="18" ry="12" fill="#0f0a08" opacity="${clamp(1 - Math.max(kl, kr) * 2.2)}"/>`; })()}
       <g transform="translate(${yaw * 14},${(p.breath || 0) * 1.2})">
         <ellipse cx="0" cy="48" rx="${34 + (p.flare || 0) * 3}" ry="26" fill="#7d4524" ${O8}/><ellipse cx="-9" cy="38" rx="10" ry="6" fill="#fff" opacity="0.4"/>
         <ellipse cx="-12" cy="58" rx="${7 + (p.flare || 0) * 2}" ry="5" fill="#2a130a"/><ellipse cx="12" cy="58" rx="${7 + (p.flare || 0) * 2}" ry="5" fill="#2a130a"/>
