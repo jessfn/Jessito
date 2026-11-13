@@ -30,14 +30,16 @@ CAST.tomas=mk('Tomas',{hair:'short',skin:'#e0a98a',skin2:'#c98a64',hood:'#55606e
 export const DEF={L:{w:[146,422],hand:'relax'},R:{w:[354,422],hand:'relax'}};
 // pose: {L:{w,hand,prop},R:{...},head:{rot,dx,dy},breath,expr,blink,look,talk}
 export function body(st,pose={}){const ol=st.ol;const hs=st.hs;const k=0.97*hs;let o='';
- const br=(pose.breath||0)*2.2;const shL=[P.shL[0],P.shL[1]+br],shR=[P.shR[0],P.shR[1]+br];
- const L={...DEF.L,...(pose.L||{})},R={...DEF.R,...(pose.R||{})};
- const wk=pose.walk||{phase:0,amp:0};const lfL=Math.max(0,Math.sin(wk.phase))*28*wk.amp,lfR=Math.max(0,Math.sin(wk.phase+Math.PI))*28*wk.amp;const KNL=[P.knL[0],P.knL[1]-lfL*.5],ANL=[P.anL[0],P.anL[1]-lfL],KNR=[P.knR[0],P.knR[1]-lfR*.5],ANR=[P.anR[0],P.anR[1]-lfR];
- const legL=limb(P.hipL,KNL,56,46)+limb(KNL,ANL,46,34),legR=limb(P.hipR,KNR,56,46)+limb(KNR,ANR,46,34);
+ const br=(pose.breath||0)*2.2;const Y=Math.max(-1,Math.min(1,pose.byaw||0));const cB=Math.max(.24,Math.cos(Math.abs(Y)*1.3));const mx=x=>250+(x-250)*cB;const sg=Math.sign(Y)||1;const sY=Math.sin(Math.abs(Y)*1.2);
+ const shL=[mx(P.shL[0]),P.shL[1]+br],shR=[mx(P.shR[0]),P.shR[1]+br];
+ const L0={...DEF.L,...(pose.L||{})},R0={...DEF.R,...(pose.R||{})};const mp=A=>({...A,w:[mx(A.w[0]),A.w[1]],e:A.e?[mx(A.e[0]),A.e[1]]:undefined});const L=mp(L0),R=mp(R0);
+ const wk=pose.walk||{phase:0,amp:0};const lfL=Math.max(0,Math.sin(wk.phase))*28*wk.amp,lfR=Math.max(0,Math.sin(wk.phase+Math.PI))*28*wk.amp;const str=Math.sin(wk.phase)*wk.amp*42*sY*sg;const KNL=[mx(P.knL[0])+str*.5,P.knL[1]-lfL*.5],ANL=[mx(P.anL[0])+str,P.anL[1]-lfL],KNR=[mx(P.knR[0])-str*.5,P.knR[1]-lfR*.5],ANR=[mx(P.anR[0])-str,P.anR[1]-lfR];const HPL=[mx(P.hipL[0]),P.hipL[1]],HPR=[mx(P.hipR[0]),P.hipR[1]];
+ const legL=limb(HPL,KNL,56,46)+limb(KNL,ANL,46,34),legR=limb(HPR,KNR,56,46)+limb(KNR,ANR,46,34);
  o+=grp(legL,st.pants,st,[150,420,140,290])+grp(legR,st.pants,st,[220,420,140,290]);
  o+=`<path d="M214,452 L212,560 M286,452 L288,555" stroke="${ol}" stroke-width="1.6" opacity=".5"/>`;
- o+=`<g transform="translate(${ANL[0]},${ANL[1]-2})">${withT(T(ANL[0],ANL[1]-2),()=>shoeV2(st,-1))}</g><g transform="translate(${ANR[0]},${ANR[1]-2})">${withT(T(ANR[0],ANR[1]-2),()=>shoeV2(st,1))}</g>`;
+ const dL=Math.abs(Y)>.45?sg:-1,dR=Math.abs(Y)>.45?sg:1,shS=1+.45*sY;o+=`<g transform="translate(${ANL[0]},${ANL[1]-2}) scale(${shS.toFixed(3)},1)">${withT(T(ANL[0],ANL[1]-2,0,shS,1),()=>shoeV2(st,dL))}</g><g transform="translate(${ANR[0]},${ANR[1]-2}) scale(${shS.toFixed(3)},1)">${withT(T(ANR[0],ANR[1]-2,0,shS,1),()=>shoeV2(st,dR))}</g>`;
  o+=`<ellipse cx="${ANL[0]}" cy="${ANL[1]-6}" rx="22" ry="8" fill="${st.pants}" stroke="${ol}" stroke-width="${st.ow*1.4}"/><ellipse cx="${ANR[0]}" cy="${ANR[1]-6}" rx="22" ry="8" fill="${st.pants}" stroke="${ol}" stroke-width="${st.ow*1.4}"/>`;
+ const farIdx=o.length;o+=`<g transform="translate(250,0) scale(${cB.toFixed(3)},1) translate(-250,0)">`;
  o+=grp(`<path d="M184,${232+br} Q250,${214+br} 316,${232+br} Q326,330 300,448 Q250,462 200,448 Q174,330 184,${232+br}Z"/>`,st.hood,st,[170,215,160,250]);
  o+=`<path d="M214,${246+br} Q250,${284+br} 286,${246+br}" stroke="${ol}" stroke-width="${st.ow*1.2}" fill="none"/><path d="M240,268 v52 M262,268 v48" stroke="${st.shoe}" stroke-width="3" stroke-linecap="round"/><circle cx="240" cy="322" r="3" fill="${st.shoe}"/><circle cx="262" cy="318" r="3" fill="${st.shoe}"/><path d="M208,392 Q250,404 292,392 L298,440 Q250,452 202,440Z" fill="${st.hood2}" stroke="${ol}" stroke-width="${st.ow*1.1}"/>`;
  o+=grp(`<path d="M198,${238+br} Q204,${200+br} 250,${196+br} Q296,${200+br} 302,${238+br} Q250,${222+br} 198,${238+br}Z"/>`,st.hood,st,[190,190,120,60],{sd:3});
@@ -47,6 +49,7 @@ export function body(st,pose={}){const ol=st.ol;const hs=st.hs;const k=0.97*hs;l
  const hy=P.head[1]-(hs-1)*27+(pose.head?.dy||0);
  if(visibleBB(205,155,295,245,2)){const cn=uid();o+=`<clipPath id="${cn}">${nk}</clipPath><g clip-path="url(#${cn})"><ellipse cx="250" cy="${hy+54*k+6}" rx="${34*k}" ry="${16*k}" fill="#1a0f2a" opacity=".22"/></g><path d="M238,196 Q243,212 246,228 M262,196 Q257,212 254,228" stroke="${ol}" stroke-width="1.6" fill="none" opacity=".4" stroke-linecap="round"/>`}
  o+=grp(`<path d="M202,${230+br} Q250,${270+br} 298,${230+br} Q304,${218+br} 292,${214+br} Q250,${244+br} 208,${214+br} Q196,${218+br} 202,${230+br}Z"/>`,st.hood2,st,[190,200,120,80],{sd:3});
+ o+=`</g>`;
  const arm=(sh0,wr,side,A)=>{const lift=Math.max(0,Math.min(1,(sh0[1]-wr[1]+20)/170))*9;const sh=[sh0[0]+side*lift*.3,sh0[1]-lift];const el=A.e?[A.e[0]+side*lift*.3,A.e[1]-lift*.5]:elbow(sh,wr,side,A.fs||1);let r=grp(limb(sh,el,50,42)+limb(el,wr,42,34),st.hood,st,[Math.min(sh[0],wr[0])-70,Math.min(sh[1],wr[1])-70,Math.abs(wr[0]-sh[0])+140,Math.abs(wr[1]-sh[1])+160]);
   r+=`<path d="M${el[0]-8},${el[1]+8} q8,6 4,14M${el[0]+6},${el[1]-10} q-6,6 -4,14" stroke="${ol}" stroke-width="1.5" fill="none" opacity=".5"/>`;
   const fa=ang(el,wr),dir=[Math.cos(fa*Math.PI/180),Math.sin(fa*Math.PI/180)];
@@ -59,10 +62,16 @@ export function body(st,pose={}){const ol=st.ol;const hs=st.hs;const k=0.97*hs;l
   else{{const sd=side<0?-1:1;r+=hand(hw,fa,1.2,sd,withT(T(hw[0],hw[1],fa,1.2,1.2*sd),()=>handProf('free',st)))}}
   return r};
  let late='';
- {const a=arm(shL,L.w,-1,L);if(L.front)late+=a;else o+=a}
- {const a=arm(shR,R.w,1,R);if(R.front)late+=a;else o+=a}
+ let farS='';
+ {const a=arm(shL,L.w,-1,L);if(Y>.4&&!L.front)farS+=a;else if(L.front)late+=a;else o+=a}
+ {const a=arm(shR,R.w,1,R);if(Y<-.4&&!R.front)farS+=a;else if(R.front)late+=a;else o+=a}
+ if(farS)o=o.slice(0,farIdx)+farS+o.slice(farIdx);
  const hd=pose.head||{};
- const yw=Math.max(-1,Math.min(1,hd.yaw||0)),cyw=Math.cos(yw*1.0),sxs=k*cyw,hdx=(hd.dx||0)+yw*20*k,lkY=pose.look?[pose.look[0]+yw*1.4,pose.look[1]]:pose.look;
+ const yw=Math.max(-1,Math.min(1,(hd.yaw||0)+Y*.8)),cyw=Math.cos(yw*1.0),sxs=k*cyw,hdx=(hd.dx||0)+yw*20*k+Y*12,lkY=pose.look?[pose.look[0]+yw*1.4,pose.look[1]]:pose.look;
  o+=`<g transform="translate(${P.head[0]+hdx},${hy}) rotate(${(hd.rot||0)+yw*3}) scale(${f(sxs)},${f(k)})">${withT(T(P.head[0]+hdx,hy,(hd.rot||0)+yw*3,sxs,k),()=>face(st,pose.expr||'neutral',{blink:pose.blink,look:lkY,talk:pose.talk}))}</g>`+late;
  return o}
 export {defs};
+
+CAST.sgt=mk('Sargento',{hair:'short',skin:'#b98260',skin2:'#966448',hood:'#55603f',hood2:'#3f4a2e',pants:'#3b4230'});CAST.sgt.hair='#14100c';CAST.sgt.hair2='#2a221a';CAST.sgt.hairStyle='short';
+CAST.sol2=mk('Soldado',{hair:'short',skin:'#e0a98a',skin2:'#c98a64',hood:'#55603f',hood2:'#3f4a2e',pants:'#3b4230'});CAST.sol2.hair='#3a2418';CAST.sol2.hair2='#5a3a28';CAST.sol2.hairStyle='short';
+CAST.sol3=mk('Soldado',{hair:'short',skin:'#8a5a40',skin2:'#6a4430',hood:'#4d5a3a',hood2:'#3a4630',pants:'#363c2c'});CAST.sol3.hair='#0e0a08';CAST.sol3.hair2='#241a14';CAST.sol3.hairStyle='short';

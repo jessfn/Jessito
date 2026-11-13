@@ -1,0 +1,110 @@
+[
+ {
+  "id": "e0",
+  "who": "Sargento",
+  "text": "¡Quietos! ¡Manos arriba, ahora mismo!",
+  "say": "[shouting aggressively, military, loud] ¡Quietos! ¡Manos arriba, ahora mismo!"
+ },
+ {
+  "id": "e1",
+  "who": "Diego",
+  "text": "No disparen... somos civiles. Tenemos un herido.",
+  "say": "[trembling voice, slowly, terrified, short breaths] No disparen... somos civiles... Tenemos un herido."
+ },
+ {
+  "id": "e2",
+  "who": "Sargento",
+  "text": "¿Alguno fue mordido o arañado? Muéstrenme los brazos.",
+  "say": "[cold, slow, suspicious, low voice] ¿Alguno fue mordido... o arañado? Muéstrenme los brazos."
+ },
+ {
+  "id": "e3",
+  "who": "Marta",
+  "text": "Nadie. Solo mi amigo tiene la pierna rota.",
+  "say": "[shaky, forcing calm, voice cracking] Nadie... Solo mi amigo tiene la pierna rota."
+ },
+ {
+  "id": "e4",
+  "who": "Sargento",
+  "text": "Pasen. Rápido. Cierren esa puerta.",
+  "say": "[urgent, low, whispering sharply] Pasen. Rápido. Cierren esa puerta."
+ },
+ {
+  "id": "e5",
+  "who": "Tomas",
+  "text": "Hay una cámara en el techo... y un letrero: Centro de Mando.",
+  "say": "[whispering, in awe, slowly] Hay una cámara en el techo... y un letrero: Centro de Mando."
+ },
+ {
+  "id": "e6",
+  "who": "Lucia",
+  "text": "Hay literas y cajas de comida. Es un refugio.",
+  "say": "[relieved, soft, exhaling] Hay literas y cajas de comida... Es un refugio."
+ },
+ {
+  "id": "e7",
+  "who": "Sofi",
+  "text": "Quiero ver a mi papá. ¿Dónde están los demás?",
+  "say": "[crying, small voice, pleading, sniffling] Quiero ver a mi papá... ¿Dónde están los demás?"
+ },
+ {
+  "id": "e8",
+  "who": "Sargento",
+  "text": "Encontramos la gorra y el llavero de tu papá. Lo siento mucho, pequeña.",
+  "say": "[very slowly, gently, sorrowful, heavy sigh] Encontramos la gorra... y el llavero de tu papá. Lo siento mucho, pequeña."
+ },
+ {
+  "id": "e9",
+  "who": "Sofi",
+  "text": "No... no, no, no. ¡Papá!",
+  "say": "[sobbing, voice breaking, devastated, then screaming in grief] No... no, no, no... ¡Papá!"
+ },
+ {
+  "id": "e10",
+  "who": "Marta",
+  "text": "Aquí estoy, Sofi. Respira conmigo. Despacio.",
+  "say": "[very softly, tender, slowly, comforting whisper] Aquí estoy, Sofi... Respira conmigo... Despacio."
+ },
+ {
+  "id": "e11",
+  "who": "Radio",
+  "text": "Puesto Cuatro a Central. La criatura avanza hacia el centro. Solicitamos evacuación aérea.",
+  "say": "[radio transmission, urgent, breathless, static] Puesto Cuatro a Central. La criatura avanza hacia el centro. Solicitamos evacuación aérea."
+ },
+ {
+  "id": "e12",
+  "who": "Sargento",
+  "text": "Escuchen. Al amanecer sale un helicóptero desde la azotea. Aquí está, en el mapa.",
+  "say": "[serious, measured, authoritative] Escuchen. Al amanecer sale un helicóptero desde la azotea. Aquí está, en el mapa."
+ },
+ {
+  "id": "e13",
+  "who": "Sargento",
+  "text": "Pero solo hay lugar para cuatro.",
+  "say": "[flat, heavy, very slowly, grave] Pero solo hay lugar... para cuatro."
+ },
+ {
+  "id": "e14",
+  "who": "Beto",
+  "text": "¿Cuatro? Somos seis.",
+  "say": "[disbelief, angry, voice rising] ¿Cuatro? ¡Somos seis!"
+ },
+ {
+  "id": "e15",
+  "who": "Sargento",
+  "text": "Elijan ustedes... o yo elegiré por ustedes.",
+  "say": "[cold, menacing, slowly, quiet] Elijan ustedes... o yo elegiré por ustedes."
+ },
+ {
+  "id": "e16",
+  "who": "Tomas",
+  "text": "Algo está golpeando la puerta.",
+  "say": "[terrified whisper, trembling, out of breath] Algo está golpeando la puerta..."
+ },
+ {
+  "id": "e17",
+  "who": "Sargento",
+  "text": "¡A sus posiciones! ¡Ya!",
+  "say": "[screaming orders, loud, urgent] ¡A sus posiciones! ¡Ya!"
+ }
+]

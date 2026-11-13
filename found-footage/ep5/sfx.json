@@ -1,0 +1,50 @@
+{
+ "rifle_aim": [
+  "soldiers raising assault rifles and cocking them, tactical, tense, realistic",
+  4
+ ],
+ "heavy_door_close": [
+  "very heavy steel bunker door slamming shut with metal bars locking, deep echo, realistic",
+  5
+ ],
+ "footsteps_bunker": [
+  "several people walking slowly on concrete floor in a bunker, echo, realistic",
+  8
+ ],
+ "bunker_amb": [
+  "underground military bunker ambience, ventilation hum, distant generator, faint radio chatter, eerie, realistic",
+  20
+ ],
+ "radio_static": [
+  "military radio transmission static and squelch, short, realistic",
+  4
+ ],
+ "cry_soft": [
+  "young girl crying softly and sniffling, realistic",
+  8
+ ],
+ "paper_map": [
+  "paper map being unfolded and slapped on a metal table, realistic",
+  3
+ ],
+ "item_drop": [
+  "small metal keys and a cap placed on a metal table, soft, realistic",
+  3
+ ],
+ "door_knock": [
+  "heavy repeated thuds from monstrous impacts against a steel door from the other side, metal denting, terrifying, realistic",
+  8
+ ],
+ "alarm_bunker": [
+  "bunker alarm siren blaring with red alert, realistic",
+  8
+ ],
+ "lasers_hum": [
+  "tense electronic tension drone, subtle, realistic",
+  8
+ ],
+ "heartbeat": [
+  "slow heartbeat, deep, realistic",
+  8
+ ]
+}
