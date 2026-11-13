@@ -20,25 +20,25 @@ S['h9']=end('h8')+1.6;ev['metro']=end('h8')+.2
 S['h10']=end('h9')+3.0;ev['street']=end('h9')+.6
 S['h11']=end('h10')+1.0;S['h12']=end('h11')+1.2
 # ---- Block C: rooftop II
-ev['cutC']=end('h12')+4.5
-S['h13']=ev['cutC']+3.2;S['h14']=end('h13')+1.2;S['h15']=end('h14')+.9
+ev['cutC']=end('h12')+3.0
+S['h13']=ev['cutC']+2.6;S['h14']=end('h13')+1.2;S['h15']=end('h14')+.9
 ev['crack1']=end('h15')+.2;S['h16']=end('h15')+1.0
 S['h17']=end('h16')+1.4;ev['peek']=S['h17']+1.0
 S['h18']=end('h17')+3.2;S['h19']=end('h18')+2.0
 ev['attack']=end('h19')+3.0;S['h20']=ev['attack']-.5;ev['death']=end('h20')+1.6
 # ---- Block D: facade descent
-ev['cutD']=ev['death']+5.0
+ev['cutD']=ev['death']+3.6
 S['h21']=ev['cutD']+2.0;S['h22']=end('h21')+3.0;ev['eyeWin']=end('h22')+2.0
 S['h23']=ev['eyeWin']+4.5
 # ---- Block E: tunnel + door
-ev['cutE']=end('h23')+5.5
+ev['cutE']=end('h23')+4.0
 S['h24']=ev['cutE']+3.5;S['h25']=end('h24')+1.8;S['h26']=end('h25')+1.4
 ev['pierce']=end('h26')+1.0;S['h27']=ev['pierce']+2.2;ev['doorBreak']=end('h27')+1.8
-S['h28']=ev['doorBreak']+5.0
+S['h28']=ev['doorBreak']+4.0
 # ---- Block F: jets, whiteout, dead city, suspense
-ev['cutF']=end('h28')+2.5;S['h29']=ev['cutF']+1.5;ev['jets']=S['h29']-.3
-ev['white']=end('h29')+3.2;ev['dawn']=ev['white']+5.5;ev['sil']=ev['dawn']+9.0;ev['turn']=ev['sil']+7.0;ev['eyes']=ev['turn']+5.0;ev['dead']=ev['eyes']+5.0
+ev['cutF']=end('h28')+1.5;S['h29']=ev['cutF']+1.5;ev['jets']=S['h29']-.3
+ev['white']=end('h29')+3.2;ev['dawn']=ev['white']+4.5;ev['sil']=ev['dawn']+6.5;ev['turn']=ev['sil']+5.5;ev['eyes']=ev['turn']+4.0;ev['dead']=ev['eyes']+4.0
 ev['black']=ev['dead']+2.0;ev['endcard']=ev['black']+1.2
-dur=ev['endcard']+9
+dur=ev['endcard']+8.5
 json.dump({'start':{k:round(v,2) for k,v in S.items()},'ev':{k:round(v,2) for k,v in ev.items()},'dur':round(dur,2),'durs':{k:round(v,2) for k,v in D.items()},'est':not all(os.path.exists(f"build/ep7/voz_t/{l['id']}.mp3") for l in script)},open('ep7/timeline.json','w'))
 print({k:round(v,1) for k,v in ev.items()},round(dur,1))
