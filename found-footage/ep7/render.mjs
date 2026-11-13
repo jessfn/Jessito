@@ -31,9 +31,9 @@ function speakerAt(t){return LINES.find(l=>t>=l.t0&&t<l.t0+l.dur+.15)}
 const MODE={s:[3.2,.92],n:[8,.72],w:[16,.5],c:[55,.9],p:[2.4,.95],z:[12,.6]};
 function stepResp(tau,w,z){if(tau<=0)return 0;const wd=w*Math.sqrt(1-z*z);return 1-Math.exp(-z*w*tau)*(Math.cos(wd*tau)+(z/Math.sqrt(1-z*z))*Math.sin(wd*tau))}
 function camera(t){const ch=s=>[s[1],s[2],s[3],s[4],s[6]];let tc=0;for(const c of CUTS)if(c<=t+1e-6)tc=Math.max(tc,c);const SH=SHOTS.filter(s=>s[0]>=tc-1e-6);let c=ch(SH[0]);for(let i=1;i<SH.length;i++){const sh=SH[i];let [w,z]=MODE[sh[5]];if(sh[4]>40){w=14;z=.7}const g=stepResp(t-sh[0]-(sh[5]==='c'?0:.28),w,z);if(g===0)continue;const A=ch(sh),B=ch(SH[i-1]);for(let k=0;k<5;k++)c[k]+=(A[k]-B[k])*g}return c}
-function focusBlur(t){let b=0;let tc=0;for(const c of CUTS)if(c<=t+1e-6)tc=Math.max(tc,c);const SH=SHOTS.filter(s=>s[0]>=tc-1e-6);for(let i=1;i<SH.length;i++){const sh=SH[i];if(!'wzc'.includes(sh[5]))continue;const tau=t-sh[0]-(sh[5]==='c'?0:.3);if(tau<0||tau>1.2)continue;const amp=sh[5]==='c'?9:sh[5]==='w'?6:3;b=Math.max(b,amp*Math.exp(-tau/.3))}return b}
+function focusBlur(t){let b=0;let tc=0;for(const c of CUTS)if(c<=t+1e-6)tc=Math.max(tc,c);const SH=SHOTS.filter(s=>s[0]>=tc-1e-6);for(let i=1;i<SH.length;i++){const sh=SH[i];if(!'wzc'.includes(sh[5]))continue;const tau=t-sh[0]-(sh[5]==='c'?0:.3);if(tau<0||tau>1.2)continue;const amp=sh[5]==='c'?9:sh[5]==='w'?6:3;b=Math.max(b,amp*Math.exp(-tau/.3))}for(const c of CUTS){if(c<=0)continue;if(t>=c-.12&&t<c)b=Math.max(b,16*(1-(c-t)/.12));if(t>=c&&t<c+.22)b=Math.max(b,16*Math.exp(-(t-c)/.09))}return b}
 const IMPULSES=[[EVT.lunge0,60],[EVT.snap,60],[EVT.attack,90],[EVT.shatter,70],[EVT.pierce,40],[EVT.doorBreak,90],[EVT.white,60]];
-function shakeAmp(t){const v=viewOf(t);let a=4.5+2*clamp((t-EVT.cam)/60,0,1);if(v==='roofA')a+=(t<EVT.lunge0+3?14:5);if(v==='tele')a+=4;if(v==='ext'||v==='cab')a+=10;if(v==='cabB')a+=7;if(v==='roof'&&t>=EVT.peek-3)a+=5+(t>=EVT.peek?5:0);if(v==='roof'&&t>=EVT.run)a+=10;if(v==='stairs')a+=6;if(v==='edge')a+=6;if(v==='facade')a+=8;if(v==='alley')a+=9;if(v==='tunnel'&&t>=EVT.pierce)a+=14;if(v==='jets')a+=10;if(v==='dead')a=2.2;
+function shakeAmp(t){const v=viewOf(t);let a=4.5+2*clamp((t-EVT.cam)/60,0,1);if(v==='roofA')a+=(t<EVT.lunge0+3?14:5);if(v==='tele')a+=4;if(v==='ext'||v==='cab')a+=10;if(v==='cabB')a+=7;if(v==='roof'&&t>=EVT.peek-3)a+=5+(t>=EVT.peek?5:0);if(v==='roof'&&t>=EVT.run)a+=10;if(v==='stairs')a+=6;if(v==='edge')a+=6;if(v==='facade')a+=8;if(v==='alley')a+=9;if(v==='tunnel'&&t>=EVT.pierce)a+=14;if(v==='cabF')a+=12+(t>=EVT.white-1?14:0);if(v==='tunnelB')a+=18*Math.exp(-(t-EVT.tunnelB)/1.5);if(v==='cabAfter')a+=5;if(v==='dead')a=2.2;
  for(const [ti,m] of IMPULSES)if(t>ti)a+=m*Math.exp(-(t-ti)/.5);return a}
 const nz=(t,s)=>Math.sin(t*1.7*s+1)*.5+Math.sin(t*3.9*s+2)*.3+Math.sin(t*7.3*s+3)*.2;
 function quakeLvl(t){return clamp(shakeAmp(t)/40,0,1.4)}
@@ -55,7 +55,7 @@ const EXL={
  j19:A('worry','neutral','worry','worry','sad','sad'),j20:A('worry','neutral','worry','worry','sad','sad'),j21:A('worry','neutral','worry','worry','fear','fear'),j22:A('worry','neutral','worry','worry','scream','scream'),
  j23:A('worry','neutral','worry','worry','scream'),j24:A('worry','neutral','worry','worry','fear'),j25:A('worry','neutral','worry','worry','fear'),j26:A('worry','neutral','worry','worry','fear'),
  j27:A('worry','neutral','worry','worry','scream'),j28:A('worry','neutral','worry','worry','fear'),j29:A('worry','neutral','worry','worry','sad'),j30:A('worry','neutral','worry','worry','sad'),
- j31:A('worry','neutral','worry','worry','sad'),j32:A('worry','neutral','worry','worry','sad'),j33:A('worry','neutral','worry','worry','sad')};
+ j31:A('worry','neutral','worry','worry','sad'),j32:A('worry','neutral','worry','worry','sad'),j33:A('shock','neutral','sad','sad','sad'),j34:A('sad','neutral','sad','sad','sad'),j35:A('shock','neutral','shock','shock','sad')};
 function exprNew(who,tn){const idx=WHOL.indexOf(who);let ex=who==='sgt'?'neutral':'fear';if(tn<START.j0)return ex;
  for(const l of LINES){if(!EXL[l.id])continue;const spk=WHOKEY[l.who]===who;const t0=l.t0+(spk?0:.25+.1*Math.max(0,idx));if(tn<t0)break;ex=EXL[l.id][who]||ex}
  if(who==='marta'&&tn>=EVT.attack&&tn<EVT.stairs)ex='scream';
@@ -73,8 +73,8 @@ function viewOf(t){
  if(t<T7.tele)return 'roofA';if(t<S_('j3')-.2)return 'tele';if(t<T7.cutH)return 'roofA';
  if(t<T7.cutB)return EXTW.some(w=>t>=w[0]&&t<w[1])?'ext':'cab';
  if(t<T7.cutC)return 'cabB';if(t<T7.stairs)return 'roof';if(t<T7.rope)return 'stairs';if(t<T7.cutD)return 'edge';
- if(t<T7.alley)return 'facade';if(t<T7.cutE)return 'alley';if(t<T7.cutF)return 'tunnel';if(t<T7.dawn)return 'jets';return 'dead'}
-const CUTS=[0,T7.tele,S_('j3')-.2,T7.cutH,S_('j5')-.1,T7.ext1,S_('j8')-.1,T7.close,T7.snap+1.4,T7.cutB,T7.cutC,T7.run,T7.stairs,T7.rope,T7.cutD,T7.alley,T7.cutE,T7.cutF,T7.dawn];
+ if(t<T7.alley)return 'facade';if(t<T7.cutE)return 'alley';if(t<T7.cutF)return 'tunnel';if(t<T7.tunnelB)return 'cabF';if(t<T7.cabAfter)return 'tunnelB';if(t<T7.dawn)return 'cabAfter';return 'dead'}
+const CUTS=[0,T7.tele,S_('j3')-.2,T7.cutH,S_('j5')-.1,T7.ext1,S_('j8')-.1,T7.close,T7.snap+1.4,T7.cutB,T7.cutC,T7.run,T7.stairs,T7.rope,T7.cutD,T7.alley,T7.cutE,T7.cutF,T7.tunnelB,T7.cabAfter,T7.dawn];
 const REL={L:{w:[146,422],hand:'relax'},R:{w:[354,422],hand:'relax'}};
 const MOUTH=()=>({L:{e:[168,332],w:[224,238],hand:'open',front:1},R:{e:[332,332],w:[276,238],hand:'open',front:1}});
 const DEF2={L:{e:[118,322],w:[134,214],hand:'open'},R:{e:[382,322],w:[366,214],hand:'open'}};
@@ -89,7 +89,7 @@ function chars(t){const v=viewOf(t);const out={};
  if(v==='roofA'){const dn=t<T7.monLeaves-.5;out.marta={x:1000,fy:FL,s:1.5,yaw:.9,arms:dn?COVER:{L:{w:[100,330],hand:'open'},R:{w:[560,170],hand:'open'}},rot:dn?-6:2};
   out.sgt={x:1700,fy:FL,s:1.5,yaw:.9,arms:t<S_('j3')?(dn?COVER:{L:REL.L,R:{w:[470,170],hand:'point'}}):{L:{w:[440,330],hand:'open'},R:{w:[300,380],hand:'relax'}},rot:dn?-6:0}}
  else if(v==='ext'){out.diego={x:EXT.cx+Math.sin(t*1.3)*14,fy:EXT.diegoY,s:1.5,yaw:0,rot:Math.sin(t*1.7)*5,arms:HANGA,hang:1,vis:t<T7.snap+.1}}
- else if(v==='cab'||v==='cabB'){const calm=t>=T7.cutB||t>=T7.snap+.2;
+ else if(v==='cab'||v==='cabB'||v==='cabF'||v==='cabAfter'){const calm=t>=T7.cutB||t>=T7.snap+.2;
   out.lucia={x:2050,fy:FL,s:1.5,yaw:1.05,arms:calm?{L:REL.L,R:{w:[520,300],hand:'open'}}:REACH,rot:calm?0:-4};
   out.beto={x:1640,fy:FL,s:1.5,yaw:.9,arms:calm?{L:REL.L,R:REL.R}:{L:{w:[100,160],hand:'grip'},R:{w:[500,210],hand:'open'}},rot:calm?4:-3};
   out.sofi={x:1230,fy:FL,s:1.05,yaw:.35,arms:t>=S_('j8')?MOUTH():{L:{w:[134,330],hand:'open'},R:REL.R},rot:0}}
@@ -133,8 +133,8 @@ function charSVG(who,t,shock,tn,L){const st=CAST[who];const sp=speakerAt(tn);
 function wrap(txt,max){const w=txt.split(' ');const out=[];let cur='';for(const x of w){if((cur+' '+x).trim().length>max){out.push(cur.trim());cur=x}else cur+=' '+x}out.push(cur.trim());return out}
 function caption(t){const sp=speakerAt(t);if(!sp)return'';const lines=wrap(sp.text.replace(/\.\.\./g,'…'),22);const fs=lines.length>2?50:56;let s='';const y0=1440-(lines.length-1)*34;lines.forEach((l,i)=>{s+=`<text x="520" y="${y0+i*(fs+10)}" text-anchor="middle" font-family="Inter" font-weight="800" font-size="${fs}" fill="#fff" stroke="#000" stroke-width="10" paint-order="stroke" stroke-linejoin="round">${l.replace(/&/g,'&amp;')}</text>`});
  return `<text x="520" y="${y0-fs-14}" text-anchor="middle" font-family="Inter" font-weight="800" font-size="30" letter-spacing="4" fill="#ffd54a" stroke="#000" stroke-width="7" paint-order="stroke">${NAMES[sp.who]||sp.who}</text>`+s}
-function hud(t){const src=(t>=EVT.cutH&&t<EVT.cutC)?'AEROCAM 02':'CAM 01 · TOMÁS';const el=Math.max(0,t-EVT.cam);const hh=String(Math.floor(el/3600)).padStart(2,'0'),mm=String(Math.floor(el/60)%60).padStart(2,'0'),ss=String(Math.floor(el)%60).padStart(2,'0');const on=Math.floor(t*1.6)%2===0;const low=t>=EVT.eyes;
- return `<g font-family="DejaVu Sans Mono" fill="#fff" stroke="#000" stroke-width="5" paint-order="stroke"><circle cx="86" cy="270" r="15" fill="#ff2222" opacity="${on?1:.12}" stroke="none"/><text x="116" y="282" font-size="38" font-weight="700">REC</text><text x="640" y="282" font-size="36">${hh}:${mm}:${ss}</text><text x="70" y="330" font-size="28" fill="#ffd54a">${src}</text><text x="70" y="1575" font-size="30">SEP 19 2025  ${t<EVT.cutH?'05:42':t<EVT.cutC?'05:44':t<EVT.dawn?'05:52':'07:03'}</text><text x="700" y="1575" font-size="30" fill="${low&&on?'#ff4a3a':'#fff'}">${low?'BAT ▮▯▯▯':'BAT ▮▮▮▯'}</text></g><g stroke="#fff" stroke-width="4" fill="none" opacity=".75"><path d="M50,236h60M50,236v60M960,236h-60M960,236v60M50,1600h60M50,1600v-60M960,1600h-60M960,1600v-60"/><path d="M480,930h60M510,900v60" opacity=".5"/></g>`}
+function hud(t){const vv=viewOf(t);const src=(['ext','cab','cabB','cabF','cabAfter'].includes(vv))?'AEROCAM 02':'CAM 01 · TOMÁS';const el=Math.max(0,t-EVT.cam);const hh=String(Math.floor(el/3600)).padStart(2,'0'),mm=String(Math.floor(el/60)%60).padStart(2,'0'),ss=String(Math.floor(el)%60).padStart(2,'0');const on=Math.floor(t*1.6)%2===0;const low=t>=EVT.eyes;
+ return `<g font-family="DejaVu Sans Mono" fill="#fff" stroke="#000" stroke-width="5" paint-order="stroke"><circle cx="86" cy="270" r="15" fill="#ff2222" opacity="${on?1:.12}" stroke="none"/><text x="116" y="282" font-size="38" font-weight="700">REC</text><text x="640" y="282" font-size="36">${hh}:${mm}:${ss}</text><text x="70" y="330" font-size="28" fill="#ffd54a">${src}</text><text x="70" y="1575" font-size="30">SEP 19 2025  ${t<EVT.cutH?'05:42':t<EVT.cutC?'05:44':t<EVT.cutF?'05:52':t<EVT.dawn?'05:58':'07:03'}</text><text x="700" y="1575" font-size="30" fill="${low&&on?'#ff4a3a':'#fff'}">${low?'BAT ▮▯▯▯':'BAT ▮▮▮▯'}</text></g><g stroke="#fff" stroke-width="4" fill="none" opacity=".75"><path d="M50,236h60M50,236v60M960,236h-60M960,236v60M50,1600h60M50,1600v-60M960,1600h-60M960,1600v-60"/><path d="M480,930h60M510,900v60" opacity=".5"/></g>`}
 const rng=s=>{let x=s>>>0;return()=>(x=(x*1664525+1013904223)>>>0)/4294967296};
 function glitch(inner,t,amt){const r=rng(Math.floor(t*30)*7919);const dx=(r()-.5)*70*amt;let s=`<g transform="translate(${dx.toFixed(0)},0)">${inner}</g>`;const cols=['#ff2a3a','#2af0ff','#ffffff','#ff2a3a'];for(let i=0;i<Math.round(3+amt*6);i++){const y=Math.floor(r()*(H-60)),h=6+Math.floor(r()*40*amt+4);s+=`<rect x="0" y="${y}" width="${W}" height="${h}" fill="${cols[i%4]}" fill-opacity="${(.15+r()*.35).toFixed(2)}"/>`;if(r()<.5)s+=`<rect x="${Math.floor(r()*500)}" y="${y+h}" width="${Math.floor(200+r()*500)}" height="${Math.floor(3+r()*10)}" fill="#fff" fill-opacity="${(.3+r()*.4).toFixed(2)}"/>`}return s}
 function title(t){const u=t-4.7;const ser=`<text x="540" y="300" text-anchor="middle" font-family="Inter" font-weight="700" font-size="32" letter-spacing="16" fill="#ffffff" fill-opacity=".75">CLOVERFIELD</text>`;const fl=u<.4?(Math.sin(u*90)>0?1:.2):1;const g=(u>.3&&u<.55)||(u>2.1)?10:2;
@@ -159,11 +159,29 @@ function operatorHand(t,tgt){const S=opState(t,tgt);const st=CAST.tomas;const a=
  if(S.on){const dx=S.bx-ox,dy=S.by-oy,L=Math.hypot(dx,dy),nx=-dy/L,ny=dx/L;s=`<polygon points="${(ox+nx*10).toFixed(0)},${(oy+ny*10).toFixed(0)} ${(S.bx+nx*330).toFixed(0)},${(S.by+ny*330).toFixed(0)} ${(S.bx-nx*330).toFixed(0)},${(S.by-ny*330).toFixed(0)} ${(ox-nx*10).toFixed(0)},${(oy-ny*10).toFixed(0)}" fill="#e8f2ff" fill-opacity=".16"/>`+s}
  if(t>=EVT.black-.9&&t<EVT.black){const u=clamp((t-EVT.black+.9)/.4);setCTM(T(540,980,-8,8*u+.1,8*u+.1));const hp=handSkin('open',st);setCTM([1,0,0,1,0,0]);s+=`<g transform="translate(540,980) rotate(-8) scale(${(8*u+.1).toFixed(2)})"><g transform="translate(-30,-30)">${hp}</g></g>`}
  return {svg:s,bx:S.bx,by:S.by,on:S.on}}
-function opMode(t){if(((t>=EVT.stairs&&t<EVT.rope)||(t>=EVT.cutE&&t<EVT.cutF))&&!(t>=EVT.pierce&&t<EVT.doorBreak+1.2))return {m:'flash'};const win=[[S_('j16')+.2,S_('j16')+2.4,'steady'],[EVT.attack+1.0,EVT.attack+2.6,'shield'],[EVT.shatter-.2,EVT.shatter+1.4,'shield'],[EVT.pierce,EVT.doorBreak+1.2,'shield'],[EVT.dead-.2,EVT.black,'shield']];for(const [a,b,m] of win)if(t>=a&&t<b)return {m,u:clamp(Math.min((t-a)/.25,(b-t)/.25))};return {m:'none'}}
+function opMode(t){const dark=((t>=EVT.stairs&&t<EVT.rope)||(t>=EVT.cutE&&t<EVT.cutF)||(t>=EVT.tunnelB&&t<EVT.cabAfter))&&!(t>=EVT.pierce&&t<EVT.doorBreak+1.2);return dark?{m:'flash'}:{m:'none'}}
+function opSchedule(){return [['brace',.2,4.2],['point',S_('j1')+.3,S_('j1')+2.2],['point',EVT.tele-.2,EVT.tele+2.6],['brace',S_('j3')-.1,EVT.cutH],
+ ['brace',EVT.cutC+.4,S_('j16')],['point',S_('j16')+.2,S_('j16')+2.4],['brace',EVT.peek+1.5,EVT.attack-1.6],['shield',EVT.attack+1.0,EVT.attack+2.6],['swing',EVT.run,EVT.stairs],
+ ['brace',EVT.stairs+.3,EVT.rope],['grip',EVT.rope+.2,EVT.cutD],['grip',EVT.cutD+.2,EVT.shatter-.3],['shield',EVT.shatter-.2,EVT.shatter+1.4],['swing',EVT.alley,EVT.cutE],
+ ['brace',EVT.cutE+.3,EVT.pierce-.1],['shield',EVT.pierce,EVT.doorBreak+1.2],['reach',EVT.doorBreak+1.2,EVT.doorBreak+2.6],['brace',EVT.doorBreak+2.6,EVT.cutF],
+ ['brace',EVT.tunnelB+.2,EVT.cabAfter],['brace',EVT.dawn,EVT.dead-.4],['shield',EVT.dead-.2,EVT.black]]}
+function opArms(t){const vv=viewOf(t);if(['ext','cab','cabB','cabF','cabAfter'].includes(vv)||t<.2)return'';let cur=null;for(const o of opSchedule())if(t>=o[1]&&t<o[2]){cur=o;break}if(!cur)return'';
+ const [type,t0,t1]=cur;const u=clamp(Math.min((t-t0)/.3,(t1-t)/.3));const e=sstep(u);const st=CAST.tomas;
+ const c0=camera(t-.06),c2=camera(t+.06),c1=camera(t);const vx=(c2[0]-c0[0])/.12*c1[2],vy=(c2[1]-c0[1])/.12*c1[2];
+ const swx=-clamp(vx*.04,-120,120)+Math.sin(t*1.3)*10+Math.sin(t*3.1)*5,swy=-clamp(vy*.03,-80,80)+Math.sin(t*1.7)*8;
+ const run=(type==='swing');const bob=run?Math.sin(t*11)*150:0;const jit=(t>=EVT.attack-.5&&t<EVT.attack+4)||(t>=EVT.pierce&&t<EVT.doorBreak+2)?Math.sin(t*34)*9:0;
+ let pose='open',hx,hy,rot,sc=3.3,from=[-220,2150];
+ if(type==='brace'){pose='open';hx=180;hy=1620;rot=80}else if(type==='point'){pose='point';hx=300;hy=1260;rot=-72;sc=3.5}else if(type==='grip'){pose='fist';hx=210;hy=1320;rot=-88}
+ else if(type==='swing'){pose='relax';hx=170;hy=1700;rot=95}else if(type==='reach'){pose='open';hx=430;hy=1120;rot=-58;sc=3.7}else{pose='open';hx=560;hy=1040;rot=-95;sc=4.2}
+ const off=1-e;let X=hx+swx+jit,Y=hy+swy+bob+off*520;if(type==='shield'){X=560+swx*.4+jit;Y=1040+swy*.4+off*900;sc=(t>=EVT.dead-.2)?8*sstep((t-EVT.dead+.2)/1.8)+.1:sc*(.3+.7*e)}
+ else{from=[-220+swx*.5,2150]}
+ setCTM(T(X,Y,rot,sc,sc));const hh=handSkin(pose,st);setCTM([1,0,0,1,0,0]);let g='';
+ if(type!=='shield'){const sl=limbS(from,[X-Math.cos(rot*Math.PI/180)*60*sc/3,Y-Math.sin(rot*Math.PI/180)*60*sc/3],175,118);setCTM([1,0,0,1,0,0]);g+=grpS(sl,st.hood,st,[-300,Y-500,Math.max(X,0)+700,1200],{ow:5,sd:8})}
+ g+=`<g transform="translate(${X.toFixed(1)},${Y.toFixed(1)}) rotate(${rot}) scale(${sc.toFixed(2)} ${sc.toFixed(2)})">${type==='shield'?`<g transform="translate(-30,-30)">${hh}</g>`:hh}</g>`;return g}
 // ---- scene composition
 const w2s=(x,y)=>[CAMM[0]*x+CAMM[2]*y+CAMM[4],CAMM[1]*x+CAMM[3]*y+CAMM[5]];
 const f1=n=>(+n).toFixed(1);
-const STRAPS=[[0.3,'AZOTEA · EDIFICIO CENTRAL'],[EVT.cutH,'AEROCAM 02 · HELICÓPTERO ÁGUILA 1'],[EVT.cutB,'SOBRE EL DISTRITO NORTE'],[EVT.cutC,'AZOTEA · 12 MIN PARA EL BOMBARDEO'],[EVT.stairs,'ESCALERA DE SERVICIO'],[EVT.cutD,'FACHADA OESTE · 40 PISOS'],[EVT.alley,'CALLE · ACCESO A SERVICIOS'],[EVT.cutE,'TÚNEL DE SERVICIO'],[EVT.cutF,'BOMBARDEO · SECTOR 4'],[EVT.dawn,'DISTRITO CENTRO · 07:03']];
+const STRAPS=[[0.3,'AZOTEA · EDIFICIO CENTRAL'],[EVT.cutH,'AEROCAM 02 · HELICÓPTERO ÁGUILA 1'],[EVT.cutB,'SOBRE EL DISTRITO NORTE'],[EVT.cutC,'AZOTEA · 12 MIN PARA EL BOMBARDEO'],[EVT.stairs,'ESCALERA DE SERVICIO'],[EVT.cutD,'FACHADA OESTE · 40 PISOS'],[EVT.alley,'CALLE · ACCESO A SERVICIOS'],[EVT.cutE,'TÚNEL DE SERVICIO'],[EVT.cutF,'ÁGUILA 1 · SOBRE LA BAHÍA'],[EVT.tunnelB,'TÚNEL DE SERVICIO · IMPACTO'],[EVT.cabAfter,'ÁGUILA 1 · 22 KM DEL SECTOR 4'],[EVT.dawn,'DISTRITO CENTRO · 07:03']];
 function strap(t){for(const [t0,tx] of STRAPS){if(t>=t0&&t<t0+3.6){const a=clamp(Math.min((t-t0)/.4,(t0+3.6-t)/.5));if(t<EVT.cam&&t0>1)continue;return `<g opacity="${a.toFixed(2)}"><rect x="60" y="350" width="${Math.min(940,tx.length*21+60)}" height="52" fill="#000" fill-opacity=".55"/><text x="80" y="388" font-family="DejaVu Sans Mono" font-size="30" font-weight="700" fill="#ffd54a">${tx}</text></g>`}}return''}
 const specks=(x,y,seed,n=16,r=70)=>{let s='';for(let i=0;i<n;i++){const a=rn(seed+i)*6.28,d=rn(seed+i*3)*r;s+=`<circle cx="${f1(x+Math.cos(a)*d)}" cy="${f1(y+Math.sin(a)*d*1.3)}" r="${f1(2+rn(seed+i*5)*7)}" fill="#8a0c14" fill-opacity=".9"/>`}return s};
 function monRoofA(t){const lu=sstep((t-(EVT.lunge0-.5))/.7),lv=sstep((t-EVT.monLeaves)/2.8);let hx=lerp(3900,2500,lu),hy=lerp(420,820,lu);
@@ -244,18 +262,28 @@ function sceneWorld(t,tn){const [cx,cy,z,rot,sk]=camera(t);const blur=process.en
   if(t>=EVT.doorBreak){const g=clamp((t-EVT.doorBreak)/1.5);w+=bloodSpray(t,EVT.doorBreak,2100,900,-.9,-.2,61,60,1.8)+bloodStain(1800,FL+60,260*g,71,1)+bloodStain(1500,FL+90,140*g,81,1)}
   if(op>0){w+=`<path d="M2100,${FL} Q2300,900 2700,${FL-60} L2900,${FL} Z" fill="#05030a" fill-opacity="${(.9*op).toFixed(2)}"/>`}
   tint='#ff7a2a';tintA=.06+.1*pr;dark=.55}
- else if(view==='jets'){w+=sky(t,1500)+skyline(t,1500);
-  const u0=t-EVT.jets;for(let k=0;k<4;k++){const x=lerp(5200,-1800,clamp((u0-k*.25)/3.2)),y=300+k*70+Math.sin(t*2+k)*10;if(x<5100&&x>-1700)w+=`<g transform="translate(${f1(x)},${f1(y)})"><polygon points="-240,0 40,-22 120,0 40,22" fill="#0a0c10" stroke="#05060a" stroke-width="4"/><polygon points="-30,0 -130,-120 -90,0" fill="#0a0c10"/><polygon points="-30,0 -130,120 -90,0" fill="#0a0c10"/><ellipse cx="-260" cy="0" rx="120" ry="14" fill="#ffb04a" fill-opacity=".85"/><ellipse cx="-300" cy="0" rx="260" ry="26" fill="#ff7a2a" fill-opacity=".35"/></g>`}
-  for(let k=0;k<6;k++){const bt=EVT.jets+2.4+k*.55;if(t>=bt&&t<bt+1.2){const u=(t-bt)/1.2;w+=`<circle cx="${f1(400+k*600)}" cy="1100" r="${f1(60+500*u)}" fill="url(#orangeG7)" fill-opacity="${(.9*(1-u)).toFixed(2)}"/><circle cx="${f1(400+k*600)}" cy="1100" r="${f1(30+260*u)}" fill="#fff" fill-opacity="${(.8*(1-u)).toFixed(2)}"/>`}}
-  tint='#ff9a4a';tintA=.1;dark=.2}
+ else if(view==='cabF'||view==='cabAfter'){
+  if(view==='cabF'){w+=sky(t,0)+skyline(t,t*420);const u0=t-EVT.jets;
+   for(let k=0;k<4;k++){const x=lerp(5200,-1800,clamp((u0-k*.25)/3.0)),y=300+k*70+Math.sin(t*2+k)*10;if(x<5100&&x>-1700)w+=`<g transform="translate(${f1(x)},${f1(y)})"><polygon points="-240,0 40,-22 120,0 40,22" fill="#0a0c10" stroke="#05060a" stroke-width="4"/><polygon points="-30,0 -130,-120 -90,0" fill="#0a0c10"/><polygon points="-30,0 -130,120 -90,0" fill="#0a0c10"/><ellipse cx="-260" cy="0" rx="120" ry="14" fill="#ffb04a" fill-opacity=".85"/><ellipse cx="-300" cy="0" rx="260" ry="26" fill="#ff7a2a" fill-opacity=".35"/></g>`}
+   for(let k=0;k<7;k++){const bt=EVT.jets+2.0+k*.55;if(t>=bt&&t<bt+1.2){const u=(t-bt)/1.2;w+=`<circle cx="${f1(200+k*480)}" cy="1000" r="${f1(60+420*u)}" fill="url(#orangeG7)" fill-opacity="${(.9*(1-u)).toFixed(2)}"/><circle cx="${f1(200+k*480)}" cy="1000" r="${f1(30+220*u)}" fill="#fff" fill-opacity="${(.8*(1-u)).toFixed(2)}"/>`}}}
+  else{w+=deadCity(t,{cx:2000});for(let i=0;i<60;i++){const x=((rn(i)*3600+t*30)%3600),y=((rn(i+3)*1800+t*110*(.5+rn(i+5)))%1800);w+=`<circle cx="${f1(x)}" cy="${f1(y)}" r="${f1(3+rn(i+4)*5)}" fill="#e8e0d4" fill-opacity=".6"/>`}}
+  w+=cabin(t,{});
+  for(const k of ['sofi','beto','lucia'])if(L[k])w+=charSVG(k,t,q,tn,L[k]);
+  if(t>=EVT.snap+.3){w+=specks(2050,540,31,22,90)+specks(1640,560,53,20,85)+specks(1230,820,77,10,50)+bloodStain(2050,1380,150,9,1)}
+  tint=view==='cabF'?'#ff9a4a':'#cfc7bd';tintA=view==='cabF'?.1:.08;dark=.3}
+ else if(view==='tunnelB'){const u=t-EVT.tunnelB;w+=tunnelDoor(t,{bulge:0,pierce:1,open:1,lightsOut:u>.4});
+  for(let i=0;i<60;i++){const x=rn(i)*4200-600,y=((rn(i+3)*1500+u*(300+rn(i+5)*700))%1700)-100;w+=`<rect x="${f1(x)}" y="${f1(y)}" width="${f1(4+rn(i+7)*14)}" height="${f1(4+rn(i+9)*14)}" fill="#cfc7bd" fill-opacity="${(.5*Math.max(0,1-u/3.4)).toFixed(2)}"/>`}
+  w+=bloodStain(1800,FL+60,260,71,1)+bloodStain(1500,FL+90,140,81,1);
+  w+=`<ellipse cx="2000" cy="${FL-40}" rx="1400" ry="${f1(300+200*Math.max(0,1-u/2))}" fill="#e8dccf" fill-opacity="${(.35*Math.max(0,1-u/3)).toFixed(2)}"/>`;
+  tint='#ffb07a';tintA=.08;dark=.5}
  else{w+=deadCity(t,{cx});w+=farSilhouette(t,{x:3900,y:1340,sc:.3+.12*sstep((t-EVT.sil)/10),turnT:EVT.turn,eyesT:EVT.eyes});
   for(let k=0;k<4;k++)w+=smokeBlob(t,2800+k*500,1250,420,k);tint='#ffb87a';tintA=.06;dark=.2}
  w+=`</g>`;
  const tg=[540,900];const op=operatorHand(t,[tg[0],tg[1]]);
  w+=`<rect width="${W}" height="${H}" fill="${tint}" fill-opacity="${(tintA+.03*Math.sin(t*5)).toFixed(3)}"/>`;
  w+=`<defs><radialGradient id="dk" gradientUnits="userSpaceOnUse" cx="540" cy="960" r="1200"><stop offset="0" stop-color="#02040a" stop-opacity="0"/><stop offset=".6" stop-color="#02040a" stop-opacity="${(dark*.5).toFixed(2)}"/><stop offset="1" stop-color="#02040a" stop-opacity="${(dark+.3).toFixed(2)}"/></radialGradient></defs><rect width="${W}" height="${H}" fill="url(#dk)"/>`;
- const om=opMode(t);if(om.m==='flash')w+=op.svg;else if(om.m==='steady'){const st=CAST.tomas;const sw=Math.sin(t*2.1)*10;setCTM(T(780+sw,1760,-70,3.2,3.2));const hh=handSkin('open',st);setCTM([1,0,0,1,0,0]);const sl=limbS([1010,2150],[800+sw,1800],170,120);setCTM([1,0,0,1,0,0]);w+=grpS(sl,st.hood,st,[600,1600,700,700],{ow:5,sd:8})+`<g transform="translate(${(780+sw).toFixed(1)},1760) rotate(-70) scale(3.2 3.2)">${hh}</g>`}
- else if(om.m==='shield'){const st=CAST.tomas;const u=om.u;const big=(t>=EVT.dead-.2)?8*sstep((t-EVT.dead+.2)/1.8):4.2*u;const tr=Math.sin(t*36)*8*u;setCTM(T(560+tr,1040,-95,big+.1,big+.1));const hp=handSkin('open',st);setCTM([1,0,0,1,0,0]);w+=`<g transform="translate(${(560+tr).toFixed(1)},1040) rotate(-95) scale(${(big+.1).toFixed(2)})"><g transform="translate(-30,-30)">${hp}</g></g>`}
+ const om=opMode(t);if(om.m==='flash')w+=op.svg;
+ w+=opArms(t);
  for(let i=0;i<7;i++){const dx=(rn(i)*1000+60),dy=(rn(i+5)*1700+100);w+=`<circle cx="${f1(dx)}" cy="${f1(dy)}" r="${f1(5+rn(i+2)*10)}" fill="#fff" fill-opacity="${(.05+.04*rn(i+7)).toFixed(2)}"/>`}
  // blood on the lens at the moments of violence
  for(const [t0,sd] of [[EVT.snap+.1,3],[EVT.attack+.7,9],[EVT.doorBreak+.2,17]])if(t>=t0&&t<t0+7)w+=lensBlood(t,t0,sd,{hold:3.5});
@@ -306,7 +334,9 @@ const SHOTS=[
  // 5) tunnel
  [EVT.cutE,1700,780,1.0,-2,'w',0],[S_('j28')-.4,1700,800,1.6,2,'n',0],[EVT.pierce-.6,2300,700,1.0,0,'w',0],[S_('j29')-.4,1700,800,1.8,3,'w',0],[S_('j30')-.4,1700,820,1.8,-2,'n',0],[S_('j31')-.4,1700,820,1.9,2,'n',0],[EVT.doorBreak-.4,2300,800,1.1,-4,'w',0],[EVT.doorBreak+.8,1300,900,.8,0,'n',0],[S_('j32')-.3,1200,900,.9,2,'n',0],
  // 6) jets / bombing / dead city
- [EVT.cutF,2000,300,.55,-3,'w',0],[S_('j33')-.5,2000,350,.6,2,'n',0],[EVT.jets+1.5,2200,300,.7,-2,'w',0],
+ [EVT.cutF,1400,900,.7,0,'s',0],[S_('j33')-.3,2650,700,.8,-2,'n',0],[EVT.white-1.4,2650,600,.9,0,'w',0],
+ [EVT.tunnelB,1700,820,.9,0,'w',0],
+ [EVT.cabAfter,1400,900,.7,0,'s',0],[S_('j34')-.3,1230,900,1.75,2,'n',0],[S_('j35')-.3,520,1000,1.1,0,'n',0],
  [EVT.dawn,2000,900,.6,0,'s',0],[EVT.sil,2700,700,.9,0,'s',0],[EVT.sil+3.5,3300,900,1.2,0,'n',0],[EVT.turn,3800,900,1.9,0,'z',0],[EVT.eyes,3900,780,2.4,0,'z',0]];
 // street run: the camera follows Marta toward the service entrance
 for(let tt=EVT.alley;tt<EVT.cutE-.5;tt+=1.4){const mx=700+Math.min(Math.max(tt-EVT.alley,0),13)*270;SHOTS.push([tt,mx+380,820,tt<S_('j26')-.2?.9:1.15,((tt*7)%5)-2,'w',0])}

@@ -202,5 +202,17 @@
   "who": "Radio",
   "text": "Todas las unidades. Bombardeo en cinco. Cuatro.",
   "say": "[radio transmission, flat military countdown, static] Todas las unidades. Bombardeo en cinco... cuatro..."
+ },
+ {
+  "id": "j34",
+  "who": "Sofi",
+  "text": "Marta... Tomás... por favor, que estén vivos.",
+  "say": "[whispering, crying, shaky, small voice, hollow] Marta... Tomás... por favor, que estén vivos."
+ },
+ {
+  "id": "j35",
+  "who": "Radio",
+  "text": "Águila Uno, detecto una señal de video activa en el sector cuatro. Alguien sigue grabando.",
+  "say": "[radio transmission, astonished, calm, static] Águila Uno, detecto una señal de video activa en el sector cuatro. Alguien sigue grabando."
  }
 ]
