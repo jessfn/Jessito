@@ -66,10 +66,28 @@ print('cardT',cardT)
 # ---- audio mix ----
 total=int((T['END']+0.5)*SR)
 mix=np.zeros(total,dtype=np.float32); voice=np.zeros(total,dtype=np.float32)
+def fftconv(a,b):
+    n=len(a)+len(b)-1; N=1<<(n-1).bit_length()
+    return np.fft.irfft(np.fft.rfft(a,N)*np.fft.rfft(b,N),N)[:n].astype(np.float32)
+_r=np.random.default_rng(5)
+_n=int(0.5*SR); IR=(_r.standard_normal(_n)*np.exp(-np.arange(_n)/SR*7)).astype(np.float32); IR/=np.sqrt(np.sum(IR**2))
+def resamp(a,f):
+    idx=np.arange(0,len(a)-1,f); return np.interp(idx,np.arange(len(a)),a).astype(np.float32)
 for lid,who,vid,text in lines:
     a=load(f'audio/{lid}.mp3'); s=int(T[lid]*SR)
-    g=1.0 if who!='crowd' else 0.9
-    voice[s:s+len(a)]+=a*g
+    w_=int(0.02*SR); n_=len(a)//w_; rms=np.sqrt(np.mean(a[:n_*w_].reshape(n_,w_)**2,axis=1)); p90=np.percentile(rms[rms>1e-4],90)
+    a=a*(0.16/p90)
+    if who=='crowd':
+        l2=np.zeros(len(a)+SR//10,dtype=np.float32); l2[:len(a)]+=a
+        for f,dl in ((0.93,0.03),(1.07,0.06)):
+            r_=resamp(a,f)*0.7; d_=int(dl*SR); 
+            if d_+len(r_)>len(l2): l2=np.pad(l2,(0,d_+len(r_)-len(l2)))
+            l2[d_:d_+len(r_)]+=r_
+        a=l2*0.7
+    if who in ('anun','crowd'):
+        a=a*1.15; wet=fftconv(a,IR)*(0.22 if who=='crowd' else 0.12); a=np.pad(a,(0,len(wet)-len(a)))+wet
+    a=(np.tanh(a*1.3)/1.3).astype(np.float32)
+    voice[s:s+len(a)]+=a[:max(0,len(voice)-s)]
 rng=np.random.default_rng(3)
 t_=np.arange(total)/SR
 def env_ad(n,a=0.005,d=0.3,p=3):
@@ -129,9 +147,8 @@ while tt<T['END']:
 # sidechain duck
 vol=np.abs(voice); w=int(0.12*SR)
 env_v=np.convolve(vol,np.ones(w)/w,'same')
-duck=1-0.55*np.clip(env_v/0.06,0,1)
-music*=duck.astype(np.float32)
-mix+=music*0.9
+duck=1-0.75*np.clip(env_v/0.03,0,1)
+mix+=music*0.5
 # crowd noise during stage
 cs=int(T['S2']*SR); ce=int(T['S3']*SR)
 cn=noise((ce-cs)/SR); cn=lowpass(cn,6)*3
@@ -187,10 +204,6 @@ def click(): return (noise(0.02)*np.exp(-np.arange(int(0.02*SR))/SR*200)).astype
 def heart():
     out=np.zeros(int(0.2*SR),dtype=np.float32); a=sw(500,900,0.12,20); b=sw(900,1400,0.16,18); out[:len(a)]+=a; out[:len(b)]+=0.7*b; return out
 ev=[]
-# word-chunk pops
-for c in chunks:
-    last=c['words'][-1]['w']; f=980 if re.search(r'[!?]$',last) else (820 if c['who']=='dina' else 700)
-    put(mix,c['t0'],pop(f),0.22)
 # hook slams (kinetic title words)
 for i,tt in enumerate((0.3,0.52,0.74,0.96,1.18,1.40)): put(mix,tt,slam()*0.5,0.4)
 # title cards
@@ -204,6 +217,7 @@ put(mix,T['S5']+0.55,pop(900),0.4); put(mix,T['S5']+0.8,pop(1100),0.4)
 put(mix,T['L10']+dur['L10']*0.9,click(),0.8); put(mix,T['L10']+dur['L10']*0.9+0.15,heart(),0.5)
 put(mix,T['END']-1.2,sparkle(),0.35)
 
+mix*=duck.astype(np.float32)
 mix+=voice*1.0
 mix=np.tanh(mix*0.9)
 import wave
