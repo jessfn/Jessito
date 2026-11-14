@@ -150,3 +150,7 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
 - Narrativa constante: gancho, imprevisto (apagon), truco de cinta, giro final (nota "No vayas a la gala", firma M). SIEMPRE incluir inserts cinematograficos de los objetos nombrados
   (paleta, cinta, labial, reloj, nota) con iris, empuje de camara y efectos; punch-ins moderados en la camara principal sobre el paso del maquillaje.
 - Nuevos fondos 3D: camerino (espejo de focos) y pasillo. Personaje nuevo: ninguno (Nina vuelve).
+
+## Ajuste dia 7 (creador)
+- La historia NO menciona el lunar (se quito la frase de Nina y la de la narradora). El lunar solo aparece como opcion final de votacion: "QUITAR EL LUNAR" (se ve feo).
+- Los RIZOS ya NO son opcion. Opciones del dia 8: A = QUITAR EL LUNAR, B = UNAS Y MANOS.

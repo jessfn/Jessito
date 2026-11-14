@@ -6,7 +6,7 @@ import { spawn } from 'node:child_process';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { defs } from './lazy_lib.mjs';
+import { defs, hand } from './lazy_lib.mjs';
 import { drawLazy } from './rig.mjs';
 import { drawNina, handsToTargets, salonTool } from './chars.mjs';
 import { makeDirector } from './director7.mjs';
@@ -37,7 +37,7 @@ const T = {
   shadowA: w('l5', 'sombras') - 0.2, shadowB: L.l5.end - 0.1, linerA: w('l6', 'delineado') - 0.1, outA: w('l7', 'luz') - 0.15, outB: w('l11', 'Volvio') - 0.1,
   tapeA: w('l9', 'cinta') - 0.5, tapeB: w('l9', 'perfecta') + 0.5, lashA: w('l10', 'pestanas') - 0.1, lipA: w('l10', 'labial') - 0.1,
   mirrorA: w('l11', 'mire') - 0.25, reveal: w('l11', 'mire') - 0.2, mirrorB: L.l12.start - 0.2, clockA: L.l13.start + 0.1, knockA: w('l13', 'toco') - 0.15, noteA: w('l13', 'nota') - 0.3, noteB: L.l14.end + 0.3,
-  vote: w('l15', 'Que') - 0.1, optA: w('l15', 'rizos'), optB: w('l15', 'lunar'), cta1: w('l15', 'Comenta'), cta2: w('l15', 'sigueme'),
+  vote: w('l15', 'Que') - 0.1, optA: w('l15', 'lunar'), optB: w('l15', 'unas'), cta1: w('l15', 'Comenta'), cta2: w('l15', 'sigueme'),
 };
 T.walks = [[T.limoOut, T.sceneB - 0.2]];
 T.scenes = [T.slateEnd, T.limoOut, T.sceneB, T.baseA, T.contourA, T.shadowA, T.linerA, T.outA, T.tapeA, T.lipA, T.mirrorA, T.clockA, T.knockA, T.noteA, T.vote];
@@ -188,11 +188,11 @@ function thumb(pp, r) { const sc = r / 235; return `<g><clipPath id="th${Math.ro
 function endCard(t, P) {
   const k = clamp((t - T.vote) / 0.6); if (k <= 0) return '';
   const a = pop(t, T.optA), b = pop(t, T.optB);
-  const A = { ...P, __id: 'A', hair: { rl: 1, s: 0, len: 1, shine: 0.95, sway: 0.2 } };
-  const Bp = { ...P, __id: 'B', makeup: { ...P.makeup, mole: 0 } };
+  const A = { ...P, __id: 'A', makeup: { ...P.makeup, mole: 0 } };
+  const handThumb = `<g><circle r="62" fill="#fbcfe8"/><clipPath id="thH"><circle r="62"/></clipPath><g clip-path="url(#thH)"><g transform="translate(0,22) scale(0.5)">${hand(0, 0, 1, 'stroke="#12090a" stroke-width="8" stroke-linejoin="round"', 'url(#skinB)', true, 0.1, 0.45, 0)}</g></g><circle r="62" fill="none" stroke="#fff" stroke-width="6"/><circle r="66" fill="none" stroke="#12090a" stroke-width="4"/></g>`;
   let s = `<rect width="${W}" height="${H}" fill="#12090a" opacity="${0.6 * k}"/><text x="540" y="${1010 - 30 * (1 - ease(k))}" font-family="Anton" font-size="78" text-anchor="middle" fill="#fff" stroke="${OUT}" stroke-width="14" paint-order="stroke" opacity="${k}">¿QUÉ ARREGLAMOS MAÑANA?</text>`;
-  if (a > 0) s += `<g transform="translate(540,1170) scale(${a})"><rect x="-416" y="-72" width="840" height="150" rx="44" fill="#000" opacity="0.35"/><rect x="-420" y="-80" width="840" height="150" rx="44" fill="#22d3ee" stroke="${OUT}" stroke-width="8"/><rect x="-400" y="-70" width="800" height="36" rx="18" fill="#fff" opacity="0.25"/><g transform="translate(-320,-5)">${thumb(A, 62)}</g><text x="50" y="26" font-family="Anton" font-size="72" text-anchor="middle" fill="${OUT}">A · RIZOS</text></g>`;
-  if (b > 0) s += `<g transform="translate(540,1336) scale(${b})"><rect x="-416" y="-72" width="840" height="150" rx="44" fill="#000" opacity="0.35"/><rect x="-420" y="-80" width="840" height="150" rx="44" fill="#ff4d8d" stroke="${OUT}" stroke-width="8"/><rect x="-400" y="-70" width="800" height="36" rx="18" fill="#fff" opacity="0.2"/><g transform="translate(-320,-5)">${thumb(Bp, 62)}</g><text x="50" y="26" font-family="Anton" font-size="72" text-anchor="middle" fill="#fff">B · EL LUNAR</text></g>`;
+  if (a > 0) s += `<g transform="translate(540,1170) scale(${a})"><rect x="-416" y="-72" width="840" height="150" rx="44" fill="#000" opacity="0.35"/><rect x="-420" y="-80" width="840" height="150" rx="44" fill="#22d3ee" stroke="${OUT}" stroke-width="8"/><rect x="-400" y="-70" width="800" height="36" rx="18" fill="#fff" opacity="0.25"/><g transform="translate(-320,-5)">${thumb(A, 62)}</g><text x="50" y="26" font-family="Anton" font-size="64" text-anchor="middle" fill="${OUT}">A · QUITAR EL LUNAR</text></g>`;
+  if (b > 0) s += `<g transform="translate(540,1336) scale(${b})"><rect x="-416" y="-72" width="840" height="150" rx="44" fill="#000" opacity="0.35"/><rect x="-420" y="-80" width="840" height="150" rx="44" fill="#ff4d8d" stroke="${OUT}" stroke-width="8"/><rect x="-400" y="-70" width="800" height="36" rx="18" fill="#fff" opacity="0.2"/><g transform="translate(-320,-5)">${handThumb}</g><text x="50" y="26" font-family="Anton" font-size="72" text-anchor="middle" fill="#fff">B · UÑAS Y MANOS</text></g>`;
   const c1 = pop(t, T.cta1, 0.3), c2 = pop(t, T.cta2, 0.3);
   if (c1 > 0) s += `<g transform="translate(540,1500) scale(${c1})"><rect x="-400" y="-44" width="800" height="88" rx="44" fill="#ffe14d" stroke="${OUT}" stroke-width="7"/><path d="M-352,-18 h60 a10,10 0 0 1 10,10 v22 a10,10 0 0 1 -10,10 h-34 l-16,14 v-14 h-10 a10,10 0 0 1 -10,-10 v-22 a10,10 0 0 1 10,-10Z" fill="#fff" stroke="${OUT}" stroke-width="5" transform="translate(0,-4)"/><text x="40" y="18" font-family="Anton" font-size="50" text-anchor="middle" fill="${OUT}">COMENTA TU ELECCIÓN</text></g>`;
   if (c2 > 0) s += `<g transform="translate(540,1600) scale(${c2})"><rect x="-400" y="-44" width="800" height="88" rx="44" fill="#fff" stroke="${OUT}" stroke-width="7"/><circle cx="-338" cy="0" r="30" fill="#ff4d8d" stroke="${OUT}" stroke-width="5"/><path d="M-338,-14 v28 M-352,0 h28" stroke="#fff" stroke-width="8" stroke-linecap="round"/><text x="40" y="18" font-family="Anton" font-size="50" text-anchor="middle" fill="${OUT}">SÍGUEME PARA EL DÍA 8</text></g>`;
