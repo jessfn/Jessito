@@ -37,9 +37,20 @@ html,body{margin:0;background:#000;overflow:hidden}
 .card .nm{position:absolute;left:0;right:0;bottom:16px;font:italic 900 31px 'Mont';color:#4a0f3a;letter-spacing:-.5px}
 .card svg{position:absolute;left:32px;top:36px;width:140px;height:140px}
 #vs{position:absolute;left:310px;top:80px;width:100px;height:100px;border-radius:50%;background:linear-gradient(#ffe14a,#ff9a3c);border:6px solid #fff;box-shadow:0 8px 0 #7a3a00;font:italic 900 40px/88px 'Mont';text-align:center;color:#4a0f3a;opacity:0}
-#cta{position:absolute;left:0;right:0;top:250px}
-.btn{position:absolute;left:40px;right:40px;height:130px;border-radius:70px;color:#fff;font:italic 900 31px/130px 'Mont';text-transform:uppercase;letter-spacing:-.5px;padding-left:126px;white-space:nowrap;border:6px solid #fff;box-shadow:0 12px 0 rgba(0,0,0,.45);opacity:0}
-.btn svg{position:absolute;left:26px;top:20px;width:84px;height:84px}
+#cta{position:absolute;left:0;right:0;top:300px}
+#ctaCard{position:absolute;left:130px;width:460px;top:0;padding:8px 18px;border-radius:32px;background:linear-gradient(160deg,rgba(40,22,86,.78),rgba(14,8,40,.82));border:2px solid rgba(255,255,255,.38);box-shadow:0 14px 40px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.35);backdrop-filter:blur(14px);opacity:0;transform-origin:50% 0}
+#ctaCard .row{position:relative;display:flex;align-items:center;gap:14px;height:78px}
+#ctaCard .sep{height:2px;margin:0 6px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent)}
+#ctaCard .ic{width:48px;height:48px;border-radius:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 5px 14px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.5)}
+#ctaCard .ic svg{width:26px;height:26px}
+#ctaCard .tx{flex:1;line-height:1.05}
+#ctaCard .tx b{display:block;font:800 25px 'Pop';color:#fff;letter-spacing:.2px}
+#ctaCard .tx span{display:block;margin-top:3px;font:700 14px 'Pop';color:#c9c0ff;letter-spacing:.4px}
+#ctaCard .ab{display:flex;gap:8px}
+#ctaCard .ab i{width:38px;height:38px;border-radius:50%;font:900 20px/38px 'Mont';font-style:italic;text-align:center;color:#fff;box-shadow:0 4px 10px rgba(0,0,0,.4);border:2px solid rgba(255,255,255,.8)}
+#ctaCard .fol{font:800 17px 'Pop';color:#fff;padding:9px 18px;border-radius:22px;background:linear-gradient(90deg,#ff3d7f,#ff8a3c);box-shadow:0 5px 14px rgba(255,61,127,.55),inset 0 1px 0 rgba(255,255,255,.5);letter-spacing:.4px}
+#ctaCard .shine{position:absolute;inset:0;border-radius:32px;overflow:hidden;pointer-events:none}
+#ctaCard .shine::after{content:'';position:absolute;top:0;bottom:0;width:90px;left:var(--sx,-120px);background:linear-gradient(100deg,transparent,rgba(255,255,255,.28),transparent);transform:skewX(-18deg)}
 </style></head><body>
 <div id="stage">
 <canvas id="gl" width="720" height="1280"></canvas>
@@ -154,8 +165,9 @@ box(1.62,0.22,2.0,std({map:mattTex}),0,0.56,-1.9,bed);
 const pillow=sph(0.5,std({color:'#e9e2cf'}),0,0.72,-2.58,bed,0.62,0.2,0.4);
 const bl=std({map:blanketTex});
 box(1.66,0.05,1.5,bl,0,0.56,-1.55,bed);
-sph(0.5,bl,0,0.58,-1.7,bed,1.5,0.62,1.4);sph(0.5,bl,0,0.58,-1.15,bed,1.3,0.42,0.75);
-for(const sx of [-1,1]){sph(0.5,bl,sx*0.3,0.62,-0.82,bed,0.34,0.3,0.55)}
+const bumps=new THREE.Group();bed.add(bumps);
+sph(0.5,bl,0,0.58,-1.7,bumps,1.5,0.62,1.4);sph(0.5,bl,0,0.58,-1.15,bumps,1.3,0.42,0.75);
+for(const sx of [-1,1]){sph(0.5,bl,sx*0.3,0.62,-0.82,bumps,0.34,0.3,0.55)}
 box(1.5,0.07,0.28,std({color:'#c9c3d8'}),0,0.85,-2.18,bed,0.35,0,0);
 // under-bed junk
 box(0.5,0.12,0.4,std({color:'#222'}),-0.4,0.07,-0.9,bed,0,0.4,0);
@@ -242,8 +254,10 @@ const icons={
  bano:'<svg viewBox="0 0 100 100"><path d="M18,34 Q18,12 50,12 Q82,12 82,34Z" fill="#7ac8f0" stroke="#6a1240" stroke-width="5"/><rect x="46" y="34" width="8" height="10" fill="#6a1240"/><g stroke="#3a9ad8" stroke-width="5" stroke-linecap="round"><path d="M28,52 l-5,14 M42,52 l-5,18 M58,52 l5,18 M72,52 l5,14 M50,56 l0,22"/></g><circle cx="30" cy="84" r="5" fill="#bfe6ff"/><circle cx="52" cy="90" r="4" fill="#bfe6ff"/><circle cx="72" cy="84" r="5" fill="#bfe6ff"/></svg>',
  pelo:'<svg viewBox="0 0 100 100"><path d="M20,48 Q16,12 52,10 Q86,12 80,48 Q82,70 74,90 L64,90 Q70,60 64,40 Q50,54 36,40 Q30,60 36,90 L26,90 Q18,70 20,48Z" fill="#8a5a2a" stroke="#6a1240" stroke-width="5"/><path d="M60,64 l24,0 M60,70 l24,0 M60,76 l24,0" stroke="#ff3d7f" stroke-width="4"/><rect x="58" y="58" width="30" height="22" rx="5" fill="#ff3d7f" opacity=".9"/></svg>'};
 let chHTML='';CH.forEach((c,i)=>{chHTML+=`<div class="card" id="card${i}" style="left:${CX[i]}px"><div class="lt">${c.c}</div>${icons[c.k]}<div class="nm">${c.n}</div></div>`});$('choices').innerHTML=chHTML+'<div id="vs">VS</div>';
-const ctaHTML=`<div class="btn" id="btn1" style="top:0;background:linear-gradient(90deg,#00b0ff,#2d6cff)"><svg viewBox="0 0 100 100"><path d="M14,18 H86 Q94,18 94,26 V60 Q94,68 86,68 H44 L24,86 V68 H14 Q6,68 6,60 V26 Q6,18 14,18Z" fill="#fff"/><circle cx="32" cy="43" r="6" fill="#2d6cff"/><circle cx="50" cy="43" r="6" fill="#2d6cff"/><circle cx="68" cy="43" r="6" fill="#2d6cff"/></svg>COMENTA A o B</div>
-<div class="btn" id="btn2" style="top:170px;background:linear-gradient(90deg,#ff3d7f,#ff8a3c)"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="#fff"/><path d="M50,24 V76 M24,50 H76" stroke="#ff3d7f" stroke-width="12" stroke-linecap="round"/></svg>SÍGUEME para el día 2</div>`;
+const ctaHTML=`<div id="ctaCard"><div class="shine"></div>
+<div class="row" id="r1"><div class="ic" style="background:linear-gradient(145deg,#4ac8ff,#2d6cff)"><svg viewBox="0 0 24 24"><path d="M4 4h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-8l-5 4v-4H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" fill="#fff"/><circle cx="8" cy="10.5" r="1.4" fill="#2d6cff"/><circle cx="12" cy="10.5" r="1.4" fill="#2d6cff"/><circle cx="16" cy="10.5" r="1.4" fill="#2d6cff"/></svg></div><div class="tx"><b>Comenta</b><span>TU ELECCIÓN</span></div><div class="ab"><i id="chA" style="background:linear-gradient(#ff5ab0,#ff2d8a)">A</i><i id="chB" style="background:linear-gradient(#7af6ff,#2db8e8)">B</i></div></div>
+<div class="sep"></div>
+<div class="row" id="r2"><div class="ic" style="background:linear-gradient(145deg,#ff6a9a,#ff8a3c)"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="4" fill="#fff"/><path d="M2 20c0-4 3-6 7-6s7 2 7 6z" fill="#fff"/><path d="M19 7v6M16 10h6" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg></div><div class="tx"><b>Sígueme</b><span>PARA EL DÍA 2</span></div><div class="fol" id="fol">+ Seguir</div></div></div>`;
 $('cta').innerHTML=ctaHTML;
 
 // ---------- Dina rig ----------
@@ -307,7 +321,7 @@ function render(t){
  // scenes
  const sc=t<T.S1?0:t<T.S2?1:t<T.S3?2:t<T.S4?3:t<T.S5?4:5;
  const isStage=sc===2;
- bed.visible=!isStage;stg.visible=isStage;
+ bed.visible=!isStage;stg.visible=isStage;bumps.visible=(sc===1);
  scene.fog=isStage?new THREE.FogExp2('#150a30',0.011):null;
  scene.background=new THREE.Color(isStage?'#0a0518':'#000000');
  let sp=speaking(t);
@@ -362,7 +376,7 @@ function render(t){
     if(t<T.L6+0.5){const k=(t-T.S3)/0.6;jump=-Math.abs(Math.sin(Math.min(1,k)*Math.PI*2))*60*(1-Math.min(1,k))}
     if(sc===3&&t>=T.L7&&t<T.L8){rot=Math.sin(t*1.4)*1.5;bottom=1175}
     if(sc===4){hgt=600;bottom=1170}
-    if(sc===5){hgt=370;bottom=935;jump=-Math.abs(Math.sin(t*4))*18;rot=Math.sin(t*3)*3}
+    if(sc===5){hgt=470;bottom=985;jump=-Math.abs(Math.sin(t*4))*18;rot=Math.sin(t*3)*3}
   }
   if(speakDina&&amp===null)amp=envAt(sp[0],t);
   placeDina(cx,bottom+jump+bob*0.4,hgt,rot,sx);
@@ -386,7 +400,7 @@ function render(t){
  // particles
  burst(0,t,T.S2+0.12,360,560,'#9ff4ff');burst(1,t,T.S3+0.05,360,820,'#ffe14a');burst(2,t,T.S4+0.12,360,600,'#ff5ab0');
  DATA.cardT.forEach((ct,i)=>burst(3+i,t,ct-0.1,360+(i?1:-1)*135,640,['#ff2d8a','#7af6ff'][i]));
- burst(6,t,T.L10+DUR.L10*0.9+0.15,560,320,'#ff2d8a',true);burst(7,t,T.S5+0.35,360,400,'#ffe14a');
+ burst(6,t,T.L10+DUR.L10*0.9+0.15,520,470,'#ff2d8a',true);burst(7,t,T.S5+0.4,360,380,'#ffe14a');
  // captions
  let ch=null;for(const c of DATA.chunks){if(t>=c.t0-0.02&&t<c.t1)ch=c}
  if(ch){cap.style.display='block';
@@ -400,7 +414,11 @@ function render(t){
  if(sc===4){const vk=eob((t-(DATA.cardT[1]-0.1))/0.4);$('vs').style.opacity=Math.min(1,Math.max(0,(t-(DATA.cardT[1]-0.1))*8)).toFixed(2);$('vs').style.transform=`scale(${(0.2+0.8*vk).toFixed(3)}) rotate(${(Math.sin(t*4)*6).toFixed(1)}deg)`;DATA.cardT.forEach((ct,i)=>{const t0=ct-0.2;const k=eob((t-t0)/0.45);const c=$('card'+i);c.style.opacity=Math.min(1,(t-t0)*8).toFixed(2);const wig=Math.sin((t-t0)*5+i)*2.2*Math.min(1,(t-t0)/0.5);c.style.transform=`scale(${(0.2+0.8*k).toFixed(3)}) rotate(${((1-k)*-25+wig).toFixed(2)}deg) translateY(${Math.sin(t*3+i)*4}px)`})}
  // cta
  const cta=$('cta');cta.style.display=sc===5?'block':'none';
- if(sc===5){[1,2].forEach((n,i)=>{const b=$('btn'+n);const t0=T.S5+0.15+i*0.25;const k=eob((t-t0)/0.55);b.style.opacity=Math.min(1,(t-t0)*10).toFixed(2);const pu=1+Math.sin(t*6+i*1.5)*0.025*Math.min(1,(t-t0)/0.8);b.style.transform=`translateX(${(1-k)*(i?700:-700)}px) scale(${pu.toFixed(3)}) rotate(${(Math.sin(t*3+i)*0.8).toFixed(2)}deg)`})}
+ if(sc===5){const card=$('ctaCard');const t0=T.S5+0.15;const k=eob((t-t0)/0.6);card.style.opacity=Math.min(1,(t-t0)*7).toFixed(2);card.style.transform=`translateY(${(1-k)*70}px) scale(${(0.72+0.28*k).toFixed(3)})`;
+ card.style.setProperty('--sx',(((t-t0)*260)%700-150)+'px');
+ [['r1',0.25],['r2',0.4]].forEach(([id,d])=>{const kk=eob((t-t0-d)/0.4);const e=$(id);e.style.opacity=Math.min(1,(t-t0-d)*8).toFixed(2);e.style.transform=`translateX(${(1-kk)*60}px)`});
+ $('chA').style.transform=`scale(${1+Math.max(0,Math.sin(t*5))*0.14})`;$('chB').style.transform=`scale(${1+Math.max(0,Math.sin(t*5+Math.PI))*0.14})`;
+ $('fol').style.transform=`scale(${1+Math.sin(t*6)*0.06})`}
  return sc;
 }
 window.render=render;
