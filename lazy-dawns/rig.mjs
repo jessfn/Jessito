@@ -30,29 +30,69 @@ export function solveArm(side, target) {
 }
 
 // ---------- cara ----------
-function eyeSvg(x, open, blink, squint, gx, gy, tear, tearT, side) {
-  const o = clamp(open * (1 - blink), 0, 1.25);
+function eyeSvg(x, open, blink, squint, gx, gy, tear, tearT, side, mk) {
+  mk = mk || {}; const o = clamp(open * (1 - blink), 0, 1.25);
   const c = 1 - Math.min(o, 1);                 // 0 abierto .. 1 cerrado
   const yu = -44 + c * 50;                      // borde del parpado superior
   const yl = 46 - squint * 26 - c * 8;          // borde del parpado inferior
-  const lashY = Math.max(yu, -30);
-  const ctrl = lerp(-34, 18, c);
   const ix = gx * 13, iy = gy * 10 + 4;
+  const dir = -side;                             // +1 si la esquina externa esta hacia +x
   const tearDrop = tear > 0.5 ? `<path d="M${side * 22},${yl + ((tearT * 0.9) % 1) * 70} q7,12 0,20 q-7,-8 0,-20Z" fill="#bfe9ff" stroke="#fff" stroke-width="2" opacity="${clamp((tear - 0.5) * 3)}"/>` : '';
-  const ticks = c < 0.65 ? [-30, -12, 8, 26].map((lx) => `<path d="M${lx},${lashY - 4 + (ctrl + 10) * 0.45 * (1 - c)} l${-4 * side},-13" stroke="${OUT}" stroke-width="5" stroke-linecap="round" opacity="${1 - c * 1.4}"/>`).join('') : '';
+  const col = mk.cols || {}; const lsh = clamp(mk.lash ?? 0.35), sh = clamp(mk.shadow || 0), lift = mk.lift ? 1 : 0, cut = mk.cut ? 1 : 0;
+  // borde real del parpado superior sobre el globo (x local, 0 = centro): el mayor entre el arco del ojo y la linea del parpado
+  const arcY = (xx) => -40 * Math.sqrt(Math.max(0, 1 - (xx / 36) * (xx / 36)));
+  const lidY = (xx) => yu + lerp(-16, 8, c) * 0.5 * (1 - (xx / 46) * (xx / 46));
+  const edge = (u) => { const xx = clamp(u, -0.97, 0.97) * 36; return Math.max(arcY(xx), lidY(xx)); };   // u: -1 interno .. +1 externo
+  const PX = (u) => (dir * clamp(u, -0.97, 0.97) * 36);
+  const f1 = (n) => n.toFixed(1);
+  const gid = 'es' + side + ((col.shadow || ['a', 'b', 'c']).join('')).replace(/[^0-9a-f]/gi, '');
+  // ---- sombra de parpado ----
+  let shadow = '';
+  if (sh > 0.02 && c < 0.85) { const sc = col.shadow || ['#8a4b1e', '#e0a84a', '#f6d98a'];
+    const hgt = (u) => (11 + 9 * lift) * Math.sin(Math.PI * Math.min(1, Math.max(0, (u + 1) / 2) * 0.9 + 0.08)) + 5 + 4 * Math.max(0, u);   // alto del pliegue
+    const bot = [], top = []; for (let i = 0; i <= 20; i++) { const u = -0.95 + (i / 20) * 2.0; bot.push(`${f1(PX(u) + dir * (u > 0.7 ? (u - 0.7) * 14 : 0))},${f1(edge(u) + 1)}`); top.push(`${f1(PX(u) + dir * (u > 0.6 ? (u - 0.6) * 26 : 0))},${f1(edge(u) - hgt(u) * (u > 0.75 ? 1.15 : 1))}`); }
+    const poly = 'M' + bot.join(' L') + ' L' + top.slice().reverse().join(' L') + 'Z';
+    const wedge = `M${f1(dir * 8)},${f1(edge(0.2) - 2)} L${f1(dir * 50)},${f1(edge(1) - 28 - 6 * lift)} L${f1(dir * 46)},${f1(edge(1) + 4)} L${f1(dir * 22)},${f1(edge(0.6) + 1)}Z`;
+    shadow = `<defs><linearGradient id="${gid}" x1="${dir > 0 ? 0 : 1}" y1="0" x2="${dir > 0 ? 1 : 0}" y2="0"><stop offset="0" stop-color="${sc[2]}"/><stop offset="0.5" stop-color="${sc[1]}"/><stop offset="1" stop-color="${sc[0]}"/></linearGradient><filter id="eb" x="-40%" y="-80%" width="180%" height="260%"><feGaussianBlur stdDeviation="2.6"/></filter><filter id="eb2" x="-40%" y="-80%" width="180%" height="260%"><feGaussianBlur stdDeviation="4.5"/></filter></defs>
+      <g opacity="${0.95 * sh}"><path d="${poly}" fill="url(#${gid})" filter="url(#eb)"/><path d="${wedge}" fill="${sc[0]}" opacity="${0.6 + 0.25 * cut}" filter="url(#eb2)"/>
+      <path d="M${top.slice(2, 19).join(' L')}" stroke="${sc[0]}" stroke-width="${cut ? 4 : 6}" fill="none" stroke-linecap="round" opacity="${cut ? 0.95 : 0.3}" ${cut ? '' : 'filter="url(#eb)"'}/>
+      <ellipse cx="${f1(-dir * 24)}" cy="${f1(edge(-0.75) - 4)}" rx="9" ry="4.5" fill="${col.inner || '#fff6cf'}" opacity="0.95" filter="url(#eb)"/>
+      <ellipse cx="${f1(dir * 4)}" cy="${f1(edge(0) - 8)}" rx="15" ry="4" fill="${sc[2]}" opacity="0.55" filter="url(#eb)"/></g>
+      ${clamp(mk.sparkle || 0) > 0.02 ? [...Array(9)].map((_, i) => { const u = -0.5 + i * 0.13; return `<circle cx="${f1(PX(u))}" cy="${f1(edge(u) - 6 - (i % 3) * 4)}" r="${1.2 + (i % 3) * 0.7}" fill="#fff" opacity="${0.9 * mk.sparkle}"/>`; }).join('') + `<circle cx="${f1(-dir * 25)}" cy="${f1(edge(-0.8) - 3)}" r="3.6" fill="${col.gem || '#fff'}" stroke="#fff" stroke-width="1.2"/>` : ''}`; }
+  // ---- linea de pestanas / delineado: engrosa hacia la esquina externa y termina en ala ----
+  const lnk = clamp(mk.liner || 0) * ((side > 0 ? mk.linerL : mk.linerR) ?? 1), lc = col.liner || '#0f0708';
+  const th = (mk.thick || 4) * 0.8, wing = (mk.wing ?? 0.8) * (lnk > 0.02 ? 1 : 0);
+  let liner = '';
+  if (c < 0.9) { const up = [], dn = []; for (let i = 0; i <= 16; i++) { const u = -0.96 + (i / 16) * 1.96, t = (u + 1) / 2, w = 2.2 + (lnk > 0.02 ? th * Math.pow(t, 1.5) : 1.2 * t); up.push(`${f1(PX(u))},${f1(edge(u) - w * 0.7)}`); dn.push(`${f1(PX(u))},${f1(edge(u) + w * 0.35)}`); }
+    const ex = PX(1.0), ey = edge(1.0);
+    const tipX = ex + dir * (10 + 26 * wing), tipY = ey - (4 + 15 * wing) - 2;
+    const wingP = wing > 0.05 ? ` Q${f1(ex + dir * (6 + 10 * wing))},${f1(ey - 2 - 4 * wing)} ${f1(tipX)},${f1(tipY)} Q${f1(ex + dir * (8 + 8 * wing))},${f1(ey + 1)} ${dn[dn.length - 1]}` : ` L${dn[dn.length - 1]}`;
+    liner = `<path d="M${up.join(' L')}${wingP} L${dn.slice(0, -1).reverse().join(' L')}Z" fill="${lc}"/>`; }
+  // ---- pestanas superiores: curvas, afiladas, de afuera hacia adentro mas largas; salen del borde del parpado ----
+  let lashes = '';
+  if (c < 0.75) { const n = Math.round(5 + 3 * lsh), Lmax = 12 + 20 * lsh;
+    for (let i = 0; i < n; i++) { const k = i / (n - 1), u = 0.05 + k * 0.92;           // 0 centro .. 1 esquina externa
+      const rx = PX(u), ry = edge(u) - 0.5;
+      const len = Lmax * (0.6 + 0.5 * k) * (1 - c);
+      const rot = (10 + 62 * Math.pow(k, 0.8)) * Math.PI / 180;                       // inclinacion hacia afuera
+      const dx = dir * Math.sin(rot), dy = -Math.cos(rot);
+      const mx = rx + dx * len * 0.5 - dir * 1.5, my = ry + dy * len * 0.5;           // curva: sale recta y remata hacia afuera/arriba
+      const tx = rx + dx * len + dir * len * 0.22, ty = ry + dy * len * 0.85 - 3;
+      const w = 3.6 + 1.6 * lsh;
+      lashes += `<path d="M${f1(rx - dir * w * 0.6)},${f1(ry + 2)} Q${f1(mx - dir * w * 0.3)},${f1(my)} ${f1(tx)},${f1(ty)} Q${f1(mx + dir * w * 0.9)},${f1(my + 1)} ${f1(rx + dir * w * 0.6)},${f1(ry + 2)}Z" fill="#0b0506"/>`; } }
   return `<g transform="translate(${x},-6)">
+    ${shadow}
     <ellipse rx="36" ry="40" fill="#fff"/>
     <g clip-path="url(#eyeClip)">
       <ellipse rx="36" ry="40" fill="#000" opacity="0.08" cy="14"/>
       <g transform="translate(${ix},${iy}) scale(${1 - Math.abs(gx) * 0.12},1)"><circle r="22" fill="url(#eye)"/><circle r="11" fill="#0a0503"/><circle cx="8" cy="-9" r="7" fill="#fff"/><circle cx="-6" cy="10" r="3.5" fill="#fff" opacity="0.8"/></g>
       ${tear > 0.2 ? `<ellipse cx="0" cy="${yl - 2}" rx="34" ry="${4 + tear * 5}" fill="#dff3ff" opacity="${0.35 + tear * 0.4}"/>` : ''}
-      <path d="M-46,-62 L46,-62 L46,${yu} Q0,${yu + ctrl * 0.0 + lerp(-16, 8, c)} -46,${yu}Z" fill="${LID}"/>
+      <path d="M-46,-62 L46,-62 L46,${yu} Q0,${yu + lerp(-16, 8, c)} -46,${yu}Z" fill="${LID}"/>
+      ${sh > 0.02 ? `<path d="M-46,-62 L46,-62 L46,${yu} Q0,${yu + lerp(-16, 8, c)} -46,${yu}Z" fill="${(col.shadow || ['#8a4b1e', '#e0a84a'])[1]}" opacity="${0.8 * sh * Math.min(1, c * 2)}"/>` : ''}
       <path d="M-46,70 L-46,${yl} Q0,${yl + 10} 46,${yl} L46,70Z" fill="${LID}"/>
     </g>
-    <ellipse rx="36" ry="40" fill="none" stroke="${OUT}" stroke-width="7"/>
-    <path d="M-40,${lashY + 10} Q0,${lashY + ctrl} 40,${lashY + 10}" stroke="${OUT}" stroke-width="9" fill="none" stroke-linecap="round"/>
-    ${ticks}${tearDrop}
-    <ellipse cy="50" rx="38" ry="${16 + squint * 8}" fill="#2a1208" opacity="${0.62 + squint * 0.15}"/>
+    <ellipse rx="36" ry="40" fill="none" stroke="${OUT}" stroke-width="${c < 0.5 ? 4.5 : 7}"/>
+    ${liner}${lashes}${tearDrop}
   </g>`;
 }
 function browSvg(side, r, i, k = 0, shortF = 0) {
@@ -91,18 +131,37 @@ function mouthSvg(m, yaw) {
   const perfTeeth = PU.map((u) => T(...u)).join('') + PL;
   const teeth = perfect ? perfTeeth : upper + fang + lower;
   const buck = (open < 0.1 && smile < 0.3 && !perfect) ? `<g>${T(-18, 8, 20, 26, 6, '#e3cf6a')}${T(4, 9, 18, 22, -8, '#d4be52')}</g>` : '';
-  return `<g>
-    <clipPath id="mouthClip"><path d="${shape}"/></clipPath>
-    <path d="${shape}" fill="#4a0f12"/>
-    <g clip-path="url(#mouthClip)">${showTeeth ? teeth : ''}${open > 0.35 ? `<ellipse cx="0" cy="${lo * 0.62}" rx="${w * 0.55}" ry="${22 + open * 14}" fill="#c4505e"/>` : ''}</g>
-    <path d="${shape}" fill="none" stroke="${m.lip || '#7b2a2a'}" stroke-width="${m.lip ? (m.lipW || 17) + press * 4 : 12 + press * 4}" stroke-linejoin="round" stroke-linecap="round"/>
-    <path d="${shape}" fill="none" stroke="${OUT}" stroke-width="3" opacity="0.5"/>
-    ${buck}
-    ${m.lip ? `<path d="M${cl.x * 0.5},${cl.y - 4} Q0,${up - 10} ${cr.x * 0.5},${cr.y - 4}" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.55"/>` : ''}
-    <g stroke="#3a1010" stroke-width="3" opacity="${m.lip ? 0 : 0.7}" stroke-linecap="round"><path d="M-30,${(cl.y + cr.y) / 2 + 14} l2,9 M-6,${(cl.y + cr.y) / 2 + 16} l-2,9 M20,${(cl.y + cr.y) / 2 + 14} l3,9"/></g>
+  // ---------- labios anatomicos: arco de cupido, borde bermellon, labio inferior mas lleno, brillo y sombra de esquinas ----------
+  const N = 52, lipC = m.lip || null; const g = (x, mu, s) => Math.exp(-((x - mu) / s) * ((x - mu) / s));
+  const qy = (t, c0, cy, c1) => (1 - t) * (1 - t) * c0 + 2 * t * (1 - t) * cy + t * t * c1;
+  const pts = []; for (let i = 0; i <= N; i++) { const t = i / N, x = w * (2 * t - 1); pts.push({ x, yu: qy(t, cl.y, up, cr.y), yl: qy(t, cl.y, lo, cr.y), e: Math.pow(Math.max(0, 1 - (x / w) * (x / w)), 0.75) }); }
+  const full = (m.fullness ?? 1);
+  const tU = (p) => (3 + 19 * full * p.e) - 6.5 * g(p.x, 0, 8) + 5 * (g(Math.abs(p.x), 22, 9)) * p.e;
+  const tL = (p) => 4 + (30 * full) * p.e + (open < 0.15 ? 2 : 0);
+  const top = pts.map((p) => `${p.x.toFixed(1)},${(p.yu - tU(p)).toFixed(1)}`), upE = pts.map((p) => `${p.x.toFixed(1)},${p.yu.toFixed(1)}`);
+  const loE = pts.map((p) => `${p.x.toFixed(1)},${p.yl.toFixed(1)}`), bot = pts.map((p) => `${p.x.toFixed(1)},${(p.yl + tL(p)).toFixed(1)}`);
+  const upperPoly = 'M' + top.join(' L') + ' L' + upE.slice().reverse().join(' L') + 'Z', lowerPoly = 'M' + loE.join(' L') + ' L' + bot.slice().reverse().join(' L') + 'Z';
+  const base = lipC || '#9a4a44', dark = lipC ? shade2(lipC, 0.4) : '#5e2a2a', light = lipC ? shade2(lipC, -0.35) : '#c0766a';
+  const gid = 'lp' + (lipC || 'n').replace('#', '');
+  const defsLip = `<defs><linearGradient id="${gid}U" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${shade2(base, 0.04)}"/><stop offset="1" stop-color="${shade2(base, 0.24)}"/></linearGradient>
+    <linearGradient id="${gid}L" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${base}"/><stop offset="0.55" stop-color="${light}"/><stop offset="1" stop-color="${shade2(base, 0.12)}"/></linearGradient>
+    <linearGradient id="${gid}H" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${dark}" stop-opacity="0.65"/><stop offset="0.22" stop-color="${dark}" stop-opacity="0"/><stop offset="0.78" stop-color="${dark}" stop-opacity="0"/><stop offset="1" stop-color="${dark}" stop-opacity="0.65"/></linearGradient></defs>`;
+  const yb = pts[Math.round(N / 2)].yl, yu0 = pts[Math.round(N / 2)].yu;
+  const gloss = lipC ? `<ellipse cx="0" cy="${yb + 13 * full}" rx="${w * 0.3}" ry="${3.6 + 2 * full}" fill="#fff" opacity="0.6" filter="url(#blur3)"/><ellipse cx="${-w * 0.12}" cy="${yb + 9 * full}" rx="${w * 0.1}" ry="2" fill="#fff" opacity="0.7"/><ellipse cx="${-16}" cy="${yu0 - 10}" rx="9" ry="2.4" fill="#fff" opacity="0.4"/><ellipse cx="16" cy="${yu0 - 10}" rx="9" ry="2.4" fill="#fff" opacity="0.4"/>` : `<ellipse cx="0" cy="${yb + 12 * full}" rx="${w * 0.22}" ry="3" fill="#fff" opacity="0.22" filter="url(#blur3)"/>`;
+  const outline = `<path d="${upperPoly}" fill="none" stroke="${dark}" stroke-width="3.2" stroke-linejoin="round" opacity="0.85"/><path d="${lowerPoly}" fill="none" stroke="${dark}" stroke-width="3.2" stroke-linejoin="round" opacity="0.85"/>`;
+  const lipLine = `<path d="M${(-w * 0.9).toFixed(1)},${pts[3].yu.toFixed(1)} ${loE.slice(3, N - 2).map((s2) => 'L' + s2).join(' ')}" stroke="${shade2(dark, 0.3)}" stroke-width="${open < 0.1 ? 4.2 : 0}" fill="none" stroke-linecap="round" opacity="0.9" transform="translate(0,${open < 0.1 ? -0.5 : 0})"/>`;
+  const corners = [-1, 1].map((sg) => `<ellipse cx="${sg * (w + 2)}" cy="${(sg < 0 ? cl.y : cr.y) + 1}" rx="9" ry="6" fill="${shade2('#5a2a22', 0)}" opacity="0.3" filter="url(#blur3)"/>`).join('');
+  const philtrum = `<path d="M-9,${yu0 - 36} Q-8,${yu0 - 24} -12,${yu0 - 15} M9,${yu0 - 36} Q8,${yu0 - 24} 12,${yu0 - 15}" stroke="#000" stroke-opacity="0.15" stroke-width="4" fill="none" stroke-linecap="round"/><ellipse cx="0" cy="${yb + tL(pts[Math.round(N / 2)]) + 7}" rx="${w * 0.22}" ry="5" fill="#000" opacity="0.14" filter="url(#blur3)"/>`;
+  return `<g><defs><filter id="blur3" x="-30%" y="-80%" width="160%" height="260%"><feGaussianBlur stdDeviation="3"/></filter><clipPath id="mouthClip"><path d="${shape}"/></clipPath></defs>${defsLip}
+    ${philtrum}${corners}
+    <path d="${shape}" fill="#3a0c10"/>
+    <g clip-path="url(#mouthClip)">${showTeeth ? teeth : ''}${open > 0.35 ? `<ellipse cx="0" cy="${lo * 0.62}" rx="${w * 0.55}" ry="${22 + open * 14}" fill="#b84a58"/>` : ''}<path d="${shape}" fill="none" stroke="#000" stroke-opacity="0.35" stroke-width="10"/></g>
+    <path d="${lowerPoly}" fill="url(#${gid}L)"/><path d="${lowerPoly}" fill="url(#${gid}H)"/><path d="${upperPoly}" fill="url(#${gid}U)"/><path d="${upperPoly}" fill="url(#${gid}H)"/>
+    ${lipLine}${gloss}${outline}${buck}
     ${press > 0.4 ? `<path d="M${-w - 6},${cl.y - 6} q-6,8 0,16 M${w + 6},${cr.y - 6} q6,8 0,16" stroke="#3a1d10" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.6"/>` : ''}
   </g>`;
 }
+const shade2 = (hex, k) => { const A = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)); const f = (v) => Math.max(0, Math.min(255, Math.round(k >= 0 ? v * (1 - k) : v + (255 - v) * -k))); return '#' + A.map((v) => f(v).toString(16).padStart(2, '0')).join(''); };
 
 const PIM_DATA = [[-75, -20, 15], [-4, 20, 17], [-150, 78, 13], [148, 70, 14], [-22, -112, 11], [60, -132, 12], [112, -70, 11], [-40, 128, 11], [62, -42, 13], [108, 26, 16], [-118, 38, 12], [24, 56, 14], [-34, -78, 12], [88, -96, 13], [-98, -92, 11], [2, -4, 10], [54, 100, 12], [-60, 92, 10], [130, -20, 9]];
 function pimplesSvg(acne) {
@@ -163,7 +222,7 @@ function makeupSvg(mk, blinkOpen) {
   const liner = ln > 0.02 ? [[-1, -78, mk.linerL ?? 1], [1, 78, mk.linerR ?? 1]].map(([s, x, q]) => q < 0.02 ? '' : `<path d="M${x - s * 38},-36 Q${x},-58 ${x + s * 38},-36 Q${x + s * 62 * wing * q},-44 ${x + s * (40 + 40 * wing * q)},-${44 + 24 * wing * q}" stroke="${lc}" stroke-width="${(mk.thick || 5) * ln}" fill="none" stroke-linecap="round"/>`).join('') : '';
   const ls = clamp(mk.lash || 0), lashes = ls > 0.02 ? [[-1, -78], [1, 78]].map(([s, x]) => [...Array(8)].map((_, i) => `<path d="M${x - 36 + i * 10.5},${-44 - Math.sin(i / 7 * Math.PI) * 14} l${s * 11 * ls},${-20 * ls - (i % 2) * 8 * ls}" stroke="#0a0508" stroke-width="4.5" stroke-linecap="round"/>`).join('')).join('') : '';
   const fr = clamp(mk.freckles || 0), freckles = fr > 0.02 ? [-1, 1].map((s) => [...Array(14)].map((_, i) => `<circle cx="${s * (30 + (i * 13) % 70)}" cy="${34 + (i * 7) % 26}" r="${1.8 + (i % 3) * 0.7}" fill="#5a2d14" opacity="${0.55 * fr}"/>`).join('')).join('') : '';
-  return `${base}${dew}${contour}${blush}${highlight}${freckles}${shadow}${spark}${liner}${lashes}`;
+  return `${base}${dew}${contour}${blush}${highlight}${freckles}`;
 }
 function headSvg(p) {
   const hr = { ...HAIR_DEFAULT, ...(p.hair || {}) };
@@ -196,7 +255,7 @@ function headSvg(p) {
         <g opacity="${clamp(Math.abs(sm) * 0.6 + jaw / 60) * 0.55}"><path d="M-38,66 Q-92,96 -${86 + up * 10},${128 - up * 6}"/><path d="M38,66 Q92,96 ${86 + up * 10},${128 - up * 6}"/></g>
       </g>
       ${makeupSvg(p.makeup, 1 - clamp(p.blink.l))}${pimplesSvg(sk.acne)}${patchesSvg(sk.acne, sk.patch)}${foamSvg(sk.foam, p.tearT || 0)}${maskSvg(sk.mask, sk.dry)}
-      ${eyeSvg(-78, p.lid.l, p.blink.l, squint, p.gaze.x, p.gaze.y, p.tears, p.tearT, 1)}${eyeSvg(78, p.lid.r, p.blink.r, squint, p.gaze.x, p.gaze.y, p.tears, p.tearT, -1)}
+      ${eyeSvg(-78, p.lid.l, p.blink.l, squint, p.gaze.x, p.gaze.y, p.tears, p.tearT, 1, p.makeup)}${eyeSvg(78, p.lid.r, p.blink.r, squint, p.gaze.x, p.gaze.y, p.tears, p.tearT, -1, p.makeup)}
       ${(() => { const bs = p.browStyle || {}; const kl = bs.kl ?? bs.k ?? 0, kr = bs.kr ?? bs.k ?? 0, rd = bs.red || 0; return `${rd > 0.02 ? [-1, 1].map((s) => `<ellipse cx="${s * 76}" cy="-84" rx="72" ry="22" fill="#ff5a5a" opacity="${0.35 * rd}" filter="url(#blur8)"/>`).join('') : ''}${browSvg(-1, brL.r, brL.i, kl, bs.shortL || 0)}${browSvg(1, brR.r, brR.i, kr, bs.shortR || 0)}<ellipse cx="0" cy="${-70 + (brL.r + brR.r) * -10}" rx="18" ry="12" fill="#0f0a08" opacity="${clamp(1 - Math.max(kl, kr) * 2.2)}"/>`; })()}
       <g transform="translate(${yaw * 14},${(p.breath || 0) * 1.2})">
         <ellipse cx="0" cy="48" rx="${34 + (p.flare || 0) * 3}" ry="26" fill="#7d4524" ${O8}/><ellipse cx="-9" cy="38" rx="10" ry="6" fill="#fff" opacity="0.4"/>

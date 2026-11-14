@@ -9,8 +9,8 @@ export function defs(mode) {
   <radialGradient id="eye" cx="0.4" cy="0.35" r="0.8"><stop offset="0" stop-color="#8a5a2e"/><stop offset="0.6" stop-color="#3b2312"/><stop offset="1" stop-color="#150b05"/></radialGradient>
   <linearGradient id="bg" x1="0" y1="0" x2="0.6" y2="1"><stop offset="0" stop-color="#1b0a3d"/><stop offset="0.55" stop-color="#5b1a7a"/><stop offset="1" stop-color="#d1307f"/></linearGradient>
   <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#ff7ad9" stop-opacity="0.55"/><stop offset="1" stop-color="#ff7ad9" stop-opacity="0"/></radialGradient>
-  <filter id="grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed="4"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.9 -0.35"/></filter><filter id="blur8"><feGaussianBlur stdDeviation="8"/></filter>
-  <filter id="blur20"><feGaussianBlur stdDeviation="20"/></filter>
+  <filter id="grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed="4"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.9 -0.35"/></filter><filter id="blur8" x="-60%" y="-150%" width="220%" height="400%"><feGaussianBlur stdDeviation="8"/></filter>
+  <filter id="blur20" x="-60%" y="-150%" width="220%" height="400%"><feGaussianBlur stdDeviation="20"/></filter>
   <clipPath id="torso"><path d="M-330,90 C-390,330 -300,570 0,580 C300,570 390,330 330,90 C300,-90 -300,-90 -330,90Z"/></clipPath>
   <clipPath id="headclip"><ellipse cx="0" cy="0" rx="205" ry="205"/></clipPath>
   </defs>`;
