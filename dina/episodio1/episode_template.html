@@ -7,6 +7,7 @@ html,body{margin:0;background:#000;overflow:hidden}
 #stage{position:relative;width:720px;height:1280px;overflow:hidden;font-family:'Mont','Pop',sans-serif;background:#111}
 #gl{position:absolute;left:0;top:0;width:720px;height:1280px}
 #dinaWrap{position:absolute;transform-origin:50% 100%}
+#dinaSvg,#ann,#sleepSvg{overflow:visible}
 #sleepWrap{position:absolute;transform-origin:50% 50%}
 #annWrap{position:absolute;transform-origin:50% 100%}
 #cap{position:absolute;left:36px;right:36px;bottom:238px;text-align:center;font:800 33px/1.15 'Mont';text-transform:none;letter-spacing:0;display:none}
@@ -14,6 +15,11 @@ html,body{margin:0;background:#000;overflow:hidden}
 #cap .w{display:inline-block;margin:0 4px;color:#fff;-webkit-text-stroke:7px #12082a;paint-order:stroke fill;filter:drop-shadow(0 3px 3px rgba(0,0,0,.55));transform-origin:50% 85%}
 #cap .w.act{color:#ffe14a}
 #flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+#dark{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none}
+#grain{position:absolute;inset:-40px;pointer-events:none;opacity:.13;mix-blend-mode:overlay;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+#glow{position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;opacity:0;background:radial-gradient(ellipse at 50% 30%,rgba(255,170,240,.55),rgba(255,120,200,0) 60%)}
+.bk{position:absolute;border-radius:50%;mix-blend-mode:screen;pointer-events:none;opacity:0}
+#gl{filter:contrast(1.08) saturate(1.12)}
 #dreamTint{position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 220px 60px rgba(255,120,220,.55);opacity:0;background:radial-gradient(circle at 50% 45%,rgba(255,255,255,0) 40%,rgba(160,80,255,.25) 100%)}
 #vig{position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 200px 40px rgba(0,0,0,.55)}
 #topbar{position:absolute;left:24px;top:122px;right:24px;display:flex;justify-content:center;align-items:center}
@@ -92,19 +98,19 @@ html,body{margin:0;background:#000;overflow:hidden}
   <use href="#hairBack"/><use href="#headFace"/><use href="#exprSleep"/><use href="#headB"/>
 <g id="zz" fill="#ffe27a" font-family="Georgia,serif" font-weight="bold" stroke="#000" stroke-width="5" paint-order="stroke"><text x="100" y="-90" font-size="72">Z</text><text x="140" y="-140" font-size="52">z</text><text x="160" y="-176" font-size="36">z</text></g>
 </svg></div>
-<div id="vig"></div><div id="dreamTint"></div>
+<div id="vig"></div><div id="dreamTint"></div><div id="glow"></div><div id="bokehs"></div><div id="dark"></div>
 <div id="dim"></div>
 <div id="topbar"><div id="day">DÍA 1</div></div>
 <div id="cap"></div>
 <div id="choices"></div>
 <div id="cta"></div>
-<div id="flash"></div>
+<div id="grain"></div><div id="flash"></div>
 </div>
 <script src="vendor/three.min.js"></script>
 <script>
 const DATA=__DATA__;
 const T=DATA.T, ENV=DATA.env, FPS=DATA.FPS, DUR=DATA.dur;
-const W=720,H=1280;
+const W=720,H=1280;const $=id=>document.getElementById(id);
 const ease=x=>x<0?0:x>1?1:x*x*(3-2*x);
 const lerp=(a,b,k)=>a+(b-a)*k;
 function seeded(s){return()=>{s=(s*16807)%2147483647;return (s-1)/2147483646}}
@@ -241,9 +247,11 @@ const cfN=260;const cfGeo=new THREE.BufferGeometry();const cfp=new Float32Array(
 cfGeo.setAttribute('position',new THREE.BufferAttribute(cfp,3));cfGeo.setAttribute('color',new THREE.BufferAttribute(cfc,3));
 const cfPts=new THREE.Points(cfGeo,new THREE.PointsMaterial({size:0.09,vertexColors:true}));stg.add(cfPts);
 const stAmb=new THREE.AmbientLight('#9a7aff',1.0);stg.add(stAmb);
+const flareTex=mk(128,128,(x,w,h)=>{const g=x.createRadialGradient(64,64,0,64,64,64);g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(.18,'rgba(255,210,255,.65)');g.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=g;x.fillRect(0,0,128,128)});
+const flares=[];for(let i=0;i<6;i++){const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:flareTex,color:bcols[i],blending:THREE.AdditiveBlending,depthWrite:false,transparent:true}));sp.position.set(-3+i*1.2,4.75,-0.5);sp.scale.set(1.6,1.6,1);stg.add(sp);flares.push(sp)}
+const BK=[];{const bc=['rgba(255,90,200,.7)','rgba(110,230,255,.7)','rgba(255,225,90,.7)','rgba(190,120,255,.7)'];for(let i=0;i<14;i++){const d=document.createElement('div');d.className='bk';const r=24+(i*37)%46;d.style.width=d.style.height=r+'px';d.style.background=`radial-gradient(circle,${bc[i%4]},rgba(255,255,255,0) 70%)`;$('bokehs').appendChild(d);BK.push([d,r,i])}}
 
 // ===== DOM refs =====
-const $=id=>document.getElementById(id);
 const dinaWrap=$('dinaWrap'),sleepWrap=$('sleepWrap'),annWrap=$('annWrap'),dinaHead=$('dinaHead'),cap=$('cap'),flash=$('flash'),dreamTint=$('dreamTint');
 const dinaG=$('dina');
 const CH=[{k:'dientes',n:'DIENTES',c:'A'},{k:'piel',n:'PIEL Y<br>GRANOS',c:'B'}];const CX=[88,428];
@@ -252,9 +260,9 @@ const icons={
  piel:'<svg viewBox="0 0 100 100"><ellipse cx="50" cy="52" rx="34" ry="38" fill="#f3dccb" stroke="#6a1240" stroke-width="5"/><circle cx="36" cy="42" r="4" fill="#2a1a10"/><circle cx="64" cy="42" r="4" fill="#2a1a10"/><path d="M38,70 Q50,80 62,70" stroke="#6a1240" stroke-width="4" fill="none" stroke-linecap="round"/><g stroke="#c9605a" stroke-width="2"><circle cx="30" cy="58" r="5.5" fill="#e9e07a"/><circle cx="70" cy="56" r="5" fill="#cfe05a"/><circle cx="50" cy="28" r="4.5" fill="#e9e07a"/><circle cx="58" cy="60" r="4" fill="#cfe05a"/><circle cx="42" cy="22" r="3.5" fill="#e9e07a"/></g><path d="M68,16 l4,10 l10,4 l-10,4 l-4,10 l-4,-10 l-10,-4 l10,-4z" fill="#7af6ff" stroke="#fff" stroke-width="2"/></svg>',
  bano:'<svg viewBox="0 0 100 100"><path d="M18,34 Q18,12 50,12 Q82,12 82,34Z" fill="#7ac8f0" stroke="#6a1240" stroke-width="5"/><rect x="46" y="34" width="8" height="10" fill="#6a1240"/><g stroke="#3a9ad8" stroke-width="5" stroke-linecap="round"><path d="M28,52 l-5,14 M42,52 l-5,18 M58,52 l5,18 M72,52 l5,14 M50,56 l0,22"/></g><circle cx="30" cy="84" r="5" fill="#bfe6ff"/><circle cx="52" cy="90" r="4" fill="#bfe6ff"/><circle cx="72" cy="84" r="5" fill="#bfe6ff"/></svg>',
  pelo:'<svg viewBox="0 0 100 100"><path d="M20,48 Q16,12 52,10 Q86,12 80,48 Q82,70 74,90 L64,90 Q70,60 64,40 Q50,54 36,40 Q30,60 36,90 L26,90 Q18,70 20,48Z" fill="#8a5a2a" stroke="#6a1240" stroke-width="5"/><path d="M60,64 l24,0 M60,70 l24,0 M60,76 l24,0" stroke="#ff3d7f" stroke-width="4"/><rect x="58" y="58" width="30" height="22" rx="5" fill="#ff3d7f" opacity=".9"/></svg>'};
-let chHTML='';CH.forEach((c,i)=>{chHTML+=`<div class="card" id="card${i}" style="left:${CX[i]}px"><div class="lt">${c.c}</div>${icons[c.k]}<div class="nm">${c.n}</div></div>`});$('choices').innerHTML=chHTML+'<div id="vs">VS</div>';
+let chHTML='';CH.forEach((c,i)=>{chHTML+=`<div class="card" id="card${i}" style="left:${CX[i]}px">${icons[c.k]}<div class="nm">${c.n}</div></div>`});$('choices').innerHTML=chHTML+'<div id="vs">VS</div>';
 const ctaHTML=`<div id="ctaCard"><div class="shine"></div>
-<div class="row" id="r1"><div class="ic" style="background:linear-gradient(145deg,#4ac8ff,#2d6cff)"><svg viewBox="0 0 24 24"><path d="M4 4h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-8l-5 4v-4H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" fill="#fff"/><circle cx="8" cy="10.5" r="1.4" fill="#2d6cff"/><circle cx="12" cy="10.5" r="1.4" fill="#2d6cff"/><circle cx="16" cy="10.5" r="1.4" fill="#2d6cff"/></svg></div><div class="tx"><b>Comenta</b><span>TU ELECCIÓN</span></div><div class="ab"><i id="chA" style="background:linear-gradient(#ff5ab0,#ff2d8a)">A</i><i id="chB" style="background:linear-gradient(#7af6ff,#2db8e8)">B</i></div></div>
+<div class="row" id="r1"><div class="ic" style="background:linear-gradient(145deg,#4ac8ff,#2d6cff)"><svg viewBox="0 0 24 24"><path d="M4 4h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-8l-5 4v-4H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" fill="#fff"/><circle cx="8" cy="10.5" r="1.4" fill="#2d6cff"/><circle cx="12" cy="10.5" r="1.4" fill="#2d6cff"/><circle cx="16" cy="10.5" r="1.4" fill="#2d6cff"/></svg></div><div class="tx"><b>Comenta tu elección</b><span><em style="color:#ffe14a;font-style:normal">DIENTES</em> &nbsp;o&nbsp; <em style="color:#ff7ad0;font-style:normal">PIEL Y GRANOS</em></span></div></div>
 <div class="sep"></div>
 <div class="row" id="r2"><div class="ic" style="background:linear-gradient(145deg,#ff6a9a,#ff8a3c)"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="4" fill="#fff"/><path d="M2 20c0-4 3-6 7-6s7 2 7 6z" fill="#fff"/><path d="M19 7v6M16 10h6" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg></div><div class="tx"><b>Sígueme</b><span>PARA EL DÍA 2</span></div><div class="fol" id="fol">+ Seguir</div></div></div>`;
 $('cta').innerHTML=ctaHTML;
@@ -283,8 +291,8 @@ function placeDina(cx,bottom,h,rot,sx){const sc=h/940;dinaWrap.style.width=(420*
 function placeAnn(cx,bottom,h){const sc=h/640;annWrap.style.width=(300*sc)+'px';annWrap.style.height=h+'px';annWrap.style.left=(cx-150*sc)+'px';annWrap.style.top=(bottom-h)+'px';$('ann').setAttribute('width',300*sc);$('ann').setAttribute('height',h)}
 const projV=new THREE.Vector3();
 function project(x,y,z){projV.set(x,y,z).project(camera);return [(projV.x*0.5+0.5)*W,(-projV.y*0.5+0.5)*H]}
-const capStyle={narr:'#2d6cff',anun:'#8a3dff',crowd:'#ff8a3c',dina:'#ff2d8a'};
-const capName={narr:'NARRADORA',anun:'PRESENTADOR',crowd:'PÚBLICO',dina:'DINA'};
+const capStyle={narr:'#2d6cff',anun:'#8a3dff',crowd:'#ff8a3c',dina:'#ff2d8a',sing:'#ff2d8a'};
+const capName={narr:'NARRADORA',anun:'PRESENTADOR',crowd:'PÚBLICO',dina:'DINA',sing:'DINA  ♪'};
 
 function setBedroom(day){ // day 0 night..1 day
  glassMat.map=day>0.5?skyDay:skyNight;glassMat.needsUpdate=true;
@@ -317,9 +325,10 @@ function burst(b,t,t0,cx,cy,col,heart){const age=t-t0;const ps=PT[b];
   const a=i/14*Math.PI*2+(b*0.7);const r=ease(age/0.7)*(90+(i%4)*45);const g=age*age*120;
   d.style.opacity=Math.max(0,1-ease((age-0.45)/0.55)).toFixed(2);d.style.transform=`translate(${Math.cos(a)*r+cx}px,${Math.sin(a)*r+cy+g}px) scale(${(0.4+(1-age)*0.9+(i%3)*0.25).toFixed(2)}) rotate(${age*260*(i%2?1:-1)}deg)`;d.style.left='0px';d.style.top='0px'})}
 
-const POSE={hang:[16,-6,4],wave:[100,78,0],cheer:[150,22,0],point:[158,6,0],hug:[10,-62,8],shrug:[50,44,-12],surp:[96,48,0]};
+const REV=(()=>{let r=T.L3+DUR.L3-0.7;for(const c of DATA.chunks){if(c.lid==='L3')for(const w of c.words){if(/dina/i.test(w.w))r=w.t0}}return r})();
+const POSE={mic:[-10,-156,-10],hang:[16,-6,4],wave:[100,78,0],cheer:[150,22,0],point:[158,6,0],hug:[10,-62,8],shrug:[50,44,-12],surp:[96,48,0]};
 const KL=[[0,'hang'],[T.S2,'hang'],[T.S2+0.6,'cheer'],[T.S3-0.4,'cheer'],[T.S3,'surp'],[T.S3+1.5,'surp'],[T.S3+2.0,'hang'],[T.L7,'hang'],[T.L7+0.4,'hug'],[T.L8-0.2,'hug'],[T.L8+0.4,'cheer'],[T.L8+DUR.L8,'cheer'],[T.S4+0.3,'shrug'],[T.S5-0.3,'shrug'],[T.S5+0.5,'point'],[T.END+2,'point']];
-const KR=[[0,'hang'],[0.7,'wave'],[T.S1-0.6,'wave'],[T.S1,'hang'],[T.S2,'hang'],[T.S2+0.9,'cheer'],[T.S3-0.4,'cheer'],[T.S3,'surp'],[T.S3+1.5,'surp'],[T.S3+2.0,'hang'],[T.L7,'hang'],[T.L7+0.4,'hug'],[T.L8-0.2,'hug'],[T.L8+0.6,'cheer'],[T.L8+DUR.L8,'cheer'],[T.S4+0.3,'shrug'],[T.S5-0.3,'shrug'],[T.S5+0.4,'wave'],[T.END+2,'wave']];
+const KR=[[0,'hang'],[0.7,'wave'],[T.S1-0.6,'wave'],[T.S1,'hang'],[T.S2,'hang'],[T.S2+0.9,'cheer'],[T.SING-0.15,'cheer'],[T.SING+0.25,'mic'],[T.SING+DUR.SING,'mic'],[T.SING+DUR.SING+0.5,'cheer'],[T.S3-0.4,'cheer'],[T.S3,'surp'],[T.S3+1.5,'surp'],[T.S3+2.0,'hang'],[T.L7,'hang'],[T.L7+0.4,'hug'],[T.L8-0.2,'hug'],[T.L8+0.6,'cheer'],[T.L8+DUR.L8,'cheer'],[T.S4+0.3,'shrug'],[T.S5-0.3,'shrug'],[T.S5+0.4,'wave'],[T.END+2,'wave']];
 function poseAt(K,t){let i=0;while(i<K.length-1&&t>=K[i+1][0])i++;if(i>=K.length-1)return POSE[K[K.length-1][1]].slice();const a=POSE[K[i][1]],b=POSE[K[i+1][1]];const t1=K[i+1][0];const k=ease((t-(t1-0.45))/0.45);return a.map((v,j)=>v+(b[j]-v)*k)}
 function setArm(side,ang,t,ph,G){
  let [a1,a2,a3]=ang;
@@ -351,7 +360,7 @@ function render(t){
  scene.background=new THREE.Color(isStage?'#0a0518':'#000000');
  let sp=speaking(t);
  // ---- camera + 3D ----
- let sleepOn=false,standOn=false,annOn=false;
+ let sleepOn=false,standOn=false,annOn=false,zoom=1,pxShift=0,sg=0;
  let dayK=1;
  if(!isStage){
   if(sc===0){dayK=0.55;const k=ease((t)/(T.S1));camera.position.set(0,lerp(1.55,1.45,k),lerp(3.4,2.6,k));camera.lookAt(0,lerp(1.5,1.35,k),-3);standOn=true}
@@ -363,18 +372,25 @@ function render(t){
   const dp=dust.geometry.attributes.position;for(let i=0;i<150;i++){dp.array[i*3+1]=(dp.array[i*3+1]+0.0007)%3;}dp.needsUpdate=true;
  } else {
   annOn=true;standOn=true;
-  const k=(t-T.S2)/(T.S3-T.S2);camera.position.set(Math.sin(k*2.2)*1.1,2.0,7.6);camera.lookAt(0,1.5,-2);
+  const tin=t-T.S2;const pushK=ease(tin/(REV-T.S2));const punch=eob((t-REV)/0.6);
+  const sk=ease((t-T.SING)/Math.max(0.5,DUR.SING*0.8)),bk=ease((t-(T.SING+DUR.SING))/1.2);sg=sk*(1-bk);
+  zoom=1+0.08*punch+0.3*sg;
+  const shk=(t>=T.SING&&t<T.SING+DUR.SING)?0.03:0;
+  camera.position.set(Math.sin(tin*0.45)*1.5*(1-sg*0.85)+Math.sin(t*37)*shk,lerp(1.1,1.8,pushK)+0.5*sg+Math.sin(t*29)*shk,lerp(11.2,8.8,pushK)-2.3*punch-3.2*sg);
+  camera.lookAt(0,lerp(1.25,1.6,pushK)+0.15*sg,-2);pxShift=-camera.position.x*38;
   const beat=t*Math.PI*2*124/60/4;
   spots.forEach((s,i)=>{const a=t*0.9+i*1.3;s.target.position.set(Math.sin(a)*1.5,0.8,-1.5+Math.cos(a*.8));beams[i].lookAt(s.target.position)});
   crowd.forEach(g=>{const o=g.userData.off;const bob=Math.abs(Math.sin(t*5.2+o))*0.08;g.position.y=bob;g.userData.arms.forEach((a,j)=>{a.rotation.z=(j?-1:1)*(-0.35-Math.abs(Math.sin(t*3+o+j))*0.9)});});
   const cp=cfPts.geometry.attributes.position;for(let i=0;i<cfN;i++){const c=cf0[i];const yy=((c[1]-(t*1.2+c[3]))%6+6)%6;cp.array[i*3]=c[0]+Math.sin(t*2+c[3])*0.3;cp.array[i*3+1]=yy;cp.array[i*3+2]=c[2]}cp.needsUpdate=true;
-  ledM.color.setScalar(0.85+0.15*Math.sin(beat*8));
+  ledM.color.setScalar(0.85+0.15*Math.sin(beat*8)+0.4*sg);
+  flares.forEach((f,i)=>{const sc2=(1.1+0.8*Math.abs(Math.sin(beat*4+i)))*(1+0.8*sg);f.scale.set(sc2,sc2,1)});
+  beams.forEach(m=>{m.material.opacity=0.15+0.22*sg});cfPts.material.size=0.09+0.07*sg;spots.forEach((s2,i)=>{s2.intensity=(i<4?2.2:0)+(i>=4?0:1.6*sg)});
  }
  renderer.render(scene,camera);
  // ---- Dina states ----
  sleepWrap.style.display='none';dinaWrap.style.display='none';annWrap.style.display='none';
  const blinkOn=(Math.floor(t*24)%58)<2;
- const speakDina=sp&&sp[1]==='dina';
+ const speakDina=sp&&(sp[1]==='dina'||sp[1]==='sing');
  if(sleepOn){
   const k=ease((t-T.S1)/(T.S2-T.S1));
   const [px,py]=project(0,0.98,-2.55);const dist=camera.position.distanceTo(new THREE.Vector3(0,0.98,-2.55));
@@ -388,7 +404,7 @@ function render(t){
   dinaWrap.style.display='block';
   const bob=Math.sin(t*2.6)*4;
   let expr='neutral',amp=null,rot=0,jump=0,sx=1,hgt=740,bottom=1170,cx=360;
-  if(isStage){hgt=700;bottom=1000;cx=420;expr='happy';rot=Math.sin(t*5)*2.2;jump=-Math.abs(Math.sin(t*5.2))*26}
+  if(isStage){hgt=700*zoom;bottom=1000+(zoom-1)*430;cx=430+pxShift*0.6;expr='happy';rot=Math.sin(t*5)*2.2;jump=-Math.abs(Math.sin(t*5.2))*26}
   else if(sc===0){expr='neutral';amp=null;rot=Math.sin(t*1.3)*1;hgt=660;bottom=1170}
   else if(sc>=3){
     const lid=sp&&sp[1]==='dina'?sp[0]:null;
@@ -411,12 +427,22 @@ function render(t){
   dinaHead.setAttribute('transform',`translate(450,${196+Math.sin(t*2.6)*2}) rotate(${hr})`);
   setHead(expr,speakDina?amp:null,blinkOn);
  }
- if(annOn){annWrap.style.display='block';placeAnn(112,1002,600);
+ if(annOn){annWrap.style.display='block';placeAnn(112-(zoom-1)*320+pxShift,1002+(zoom-1)*380,600*zoom);
   const a=sp&&sp[1]==='anun'?envAt(sp[0],t):null;const m=$('annMouth');m.setAttribute('ry',(a===null?3:3+a*16).toFixed(1));
   annWrap.style.transform=`rotate(${Math.sin(t*2.4)*1.2}deg) translateY(${-Math.abs(Math.sin(t*3.5))*4}px)`;setAnnArms(t,a===null?0:Math.min(1,a))}
+
+ dinaWrap.style.filter=isStage?(t<REV?'brightness(0) drop-shadow(0 0 14px rgba(255,190,255,.95))':(t<REV+0.35?`brightness(${ease((t-REV)/0.35).toFixed(2)})`:'none')):'none';
+ const armRw=$('armR').parentNode;if(!window._armNext)window._armNext=armRw.nextSibling;
+ const micOn=isStage&&t>=T.SING-0.1&&t<T.SING+DUR.SING+0.4;
+ if(micOn){if(dinaG.lastElementChild!==armRw)dinaG.appendChild(armRw)}else if(armRw.nextSibling!==window._armNext)dinaG.insertBefore(armRw,window._armNext);
+ const micR=$('micR');if(micR)micR.style.display=(isStage&&t>=T.SING-0.1&&t<T.SING+DUR.SING+0.4)?'block':'none';
+ const darkEl=$('dark');darkEl.style.opacity=isStage?(t<REV?lerp(0.8,0.3,ease((t-T.S2)/(REV-T.S2))):Math.max(0,0.3-(t-REV)/0.4)).toFixed(2):'0';
+ $('glow').style.opacity=isStage?(0.25+0.55*Math.max(0,Math.sin(t*6*0.5))*(t>REV?1:0.2)+0.3*sg).toFixed(2):'0';
+ BK.forEach(([d,r,i])=>{if(!isStage){d.style.opacity=0;return}const x=((i*97+t*(14+i*3))%820)-50,y=700+((i*131)%520)+Math.sin(t*0.8+i)*30;d.style.opacity=(0.25+0.25*Math.sin(t*1.5+i)).toFixed(2);d.style.transform=`translate(${x}px,${y}px)`});
+ $('grain').style.backgroundPosition=`${(Math.floor(t*24)*97)%300}px ${(Math.floor(t*24)*53)%300}px`;
  // ---- overlays ----
  let f=0;for(const k of ['S1','S2','S3','S4','S5']){f=Math.max(f,1-Math.abs(t-T[k])/0.22)}
- flash.style.opacity=Math.max(0,f).toFixed(2);
+ f=Math.max(f,1-Math.abs(t-REV)/0.14);flash.style.opacity=Math.max(0,f).toFixed(2);
  dreamTint.style.opacity=isStage?'1':'0';
  const dayEl=$('day');const dk=eob((t-0.1)/0.45);dayEl.style.transform=`scale(${(0.6+0.4*dk).toFixed(3)}) rotate(${((1-dk)*-8).toFixed(1)}deg)`;
  // kinetic titles
@@ -444,7 +470,6 @@ function render(t){
  if(sc===5){const card=$('ctaCard');const t0=T.S5+0.15;const k=eob((t-t0)/0.6);card.style.opacity=Math.min(1,(t-t0)*7).toFixed(2);card.style.transform=`translateY(${(1-k)*70}px) scale(${(0.72+0.28*k).toFixed(3)})`;
  card.style.setProperty('--sx',(((t-t0)*260)%700-150)+'px');
  [['r1',0.25],['r2',0.4]].forEach(([id,d])=>{const kk=eob((t-t0-d)/0.4);const e=$(id);e.style.opacity=Math.min(1,(t-t0-d)*8).toFixed(2);e.style.transform=`translateX(${(1-kk)*60}px)`});
- $('chA').style.transform=`scale(${1+Math.max(0,Math.sin(t*5))*0.14})`;$('chB').style.transform=`scale(${1+Math.max(0,Math.sin(t*5+Math.PI))*0.14})`;
  $('fol').style.transform=`scale(${1+Math.sin(t*6)*0.06})`}
  return sc;
 }

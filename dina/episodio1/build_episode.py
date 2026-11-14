@@ -4,6 +4,8 @@ sys.path.insert(0,'..')
 import build_sheet as bs
 FPS=24
 lines=json.load(open('lines.json'))
+i4=[i for i,l in enumerate(lines) if l[0]=='L4'][0]
+lines.insert(i4+1,['SING','sing',None,'♪ Voy a brillar... voy a brillar... esta noche el mundo me va a escuchar ♪'])
 dur={}
 for lid,who,vid,text in lines:
     dur[lid]=float(subprocess.check_output(['ffprobe','-v','error','-show_entries','format=duration','-of','csv=p=0',f'audio/{lid}.mp3']))
@@ -11,7 +13,7 @@ for lid,who,vid,text in lines:
 T={}
 T['L1']=0.4
 T['S1']=T['L1']+dur['L1']+0.15; T['L2']=T['S1']+0.3
-T['S2']=T['L2']+dur['L2']+0.2; T['L3']=T['S2']+0.6; T['L4']=T['L3']+dur['L3']+0.2; T['L5']=T['L4']+dur['L4']+0.2
+T['S2']=T['L2']+dur['L2']+0.2; T['L3']=T['S2']+0.6; T['L4']=T['L3']+dur['L3']+0.2; T['SING']=T['L4']+dur['L4']+0.15; T['L5']=T['SING']+dur['SING']+0.25
 T['S3']=T['L5']+dur['L5']+0.25; T['L6']=T['S3']+0.6; T['L7']=T['L6']+dur['L6']+0.35; T['L8']=T['L7']+dur['L7']+0.35
 T['S4']=T['L8']+dur['L8']+0.2; T['L9']=T['S4']+0.3
 T['S5']=T['L9']+dur['L9']+0.2; T['L10']=T['S5']+0.3
@@ -92,7 +94,7 @@ def fade(a,fi=0.05,fo=0.2):
 for lid,who,vid,text in lines:
     a=load(f'audio/{lid}.mp3'); st=int(T[lid]*SR)
     w_=int(0.02*SR); n_=len(a)//w_; rms=np.sqrt(np.mean(a[:n_*w_].reshape(n_,w_)**2,axis=1)); p90=np.percentile(rms[rms>1e-4],90)
-    a=a*(0.16/p90)
+    a=a*((0.16 if who!='sing' else 0.2)/p90)
     if who=='crowd':
         l2=np.zeros(len(a)+SR//10,dtype=np.float32); l2[:len(a)]+=a
         for f,dl in ((0.93,0.03),(1.07,0.06)):
@@ -124,7 +126,7 @@ for tt in (0.52,0.74,0.96,1.18,1.40): put(bed,tt,clip('pop',rms=0.1),0.6)
 put(bed,T['S2']-0.7,clip('riser',rms=0.12),0.8); put(bed,T['S2']+0.1,clip('impact',rms=0.16),0.9); put(bed,T['S2']+0.12,clip('sparkle',rms=0.1),0.7)
 # crowd
 put(bed,T['L3']+dur['L3']-0.5,fade(clip('applause',rms=0.12,maxd=5.0),0.2,1.0),0.9)
-put(bed,T['L4']-0.2,fade(clip('cheer',rms=0.13,maxd=3.6),0.1,0.8),0.9)
+put(bed,T['L4']-0.2,fade(clip('cheer',rms=0.13,maxd=3.6),0.1,0.8),0.9); put(bed,T['SING']+0.2,fade(clip('cheer',rms=0.1,maxd=3.6),0.3,1.0),0.7); put(bed,T['SING']+dur['SING']-0.3,fade(clip('applause',rms=0.12,maxd=3.0),0.2,0.8),0.9)
 put(bed,T['L5']+dur['L5']-0.3,fade(clip('applause',rms=0.1,maxd=2.5),0.1,0.6),0.7)
 # wake up
 put(bed,T['S3']+0.0,clip('boing',rms=0.12),0.8); put(bed,T['S3']+0.05,clip('impact',rms=0.1,maxd=0.8),0.5)
@@ -160,9 +162,10 @@ def limb(up,fo,wid,skin):
     pass
 arm_up='<path d="M-35,0 C-38,40 -33,85 -29,106 A29,29 0 0 0 29,106 C33,85 38,40 35,0 A35,35 0 0 0 -35,0 Z" fill="url(#limbG)" stroke="#6b4a3a" stroke-width="4" stroke-linejoin="round"/><path d="M-26,52 q10,9 24,3 M-24,72 q9,7 20,2" stroke="#b78a72" stroke-width="3.2" fill="none" stroke-linecap="round"/><ellipse cx="0" cy="104" rx="14" ry="5" fill="#e2bfa8" opacity=".6"/>'
 arm_fo='<path d="M-28,0 C-29,30 -25,70 -22,92 A22,22 0 0 0 22,92 C25,70 29,30 28,0 Z" fill="url(#limbG)" stroke="#6b4a3a" stroke-width="4" stroke-linejoin="round"/><path d="M-20,40 q8,6 18,2" stroke="#b78a72" stroke-width="2.6" fill="none" stroke-linecap="round"/>'
+MIC='<g id="micR" style="display:none"><rect x="-6" y="30" width="12" height="50" rx="5" fill="#222" stroke="#000" stroke-width="2"/><circle cx="0" cy="90" r="16" fill="#777" stroke="#111" stroke-width="3"/><path d="M-11,84 l22,12 M-13,90 l26,0 M-11,96 l20,-12" stroke="#222" stroke-width="2" opacity=".6"/></g>'
 def arm_group(side):
     tr='translate(384,352)' if side=='L' else 'translate(516,352) scale(-1,1)'
-    return (f'<g transform="{tr}"><g id="arm{side}"><g id="fore{side}" transform="translate(0,108)">{arm_fo}<g id="hand{side}" transform="translate(0,104) scale(1.05)"><use href="#hand"/></g></g>{arm_up}</g></g>')
+    return (f'<g transform="{tr}"><g id="arm{side}"><g id="fore{side}" transform="translate(0,108)">{arm_fo}<g id="hand{side}" transform="translate(0,104) scale(1.05)"><use href="#hand"/>{MIC if side=='R' else ''}</g></g>{arm_up}</g></g>')
 body=bs.body
 i0=body.index(' <!-- arms -->'); i1=body.index(' <!-- shorts -->')
 body=body[:i0]+' '+arm_group('L')+arm_group('R')+'\n'+body[i1:]

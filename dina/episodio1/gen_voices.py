@@ -1,8 +1,8 @@
 import json, subprocess, urllib.request, os
-DANI='tMzxR2W7o3RLIY7zWBbG'; ANA='ewn5JTa3lNPY8QVuZJi6'; DIEGO='4rOzDieCbHQQyo9tzqZv'; BLACKIE='iFhPOZcajR7W3sDL39qJ'; ANTONIO='htFfPSZGJwjBv1CL0aMD'
+DANI='tMzxR2W7o3RLIY7zWBbG'; ANA='ewn5JTa3lNPY8QVuZJi6'; DIEGO='4rOzDieCbHQQyo9tzqZv'; BLACKIE='iFhPOZcajR7W3sDL39qJ'; ANTONIO='htFfPSZGJwjBv1CL0aMD'; TATIANA='2rigMbVWLdqtBSCahJFX'
 LINES=[
- ('L1','narr',DIEGO,"Esta es Dina. Y en treinta días, tú vas a decidir cómo cambia su vida."),
- ('L2','narr',DIEGO,"Una noche, Dina se quedó dormida... y tuvo un sueño increíble."),
+ ('L1','narr',TATIANA,"Esta es Dina. Y en treinta días, tú vas a decidir cómo cambia su vida."),
+ ('L2','narr',TATIANA,"Una noche, Dina se quedó dormida... y tuvo un sueño increíble."),
  ('L3','anun',ANTONIO,"¡Damas y caballeros! Den la bienvenida a la nueva estrella de la música... ¡Dina!"),
  ('L4','crowd',BLACKIE,"¡¡DINA!! ¡¡DINA!! ¡¡DINA!!"),
  ('L5','anun',ANTONIO,"Pero para estar aquí de verdad... tendrás que cambiar."),
@@ -10,7 +10,7 @@ LINES=[
  ('L7','dina',ANA,"Pero... mírame. Así nunca lo voy a lograr."),
  ('L8','dina',ANA,"¡No! Voy a cambiar. Pero no puedo sola... ¡necesito tu ayuda!"),
  ('L9','dina',ANA,"Día uno: ¿qué cambio primero? ¿Mis dientes... o mi piel y mis granos?"),
- ('L10','narr',DIEGO,"Comenta A o B y sigue a Dina para ver qué pasa en el día dos."),
+ ('L10','narr',TATIANA,"Comenta qué quieres que cambie primero: ¿dientes... o piel y granos? Y sigue a Dina para ver qué pasa en el día dos."),
 ]
 for lid,who,vid,text in LINES:
     out=f'audio/{lid}.mp3'
