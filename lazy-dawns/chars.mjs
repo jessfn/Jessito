@@ -151,7 +151,7 @@ export function drawDentist(p) {
 
 // ---------- Salon: Vero (estilista) y Memo (ayudante). No mueven la boca para hablar: solo la expresion cambia con el animo. ----------
 const gripHand = (col = '#d9a37c') => `<g><ellipse cx="0" cy="2" rx="44" ry="36" fill="${col}" stroke="${OUT}" stroke-width="7"/>${[0, 1, 2, 3].map((i) => `<rect x="-38" y="${-30 + i * 15}" width="76" height="17" rx="8.5" fill="${col}" stroke="${OUT}" stroke-width="4.5"/>`).join('')}<ellipse cx="-34" cy="-38" rx="17" ry="12" fill="${col}" stroke="${OUT}" stroke-width="5" transform="rotate(-22 -34 -38)"/><path d="M-30,-26 q30,6 60,0" stroke="#000" stroke-opacity="0.15" stroke-width="3" fill="none"/></g>`;
-function salonTool(kind, o = {}) {
+export function salonTool(kind, o = {}) {
   const k = o.k ?? 0; // animacion 0..1
   switch (kind) {
     case 'comb': return `<g><rect x="-14" y="0" width="28" height="130" rx="12" fill="#ff7ab6" ${O}/><rect x="-90" y="120" width="180" height="30" rx="12" fill="#ff7ab6" ${O}/>${[...Array(12)].map((_, i) => `<rect x="${-84 + i * 15}" y="150" width="8" height="48" rx="3" fill="#ff7ab6" ${O}/>`).join('')}</g>`;

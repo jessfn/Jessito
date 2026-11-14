@@ -88,7 +88,7 @@ function mouthSvg(m, yaw) {
   const topY = (cl.y + 2 * up + cr.y) / 4, botY = (cl.y + 2 * lo + cr.y) / 4;
   const PU = [-66, -44, -22, 0, 22, 44].map((x, i) => [x, topY - 4, 22, 30 + (i === 2 || i === 3 ? 3 : 0), 0, '#e3cf6a']);
   const PL = open > 0.55 ? [-36, -18, 0, 18].map((x, i) => [x, botY - 22, 18, 22, 0, '#e3cf6a']).map((u) => T(...u)).join('') : '';
-  const perfTeeth = PU.map((u) => T(...u)).join('') + PL + (tq.shine ? `<path d="M-60,${6 + drop} l120,0" stroke="#fff" stroke-width="5" opacity="0.7"/>` : '');
+  const perfTeeth = PU.map((u) => T(...u)).join('') + PL;
   const teeth = perfect ? perfTeeth : upper + fang + lower;
   const buck = (open < 0.1 && smile < 0.3 && !perfect) ? `<g>${T(-18, 8, 20, 26, 6, '#e3cf6a')}${T(4, 9, 18, 22, -8, '#d4be52')}</g>` : '';
   return `<g>
@@ -96,9 +96,10 @@ function mouthSvg(m, yaw) {
     <path d="${shape}" fill="#4a0f12"/>
     <g clip-path="url(#mouthClip)">${showTeeth ? teeth : ''}${open > 0.35 ? `<ellipse cx="0" cy="${lo * 0.62}" rx="${w * 0.55}" ry="${22 + open * 14}" fill="#c4505e"/>` : ''}</g>
     <path d="${shape}" fill="none" stroke="${m.lip || '#7b2a2a'}" stroke-width="${m.lip ? (m.lipW || 17) + press * 4 : 12 + press * 4}" stroke-linejoin="round" stroke-linecap="round"/>
-    <path d="${shape}" fill="none" stroke="${OUT}" stroke-width="3" opacity="0.5"/>${m.lip ? `<path d="M${cl.x * 0.45},${cl.y * 0.6 + 14} Q0,${up + 10} ${cr.x * 0.45},${cr.y * 0.6 + 14}" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.65"/>` : ''}
+    <path d="${shape}" fill="none" stroke="${OUT}" stroke-width="3" opacity="0.5"/>
     ${buck}
-    <g stroke="#3a1010" stroke-width="3" opacity="0.7" stroke-linecap="round"><path d="M-30,${(cl.y + cr.y) / 2 + 14} l2,9 M-6,${(cl.y + cr.y) / 2 + 16} l-2,9 M20,${(cl.y + cr.y) / 2 + 14} l3,9"/></g>
+    ${m.lip ? `<path d="M${cl.x * 0.5},${cl.y - 4} Q0,${up - 10} ${cr.x * 0.5},${cr.y - 4}" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.55"/>` : ''}
+    <g stroke="#3a1010" stroke-width="3" opacity="${m.lip ? 0 : 0.7}" stroke-linecap="round"><path d="M-30,${(cl.y + cr.y) / 2 + 14} l2,9 M-6,${(cl.y + cr.y) / 2 + 16} l-2,9 M20,${(cl.y + cr.y) / 2 + 14} l3,9"/></g>
     ${press > 0.4 ? `<path d="M${-w - 6},${cl.y - 6} q-6,8 0,16 M${w + 6},${cr.y - 6} q6,8 0,16" stroke="#3a1d10" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.6"/>` : ''}
   </g>`;
 }
@@ -159,7 +160,7 @@ function makeupSvg(mk, blinkOpen) {
   const shadow = sh > 0.02 ? `<defs><linearGradient id="shG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${sc[0]}"/><stop offset="0.5" stop-color="${sc[1]}"/><stop offset="1" stop-color="${sc[2]}"/></linearGradient></defs>` + [-78, 78].map((x) => `<ellipse cx="${x}" cy="${mk.lift ? -66 : -58}" rx="${mk.wide ? 64 : 54}" ry="${(mk.lift ? 30 : 24) + 8 * (1 - blinkOpen)}" fill="url(#shG)" opacity="${0.95 * sh}"/><ellipse cx="${x + (x < 0 ? 16 : -16)}" cy="-52" rx="18" ry="9" fill="${C.inner || '#fff6cf'}" opacity="${0.85 * sh}"/>`).join('') : '';
   const sp = clamp(mk.sparkle || 0), spark = sp > 0.02 ? [-1, 1].map((s) => [...Array(9)].map((_, i) => `<circle cx="${s * (50 + i * 9)}" cy="${-60 + (i % 3) * 9 - Math.sin(i) * 6}" r="${1.8 + (i % 3)}" fill="#fff" opacity="${0.9 * sp}"/>`).join('') + `<circle cx="${s * 62}" cy="-50" r="5" fill="${C.gem || '#fff'}" stroke="#fff" stroke-width="1.5" opacity="${sp}"/>`).join('') : '';
   const ln = clamp(mk.liner || 0), lc = C.liner || '#1a0d12', wing = mk.wing ?? 1;
-  const liner = ln > 0.02 ? [[-1, -78], [1, 78]].map(([s, x]) => `<path d="M${x - s * 38},-36 Q${x},-58 ${x + s * 38},-36 Q${x + s * 62 * wing},-44 ${x + s * (40 + 40 * wing)},-${44 + 24 * wing}" stroke="${lc}" stroke-width="${(mk.thick || 5) * ln}" fill="none" stroke-linecap="round"/>`).join('') : '';
+  const liner = ln > 0.02 ? [[-1, -78, mk.linerL ?? 1], [1, 78, mk.linerR ?? 1]].map(([s, x, q]) => q < 0.02 ? '' : `<path d="M${x - s * 38},-36 Q${x},-58 ${x + s * 38},-36 Q${x + s * 62 * wing * q},-44 ${x + s * (40 + 40 * wing * q)},-${44 + 24 * wing * q}" stroke="${lc}" stroke-width="${(mk.thick || 5) * ln}" fill="none" stroke-linecap="round"/>`).join('') : '';
   const ls = clamp(mk.lash || 0), lashes = ls > 0.02 ? [[-1, -78], [1, 78]].map(([s, x]) => [...Array(8)].map((_, i) => `<path d="M${x - 36 + i * 10.5},${-44 - Math.sin(i / 7 * Math.PI) * 14} l${s * 11 * ls},${-20 * ls - (i % 2) * 8 * ls}" stroke="#0a0508" stroke-width="4.5" stroke-linecap="round"/>`).join('')).join('') : '';
   const fr = clamp(mk.freckles || 0), freckles = fr > 0.02 ? [-1, 1].map((s) => [...Array(14)].map((_, i) => `<circle cx="${s * (30 + (i * 13) % 70)}" cy="${34 + (i * 7) % 26}" r="${1.8 + (i % 3) * 0.7}" fill="#5a2d14" opacity="${0.55 * fr}"/>`).join('')).join('') : '';
   return `${base}${dew}${contour}${blush}${highlight}${freckles}${shadow}${spark}${liner}${lashes}`;

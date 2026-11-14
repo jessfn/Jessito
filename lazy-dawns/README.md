@@ -143,3 +143,10 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
 ## Vestuario (decision del creador, dia 6)
 - Desde el dia 6 Lazy se viste SIEMPRE con el vestido de satin esmeralda con cinturon dorado, aretes, collar y tacones (outfit.kind='gown', prog=1, jewel=1). Ya no usa la ropa rota.
 - La PASARELA se descarto del dia 6: queda para mas adelante. Final del dia 6: terraza de noche (plates3d 'terrace'), mensajero con sobre dorado/invitacion misteriosa.
+
+## Dia 7 (maquillaje de gala) - decisiones
+- Look elegido: C "cut crease cobre" (ojos ahumados cobre, ala larga, piel mate, labio vino brillante). El LUNAR SE QUEDA (queda como opcion de votacion despues: dia 8 = rizos vs lunar).
+- Arreglo del rig: sin linea rosa/clara cruzando los dientes (se quito el trazo de brillo y las rayitas de labio seco con labial).
+- Narrativa constante: gancho, imprevisto (apagon), truco de cinta, giro final (nota "No vayas a la gala", firma M). SIEMPRE incluir inserts cinematograficos de los objetos nombrados
+  (paleta, cinta, labial, reloj, nota) con iris, empuje de camara y efectos; punch-ins moderados en la camara principal sobre el paso del maquillaje.
+- Nuevos fondos 3D: camerino (espejo de focos) y pasillo. Personaje nuevo: ninguno (Nina vuelve).
