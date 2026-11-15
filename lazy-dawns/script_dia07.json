@@ -2,7 +2,7 @@
  {
   "id": "l1",
   "who": "N",
-  "text": "Día siete. Ustedes eligieron maquillaje... y la invitación dorada seguía en mi mano.",
+  "text": "Día siete. Ustedes eligieron maquillaje... y esta noche, alguien no quería que yo llegara a la gala.",
   "pad": 0.25
  },
  {
@@ -14,7 +14,7 @@
  {
   "id": "l3",
   "who": "K",
-  "text": "¡Lazy! Hoy te haré un look estelar: ojos cobre, delineado largo y labios vino.",
+  "text": "¡Lazy! Hoy te haré un look estelar: sombra lila, delineado largo y labios berry.",
   "pad": 0.2
  },
  {
@@ -26,7 +26,7 @@
  {
   "id": "l5",
   "who": "N",
-  "text": "Después, sombras cobre, difuminadas con pincel suave, formando un cut crease.",
+  "text": "Después, sombra lila, difuminada con pincel suave, de adentro hacia afuera.",
   "pad": 0.2
  },
  {
@@ -38,31 +38,31 @@
  {
   "id": "l7",
   "who": "N",
-  "text": "Y justo cuando Nina dibujaba el ala... se fue la luz.",
+  "text": "Y justo cuando Nina dibujaba el ala... ¡se cayó un frasco de brillantina!",
   "pad": 0.3
  },
  {
   "id": "l8",
   "who": "K",
-  "text": "¡Aaah! ¿Quién apagó todo?",
+  "text": "¡Aaah! ¡No te muevas!",
   "pad": 0.15
  },
  {
   "id": "l9",
   "who": "N",
-  "text": "Con la linterna del celular, Nina siguió. Usó un truco: cinta, para un ala perfecta.",
+  "text": "Nina no se rindió. Usó un truco: cinta, para un ala perfecta.",
   "pad": 0.2
  },
  {
   "id": "l10",
   "who": "N",
-  "text": "Pestañas larguísimas y, para terminar, un labial vino brillante.",
+  "text": "Pestañas larguísimas y, para terminar, un labial berry brillante.",
   "pad": 0.2
  },
  {
   "id": "l11",
   "who": "N",
-  "text": "Volvió la luz. Me miré: ojos ahumados, mirada estelar, y lista para brillar.",
+  "text": "Me miré al espejo: ojos lila, mirada estelar, y lista para brillar.",
   "pad": 0.3
  },
  {
@@ -86,7 +86,7 @@
  {
   "id": "l15",
   "who": "N",
-  "text": "Uy. ¿Qué arreglamos mañana: el lunar o las uñas? Comenta tu elección, y sígueme para ver el día ocho.",
+  "text": "Uy. ¿Qué arreglamos mañana: el lunar o la nariz? Comenta tu elección, y sígueme para ver el día ocho.",
   "pad": 0.35
  }
 ]

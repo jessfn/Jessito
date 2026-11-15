@@ -45,6 +45,7 @@ function eyeSvg(x, open, blink, squint, gx, gy, tear, tearT, side, mk) {
   const edge = (u) => { const xx = clamp(u, -0.97, 0.97) * 36; return Math.max(arcY(xx), lidY(xx)); };   // u: -1 interno .. +1 externo
   const PX = (u) => (dir * clamp(u, -0.97, 0.97) * 36);
   const f1 = (n) => n.toFixed(1);
+  const swp = (id, s) => { const x0 = -dir * 58, x1 = x0 + dir * 124 * clamp(s); return `<clipPath id="${id}${side}"><rect x="${Math.min(x0, x1).toFixed(1)}" y="-130" width="${(Math.abs(x1 - x0) + 0.01).toFixed(1)}" height="230"/></clipPath>`; };
   const gid = 'es' + side + ((col.shadow || ['a', 'b', 'c']).join('')).replace(/[^0-9a-f]/gi, '');
   // ---- sombra de parpado ----
   let shadow = '';
@@ -53,8 +54,8 @@ function eyeSvg(x, open, blink, squint, gx, gy, tear, tearT, side, mk) {
     const bot = [], top = []; for (let i = 0; i <= 20; i++) { const u = -0.95 + (i / 20) * 2.0; bot.push(`${f1(PX(u) + dir * (u > 0.7 ? (u - 0.7) * 14 : 0))},${f1(edge(u) + 1)}`); top.push(`${f1(PX(u) + dir * (u > 0.6 ? (u - 0.6) * 26 : 0))},${f1(edge(u) - hgt(u) * (u > 0.75 ? 1.15 : 1))}`); }
     const poly = 'M' + bot.join(' L') + ' L' + top.slice().reverse().join(' L') + 'Z';
     const wedge = `M${f1(dir * 8)},${f1(edge(0.2) - 2)} L${f1(dir * 50)},${f1(edge(1) - 28 - 6 * lift)} L${f1(dir * 46)},${f1(edge(1) + 4)} L${f1(dir * 22)},${f1(edge(0.6) + 1)}Z`;
-    shadow = `<defs><linearGradient id="${gid}" x1="${dir > 0 ? 0 : 1}" y1="0" x2="${dir > 0 ? 1 : 0}" y2="0"><stop offset="0" stop-color="${sc[2]}"/><stop offset="0.5" stop-color="${sc[1]}"/><stop offset="1" stop-color="${sc[0]}"/></linearGradient><filter id="eb" x="-40%" y="-80%" width="180%" height="260%"><feGaussianBlur stdDeviation="2.6"/></filter><filter id="eb2" x="-40%" y="-80%" width="180%" height="260%"><feGaussianBlur stdDeviation="4.5"/></filter></defs>
-      <g opacity="${0.95 * sh}"><path d="${poly}" fill="url(#${gid})" filter="url(#eb)"/><path d="${wedge}" fill="${sc[0]}" opacity="${0.6 + 0.25 * cut}" filter="url(#eb2)"/>
+    shadow = `<defs>${swp("sw", mk[side > 0 ? "swL" : "swR"] ?? 1)}<linearGradient id="${gid}" x1="${dir > 0 ? 0 : 1}" y1="0" x2="${dir > 0 ? 1 : 0}" y2="0"><stop offset="0" stop-color="${sc[2]}"/><stop offset="0.5" stop-color="${sc[1]}"/><stop offset="1" stop-color="${sc[0]}"/></linearGradient><filter id="eb" x="-40%" y="-80%" width="180%" height="260%"><feGaussianBlur stdDeviation="2.6"/></filter><filter id="eb2" x="-40%" y="-80%" width="180%" height="260%"><feGaussianBlur stdDeviation="4.5"/></filter></defs>
+      <g clip-path="url(#sw${side})" opacity="${0.95 * sh}"><path d="${poly}" fill="url(#${gid})" filter="url(#eb)"/><path d="${wedge}" fill="${sc[0]}" opacity="${0.6 + 0.25 * cut}" filter="url(#eb2)"/>
       <path d="M${top.slice(2, 19).join(' L')}" stroke="${sc[0]}" stroke-width="${cut ? 4 : 6}" fill="none" stroke-linecap="round" opacity="${cut ? 0.95 : 0.3}" ${cut ? '' : 'filter="url(#eb)"'}/>
       <ellipse cx="${f1(-dir * 24)}" cy="${f1(edge(-0.75) - 4)}" rx="9" ry="4.5" fill="${col.inner || '#fff6cf'}" opacity="0.95" filter="url(#eb)"/>
       <ellipse cx="${f1(dir * 4)}" cy="${f1(edge(0) - 8)}" rx="15" ry="4" fill="${sc[2]}" opacity="0.55" filter="url(#eb)"/></g>
@@ -67,7 +68,7 @@ function eyeSvg(x, open, blink, squint, gx, gy, tear, tearT, side, mk) {
     const ex = PX(1.0), ey = edge(1.0);
     const tipX = ex + dir * (10 + 26 * wing), tipY = ey - (4 + 15 * wing) - 2;
     const wingP = wing > 0.05 ? ` Q${f1(ex + dir * (6 + 10 * wing))},${f1(ey - 2 - 4 * wing)} ${f1(tipX)},${f1(tipY)} Q${f1(ex + dir * (8 + 8 * wing))},${f1(ey + 1)} ${dn[dn.length - 1]}` : ` L${dn[dn.length - 1]}`;
-    liner = `<path d="M${up.join(' L')}${wingP} L${dn.slice(0, -1).reverse().join(' L')}Z" fill="${lc}"/>`; }
+    liner = `<defs>${swp('lw', mk[side > 0 ? 'lsL' : 'lsR'] ?? 1)}</defs><g clip-path="url(#lw${side})"><path d="M${up.join(' L')}${wingP} L${dn.slice(0, -1).reverse().join(' L')}Z" fill="${lc}"/></g>`; }
   // ---- pestanas superiores: curvas, afiladas, de afuera hacia adentro mas largas; salen del borde del parpado ----
   let lashes = '';
   if (c < 0.75) { const n = Math.round(5 + 3 * lsh), Lmax = 12 + 20 * lsh;
@@ -88,7 +89,7 @@ function eyeSvg(x, open, blink, squint, gx, gy, tear, tearT, side, mk) {
       <g transform="translate(${ix},${iy}) scale(${1 - Math.abs(gx) * 0.12},1)"><circle r="22" fill="url(#eye)"/><circle r="11" fill="#0a0503"/><circle cx="8" cy="-9" r="7" fill="#fff"/><circle cx="-6" cy="10" r="3.5" fill="#fff" opacity="0.8"/></g>
       ${tear > 0.2 ? `<ellipse cx="0" cy="${yl - 2}" rx="34" ry="${4 + tear * 5}" fill="#dff3ff" opacity="${0.35 + tear * 0.4}"/>` : ''}
       <path d="M-46,-62 L46,-62 L46,${yu} Q0,${yu + lerp(-16, 8, c)} -46,${yu}Z" fill="${LID}"/>
-      ${sh > 0.02 ? `<path d="M-46,-62 L46,-62 L46,${yu} Q0,${yu + lerp(-16, 8, c)} -46,${yu}Z" fill="${(col.shadow || ['#8a4b1e', '#e0a84a'])[1]}" opacity="${0.8 * sh * Math.min(1, c * 2)}"/>` : ''}
+      ${sh > 0.02 ? `<path d="M-46,-62 L46,-62 L46,${yu} Q0,${yu + lerp(-16, 8, c)} -46,${yu}Z" fill="${(col.shadow || ['#8a4b1e', '#e0a84a'])[1]}" opacity="${0.8 * sh * Math.min(1, c * 2) * clamp(mk[side > 0 ? 'swL' : 'swR'] ?? 1)}"/>` : ''}
       <path d="M-46,70 L-46,${yl} Q0,${yl + 10} 46,${yl} L46,70Z" fill="${LID}"/>
     </g>
     <ellipse rx="36" ry="40" fill="none" stroke="${OUT}" stroke-width="${c < 0.5 ? 4.5 : 7}"/>
@@ -136,7 +137,7 @@ function mouthSvg(m, yaw) {
   const qy = (t, c0, cy, c1) => (1 - t) * (1 - t) * c0 + 2 * t * (1 - t) * cy + t * t * c1;
   const pts = []; for (let i = 0; i <= N; i++) { const t = i / N, x = w * (2 * t - 1); pts.push({ x, yu: qy(t, cl.y, up, cr.y), yl: qy(t, cl.y, lo, cr.y), e: Math.pow(Math.max(0, 1 - (x / w) * (x / w)), 0.75) }); }
   const full = (m.fullness ?? 1);
-  const tU = (p) => (3 + 19 * full * p.e) - 6.5 * g(p.x, 0, 8) + 5 * (g(Math.abs(p.x), 22, 9)) * p.e;
+  const tU = (p) => (3 + 14 * full * p.e) - 6.5 * g(p.x, 0, 8) + 5 * (g(Math.abs(p.x), 22, 9)) * p.e;
   const tL = (p) => 4 + (30 * full) * p.e + (open < 0.15 ? 2 : 0);
   const top = pts.map((p) => `${p.x.toFixed(1)},${(p.yu - tU(p)).toFixed(1)}`), upE = pts.map((p) => `${p.x.toFixed(1)},${p.yu.toFixed(1)}`);
   const loE = pts.map((p) => `${p.x.toFixed(1)},${p.yl.toFixed(1)}`), bot = pts.map((p) => `${p.x.toFixed(1)},${(p.yl + tL(p)).toFixed(1)}`);
@@ -222,7 +223,8 @@ function makeupSvg(mk, blinkOpen) {
   const liner = ln > 0.02 ? [[-1, -78, mk.linerL ?? 1], [1, 78, mk.linerR ?? 1]].map(([s, x, q]) => q < 0.02 ? '' : `<path d="M${x - s * 38},-36 Q${x},-58 ${x + s * 38},-36 Q${x + s * 62 * wing * q},-44 ${x + s * (40 + 40 * wing * q)},-${44 + 24 * wing * q}" stroke="${lc}" stroke-width="${(mk.thick || 5) * ln}" fill="none" stroke-linecap="round"/>`).join('') : '';
   const ls = clamp(mk.lash || 0), lashes = ls > 0.02 ? [[-1, -78], [1, 78]].map(([s, x]) => [...Array(8)].map((_, i) => `<path d="M${x - 36 + i * 10.5},${-44 - Math.sin(i / 7 * Math.PI) * 14} l${s * 11 * ls},${-20 * ls - (i % 2) * 8 * ls}" stroke="#0a0508" stroke-width="4.5" stroke-linecap="round"/>`).join('')).join('') : '';
   const fr = clamp(mk.freckles || 0), freckles = fr > 0.02 ? [-1, 1].map((s) => [...Array(14)].map((_, i) => `<circle cx="${s * (30 + (i * 13) % 70)}" cy="${34 + (i * 7) % 26}" r="${1.8 + (i % 3) * 0.7}" fill="#5a2d14" opacity="${0.55 * fr}"/>`).join('')).join('') : '';
-  return `${base}${dew}${contour}${blush}${highlight}${freckles}`;
+  const gl = clamp(mk.glitter || 0), glit = gl > 0.02 ? [...Array(46)].map((_, i) => { const sd = ((i * 7919 + 13) % 1009) / 1009, sd2 = ((i * 104729 + 7) % 997) / 997; const x = (sd - 0.5) * 300, y = -120 + sd2 * 230; const cols = ['#ffe14d', '#ff9ad0', '#ffffff', '#c4b5fd']; return `<path transform="translate(${x.toFixed(1)},${y.toFixed(1)})" d="M0,-4 L1.6,0 L0,4 L-1.6,0Z" fill="${cols[i % 4]}" opacity="${(0.5 + 0.5 * ((i * 37) % 10) / 10) * gl}"/>`; }).join('') : '';
+  return `${base}${dew}${contour}${blush}${highlight}${freckles}${glit}`;
 }
 function headSvg(p) {
   const hr = { ...HAIR_DEFAULT, ...(p.hair || {}) };
@@ -262,8 +264,8 @@ function headSvg(p) {
         <ellipse cx="-12" cy="58" rx="${7 + (p.flare || 0) * 2}" ry="5" fill="#2a130a"/><ellipse cx="12" cy="58" rx="${7 + (p.flare || 0) * 2}" ry="5" fill="#2a130a"/>
       </g>
       ${glowSvg(sk.glow)}${redSvg(sk.red || 0)}
-      <g transform="translate(${yaw * 6},${102 + jaw * 0.8})">${mouthSvg(p.mouth, yaw)}</g>
-      ${(() => { const mk = p.makeup || {}; const m = mk.mole ?? 1, sc = mk.scab ?? 0; return `${m > 0.02 ? `<g transform="translate(96,94)" opacity="${m}"><circle r="9" fill="#2a1208" stroke="${OUT}" stroke-width="3"/><path d="M-2,-8 q-6,-18 -2,-28 M3,-8 q4,-16 12,-22 M6,-4 q16,-6 24,-4" stroke="#12090a" stroke-width="3" fill="none" stroke-linecap="round"/></g>` : ''}${sc > 0.02 ? `<g transform="translate(96,94)" opacity="${sc}"><circle r="12" fill="#e3342f" opacity="0.35"/><circle r="6.5" fill="#6b2a1a" stroke="#3a1409" stroke-width="2"/></g>` : ''}`; })()}
+      <g transform="translate(${yaw * 6},${102 + jaw * 0.8 + (p.mouth.lip ? 14 : 0)})">${(p.mouth.lip && (p.mouth.lipP ?? 1) < 1) ? `<defs><clipPath id="lipSw"><rect x="-130" y="-90" width="${(260 * clamp(p.mouth.lipP)).toFixed(1)}" height="260"/></clipPath></defs>${mouthSvg({ ...p.mouth, lip: null }, yaw)}<g clip-path="url(#lipSw)">${mouthSvg(p.mouth, yaw)}</g>` : mouthSvg(p.mouth, yaw)}</g>
+      ${(() => { const mk = p.makeup || {}; const m = mk.mole ?? 1, sc = mk.scab ?? 0; return `${m > 0.02 ? `<g transform="translate(108,70)" opacity="${m}"><circle r="9" fill="#2a1208" stroke="${OUT}" stroke-width="3"/><path d="M-2,-8 q-6,-18 -2,-28 M3,-8 q4,-16 12,-22 M6,-4 q16,-6 24,-4" stroke="#12090a" stroke-width="3" fill="none" stroke-linecap="round"/></g>` : ''}${sc > 0.02 ? `<g transform="translate(124,50)" opacity="${sc}"><circle r="12" fill="#e3342f" opacity="0.35"/><circle r="6.5" fill="#6b2a1a" stroke="#3a1409" stroke-width="2"/></g>` : ''}`; })()}
       <ellipse cx="-46" cy="-56" rx="30" ry="12" fill="#fff" opacity="0.14" filter="url(#blur8)"/>
       <ellipse cx="-130" cy="20" rx="40" ry="18" fill="#2e1a0c" opacity="0.3" filter="url(#blur8)"/><ellipse cx="110" cy="110" rx="46" ry="16" fill="#2e1a0c" opacity="0.3" filter="url(#blur8)"/>
     </g>

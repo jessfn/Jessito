@@ -132,9 +132,11 @@ export function makeDirector({ L, T, DUR }) {
       L: { rot1: st.aL1.x, rot2: st.aL2.x, w: st.wL.x, curl: st.cL.x, spread: st.sL.x, tt: t }, R: { rot1: st.aR1.x, rot2: st.aR2.x, w: st.wR.x, curl: st.cR.x, spread: st.sR.x, tt: t } });
   }
 
-  const LOOKC = { shade: 'match', mole: 1, cols: { blush: '#d4684a', contour: '#3a1608', shadow: ['#3b1a0c', '#b4572a', '#e8a066'], inner: '#ffd9a8', hl: '#ffe6c2', liner: '#0a0508' }, wide: 1, lift: 1, thick: 7, wing: 1.3 };
-  const makeupAt = (t) => ({ ...LOOKC, found: ramp(t, T.baseA, T.baseA + 1.6), contour: 0.9 * ramp(t, T.contourA, T.contourA + 1.2), highlight: 0.8 * ramp(t, T.hiA, T.hiA + 1.0), blush: 0.7 * ramp(t, T.contourA + 0.4, T.contourA + 1.6),
-    shadow: ramp(t, T.shadowA, T.shadowB), liner: ramp(t, T.linerA, T.linerA + 0.8), linerL: ramp(t, T.linerA, T.linerA + 1.2), linerR: ramp(t, T.tapeA + 0.6, T.tapeB), lash: ramp(t, T.lashA, T.lashA + 1.0) });
+  const LOOKD = { shade: 'match', mole: 1, found: 1, cols: { blush: '#e06a7a', contour: '#3a1608', shadow: ['#4b2a73', '#9d6be0', '#f0d8ff'], inner: '#f6ecff', hl: '#ffe6c2', liner: '#120818' }, wide: 1, lift: 1, thick: 5, wing: 1, sparkle: 0 };
+  const mid = (T.shadowA + T.shadowB) / 2;
+  const makeupAt = (t) => ({ ...LOOKD, found: ramp(t, T.baseA, T.baseA + 1.6), contour: 0.9 * ramp(t, T.contourA, T.contourA + 1.2), highlight: 0.8 * ramp(t, T.hiA, T.hiA + 1.0), blush: 0.7 * ramp(t, T.contourA + 0.4, T.contourA + 1.6),
+    shadow: t >= T.shadowA ? 1 : 0, swL: ramp(t, T.shadowA, mid), swR: ramp(t, mid, T.shadowB),
+    liner: t >= T.linerA ? 1 : 0, linerL: 1, linerR: t >= T.linerA ? 1 : 0, lsL: Math.max(0.75 * ramp(t, T.linerA, T.outA - 0.1), ramp(t, T.tapeA + 0.2, T.tapeB)), lsR: ramp(t, T.tapeA + 0.5, T.tapeB + 0.3), lash: 0.9 * ramp(t, T.lashA, T.lashA + 1.2), glitter: ramp(t, T.outA + 0.3, T.outA + 1.2) });
   const outfit = { kind: 'gown', prog: 1, jewel: 1 };
   const browS = { k: 1, kl: 1, kr: 1, red: 0, shortL: 0 };
   const TEETH = { clean: 1, braces: 0, crooked: 0, extra: 0, shine: true };
@@ -147,14 +149,14 @@ export function makeDirector({ L, T, DUR }) {
     const breath = (1 - Math.cos((2 * Math.PI * t) / 4.3)) / 2;
     const sh = shut(t); const bl = Math.max(blinkAt(t), slowBlink(t), sh);
     const lidDrop = Math.max(0, T0.ey) * 0.18;
-    const lip = t >= T.lipA ? '#8f1d3a' : undefined;
+    const lip = t >= T.lipA ? '#b0206a' : undefined;
     return {
       yaw: T0.yaw, pitch: T0.pitch + wa * 0.06 * Math.sin(2 * ph), roll: T0.roll + wa * 2.2 * Math.sin(ph), lean: T0.lean + wa * 16 * Math.sin(ph), hop: ev.hop, bob: Math.sin(t * 2 * Math.PI / 4.3) * 2.5 - wa * 7 * Math.abs(Math.cos(ph)),
       sway: T0.lean * 0.12 + wa * 1.2 * Math.sin(ph), breath, shoulders: e.shoulders + breath * 0.18 - wa * 0.1, flare: e.flare + breath * 0.3,
       squint: e.squint, tears: e.tears, tearT: t,
       gaze: { x: T0.ex, y: T0.ey }, lid: { l: e.lid - lidDrop, r: e.lid - lidDrop }, blink: { l: bl, r: bl },
       brow: { l: { r: e.bl, i: e.bli }, r: { r: e.br, i: e.bri } },
-      mouth: { open: e.baseOpen, wide: clamp(e.wide, -1, 1), smile: e.smile, asym: e.asym, press: e.press * (1 - e.baseOpen), teeth: TEETH, lip },
+      mouth: { open: e.baseOpen, wide: clamp(e.wide, -1, 1), smile: e.smile, asym: e.asym, press: e.press * (1 - e.baseOpen), teeth: TEETH, lip, lipP: ramp(t, T.lipA, T.lipA + 2.0) },
       armL: T0.L, armR: T0.R, skin: skinAt(t), hair: { ...HAIR, sway: Math.sin(t * 1.3) * 0.25 + wa * 0.9 * Math.sin(ph - 0.6) }, makeup: makeupAt(t), browStyle: browS, outfit,
       heel: { l: wa * Math.max(0, Math.sin(ph)) * 20, r: wa * Math.max(0, -Math.sin(ph)) * 20 }, walk: wa, walkPh: ph,
       legs: { l: { thigh: T0.lean * 0.12, knee: Math.max(0, T0.lean) * 0.15 }, r: { thigh: T0.lean * 0.12, knee: Math.max(0, -T0.lean) * 0.15 } },
