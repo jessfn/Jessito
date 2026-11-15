@@ -110,7 +110,7 @@ function browSvg(side, r, i, k = 0, shortF = 0) {
 // ---------- dientes y lengua realistas ----------
 // Proporciones (literatura odontologica): lateral ~ 66% del central, canino ~ 84% del central visto de frente; premolares algo mas angostos.
 function realTeethSvg(pts, w, open, smile, N, sty = 'A') {
-  const ST = { A: { W0: 19, hu: 21, hl: 14, can: 0.55, wl: 0.8 }, B: { W0: 22, hu: 17, hl: 12, can: 0.4, wl: 0.85 }, C: { W0: 20, hu: 19, hl: 13, can: 0.25, wl: 0.9 } }[sty] || { W0: 19, hu: 21, hl: 14, can: 0.55, wl: 0.8 };
+  const ST = { A: { W0: 16, hu: 17, hl: 11, can: 0, wl: 0.86 }, B: { W0: 22, hu: 17, hl: 12, can: 0.4, wl: 0.85 }, C: { W0: 20, hu: 19, hl: 13, can: 0.25, wl: 0.9 } }[sty] || { W0: 16, hu: 17, hl: 11, can: 0, wl: 0.86 };
   const at = (x) => { const t = clamp((x / w + 1) / 2, 0, 1), f = t * N, i = Math.min(N - 1, Math.floor(f)), k = f - i; const a = pts[i], b = pts[i + 1]; return { yu: a.yu + (b.yu - a.yu) * k, yl: a.yl + (b.yl - a.yl) * k }; };
   const W0 = ST.W0, SP = [[1.0, 1.0], [0.66, 0.84], [0.84, 0.86], [0.7, 0.72], [0.66, 0.66]];   // [ancho rel., alto rel.]
   const tooth = (cx, wd, ht, up, k, isCanine) => { const s = up ? 1 : -1, hw = wd / 2; const y0 = 0, y1 = s * ht; const cor = Math.min(hw * 0.9, 6);
@@ -128,7 +128,7 @@ function realTeethSvg(pts, w, open, smile, N, sty = 'A') {
   const row = (up) => { let out = '', shadow = '', gums = ''; const items = [];
     for (const sg of [-1, 1]) { let x = 0; for (let i = 0; i < 5; i++) { const [rw, rh] = SP[i]; const wd = W0 * rw * (up ? 1 : ST.wl * 0.92), ht = (up ? ST.hu : ST.hl) * rh; const cx = (i === 0 ? sg * wd / 2 : x + sg * wd / 2); items.push({ cx: sg === 1 ? cx : cx, wd, ht, i, sg }); x = (i === 0 ? sg * wd : x + sg * wd); if (Math.abs(x) > w * 0.86) break; } }
     items.sort((a, b) => Math.abs(b.cx) - Math.abs(a.cx));
-    for (const it of items) { const e = at(it.cx), y = up ? e.yu + 1 : e.yl - 1, canine = it.i === 2 && up; const depth = 1 - Math.abs(it.cx) / w; const tilt = it.sg * (it.i * 1.6);
+    for (const it of items) { const e = at(it.cx), y = up ? e.yu + 1 : e.yl - 1, canine = false; const depth = 1 - Math.abs(it.cx) / w; const tilt = 0;
       const path = toothPath(it.wd - 1.2, it.ht, up, canine); const dark = clamp(Math.abs(it.cx) / w * 0.75);
       out += `<g transform="translate(${it.cx.toFixed(1)},${y.toFixed(1)}) rotate(${(up ? -1 : 1) * -tilt * 0.5})"><path d="${path}" fill="url(#${up ? 'enU' : 'enL'})" stroke="#bda98a" stroke-width="1.6" stroke-linejoin="round"/><path d="${path}" fill="#7a5a48" opacity="${(dark * 0.38).toFixed(2)}"/>
         <path d="M${(-it.wd * 0.22).toFixed(1)},${up ? 7 : -7} Q${(-it.wd * 0.28).toFixed(1)},${(up ? it.ht * 0.55 : -it.ht * 0.55).toFixed(1)} ${(-it.wd * 0.12).toFixed(1)},${(up ? it.ht * 0.82 : -it.ht * 0.82).toFixed(1)}" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.8"/>
@@ -144,11 +144,11 @@ function tongueSvg(w, bot, open) { const rx = w * 0.5, ry = 16 + open * 22, cy =
   return `<g transform="translate(0,${cy.toFixed(1)})"><path d="M${-rx},${ry * 0.5} Q${-rx * 0.9},${-ry * 0.7} 0,${-ry} Q${rx * 0.9},${-ry * 0.7} ${rx},${ry * 0.5} Q0,${ry * 1.6} ${-rx},${ry * 0.5}Z" fill="url(#tng)" stroke="#7d2a3a" stroke-width="2.4"/><path d="M0,${-ry * 0.85} Q${rx * 0.04},${ry * 0.1} 0,${ry * 0.9}" stroke="#9c3345" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.8"/>${dots}<ellipse cx="${-rx * 0.28}" cy="${-ry * 0.45}" rx="${rx * 0.22}" ry="${ry * 0.16}" fill="#fff" opacity="0.4"/></g>`; }
 function mouthSvg(m, yaw) {
   const open = clamp(m.open, 0, 1), wide = m.wide, smile = m.smile, asym = m.asym || 0, press = m.press || 0;
-  const w = 78 * (1 + 0.22 * wide + 0.12 * smile);
-  const cl = { x: -w, y: -smile * 24 - asym * 8 + press * 3 };
-  const cr = { x: w, y: -smile * 24 + asym * 8 + press * 3 };
+  const w = 78 * (1 + 0.22 * wide + 0.12 * smile) * (1 - 0.1 * open);
+  const cl = { x: -w, y: -smile * 24 - asym * 8 + press * 3 + open * 8 };
+  const cr = { x: w, y: -smile * 24 + asym * 8 + press * 3 + open * 8 };
   const mid = (cl.y + cr.y) / 2;
-  const up = mid + 6 - open * 6;
+  const up = mid + 6 - open * 12;
   const lo = mid + 8 + open * 105 * (1 - 0.3 * Math.max(0, wide)) + (smile > 0.5 ? 14 : 0);
   const shape = `M${cl.x},${cl.y} Q0,${up} ${cr.x},${cr.y} Q0,${lo} ${cl.x},${cl.y}Z`;
   const showTeeth = open > 0.08 || smile > 0.3;
