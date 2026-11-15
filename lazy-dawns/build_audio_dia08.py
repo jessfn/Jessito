@@ -49,7 +49,8 @@ with wave.open('build/dia08/musica.wav', 'wb') as f:
     f.setnchannels(2); f.setsampwidth(2); f.setframerate(SR); f.writeframes((mus * 32767).astype('<i2').tobytes())
 S = 'build/dia08/sfx/'; ev = []
 def add(f, t, v=0.6, dur=None): ev.append((f, t, v, dur))
-add('epic_boom', 0.35, 0.8, 3.5); add('sparkle', 1.0, 0.6); add('shine', 1.9, 0.6); add('whoosh', 2.3, 0.5)
+add('clap', 0.6, 0.9); add('epic_boom', 0.55, 0.8, 3.5); add('sparkle', 1.0, 0.6); add('shine', 1.9, 0.6); add('rise', 2.6, 0.5); add('whoosh', 3.35, 0.9); add('zoom_in', 3.45, 0.6)
+for tt in (T['lairA'] - 0.3, T['lairB'] - 0.3, T['lairB2'] - 0.3): add('whoosh', tt, 0.8); add('zoom_in', tt + 0.1, 0.5)
 t0 = T['slateEnd']
 while t0 < T['lairA']: add('backstage_amb', t0, 0.25, 10.0); t0 += 10.0
 add('whoosh', T['planeA'] - 0.3, 0.5); add('paper_flight', T['planeA'], 0.9, 2.5); add('sparkle', T['planeA'] + 1.8, 0.5)
