@@ -161,3 +161,7 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
 - Rotulos de inserts siempre por encima de las etiquetas de personaje/subtitulos (sin traslapes).
 - Texturas: los sitios de texturas (PolyHaven/ambientCG) estan bloqueados desde este entorno; se usan texturas procedurales generadas en canvas (y archivos de GitHub cuando sirven).
 - Los videos "especial" no cuentan como dia; terminan pidiendo comentarios sobre cambiar/mejorar SOLO lo ya arreglado (piel, dientes, pelo, cejas, ropa, maquillaje). Lunar y nariz son para los videos normales.
+
+## Regla permanente: PORTADA con cada video (decision del creador)
+- Cada vez que se entregue un video (dia o especial) se entrega TAMBIEN su portada 1080x1920 (TikTok/Reels/Shorts), tematica del dia, sin spoilers y UNICA: expresion, manos, personajes y composicion distintos a las demas.
+- Todo dentro de la zona segura (caja 3:4 central, margen >= 60 px); sin texto en la parte inferior; logo oficial (logo_lazydawns.png) pequeno arriba al centro, titulo 3D, cuadro DIA N bien visible. Los personajes (Lazy y acompanantes) deben verse completos dentro del margen, con reaccion en la cara. Generador: build_cover2.mjs (CFG/UQ por episodio).

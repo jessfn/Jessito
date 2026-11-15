@@ -70,15 +70,15 @@ const mood = (p, m) => { if (m === 'shock') { p.brow = { l: { r: 0.95, i: 0.8 },
   if (m === 'serious') { p.brow = { l: { r: 0, i: -0.3 }, r: { r: 0, i: -0.3 } }; p.lid = { l: 0.9, r: 0.9 }; p.mouth.open = 0; p.mouth.smile = 0.0; p.gaze = { x: -0.8, y: 0 }; p.yaw = -0.15; }
   if (m === 'glare') { p.brow = { l: { r: -0.3, i: -0.8 }, r: { r: -0.3, i: -0.8 } }; p.lid = { l: 0.8, r: 0.8 }; p.mouth.open = 0; p.mouth.smile = 0.15; p.mouth.press = 0.8; p.pitch = -0.35; p.gaze = { x: 0, y: 0 }; p.squint = 0.2; } };
 const UQ = {
-  d1: { hands: 'cheeks', mood: 'shock', x: 420, y: 1170, s: 0.95, flip: 1, comp: { fn: drawMari, x: 880, y: 1010, s: 0.62, st: { mood: 'worry' } }, titleSide: 'L' },
-  d2: { hands: 'cheeks', mood: 'worry', x: 640, y: 1180, s: 0.95, flip: -1, comp: { fn: drawDoc, x: 190, y: 1010, s: 0.7, st: { mood: 'focus', tool: 'lupa', toolX: 120, toolY: 150, toolR: 70 } }, titleSide: 'R' },
-  d3: { hands: 'mouth', mood: 'scream', x: 460, y: 1180, s: 0.98, flip: 1, comp: { fn: drawDentist, x: 880, y: 1000, s: 0.66, st: { mood: 'focus' } }, titleSide: 'L' },
-  d4: { hands: 'chin', mood: 'glare', x: 600, y: 1170, s: 0.95, flip: -1, comp: { fn: drawStylist, x: 200, y: 1000, s: 0.66, st: { mood: 'focus', tool: 'scissors', toolX: 150, toolY: 100, toolR: 80 } }, titleSide: 'R' },
-  d5: { hands: 'point', mood: 'think', x: 430, y: 1180, s: 0.95, flip: 1, comp: { fn: drawKarla, x: 890, y: 1010, s: 0.64, st: { mood: 'proud', tool: 'tweezers', toolX: -130, toolY: 120, toolR: -80 } }, titleSide: 'L' },
-  d6: { hands: 'hips', mood: 'proud', x: 540, y: 1150, s: 0.9, flip: 1, comp: { fn: drawPia, x: 150, y: 1060, s: 0.52, st: { mood: 'happy' } }, titleSide: 'L' },
-  d7: { hands: 'fist', mood: 'serious', x: 400, y: 1190, s: 0.95, flip: 1, comp: null, sil: true, titleSide: 'L' },
-  d8: { hands: 'chin', mood: 'worry', x: 420, y: 1170, s: 0.95, flip: 1, comp: null, sil: true, titleSide: 'L' },
-  sp: { hands: 'up', mood: 'joy', x: 540, y: 1260, s: 0.78, flip: 1, comp: { fn: drawDante, x: 140, y: 1080, s: 0.5, st: { mood: 'proud' } }, comp2: { fn: drawMemo, x: 940, y: 1080, s: 0.5, st: { mood: 'happy' } }, titleSide: 'L', centerTitle: true },
+  d1: { hands: 'cheeks', mood: 'shock', x: 400, y: 1190, s: 0.86, flip: 1, comp: { fn: drawMari, x: 870, y: 930, s: 0.78, st: { mood: 'scream' } }, titleSide: 'L' },
+  d2: { hands: 'cheeks', mood: 'worry', x: 680, y: 1190, s: 0.86, flip: -1, comp: { fn: drawDoc, x: 200, y: 930, s: 0.8, st: { mood: 'shock', tool: 'lupa', toolX: 120, toolY: 150, toolR: 70 } }, titleSide: 'R' },
+  d3: { hands: 'mouth', mood: 'scream', x: 420, y: 1190, s: 0.88, flip: 1, comp: { fn: drawDentist, x: 870, y: 930, s: 0.78, st: { mood: 'worry' } }, titleSide: 'L' },
+  d4: { hands: 'chin', mood: 'glare', x: 660, y: 1180, s: 0.86, flip: -1, comp: { fn: drawStylist, x: 200, y: 930, s: 0.8, st: { mood: 'grin', tool: 'scissors', toolX: 150, toolY: 100, toolR: 80 } }, titleSide: 'R' },
+  d5: { hands: 'point', mood: 'think', x: 410, y: 1190, s: 0.86, flip: 1, comp: { fn: drawKarla, x: 870, y: 930, s: 0.78, st: { mood: 'amused', tool: 'tweezers', toolX: -130, toolY: 120, toolR: -80 } }, titleSide: 'L' },
+  d6: { hands: 'hips', mood: 'proud', x: 650, y: 1170, s: 0.84, flip: 1, comp: { fn: drawPia, x: 250, y: 960, s: 0.72, st: { mood: 'happy' } }, titleSide: 'R' },
+  d7: { hands: 'fist', mood: 'serious', x: 400, y: 1190, s: 0.88, flip: 1, comp: { fn: drawNina, x: 880, y: 930, s: 0.74, st: { mood: 'worry' } }, sil: true, titleSide: 'L' },
+  d8: { hands: 'chin', mood: 'worry', x: 410, y: 1180, s: 0.9, flip: 1, comp: null, sil: true, titleSide: 'L' },
+  sp: { hands: 'up', mood: 'joy', x: 540, y: 1280, s: 0.74, flip: 1, comp: { fn: drawDante, x: 190, y: 980, s: 0.7, st: { mood: 'shock' } }, comp2: { fn: drawMemo, x: 890, y: 980, s: 0.7, st: { mood: 'grin' } }, titleSide: 'L' },
 };
 export function coverV(id, opt, guide = false) { const c = CFG[id]; const p = common(); STATE[c.st](p); const u = UQ[id]; const L = u ? { hands: u.hands, mood: u.mood } : LAY[opt]; hands(p, L.hands); mood(p, L.mood); if (id === 'sp') p.hair.wind = 0.6;
   const lazy = u ? `<g transform="translate(${u.x},${u.y}) scale(${u.s * u.flip},${u.s}) translate(0,215)">${drawLazy(p)}</g>` : `<g transform="${L.pos}">${drawLazy(p)}</g>`;
