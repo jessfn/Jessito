@@ -19,7 +19,7 @@ const A = (() => { const x = 540, y = 760, fs = 168; const T = 'ESPECIAL';
   <text x="${x - 2}" y="${y - 3}" font-family="Bungee" font-size="${fs}" text-anchor="middle" letter-spacing="4" fill="none" stroke="#fff" stroke-width="2" opacity="0.8">${T}</text>
   <text x="${x}" y="${y}" font-family="Bungee" font-size="${fs}" text-anchor="middle" letter-spacing="4" fill="url(#sw)">${T}</text>
   ${star(150, 640, 1.6)}${star(930, 600, 1.2)}${star(520, 600, 1.0, 0.9, '#ffe9a8')}${star(880, 790, 1.4)}${star(230, 800, 0.9)}
-  <text x="540" y="900" font-family="Righteous" font-size="50" text-anchor="middle" letter-spacing="6" fill="#fff" stroke="${OUT}" stroke-width="10" paint-order="stroke">LA REVELACIÓN DE LOS RIZOS</text>
+  <text x="540" y="900" font-family="Righteous" font-size="50" text-anchor="middle" letter-spacing="6" fill="#fff" stroke="${OUT}" stroke-width="10" paint-order="stroke">NADA SERÁ IGUAL</text>
   <g transform="translate(540,990)"><rect x="-300" y="-38" width="600" height="76" rx="38" fill="#ff4d8d" stroke="${OUT}" stroke-width="7"/><text x="0" y="14" font-family="Righteous" font-size="40" text-anchor="middle" letter-spacing="4" fill="#fff">NO CUENTA COMO DÍA</text></g>`, '#ffcf6a'); })();
 // B: neon rosa 3D
 const B = (() => { const x = 540, y = 760, fs = 160; const T = 'ESPECIAL';
@@ -29,7 +29,7 @@ const B = (() => { const x = 540, y = 760, fs = 160; const T = 'ESPECIAL';
   ${extrude(T, x, y, 'Monoton', fs, 14, 0.9, 1.4, [255, 80, 170], [70, 10, 60], 2)}
   <text x="${x}" y="${y}" font-family="Monoton" font-size="${fs}" text-anchor="middle" letter-spacing="2" fill="#fff3fb" stroke="#ff9ad8" stroke-width="2">${T}</text>
   ${star(170, 650, 1.5, 1, '#ffd1f0')}${star(910, 610, 1.1, 1, '#ffd1f0')}${star(540, 590, 0.9, 0.9, '#fff')}
-  <text x="540" y="890" font-family="Righteous" font-size="50" text-anchor="middle" letter-spacing="6" fill="#fff" stroke="#8a1458" stroke-width="10" paint-order="stroke">LA REVELACIÓN DE LOS RIZOS</text>
+  <text x="540" y="890" font-family="Righteous" font-size="50" text-anchor="middle" letter-spacing="6" fill="#fff" stroke="#8a1458" stroke-width="10" paint-order="stroke">UNA GRAN REVELACIÓN</text>
   <g transform="translate(540,985)"><rect x="-300" y="-38" width="600" height="76" rx="38" fill="#1a0a24" stroke="#ff4dc0" stroke-width="6"/><text x="0" y="14" font-family="Righteous" font-size="40" text-anchor="middle" letter-spacing="4" fill="#ffd1f0">NO CUENTA COMO DÍA</text></g>`, '#ff4dc0'); })();
 // C: cristal/violeta con Bungee Shade
 const C = (() => { const x = 540, y = 760, fs = 150; const T = 'ESPECIAL';
@@ -39,7 +39,7 @@ const C = (() => { const x = 540, y = 760, fs = 150; const T = 'ESPECIAL';
   <text x="${x}" y="${y}" font-family="Bungee Shade" font-size="${fs}" text-anchor="middle" fill="url(#gC)" stroke="${OUT}" stroke-width="6" paint-order="stroke" stroke-linejoin="round">${T}</text>
   <text x="${x - 2}" y="${y - 2}" font-family="Bungee Shade" font-size="${fs}" text-anchor="middle" fill="none" stroke="#fff" stroke-width="1.6" opacity="0.8">${T}</text>
   ${star(160, 640, 1.5, 1, '#e0f2fe')}${star(920, 600, 1.2, 1, '#e0f2fe')}${star(540, 600, 1.0)}${star(900, 800, 0.9)}
-  <text x="540" y="890" font-family="Righteous" font-size="50" text-anchor="middle" letter-spacing="6" fill="#fff" stroke="${OUT}" stroke-width="10" paint-order="stroke">LA REVELACIÓN DE LOS RIZOS</text>
+  <text x="540" y="890" font-family="Righteous" font-size="50" text-anchor="middle" letter-spacing="6" fill="#fff" stroke="${OUT}" stroke-width="10" paint-order="stroke">ALGO VA A CAMBIAR</text>
   <g transform="translate(540,985)"><rect x="-300" y="-38" width="600" height="76" rx="38" fill="#7c3aed" stroke="${OUT}" stroke-width="7"/><text x="0" y="14" font-family="Righteous" font-size="40" text-anchor="middle" letter-spacing="4" fill="#fff">NO CUENTA COMO DÍA</text></g>`, '#a78bfa'); })();
 for (const [k, s] of [['A', A], ['B', B], ['C', C]]) writeFileSync(`build/title_${k}.png`, new Resvg(s, ropt).render().asPng());
 console.log('ok');
