@@ -6,7 +6,7 @@ const outName = process.argv[7] || name; mkdirSync(path.join(here, 'obj', outNam
 const port = 8770 + Math.floor(Math.random() * 100);
 const srv = spawn('python3', ['-m', 'http.server', String(port)], { cwd: here, stdio: 'ignore' }); await new Promise((r) => setTimeout(r, 1000));
 const br = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
-const dims = (name === 'title' || name === 'title8') ? { width: 1080, height: 460 } : { width: 800, height: 800 };
+const dims = (name === 'title' || name === 'title8') ? { width: 1080, height: 460 } : (name === 'cover' ? { width: 1080, height: 820 } : { width: 800, height: 800 });
 const pg = await br.newPage({ viewport: dims });
 pg.on('pageerror', (e) => console.log('pageerror', e.message)); pg.on('console', (m) => { if (m.type() === 'error') console.log('console', m.text()); });
 await pg.goto(`http://localhost:${port}/objects.html?o=${name}&d=${process.argv[4] || 3}&t1=${encodeURIComponent(process.argv[5] || '')}&t2=${encodeURIComponent(process.argv[6] || '')}`); await pg.waitForFunction('window.__done === true', null, { timeout: 120000 });
