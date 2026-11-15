@@ -52,8 +52,8 @@ function hdBackI(h, st) { const R = rng(11);
   let o = `<ellipse cx="0" cy="-24" rx="${st === 'afro' ? 262 : 226}" ry="${st === 'afro' ? 258 : 232}" fill="url(#hdBase)" stroke="${OUT}" stroke-width="8"/>`;
   if (st === 'afro') { for (let a = 150; a <= 390; a += 7) o += clump(scalp(deg(a), 200, 200), deg(a), 130 + R() * 50, 0.0009, 22, R, 3); return `<g>${o}</g>`; }
   const hang = st === 'half' ? 0.8 : st === 'side' ? 0.62 : 1;
-  for (let a = 150; a <= 215; a += 13) o += clump(scalp(deg(a), 196, 150), deg(a) + 0.05, (200 + R() * 60) * (0.7 + 0.5 * hang), 0.0030, 19, R, 3);
-  for (let a = 325; a <= 390; a += 13) o += clump(scalp(deg(a), 196, 150), deg(a) - 0.05, (200 + R() * 60) * (0.7 + 0.5 * hang), 0.0030, 19, R, 3);
+  for (let a = 150; a <= 215; a += 13) o += clump(scalp(deg(a), 196, 150), deg(a) + 0.05, (200 + R() * 60) * (0.7 + 0.5 * hang) * 0.55, 0.0030, 19, R, 3);
+  for (let a = 325; a <= 390; a += 13) o += clump(scalp(deg(a), 196, 150), deg(a) - 0.05, (200 + R() * 60) * (0.7 + 0.5 * hang) * 0.55, 0.0030, 19, R, 3);
   return `<g>${o}</g>`; }
 
 export function hdTop(h, yaw = 0) { const st = styleOf(h); if (!st) return ''; if (st === 'turban') return turban(h); return memo('t', h, () => hdTopI(h, st)); }
@@ -82,7 +82,7 @@ export function hdFront(h, yaw = 0, t = 0) { const st = styleOf(h); if (!st || s
 function hdFrontI(h, st) { const R = rng(41), sw = (h.sway || 0), L = clamp(h.len ?? 1); let o = '';
   const sway = (g) => g; void sway;
   if (st === 'afro') { for (const m of [-1, 1]) for (let i = 0; i < 3; i++) o += clump([m * (196 + i * 4), -6 + i * 36], deg(90 - m * 14), 90 + i * 16, 0.0004, 18, R, 2); return o; }
-  const ln = (st === 'half' ? 0.74 : st === 'side' ? 0.86 : 1) * (190 + 540 * L);
+  const ln = (st === 'half' ? 0.74 : st === 'side' ? 0.86 : 1) * (190 + 540 * L) * 0.62;
   for (const m of [-1, 1]) {
     for (let i = 0; i < 5; i++) { const ang = deg(90 - m * (8 + i * 2.2) + sw * 6 * m); o += clump([m * (206 + i * 7), 14 + i * 24], ang, ln * (0.62 + 0.38 * (i / 4)) * (0.9 + R() * 0.2), 0.00012 * (1 + i * 0.2), 18 - i * 0.5, R, 3); }
     for (let i = 0; i < 3; i++) o += clump([m * (214 + i * 3), -20 + i * 22], deg(92 - m * 5), 120 + i * 50, 0.0002, 11, R, 2);
