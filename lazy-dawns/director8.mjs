@@ -77,7 +77,7 @@ export function makeDirector({ L, T, DUR }) {
     { arm: 'B', t0: T.slateEnd + 0.3, t1: T.wrap, tgt: (t, s) => ({ x: s * 140, y: 336 }), curl: 0.4, spread: 0.1 },
     { arm: 'B', t0: T.wrap + 0.4, t1: T.hallA - 0.2, tgt: (t, s) => ({ x: s * 130, y: 340 }), curl: 0.45, spread: 0.1 },
     { arm: 'B', t0: T.walkA + 0.8, t1: T.countA - 0.1, tgt: (t, s) => ({ x: s * 150, y: 334 }), curl: 0.4, spread: 0.1 },
-    { arm: 'B', t0: T.reveal + 0.1, t1: T.reveal + 1.6, tgt: (t, s) => ({ x: s * 205, y: -150 + 22 * Math.sin(t * 4) }), curl: 0.1, spread: 0.7 },
+    { arm: 'B', t0: T.reveal + 0.1, t1: T.reveal + 1.6, tgt: (t, s) => ({ x: s * 330, y: -80 + 24 * Math.sin(t * 4) }), curl: 0.1, spread: 0.7 },
     { arm: 'B', t0: T.reveal + 1.6, t1: T.calmA + 3.5, tgt: (t, s) => ({ x: s * (320 - 60 * Math.sin((t - T.calmA) * 2)), y: 170 + 40 * Math.sin((t - T.calmA) * 2) }), curl: 0.2, spread: 0.5 },
     { arm: 'R', t0: T.mEnter, t1: T.mGone, tgt: () => ({ x: 190, y: 40 }), curl: 0.55, spread: 0.1 },
     { arm: 'R', t0: W('l15', 'sigueme'), t1: DUR + 1, tgt: (t) => ({ x: 440 + Math.sin(t * 9) * 30, y: -205 }), curl: 0.05, spread: 0.7, wr: (t) => Math.sin(t * 9) * 16 },
