@@ -1,0 +1,92 @@
+[
+ {
+  "id": "l1",
+  "who": "N",
+  "text": "Esto no cuenta como un día... pero lo cambió todo. Faltaban cinco minutos para la gala, y llegó una caja dorada.",
+  "pad": 0.25
+ },
+ {
+  "id": "l2",
+  "who": "N",
+  "text": "Dentro, una nota: confía en Dante. Y él llegó, con su carrito y su ayudante Memo.",
+  "pad": 0.2
+ },
+ {
+  "id": "l3",
+  "who": "T",
+  "text": "Lazy, tu cabello guarda un secreto. Cierra los ojos, y no te muevas.",
+  "pad": 0.15
+ },
+ {
+  "id": "l4",
+  "who": "N",
+  "text": "Primero, agua con atomizador. Luego, crema para rizos y gel, de la raíz a las puntas.",
+  "pad": 0.2
+ },
+ {
+  "id": "l5",
+  "who": "N",
+  "text": "Después, mechón por mechón, Dante los enrolló en su dedo, para marcar cada espiral.",
+  "pad": 0.2
+ },
+ {
+  "id": "l6",
+  "who": "E",
+  "text": "¡Jefe, el difusor! ¡Ya casi es la hora!",
+  "pad": 0.1
+ },
+ {
+  "id": "l7",
+  "who": "N",
+  "text": "El aire tibio trabajó... y mi cabello, bajo el pañuelo dorado, se movió solo.",
+  "pad": 0.2
+ },
+ {
+  "id": "l8",
+  "who": "N",
+  "text": "Las puertas del gran salón se abrieron. Todos miraban. Dante tomó el pañuelo, y contó.",
+  "pad": 0.2
+ },
+ {
+  "id": "l9",
+  "who": "T",
+  "text": "Uno... dos...",
+  "pad": 0.1
+ },
+ {
+  "id": "l10",
+  "who": "T",
+  "text": "¡Tres!",
+  "pad": 0.05
+ },
+ {
+  "id": "l11",
+  "who": "N",
+  "text": "Y mi cabello despertó. Una corona de rizos infinitos.",
+  "pad": 0.3
+ },
+ {
+  "id": "l12",
+  "who": "N",
+  "text": "Flashes por todos lados. El salón entero contuvo el aliento.",
+  "pad": 0.2
+ },
+ {
+  "id": "l13",
+  "who": "T",
+  "text": "Ahora sí. Eres la reina de la noche.",
+  "pad": 0.15
+ },
+ {
+  "id": "l14",
+  "who": "N",
+  "text": "Pero entre la multitud, alguien con un guante negro y una M sonrió... y desapareció.",
+  "pad": 0.25
+ },
+ {
+  "id": "l15",
+  "who": "N",
+  "text": "¿Qué arreglamos en el día ocho: el lunar o la nariz? Comenta tu elección, y sígueme.",
+  "pad": 0.35
+ }
+]

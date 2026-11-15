@@ -180,6 +180,43 @@ if (scene_name === 'hall') {
   const pl = new THREE.PointLight(0xffc870, 120, 24, 1.4); pl.position.set(0, 1.0, -14); sc.add(pl);
   spot(0, 8, 8, 0, 0, -4, 0xffe0b0, 260, 0.8, 0.9); spot(0, 7, -8, 0, 1, -16, 0xffd890, 200, 0.5, 0.8);
 }
+
+if (scene_name === 'ballroom') {
+  sc.background = new THREE.Color(0x0c0614); sc.fog = new THREE.Fog(0x120a1c, 16, 48);
+  cam.position.set(0, 2.5, 13); cam.lookAt(0, 3.4, -10);
+  const gold = M(0xd4a24c, 0.22, 0.95), marbleW = M(0xf2e9dc, 0.12, 0.25), marbleB = M(0x1a1220, 0.12, 0.3);
+  // suelo de marmol ajedrezado con brillo
+  const flT = tex((c, w, h) => { for (let i = 0; i < 10; i++) for (let j = 0; j < 10; j++) { c.fillStyle = (i + j) % 2 ? '#efe4d6' : '#241a2c'; c.fillRect(i * w / 10, j * h / 10, w / 10, h / 10); c.strokeStyle = 'rgba(212,162,76,.25)'; c.strokeRect(i * w / 10, j * h / 10, w / 10, h / 10); } }, 1024, 1024); flT.wrapS = flT.wrapT = THREE.RepeatWrapping; flT.repeat.set(5, 5);
+  add(Box(44, 0.3, 44), M(0xffffff, 0.1, 0.35, { map: flT }), 0, -0.15, -4, sc, false);
+  // alfombra roja con borde dorado hacia el escenario
+  const rug = tex((c, w, h) => { c.fillStyle = '#7a0f2e'; c.fillRect(0, 0, w, h); c.strokeStyle = '#d4a24c'; c.lineWidth = 14; c.strokeRect(20, 0, w - 40, h); for (let i = 0; i < 28; i++) { c.fillStyle = 'rgba(212,162,76,.55)'; c.fillRect(w / 2 - 6, i * h / 28 + 8, 12, h / 28 - 22); } }, 256, 1024);
+  add(Box(3.6, 0.06, 40), M(0xffffff, 0.8, 0, { map: rug }), 0, 0.03, -6, sc, false);
+  // escenario con escalones y telon dorado
+  add(Box(14, 0.9, 6), M(0x2a1830, 0.4, 0.2), 0, 0.45, -16, sc, false); add(Box(10, 0.45, 2), gold, 0, 0.22, -12.6, sc, false); add(Box(14.4, 0.12, 6.4), gold, 0, 0.92, -16, sc, false);
+  const cur = tex((c, w, h) => { const g = c.createLinearGradient(0, 0, w, 0); g.addColorStop(0, '#5a0a22'); g.addColorStop(0.5, '#a3143a'); g.addColorStop(1, '#5a0a22'); c.fillStyle = g; c.fillRect(0, 0, w, h); for (let i = 0; i < 26; i++) { c.fillStyle = i % 2 ? 'rgba(0,0,0,.35)' : 'rgba(255,200,200,.12)'; c.fillRect(i * w / 26, 0, w / 52, h); } }, 512, 512);
+  add(Box(20, 11, 0.3), M(0xffffff, 0.6, 0, { map: cur }), 0, 5.5, -19.5, sc, false);
+  // estrella dorada luminosa detras del escenario
+  const star = tex((c, w, h) => { c.translate(w / 2, h / 2); c.fillStyle = '#ffe8a8'; c.shadowColor = '#ffd070'; c.shadowBlur = 60; c.beginPath(); for (let i = 0; i < 16; i++) { const a = i / 16 * Math.PI * 2, rr = i % 2 ? 80 : 220; c.lineTo(Math.cos(a) * rr, Math.sin(a) * rr); } c.closePath(); c.fill(); }, 512, 512);
+  const sm = new THREE.Mesh(new THREE.PlaneGeometry(9, 9), new THREE.MeshBasicMaterial({ map: star, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false })); sm.position.set(0, 6.6, -19.2); sc.add(sm);
+  glow(0, 6.6, -19, 22, 0xffd070, 0.55);
+  // columnas con capitel dorado
+  for (let z = 8; z > -16; z -= 6) for (const x of [-9, 9]) { add(Cyl(0.7, 0.8, 10), marbleW, x, 5, z); add(Cyl(0.95, 0.95, 0.4), gold, x, 0.2, z); add(Cyl(1.0, 0.75, 0.6), gold, x, 9.8, z); add(Box(1.6, 0.4, 1.6), gold, x, 10.2, z); }
+  // paredes laterales con arcos y balcones
+  const wl = M(0x2a1230, 0.8); add(Box(0.4, 12, 44), wl, -13, 6, -4); add(Box(0.4, 12, 44), wl, 13, 6, -4); add(Box(30, 0.4, 44), M(0x160a1e, 0.9), 0, 12.2, -4);
+  for (const x of [-12.5, 12.5]) for (let z = 6; z > -16; z -= 7) { add(Box(0.5, 3, 4), gold, x, 6.6, z); add(Box(0.3, 2.6, 3.4), M(0x120818, 0.9, 0, { emissive: 0x201030, emissiveIntensity: 0.6 }), x * 0.99, 6.6, z); }
+  // candelabros: aros dorados con luces calidas
+  for (const [x, z, s] of [[0, 2, 1.7], [0, -6, 1.5], [-7, -2, 1.1], [7, -2, 1.1], [0, 9, 1.4]]) { const y = 9.2;
+    add(Cyl(0.05, 0.05, 12.2 - y), gold, x, y + (12.2 - y) / 2, z, sc, false);
+    for (let k = 0; k < 2; k++) { const rg = new THREE.Mesh(new THREE.TorusGeometry(s * (1.6 - k * 0.7), 0.08, 12, 48), gold); rg.rotation.x = Math.PI / 2; rg.position.set(x, y - k * 0.7, z); sc.add(rg); }
+    for (let i = 0; i < 14; i++) { const a = i / 14 * 6.283; add(Sph(0.13), M(0xfff2d0, 0.1, 0, { emissive: 0xffd58a, emissiveIntensity: 3.8 }), x + Math.cos(a) * s * 1.6, y + 0.06, z + Math.sin(a) * s * 1.6, sc, false); }
+    glow(x, y - 0.3, z, 7 * s, 0xffd58a, 0.65); }
+  // luces de escenario y haces
+  sc.add(new THREE.AmbientLight(0x8a70b0, 1.0)); sc.add(new THREE.HemisphereLight(0xc8a8e8, 0x241230, 0.9));
+  spot(0, 11, 6, 0, 0, -2, 0xfff0d0, 320, 0.7, 0.8); spot(-7, 10, -6, 0, 0.5, -12, 0xffc8e8, 160, 0.8, 0.9); spot(7, 10, -6, 0, 0.5, -12, 0xc8d8ff, 160, 0.8, 0.9);
+  cone(0, 6, 0, 12, 3.6, 0xfff0d0, 0.05); cone(-5, 6, -8, 12, 2.4, 0xffc8e8, 0.04); cone(5, 6, -8, 12, 2.4, 0xc8d8ff, 0.04);
+  // destellos flotantes (champan / confeti dorado)
+  for (let i = 0; i < 90; i++) { const x = ((i * 37) % 26) - 13, y = 1 + ((i * 53) % 90) / 10, z = -18 + ((i * 29) % 36); glow(x, y, z, 0.18 + (i % 4) * 0.08, i % 3 ? 0xffe0a0 : 0xffc0e0, 0.9); }
+}
 r.render(sc, cam);
 window.__done = true;
 </script></body></html>
