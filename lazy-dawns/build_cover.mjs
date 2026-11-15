@@ -49,8 +49,8 @@ export function cover(id) { const c = CFG[id]; const p = common(); STATE[c.st](p
     ${c.sil ? sil : ''}${lazy}${patch}<rect width="${W}" height="520" fill="url(#tp)"/><rect y="1340" width="${W}" height="580" fill="url(#bt)"/>
     <ellipse cx="540" cy="${c.titleY}" rx="520" ry="240" fill="${c.glow}" opacity="0.2" filter="url(#bl)"/>
     <image href="${b64('plates3d/obj/cov_' + id + '/f000.png')}" x="0" y="${c.titleY - 410}" width="${W}" height="820"/>${badge}
-    <text x="540" y="${c.badge ? 1830 : 1760}" font-family="Righteous" font-size="46" text-anchor="middle" letter-spacing="8" fill="#fff" stroke="${OUT}" stroke-width="12" paint-order="stroke">${c.tag}</text>
-    <text x="540" y="118" font-family="Bungee" font-size="44" text-anchor="middle" letter-spacing="10" fill="#fff" stroke="${OUT}" stroke-width="10" paint-order="stroke" opacity="0.92">LAZY DAWNS</text>
+    <text x="540" y="${c.badge ? 1822 : 1760}" font-family="Righteous" font-size="46" text-anchor="middle" letter-spacing="8" fill="#fff" stroke="${OUT}" stroke-width="12" paint-order="stroke">${c.tag}</text>
+    <rect x="60" y="1868" width="960" height="3" fill="#fff" opacity="0.5"/><text x="540" y="1904" font-family="Righteous" font-size="26" text-anchor="middle" letter-spacing="6" fill="#fff" opacity="0.75">UNA SERIE ORIGINAL · LAZY DAWNS · 30 DÍAS · 30 CAMBIOS</text><text x="540" y="118" font-family="Bungee" font-size="44" text-anchor="middle" letter-spacing="10" fill="#fff" stroke="${OUT}" stroke-width="10" paint-order="stroke" opacity="0.92">LAZY DAWNS</text>
     ${star(130, 330, 1.6, 0.95, c.glow)}${star(940, 250, 1.2, 0.9, '#fff')}${star(980, 880, 1.0, 0.8, c.glow)}${star(100, 1100, 0.9, 0.8, '#fff')}${star(900, 1500, 1.3, 0.9, c.glow)}
     <rect width="${W}" height="${H}" fill="url(#vg)"/></svg>`; }
 const ids = process.argv.slice(2).length ? process.argv.slice(2) : Object.keys(CFG);
