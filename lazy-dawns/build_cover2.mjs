@@ -23,7 +23,7 @@ const STATE = {
   6: (p) => { p.skin = { ...SKIN }; p.mouth.teeth = TEETH; p.hair = { s: 1, len: 1, shine: 0.9, sway: 0.3 }; p.browStyle = { k: 1, kl: 1, kr: 1, red: 0, shortL: 0 }; p.outfit = { kind: 'gown', prog: 1, jewel: 1 }; suspense(p, { gx: 0.8 }); },
   7: (p) => { STATE[6](p); p.makeup = { ...LOOKD }; p.mouth.lip = '#b0206a'; suspense(p, { gx: 0.8, smile: -0.05 }); },
   8: (p) => { p.skin = { ...SKIN }; p.mouth.teeth = TEETH; p.hair = { hd: 'long', len: 0.82, shine: 1, cp: 1, grow: 1, sway: 0.2 }; p.browStyle = { k: 1, kl: 1, kr: 1, red: 0, shortL: 0 }; p.outfit = { kind: 'gown', prog: 1, jewel: 1 }; p.makeup = { ...LOOKD, mole: 0 }; p.mouth.lip = '#b0206a'; suspense(p, { gx: 0.8 }); },
-  9: (p) => { p.skin = { ...SKIN }; p.mouth.teeth = TEETH; p.hair = { hd: 'long', len: 0.82, shine: 1, cp: 1, grow: 1, sway: 0.2 }; p.outfit = { kind: 'gown', prog: 1, jewel: 1, loose: 1.2 }; p.slim = 3.8; p.faceWrinkle = 0.8; p.bodyWrinkle = 1; p.makeup = { ...LOOKD, mole: 0 }; p.mouth.lip = '#b0206a'; p.mouth.tstyle = 'A'; },
+  9: (p) => { p.skin = { ...SKIN }; p.mouth.teeth = TEETH; p.hair = { hd: 'long', len: 0.82, shine: 1, cp: 1, grow: 1, sway: 0.2 }; p.browStyle = { k: 1, kl: 1, kr: 1, red: 0, shortL: 0 }; p.outfit = { kind: 'gown', prog: 1, jewel: 1, loose: 1.2 }; p.slim = 3.8; p.faceWrinkle = 0.8; p.bodyWrinkle = 1; p.makeup = { ...LOOKD, mole: 0 }; p.mouth.lip = '#b0206a'; p.mouth.tstyle = 'A'; },
   sp: (p) => { STATE[8](p); p.makeup = { ...LOOKD, mole: 1, glitter: 1 }; p.mouth.open = 0.6; p.mouth.smile = 1; p.mouth.wide = 0.8; p.brow = { l: { r: 0.4, i: 0.1 }, r: { r: 0.4, i: 0.1 } }; p.squint = 0.4; p.pitch = -0.3; p.yaw = 0; p.gaze = { x: 0, y: 0 }; p.hair.wind = 0.5; },
 };
 const CFG = {
