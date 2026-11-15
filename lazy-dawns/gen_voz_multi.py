@@ -58,7 +58,8 @@ inp = []; fc = []; labs = []
 for i, L in enumerate(lines):
     inp += ['-i', f"{out}/lines/{L['id']}.mp3"]; ms = int(L['start'] * 1000)
     gain = {'N': 1.0, 'M': 1.0, 'D': 1.1, 'V': 1.05, 'E': 1.0, 'S': 1.05, 'K': 1.05, 'B': 1.05, 'T': 1.05}[L['who']]
-    fc.append(f"[{i}:a]loudnorm=I=-17:TP=-1.5:LRA=7,aresample=44100,pan=stereo|c0=c0|c1=c0,volume={gain},adelay={ms}|{ms}[v{i}]"); labs.append(f"[v{i}]")
+    fx = (',' + L['fx']) if L.get('fx') else ''
+    fc.append(f"[{i}:a]loudnorm=I=-17:TP=-1.5:LRA=7,aresample=44100{fx},pan=stereo|c0=c0|c1=c0,volume={gain},adelay={ms}|{ms}[v{i}]"); labs.append(f"[v{i}]")
 fc.append(''.join(labs) + f"amix=inputs={len(labs)}:normalize=0:duration=longest,apad=whole_dur={total}[a]")
 subprocess.run(['ffmpeg', '-y', '-loglevel', 'error'] + inp + ['-filter_complex', ';'.join(fc), '-map', '[a]', '-ar', '44100', out + '/voces.wav'], check=True)
 print('TOTAL', total)

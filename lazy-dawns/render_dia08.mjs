@@ -1,0 +1,256 @@
+// Lazy Dawns - DIA 8: "Quitamos el lunar" (villano M). Voces: narrador, Dra. Valentina, Memo, M (voz distorsionada). Los personajes NO mueven la boca para hablar.
+// Uso: node render_dia08.mjs preview 5 12 ...   |   node render_dia08.mjs <inicio> <fin> <salida.mp4>   |   node render_dia08.mjs audit
+import { Resvg } from '@resvg/resvg-js';
+import { spawn } from 'node:child_process';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
+import { defs, hand } from './lazy_lib.mjs';
+import { drawLazy } from './rig.mjs';
+import { drawDerm, drawMemo, handsToTargets, salonTool, armIK } from './chars.mjs';
+import { makeDirector } from './director9.mjs';
+
+const here = path.dirname(fileURLToPath(import.meta.url));
+const B = path.join(here, 'build/dia08');
+const W = 1080, H = 1920, FPS = 30;
+const FDIR = path.join(here, '../assets/fonts/');
+const ropt = { font: { fontFiles: ['Anton-Regular.ttf', 'Bungee-Regular.ttf', 'Righteous-Regular.ttf'].map((f) => FDIR + f), loadSystemFonts: true, defaultFontFamily: 'Inter' } };
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+const smooth = (x) => { x = clamp(x); return x * x * (3 - 2 * x); };
+const pop = (t, t0, d = 0.35) => { const x = (t - t0) / d; if (x <= 0) return 0; if (x >= 1) return 1; const c = 1.70158; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+const win = (t, a, b, fi = 0.25, fo = 0.25) => clamp((t - a) / fi) * clamp((b - t) / fo);
+const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+const OUT = '#12090a';
+
+const imgCache = new Map();
+const obj3 = (name, u, cx, cy, w, h = w) => { const i = Math.min(OBJN[name] - 1, Math.max(0, Math.round(clamp(u) * (OBJN[name] - 1)))); const key = name + i; if (!imgCache.has(key)) imgCache.set(key, 'data:image/png;base64,' + readFileSync(path.join(here, 'plates3d/obj', name, 'f' + String(i).padStart(3, '0') + '.png')).toString('base64')); if (name === 'title') return `<image href="${imgCache.get(key)}" x="${cx - w / 2}" y="${cy - h / 2}" width="${w}" height="${h}"/>`; return `<defs><radialGradient id="mk${name}" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#fff"/><stop offset="0.62" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient><mask id="mm${name}" maskUnits="userSpaceOnUse" x="${cx - w / 2}" y="${cy - h / 2}" width="${w}" height="${h}"><rect x="${cx - w / 2}" y="${cy - h / 2}" width="${w}" height="${h}" fill="url(#mk${name})"/></mask></defs><image href="${imgCache.get(key)}" x="${cx - w / 2}" y="${cy - h / 2}" width="${w}" height="${h}" mask="url(#mm${name})"/>`; };
+const nm = (x) => x.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-zñ0-9]/g, '');
+const rnd = (i) => { const s = Math.sin(i * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+
+// ---------------- guion con tiempos ----------------
+const DATA = JSON.parse(readFileSync(path.join(B, 'lines.json'), 'utf8'));
+const L = Object.fromEntries(DATA.lines.map((l) => [l.id, l]));
+const DUR = DATA.total;
+const w = (id, word, n = 0) => { const r = L[id].words.filter((x) => nm(x[0]) === nm(word))[n]; if (!r) throw new Error('palabra no encontrada ' + id + ' ' + word); return r[1]; };
+const T = {
+  slateEnd: 1.4, planeA: w('l1', 'avion') - 0.45, noteA: w('l2', 'nota') - 0.4, enter: L.l2.end - 0.2, numbA: w('l4', 'crema') - 0.4, dermoA: w('l4', 'dermatoscopio') - 0.5,
+  droneA: L.l5.start - 0.2, lairA: L.l6.start + 1.6, laserA: w('l8', 'laser') - 0.5, flash: w('l8', 'desaparecio') - 0.35, serumA: w('l9', 'serum') - 0.3,
+  mirrorA: L.l9b.start - 0.1, lairB2: L.l10.start - 0.5, mSmile: w('l11', 'sonrio') - 0.2,
+  vote: w('l12', 'Que') - 0.1, optA: w('l12', 'unas'), optB: w('l12', 'nariz'), cta1: w('l12', 'Comenta'), cta2: w('l12', 'sigueme'),
+};
+T.planeB = T.planeA + 2.6; T.noteB = T.noteA + 2.8; T.numbB = T.dermoA - 0.1; T.dermoB = L.l4.end + 0.3; T.droneB = T.droneA + 2.7; T.lairB = T.lairA + 2.7; T.laserB = T.laserA + 3.3; T.serumB = T.serumA + 3.4; T.mirrorB = L.l9b.end + 0.3;
+T.walks = [];
+T.scenes = [T.slateEnd, T.planeA, T.noteA, T.enter, T.numbA, T.dermoA, T.droneA, T.lairA, T.laserA, T.flash, T.serumA, T.mirrorA, T.lairB2, T.vote];
+const OBJD = { title8: 4.0, plane: T.planeB - T.planeA, note8: T.noteB - T.noteA, numb: T.numbB - (T.numbA - 0.2), dermo: T.dermoB - (T.dermoA - 0.2), drone: T.droneB - T.droneA, laser: T.laserB - T.laserA, serum: T.serumB - T.serumA };
+const OBJN = Object.fromEntries(Object.entries(OBJD).map(([k, v]) => [k, Math.ceil(v * 30)]));
+writeFileSync(path.join(B, 'timeline.json'), JSON.stringify({ T, DUR }));
+writeFileSync(path.join(B, 'objdur.json'), JSON.stringify(OBJD));
+const pose = makeDirector({ L, T, DUR });
+// ---------------- fondos 3D y defs ----------------
+const b64 = (buf) => 'data:image/png;base64,' + Buffer.from(buf).toString('base64');
+const grainPng = b64(new Resvg(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><filter id="g" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="7"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.9 -0.42"/></filter><rect width="${W}" height="${H}" filter="url(#g)" opacity="0.28"/></svg>`, ropt).render().asPng());
+const charDefs = defs('e3d');
+const PL = (n) => b64(readFileSync(path.join(here, 'plates3d', n + '.png')));
+const platePng = { clinic: PL('clinic_dof'), lair: PL('lair_dof') };
+const VIN = `<linearGradient id="vin" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#0f766e"/><stop offset="0.35" stop-color="#2dd4bf"/><stop offset="0.7" stop-color="#14b8a6"/><stop offset="1" stop-color="#134e4a"/></linearGradient><linearGradient id="chrome" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9ca3af"/><stop offset="0.4" stop-color="#f3f4f6"/><stop offset="1" stop-color="#6b7280"/></linearGradient>`;
+function chairBack() { return `<defs>${VIN}</defs><ellipse cx="540" cy="1650" rx="330" ry="34" fill="#000" opacity="0.3"/><rect x="496" y="1490" width="88" height="170" fill="url(#chrome)" stroke="${OUT}" stroke-width="7"/><ellipse cx="540" cy="1660" rx="210" ry="30" fill="url(#chrome)" stroke="${OUT}" stroke-width="7"/>
+  <rect x="300" y="820" width="480" height="470" rx="120" fill="url(#vin)" stroke="${OUT}" stroke-width="8"/><path d="M336,870 Q336,846 400,846" stroke="#fff" stroke-opacity="0.35" stroke-width="12" fill="none" stroke-linecap="round"/><rect x="236" y="1080" width="96" height="46" rx="22" fill="#115e59" stroke="${OUT}" stroke-width="7"/><rect x="748" y="1080" width="96" height="46" rx="22" fill="#115e59" stroke="${OUT}" stroke-width="7"/>`; }
+function chairFront() { return `<path d="M276,1246 Q540,1226 804,1246 L822,1470 Q540,1498 258,1470Z" fill="url(#vin)" stroke="${OUT}" stroke-width="8"/><path d="M316,1280 Q540,1264 764,1280" stroke="#fff" stroke-opacity="0.3" stroke-width="12" fill="none" stroke-linecap="round"/><rect x="300" y="1470" width="480" height="36" rx="14" fill="url(#chrome)" stroke="${OUT}" stroke-width="7"/>`; }
+// ---------------- personajes, lugares y camara ----------------
+const sceneAt = (t) => (((t >= T.lairA && t < T.lairB) || t >= T.lairB2) ? 'lair' : 'clinic');
+const K = 0.68 / 0.62;
+const lazyPlace = (t) => ({ x: 540, fy: 1355, S: 0.68, vis: sceneAt(t) === 'clinic', seated: true });
+const headOf = (t) => { const p = lazyPlace(t); const py = p.fy - 790 * p.S; return { x: p.x, y: py - 215 * p.S, S: p.S }; };
+const facePt = (t, lx, ly) => { const h = headOf(t); return { x: h.x + lx * h.S, y: h.y + ly * h.S }; };
+function toolPose(ch, tipX, tipY, len, theta) { const r = theta * Math.PI / 180, wl = len * ch.s, ox = tipX - wl * -Math.sin(r), oy = tipY - wl * Math.cos(r); return { toolX: (ox - ch.x) / ch.s, toolY: (oy - ch.y) / ch.s, toolR: theta, toolS: 1 }; }
+const toLocal = (ch, x, y) => ({ x: (x - ch.x) / ch.s, y: (y - ch.y) / ch.s });
+const DERM = { x: 905, y: 745, s: 0.8 }, MEMO = { x: 150, y: 790, s: 0.74 };
+const dermCh = (t) => ({ ...DERM, x: DERM.x + 420 * (1 - ease((t - T.enter) / 1.4)) });
+const memoCh = (t) => ({ ...MEMO, x: MEMO.x - 420 * (1 - ease((t - T.enter - 0.5) / 1.4)) });
+function dermState(t) { if (t < T.enter - 0.2) return null; const ch = dermCh(t); let mood = 'happy', tool = 'none', o = {};
+  const at = (len, th, lx, ly) => { const p = facePt(t, lx, ly); return toolPose(ch, p.x, p.y, len, th); };
+  if (t >= T.enter) mood = 'calm'; if (t >= L.l3.start) mood = 'happy';
+  if (t >= T.numbA && t < T.dermoA) { tool = 'bottle'; mood = 'focus'; o = at(150, 100, 112 + Math.sin(t * 5) * 14, 60); }
+  if (t >= T.dermoA && t < T.droneA) { tool = 'lupa'; mood = 'focus'; o = at(150, 96, 118, 66); }
+  if (t >= T.droneA && t < L.l7.start) { mood = 'scream'; } if (t >= L.l7.start && t < T.laserA) { tool = 'bottle'; mood = 'determined' in {} ? 'focus' : 'focus'; o = at(150, 100, 118, 90); }
+  if (t >= T.laserA && t < T.serumA) { tool = 'laser'; mood = 'focus'; o = at(180, 96, 114, 62); } if (t >= T.flash) mood = 'proud';
+  if (t >= T.serumA && t < T.mirrorA) { tool = 'brushM'; mood = 'proud'; o = at(150, 96, 114, 62 + Math.sin(t * 4) * 6); }
+  if (t >= T.mirrorA) { tool = 'none'; mood = 'happy'; } if (t >= L.l12.start) mood = 'worry';
+  return { mood, tool, hands: 'none', ...o, ch };
+}
+function memoState(t) { if (t < T.enter + 0.4) return null; const ch = memoCh(t); let mood = 'happy', hands = 'none';
+  if (t >= T.dermoA) mood = 'calm'; if (t >= T.droneA && t < L.l7.start) { mood = 'scream'; hands = 'cheeks'; } if (t >= T.flash) mood = 'shock'; if (t >= T.flash + 1) mood = 'grin'; if (t >= T.mirrorA + 2.4) mood = 'worry';
+  return { mood, hands, ch };
+}
+const blinkOf = (t, seed) => { const m = (t + seed) % 3.4; return m < 0.14 ? Math.sin((m / 0.14) * Math.PI) : 0; };
+// camara cinematografica: empujes, grua, empuje extremo al lunar, movimientos de paralaje
+const MOLE = () => { const h = headOf(1); return { x: h.x + 108 * h.S, y: h.y + 70 * h.S }; };
+const CAM = [[0, 1.0, 540, 960], [T.slateEnd, 1.0, 540, 960], [T.planeA, 1.06, 600, 900], [T.noteB, 1.0, 540, 960], [T.enter, 1.02, 560, 940], [L.l3.start + 1.0, 1.12, 560, 800], [T.numbA, 1.3, 600, 760], [T.dermoA, 1.45, 610, 740], [T.droneA - 0.1, 1.05, 540, 940], [T.droneA + 1.2, 1.18, 700, 880],
+  [T.lairA - 0.1, 1.0, 540, 960], [T.lairB, 1.0, 540, 960], [T.lairB + 0.2, 1.0, 540, 940], [L.l7.start, 1.1, 580, 820], [T.laserA - 0.3, 1.25, 600, 760], [T.laserA + 1.6, 1.9, 610, 730], [T.flash - 0.2, 2.9, 613, 722], [T.flash + 0.5, 2.6, 613, 722], [T.flash + 1.4, 1.2, 560, 820], [T.serumA, 1.15, 580, 780], [T.serumA + 3.0, 1.1, 560, 820],
+  [T.mirrorA, 1.3, 540, 740], [T.mirrorA + 2.4, 1.7, 540, 700], [T.mirrorA + 3.6, 1.0, 540, 940], [T.lairB2 - 0.1, 1.0, 540, 960], [L.l12.start, 1.2, 540, 900], [T.vote - 0.2, 1.12, 540, 960], [9999, 1.12, 540, 960]];
+function camAt(t) {
+  let i = 0; while (i < CAM.length - 1 && CAM[i + 1][0] <= t) i++; const a = CAM[i], b = CAM[Math.min(i + 1, CAM.length - 1)]; const u = smooth((t - a[0]) / Math.max(1e-3, b[0] - a[0]));
+  const shake = win(t, T.flash - 0.05, T.flash + 0.6, 0.02, 0.5) * 11 + win(t, T.droneA + 0.8, T.droneA + 1.2, 0.02, 0.3) * 4 + win(t, T.mirrorA + 2.5, T.mirrorA + 2.9, 0.02, 0.3) * 6 + win(t, T.lairB2, T.lairB2 + 0.3, 0.02, 0.3) * 4;
+  const sway = Math.sin(t * 0.55) * 8;
+  return { z: lerp(a[1], b[1], u) * (1 + 0.012 * Math.sin(t * 0.7)), x: lerp(a[2], b[2], u) + Math.sin(t * 61) * shake * 0.6 + sway, y: lerp(a[3], b[3], u) + Math.cos(t * 53) * shake * 0.6 };
+}
+
+// ---------------- efectos epicos de la revelacion ----------------
+const headPx = (t) => { const h = headOf(t); return { x: h.x, y: h.y - 40 * h.S, S: h.S }; };
+function godRays(t) { const d = t - T.flash; if (d < -0.05 || d > 8) return ''; const a = smooth((d + 0.05) / 0.4) * (1 - smooth((d - 4.5) / 3)); const h = headPx(t), n = 16;
+  return `<defs><radialGradient id="grg" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#fff6d0" stop-opacity="0.95"/><stop offset="0.5" stop-color="#ffd98a" stop-opacity="0.35"/><stop offset="1" stop-color="#ffd98a" stop-opacity="0"/></radialGradient></defs><g opacity="${a}"><circle cx="${h.x}" cy="${h.y}" r="${520 + 40 * Math.sin(t * 6)}" fill="url(#grg)"/>${[...Array(n)].map((_, i) => { const a0 = i / n * 6.283 + d * 0.22, a1 = a0 + 0.1; return `<path d="M${h.x},${h.y} L${h.x + Math.cos(a0) * 1100},${h.y + Math.sin(a0) * 1100} L${h.x + Math.cos(a1) * 1100},${h.y + Math.sin(a1) * 1100}Z" fill="#fff0c0" opacity="${i % 2 ? 0.13 : 0.2}"/>`; }).join('')}</g>`; }
+function flashScreen(t) { const d = t - T.flash; if (d < -0.03 || d > 0.8) return ''; const k = d < 0 ? 0.6 : Math.max(0, 1 - d / 0.45); return `<rect width="${W}" height="${H}" fill="#fff" opacity="${k * 0.9}"/>`; }
+function flashFx(t) { const d = t - T.flash; if (d < -0.03 || d > 0.8) return ''; const h = headPx(t); const ring = d > 0 ? `<circle cx="${h.x}" cy="${h.y}" r="${80 + d * 1500}" fill="none" stroke="#fff" stroke-width="${26 * (1 - d / 0.8)}" opacity="${1 - d / 0.8}"/><circle cx="${h.x}" cy="${h.y}" r="${40 + d * 1000}" fill="none" stroke="#ffe08a" stroke-width="${14 * (1 - d / 0.8)}" opacity="${1 - d / 0.8}"/>` : '';
+  const lines = d > 0 && d < 0.7 ? [...Array(28)].map((_, i) => { const a = i / 28 * 6.283 + rnd(i) * 0.2, r0 = 200 + d * 900, r1 = r0 + 400 * (1 - d); return `<line x1="${h.x + Math.cos(a) * r0}" y1="${h.y + Math.sin(a) * r0}" x2="${h.x + Math.cos(a) * r1}" y2="${h.y + Math.sin(a) * r1}" stroke="#fff" stroke-width="${6 + rnd(i + 5) * 10}" opacity="${0.7 * (1 - d / 0.7)}" stroke-linecap="round"/>`; }).join('') : '';
+  return `${ring}${lines}`; }
+function glitterBurst(t) { const d = t - T.flash; if (d < 0 || d > 5) return ''; const h = headPx(t); const cols = ['#ffe14d', '#ff9ad0', '#ffffff', '#c4b5fd', '#7dd3fc'];
+  return [...Array(110)].map((_, i) => { const a = rnd(i) * 6.283, sp = 160 + rnd(i + 9) * 620, age = d - rnd(i + 3) * 0.12; if (age < 0) return ''; const x = h.x + Math.cos(a) * sp * age * (1 - 0.18 * age) + Math.sin(i) * 6, y = h.y + Math.sin(a) * sp * age * 0.85 + 220 * age * age; const op = clamp(1 - age / 3.8) * (0.5 + 0.5 * Math.sin(t * 16 + i)); if (op <= 0.02 || y > 2100) return ''; const s = 0.7 + rnd(i + 1) * 1.5;
+    return `<g transform="translate(${x.toFixed(1)},${y.toFixed(1)}) rotate(${i * 40 + t * 120}) scale(${s})" opacity="${op.toFixed(2)}"><path d="M0,-9 L2.6,0 L0,9 L-2.6,0Z M-9,0 L0,2.6 L9,0 L0,-2.6Z" fill="${cols[i % 5]}"/></g>`; }).join(''); }
+function confetti(t) { const a = T.calmA - 0.3, b = T.calmA + 5; if (t < a || t > b) return ''; const d = t - a; const cols = ['#fbbf24', '#f472b6', '#fff', '#a78bfa', '#34d399'];
+  return [...Array(70)].map((_, i) => { const x0 = rnd(i) * W, age = d - rnd(i + 7) * 1.5; if (age < 0) return ''; const y = -60 + age * (260 + rnd(i + 2) * 260), x = x0 + Math.sin(age * 3 + i) * 40; if (y > H + 40) return ''; return `<rect x="${x.toFixed(0)}" y="${y.toFixed(0)}" width="${10 + rnd(i + 4) * 10}" height="${18 + rnd(i + 6) * 10}" fill="${cols[i % 5]}" stroke="${OUT}" stroke-width="2" transform="rotate(${(age * 240 + i * 33) % 360} ${x.toFixed(0)} ${y.toFixed(0)})"/>`; }).join(''); }
+function flyTurban(t) { const d = t - T.flash; if (d < 0 || d > 1.6) return ''; const h = headOf(t), k = ease(d / 1.4); return `<g transform="translate(${h.x + 280 * k},${h.y - 700 * k}) rotate(${d * 520}) scale(${h.S * (1 - 0.35 * k)})" opacity="${1 - clamp((d - 1.0) / 0.6)}">${turbanSvg({ tw: 0 })}</g>`; }
+function titleFx(t) { const a = T.flash + 0.7, b = T.flash + 3.2; const k = win(t, a, b, 0.25, 0.4); if (k <= 0) return ''; const s = pop(t, a, 0.45);
+  return `<g transform="translate(540,590) scale(${s})" opacity="${k}"><defs><linearGradient id="ttl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff6c8"/><stop offset="0.5" stop-color="#fbbf24"/><stop offset="1" stop-color="#b45309"/></linearGradient></defs><text x="0" y="0" font-family="Anton" font-size="190" text-anchor="middle" fill="url(#ttl)" stroke="${OUT}" stroke-width="22" paint-order="stroke" letter-spacing="6">¡RIZOS!</text><text x="0" y="88" font-family="Anton" font-size="56" text-anchor="middle" fill="#fff" stroke="${OUT}" stroke-width="12" paint-order="stroke" letter-spacing="8">LA REVELACIÓN</text></g>`; }
+function letterbox(t) { const k = win(t, T.laserA + 1.0, T.flash + 2.2, 0.5, 0.7); if (k <= 0) return ''; return `<rect width="${W}" height="${120 * k}" fill="#000"/><rect y="${H - 120 * k}" width="${W}" height="${120 * k}" fill="#000"/>`; }
+function spotDark(t) { const k = win(t, T.countA - 0.2, T.flash + 0.05, 0.5, 0.05); if (k <= 0) return ''; const h = headPx(t); return `<defs><radialGradient id="spd" cx="0.5" cy="0.5" r="0.5"><stop offset="0.25" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.92"/></radialGradient></defs><g opacity="${k}"><rect width="${W}" height="${H}" fill="#000" opacity="0.35"/><ellipse cx="${h.x}" cy="${h.y + 30}" rx="${700 - 220 * k}" ry="${900 - 280 * k}" fill="url(#spd)"/></g>`; }
+function doorsFx(t) { const d = t - T.hallA; if (d < -0.1 || d > 1.3) return ''; const o = ease(d / 1.1); return `<g opacity="${1 - clamp((d - 0.9) / 0.4)}"><rect x="0" y="0" width="${540 * (1 - o)}" height="${H}" fill="#3a1218" stroke="${OUT}" stroke-width="10"/><rect x="${540 + 540 * o}" y="0" width="${540 * (1 - o)}" height="${H}" fill="#3a1218" stroke="${OUT}" stroke-width="10"/><rect x="${540 * (1 - o) - 22}" y="0" width="22" height="${H}" fill="#d4a24c"/><rect x="${540 + 540 * o}" y="0" width="22" height="${H}" fill="#d4a24c"/><rect width="${W}" height="${H}" fill="#fff6d0" opacity="${0.55 * (1 - o)}"/></g>`; }
+
+
+// ---------------- inserts cinematograficos (objetos disenados a detalle) ----------------
+function wrapIns(t, a, b, inner, tint = '#1a0e24') { const k = win(t, a, b, 0.3, 0.3); if (k <= 0) return ''; const u = clamp((t - a) / (b - a)), s = 1 + 0.12 * u, id = Math.round(a * 10);
+  return `<clipPath id="ic${id}"><circle cx="540" cy="900" r="${lerp(0, 1500, k)}"/></clipPath><g clip-path="url(#ic${id})"><rect width="${W}" height="${H}" fill="${tint}"/><radialGradient id="ig${id}" cx="0.5" cy="0.45" r="0.7"><stop offset="0" stop-color="#fff" stop-opacity="0.18"/><stop offset="1" stop-color="#000" stop-opacity="0.6"/></radialGradient><rect width="${W}" height="${H}" fill="url(#ig${id})"/><g transform="translate(0,80)"><g transform="translate(540,880) scale(${s}) translate(-540,-880)">${inner(u)}</g></g>${k < 1 ? `<circle cx="540" cy="900" r="${lerp(0, 1500, k)}" fill="none" stroke="${OUT}" stroke-width="14"/>` : ''}</g>`; }
+const insLabel = (txt, col = '#ffe14d', y = 1320, fs = 78) => `<text x="540" y="${y - 118}" font-family="Anton" font-size="${fs}" text-anchor="middle" fill="${col}" stroke="${OUT}" stroke-width="14" paint-order="stroke" letter-spacing="3">${txt}</text>`;
+const sparkle = (x, y, s, o = 1, c = '#fff') => `<g transform="translate(${x},${y}) scale(${s})" opacity="${o}"><path d="M0,-14 Q2,-2 14,0 Q2,2 0,14 Q-2,2 -14,0 Q-2,-2 0,-14Z" fill="${c}"/></g>`;
+const SPK = (u, n, x0, y0, wv, hv, op = 1) => [...Array(n)].map((_, i) => sparkle(x0 + (i * 83) % wv, y0 + (i * 57) % hv, 0.5 + 0.5 * Math.sin(u * 14 + i), op * (0.5 + 0.5 * Math.sin(u * 9 + i * 2)))).join('');
+// ---------------- inserts cinematograficos 3D (objetos modelados en Three.js) ----------------
+function ins3(t, a, b, name, label, col, cy = 690, size = 1100, tint = '#14202a') { return wrapIns(t, a, b, (u) => `${[...Array(10)].map((_, i) => `<path d="M540,720 L${540 + Math.cos(i * 0.62 + u * 0.6) * 1000},${720 + Math.sin(i * 0.62 + u * 0.6) * 1000} L${540 + Math.cos(i * 0.62 + u * 0.6 + 0.12) * 1000},${720 + Math.sin(i * 0.62 + u * 0.6 + 0.12) * 1000}Z" fill="#cfefff" opacity="0.06"/>`).join('')}${obj3(name, u, 540, cy, size)}${SPK(u, 9, 200, 260, 680, 520, 0.7)}${insLabel(label, col, 1330)}`, tint); }
+const insPlane = (t) => ins3(t, T.planeA, T.planeB, 'plane', 'UN AVIÓN DE PAPEL', '#f6f3ea', 760, 1180, '#10151f');
+const insNote = (t) => ins3(t, T.noteA, T.noteB, 'note8', 'NO TE LO QUITES', '#fca5a5', 700, 1180, '#120a0c');
+const insNumb = (t) => ins3(t, T.numbA - 0.2, T.numbB, 'numb', 'ANESTÉSICO + GEL FRÍO', '#9de6ff', 700, 1160, '#101c24');
+const insDermo = (t) => ins3(t, T.dermoA - 0.2, T.dermoB, 'dermo', 'DERMATOSCOPIO', '#fff1c8', 690, 1160, '#151a22');
+const insDrone = (t) => ins3(t, T.droneA, T.droneB, 'drone', '¡DRON SABOTEADOR!', '#ff9a9a', 700, 1180, '#1a0e12');
+const insLaser = (t) => ins3(t, T.laserA, T.laserB, 'laser', 'LÁSER FRÍO', '#8af4ff', 690, 1160, '#0e1620');
+const insSerum = (t) => ins3(t, T.serumA, T.serumB, 'serum', 'SÉRUM + PARCHE', '#ffe08a', 700, 1160, '#1a1510');
+
+const mCache = new Map();
+function inkWidth(str, fs) { const key = fs.toFixed(1) + '|' + str; if (mCache.has(key)) return mCache.get(key);
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="3200" height="${Math.ceil(fs * 2)}"><text x="40" y="${fs * 1.3}" font-family="Anton" font-size="${fs}" letter-spacing="2" stroke="#000" stroke-width="16" stroke-linejoin="round" paint-order="stroke" fill="#fff">${str}</text></svg>`;
+  const im = new Resvg(svg, ropt).render(), px = im.pixels, wd = im.width, ht = im.height; let lo = wd, hi = 0;
+  for (let y = 0; y < ht; y += 2) for (let x = 0; x < wd; x++) if (px[(y * wd + x) * 4 + 3] > 20) { if (x < lo) lo = x; if (x > hi) hi = x; }
+  const r = Math.max(0, hi - lo); mCache.set(key, r); return r; }
+const SAFE_W = 920;
+const SPEAK = { N: { col: '#ffe14d', name: null }, T: { col: '#93c5fd', name: 'DANTE' }, E: { col: '#fdba74', name: 'MEMO' } };
+const SUB_Y = 1580;
+function captions(t) {
+  const cur = DATA.lines.find((l) => t >= l.start - 0.15 && t <= l.end + 0.3); if (!cur) return '';
+  const sp = SPEAK[cur.who]; const groups = []; let g = [];
+  cur.words.forEach(([ww, s, e]) => { g.push({ w: ww, s, e }); if (g.length === 3 || /[.?!:]$|\.\.\.$/.test(ww)) { groups.push(g); g = []; } }); if (g.length) groups.push(g);
+  const grp = groups.find((gr) => t >= gr[0].s - 0.05 && t <= gr[gr.length - 1].e + 0.25) || groups[groups.length - 1];
+  const txt = grp.map((o) => esc(o.w.replace(/\.\.\./g, '').toUpperCase())).join(' ');
+  let fs = 84, wdt = inkWidth(txt, fs); if (wdt > SAFE_W) { fs = Math.max(44, Math.floor(fs * SAFE_W / wdt)); wdt = inkWidth(txt, fs); }
+  const spans = grp.map((o) => `<tspan fill="${t >= o.s && t < o.e + 0.05 ? sp.col : '#fff'}">${esc(o.w.replace(/\.\.\./g, '').toUpperCase())} </tspan>`).join('');
+  const tag = sp.name ? `<g transform="translate(540,${SUB_Y - fs * 0.98 - 58})"><rect x="-${sp.name.length * 19 + 34}" y="-36" width="${sp.name.length * 38 + 68}" height="72" rx="36" fill="${sp.col}" stroke="${OUT}" stroke-width="7"/><text x="0" y="15" font-family="Anton" font-size="48" text-anchor="middle" fill="${OUT}" letter-spacing="2">${sp.name}</text></g>` : '';
+  return `${tag}<text x="540" y="${SUB_Y}" font-family="Anton" font-size="${fs}" text-anchor="middle" stroke="${OUT}" stroke-width="16" stroke-linejoin="round" paint-order="stroke" letter-spacing="2">${spans}</text>`;
+}
+function talkIcon(t, who, x, y) { const l = DATA.lines.find((q) => q.who === who && t >= q.start && t <= q.end); if (!l) return '';
+  const p = 0.5 + 0.5 * Math.sin(t * 14), col = SPEAK[who].col;
+  return `<g transform="translate(${x},${y})"><circle r="42" fill="#fff" stroke="${OUT}" stroke-width="6"/>${[0, 1, 2].map((i) => `<path d="M${-15 + i * 15},${-13 - (i === 1 ? 4 : 0) * p} v${26 + (i === 1 ? 8 : 0) * p}" stroke="${col}" stroke-width="8" stroke-linecap="round" transform="translate(0,${-(i === 1 ? 4 : 0) * p / 2})"/>`).join('')}</g>`; }
+const ICON = {
+  PIEL: `<circle r="24" fill="#d9a073" stroke="${OUT}" stroke-width="5"/><path d="M-12,-4 q6,-8 12,0 M2,-4 q6,-8 12,0 M-10,10 q10,8 20,0" stroke="${OUT}" stroke-width="4" fill="none" stroke-linecap="round"/>${sparkle(22, -22, 0.9, 1, '#fff')}`,
+  DIENTES: `<path d="M-26,-6 Q0,28 26,-6 Q0,6 -26,-6Z" fill="#fff" stroke="${OUT}" stroke-width="5"/><path d="M-26,-6 Q0,-18 26,-6" stroke="#be123c" stroke-width="9" fill="none" stroke-linecap="round"/>${[-14, -4, 6, 16].map((x) => `<path d="M${x},-2 v10" stroke="${OUT}" stroke-width="2"/>`).join('')}`,
+  PELO: `<path d="M-18,22 Q-30,-6 -10,-14 Q10,-24 14,-4 Q20,14 2,12 Q-8,10 -4,0" stroke="${OUT}" stroke-width="14" fill="none" stroke-linecap="round"/><path d="M-18,22 Q-30,-6 -10,-14 Q10,-24 14,-4 Q20,14 2,12 Q-8,10 -4,0" stroke="#4a2f22" stroke-width="8" fill="none" stroke-linecap="round"/>`,
+  CEJAS: `<path d="M-28,6 Q-14,-14 0,4 M2,4 Q16,-14 30,6" stroke="${OUT}" stroke-width="12" fill="none" stroke-linecap="round"/><path d="M-26,6 Q-14,-10 -2,4 M4,4 Q16,-10 28,6" stroke="#2a1d18" stroke-width="6" fill="none" stroke-linecap="round"/>`,
+  ROPA: `<path d="M-18,-24 L-30,-6 L-18,0 L-22,26 L22,26 L18,0 L30,-6 L18,-24 Q0,-12 -18,-24Z" fill="#10b981" stroke="${OUT}" stroke-width="5" stroke-linejoin="round"/><path d="M-20,8 h40" stroke="#fbbf24" stroke-width="5"/>`,
+  MAQUILLAJE: `<rect x="-12" y="-4" width="24" height="30" rx="4" fill="#111827" stroke="${OUT}" stroke-width="4"/><rect x="-9" y="-28" width="18" height="28" rx="3" fill="#b0206a" stroke="${OUT}" stroke-width="4"/><path d="M-9,-28 L9,-28 L5,-36 L-5,-38Z" fill="#d63a8a" stroke="${OUT}" stroke-width="3"/>`,
+  LUNAR: `<circle r="10" fill="#2a1208" stroke="${OUT}" stroke-width="3"/><path d="M-2,-8 q-6,-14 -2,-20 M3,-8 q4,-12 10,-16" stroke="${OUT}" stroke-width="3" fill="none" stroke-linecap="round"/>`,
+  NARIZ: `<ellipse rx="22" ry="18" fill="#7d4524" stroke="${OUT}" stroke-width="5"/><ellipse cx="-8" cy="6" rx="5" ry="4" fill="#2a130a"/><ellipse cx="8" cy="6" rx="5" ry="4" fill="#2a130a"/><ellipse cx="-6" cy="-8" rx="6" ry="3" fill="#fff" opacity="0.5"/>`,
+};
+function chip(name, x, y, w, col, pp, label) { return `<g transform="translate(${x},${y}) scale(${pp})"><rect x="${-w / 2 + 4}" y="-52" width="${w}" height="104" rx="30" fill="#000" opacity="0.35"/><rect x="${-w / 2}" y="-56" width="${w}" height="104" rx="30" fill="${col}" stroke="${OUT}" stroke-width="7"/><rect x="${-w / 2 + 12}" y="-48" width="${w - 24}" height="26" rx="13" fill="#fff" opacity="0.22"/><g transform="translate(${-w / 2 + 52},-4)"><circle r="38" fill="#fff" stroke="${OUT}" stroke-width="5"/><g transform="scale(0.9)">${ICON[name]}</g></g><text x="${-w / 2 + 108}" y="${label ? -2 : 14}" font-family="Anton" font-size="${name.length > 8 ? 36 : 44}" fill="${OUT}" letter-spacing="1">${name}</text>${label ? `<text x="${-w / 2 + 108}" y="30" font-family="Inter" font-weight="800" font-size="24" fill="${OUT}" opacity="0.8">${label}</text>` : ''}</g>`; }
+const SPEAK8 = { N: { col: '#ffe14d', name: null }, S: { col: '#99f6e4', name: 'DRA. VALENTINA' }, E: { col: '#fdba74', name: 'MEMO' }, D: { col: '#ff5a6a', name: 'M' } };
+Object.assign(SPEAK, SPEAK8);
+const stepBanners = [['1', 'ANESTÉSICO', T.numbA - 0.1, T.numbB, '#a5f3fc'], ['2', 'DERMATOSCOPIO', T.dermoA - 0.1, T.dermoB, '#fde68a'], ['3', 'LÁSER FRÍO', T.laserA + 0.1, T.laserB, '#99f6e4'], ['4', 'SÉRUM CALMANTE', T.serumA + 0.1, T.serumB, '#fbcfe8']];
+function banner(t, n, text, a, b, col) { const k = win(t, a, b, 0.25, 0.25); if (k <= 0) return '';
+  return `<g transform="translate(540,300) scale(${pop(t, a, 0.3)})" opacity="${k}"><rect x="-330" y="-50" width="660" height="100" rx="50" fill="#000" opacity="0.3" transform="translate(4,6)"/><rect x="-330" y="-50" width="660" height="100" rx="50" fill="${col}" stroke="${OUT}" stroke-width="8"/><circle cx="-272" cy="0" r="36" fill="${OUT}"/><text x="-272" y="17" font-family="Anton" font-size="50" text-anchor="middle" fill="#fff">${n}</text><text x="34" y="20" font-family="Anton" font-size="${text.length > 11 ? 50 : 62}" text-anchor="middle" fill="${OUT}" letter-spacing="2">${esc(text)}</text></g>`; }
+// ---------------- villano M: figura de espaldas / de frente, silla giratoria, guante, pantallas con feed de Lazy ----------------
+function mFigure(t) { const a = T.lairA - 0.1, b = T.lairB + 0.1; const inA = win(t, a, b, 0.2, 0.2), inB = win(t, T.lairB2, DUR + 5, 0.2, 0.2); const vis = Math.max(inA, inB); if (vis <= 0) return '';
+  const turn = clamp((t - (L.l10.start - 0.2)) / 1.4); const sq = turn < 0.5 ? 1 - turn * 2 : (turn - 0.5) * 2, front = turn >= 0.5; const sx = Math.max(0.05, sq);
+  const press = win(t, T.lairA + 0.5, T.lairA + 1.4, 0.1, 0.2), smileK = clamp((t - T.mSmile) / 0.4);
+  const back = `<g><path d="M-120,10 Q-150,-190 -50,-270 L50,-270 Q150,-190 120,10Z" fill="#0d0b14" stroke="${OUT}" stroke-width="6"/><ellipse cx="0" cy="-300" rx="64" ry="70" fill="#14141c"/><ellipse cx="0" cy="-366" rx="118" ry="22" fill="#0b0b10" stroke="${OUT}" stroke-width="5"/><path d="M-62,-370 Q0,-474 62,-370Z" fill="#0b0b10" stroke="${OUT}" stroke-width="5"/><path d="M-64,-376 H64" stroke="#d4a24c" stroke-width="10"/><path d="M-100,-40 Q0,-70 100,-40" stroke="#241c30" stroke-width="10" fill="none"/></g>`;
+  const frontV = `<g><path d="M-120,10 Q-130,-250 -40,-300 L40,-300 Q130,-250 120,10Z" fill="#0b0b10" stroke="${OUT}" stroke-width="6"/><path d="M-26,-296 L0,-230 L26,-296Z" fill="#7f1d1d"/><ellipse cx="0" cy="-330" rx="66" ry="72" fill="#12121a"/><ellipse cx="0" cy="-392" rx="118" ry="22" fill="#0b0b10" stroke="${OUT}" stroke-width="5"/><path d="M-62,-396 Q0,-496 62,-396Z" fill="#0b0b10" stroke="${OUT}" stroke-width="5"/><path d="M-64,-402 H64" stroke="#d4a24c" stroke-width="10"/>
+    <circle cx="-24" cy="-344" r="${5 + 3 * smileK}" fill="#ef4444"/><circle cx="24" cy="-344" r="${5 + 3 * smileK}" fill="#ef4444"/><path d="M-34,${-316} Q0,${-316 + 34 * smileK} 34,-316 Q0,${-316 + 12 * smileK + 4} -34,-316Z" fill="#fff" stroke="#fff" stroke-width="3"/>
+    <g transform="translate(112,-96) rotate(${-24 + Math.sin(t * 3) * 4})"><path d="M-18,0 q-6,-54 8,-78 l24,0 q10,40 -4,78Z" fill="#0b0b10" stroke="${OUT}" stroke-width="5"/><path d="M-12,-72 l-10,-30 M-2,-78 l0,-34 M8,-76 l10,-30 M18,-70 l16,-24" stroke="#0b0b10" stroke-width="12" stroke-linecap="round"/><text x="2" y="-18" font-family="Anton" font-size="34" text-anchor="middle" fill="#fde68a">M</text></g></g>`;
+  const btn = press > 0 ? `<g transform="translate(150,-40)"><circle r="${22 + 8 * press}" fill="#ff2a4a" opacity="${0.8 * press}"/><circle r="12" fill="#ff7a8a"/></g>` : '';
+  return `<g opacity="${vis}"><g transform="translate(540,1180) scale(0.78)"><ellipse cx="0" cy="30" rx="150" ry="26" fill="#000" opacity="0.5"/><g transform="scale(${sx},1)">${front ? frontV : back}</g>${btn}</g></g>`; }
+function feeds(t) { const lairNow = sceneAt(t) === 'lair'; if (!lairNow) return ''; const flick = 0.82 + 0.18 * Math.sin(t * 23) * Math.sin(t * 7);
+  const lz = (cx, cy, w, h, who) => `<g><clipPath id="fd${who}"><rect x="${cx - w / 2}" y="${cy - h / 2}" width="${w}" height="${h}"/></clipPath><rect x="${cx - w / 2}" y="${cy - h / 2}" width="${w}" height="${h}" fill="#1a0610" opacity="0.9"/><g clip-path="url(#fd${who})" opacity="${flick}"><g transform="translate(${cx + Math.sin(t * 31) * 1.5},${cy + h * 0.52}) scale(${h / 470})"><g transform="translate(0,215)">${drawLazy({ ...FEEDPOSE, makeup: { ...FEEDPOSE.makeup, mole: t < T.flash ? 1 : 0 } })}</g></g>${[...Array(Math.floor(h / 6))].map((_, i) => `<rect x="${cx - w / 2}" y="${cy - h / 2 + i * 6}" width="${w}" height="2" fill="#000" opacity="0.28"/>`).join('')}<rect x="${cx - w / 2}" y="${cy - h / 2}" width="${w}" height="${h}" fill="#ff2a4a" opacity="0.14"/></g><rect x="${cx - w / 2}" y="${cy - h / 2}" width="${w}" height="${h}" fill="none" stroke="#ff2a4a" stroke-width="3"/><circle cx="${cx - w / 2 + 14}" cy="${cy - h / 2 + 14}" r="5" fill="#ff2a4a" opacity="${0.5 + 0.5 * Math.sin(t * 6)}"/><text x="${cx + w / 2 - 8}" y="${cy - h / 2 + 20}" font-family="Anton" font-size="16" text-anchor="end" fill="#ff7a8a">REC</text></g>`;
+  return `<g>${lz(790, 735, 214, 160, 'a')}${lz(300, 735, 214, 160, 'b')}</g>`; }
+const FEEDPOSE = { yaw: 0, pitch: 0, roll: 0, bob: 0, sway: 0, breath: 0, shoulders: 0, flare: 0, squint: 0, tears: 0, tearT: 1, gaze: { x: 0, y: 0 }, lid: { l: 1, r: 1 }, blink: { l: 0, r: 0 }, brow: { l: { r: 0.1, i: 0 }, r: { r: 0.1, i: 0 } }, mouth: { open: 0.1, wide: 0.5, smile: 0.7, asym: 0, press: 0, teeth: { clean: 1, braces: 0, crooked: 0, shine: true }, lip: '#b0206a' }, armL: { rot1: 4, rot2: 6, w: 0, curl: 0.3 }, armR: { rot1: -4, rot2: -6, w: 0, curl: 0.3 }, skin: { acne: 0.02, glow: 1, mask: 0, dry: 0, foam: 0, patch: 0, red: 0 }, hair: { hd: 'long', len: 0.82, shine: 1, cp: 1, grow: 1 }, browStyle: { k: 1 }, outfit: { kind: 'gown', prog: 1, jewel: 1 }, makeup: { found: 1, shade: 'match', contour: 0.9, highlight: 0.8, blush: 0.7, shadow: 1, swL: 1, swR: 1, liner: 1, lsL: 1, lsR: 1, thick: 5, wing: 1, lash: 0.9, lift: 1, mole: 1, cols: { blush: '#e06a7a', shadow: ['#4b2a73', '#9d6be0', '#f0d8ff'], inner: '#f6ecff', liner: '#120818' } } };
+function lairFx(t) { if (sceneAt(t) !== 'lair') return ''; const p = 0.6 + 0.4 * Math.sin(t * 3.1); return `<rect width="${W}" height="${H}" fill="#ff2a4a" opacity="${0.04 + 0.03 * p}"/>${[...Array(18)].map((_, i) => { const y = ((t * 90 + i * 140) % 2000) - 40; return `<rect x="0" y="${y}" width="${W}" height="3" fill="#ff5a6a" opacity="0.05"/>`; }).join('')}`; }
+function mirrorOverlay(t) { const a = win(t, T.mirrorA + 0.1, T.mirrorB, 0.35, 0.4); if (a <= 0) return ''; const u = clamp((t - T.mirrorA) / (T.mirrorB - T.mirrorA)), ap = smooth((t - (T.mirrorA + 2.0)) / 0.7), h = headOf(t);
+  return `<g opacity="${a}"><path d="M0,0 H${W} V${H} H0Z M540,860 m-430,0 a430,610 0 1,0 860,0 a430,610 0 1,0 -860,0Z" fill="#05060a" fill-rule="evenodd" opacity="0.93"/><ellipse cx="540" cy="860" rx="430" ry="610" fill="none" stroke="#e8c27a" stroke-width="24"/><ellipse cx="540" cy="860" rx="406" ry="586" fill="none" stroke="#fff" stroke-opacity="0.5" stroke-width="5"/>
+    <g transform="translate(${760 + (1 - ap) * 40},${700 + (1 - ap) * 20}) scale(${0.34 * ap})" opacity="${ap * 0.85}"><path d="M-120,300 Q-130,50 -40,0 L40,0 Q130,50 120,300Z" fill="#0b0b10" stroke="${OUT}" stroke-width="6"/><ellipse cx="0" cy="-30" rx="66" ry="72" fill="#12121a"/><ellipse cx="0" cy="-92" rx="118" ry="22" fill="#0b0b10" stroke="${OUT}" stroke-width="5"/><path d="M-62,-96 Q0,-196 62,-96Z" fill="#0b0b10" stroke="${OUT}" stroke-width="5"/><path d="M-64,-102 H64" stroke="#d4a24c" stroke-width="10"/><circle cx="-24" cy="-44" r="8" fill="#ef4444"/><circle cx="24" cy="-44" r="8" fill="#ef4444"/></g>
+    <g opacity="${0.4 + 0.2 * Math.sin(t * 2)}"><path d="M300,300 L420,300 L240,1260 L120,1260Z" fill="#fff" opacity="0.1" transform="translate(${((t - T.mirrorA) * 120) % 600},0)"/></g></g>`; }
+function titleIntro(t) { const END = 4.0; if (t > END) return ''; const k = win(t, 0, END, 0.01, 0.7); const u = clamp(t / 4.0); const sub = pop(t, 1.9, 0.4), pill = pop(t, 2.4, 0.4);
+  return `<g opacity="${k}"><rect width="${W}" height="${H}" fill="#05030a" opacity="${0.78 * k}"/><defs><radialGradient id="tg1" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#8af4ff" stop-opacity="0.7"/><stop offset="1" stop-color="#8af4ff" stop-opacity="0"/></radialGradient></defs><circle cx="540" cy="700" r="${520 + 40 * Math.sin(t * 5)}" fill="url(#tg1)" opacity="${clamp(u * 1.5)}"/>
+    ${[...Array(18)].map((_, i) => { const a0 = i / 18 * 6.283 + t * 0.25, a1 = a0 + 0.1; return `<path d="M540,700 L${540 + Math.cos(a0) * 1100},${700 + Math.sin(a0) * 1100} L${540 + Math.cos(a1) * 1100},${700 + Math.sin(a1) * 1100}Z" fill="#cfefff" opacity="${(i % 2 ? 0.06 : 0.1) * clamp(u * 2)}"/>`; }).join('')}
+    ${obj3('title8', u, 540, 690, 1080, 460)}${SPK(t, 10, 120, 520, 840, 360, clamp(u * 2))}
+    <g transform="translate(540,918) scale(${sub})"><text x="0" y="0" font-family="Righteous" font-size="60" text-anchor="middle" letter-spacing="7" fill="#e8fbff" stroke="#1d5f77" stroke-width="12" paint-order="stroke">NO TODO ES LO QUE PARECE</text></g>
+    <g transform="translate(540,1018) scale(${pill})"><rect x="-290" y="-38" width="580" height="76" rx="38" fill="#14b8a6" stroke="${OUT}" stroke-width="7"/><rect x="-272" y="-30" width="544" height="22" rx="11" fill="#fff" opacity="0.25"/><text x="0" y="14" font-family="Righteous" font-size="40" text-anchor="middle" letter-spacing="4" fill="#fff">QUITAMOS EL LUNAR</text></g></g>`; }
+ICON['UÑAS'] = `<path d="M-14,20 L-14,-6 Q-14,-22 0,-22 Q14,-22 14,-6 L14,20Z" fill="#f2c9a6" stroke="${OUT}" stroke-width="5" stroke-linejoin="round"/><path d="M-9,-8 Q0,-30 9,-8 L9,2 Q0,6 -9,2Z" fill="#ff4d8d" stroke="${OUT}" stroke-width="3"/><path d="M-4,-10 Q-1,-18 2,-10" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+function endCard(t) {
+  const k = clamp((t - T.vote) / 0.6); if (k <= 0) return '';
+  let s = `<rect width="${W}" height="${H}" fill="#12090a" opacity="${0.62 * k}"/><text x="540" y="${690 - 24 * (1 - ease(k))}" font-family="Anton" font-size="74" text-anchor="middle" fill="#fff" stroke="${OUT}" stroke-width="14" paint-order="stroke" opacity="${k}">¿QUÉ ARREGLAMOS</text><text x="540" y="${776 - 24 * (1 - ease(k))}" font-family="Anton" font-size="74" text-anchor="middle" fill="#fff" stroke="${OUT}" stroke-width="14" paint-order="stroke" opacity="${k}">MAÑANA?</text>`;
+  const a = pop(t, T.optA, 0.35), b = pop(t, T.optB, 0.35);
+  if (a > 0) s += `<g transform="translate(540,960) scale(${a})"><rect x="-416" y="-72" width="840" height="150" rx="44" fill="#000" opacity="0.35"/><rect x="-420" y="-80" width="840" height="150" rx="44" fill="#22d3ee" stroke="${OUT}" stroke-width="8"/><rect x="-400" y="-70" width="800" height="36" rx="18" fill="#fff" opacity="0.25"/><g transform="translate(-320,-5)"><circle r="62" fill="#fff" stroke="${OUT}" stroke-width="6"/><g transform="scale(1.6)">${ICON['UÑAS']}</g></g><text x="50" y="26" font-family="Anton" font-size="64" text-anchor="middle" fill="${OUT}">A · UÑAS Y MANOS</text></g>`;
+  if (b > 0) s += `<g transform="translate(540,1136) scale(${b})"><rect x="-416" y="-72" width="840" height="150" rx="44" fill="#000" opacity="0.35"/><rect x="-420" y="-80" width="840" height="150" rx="44" fill="#ff4d8d" stroke="${OUT}" stroke-width="8"/><rect x="-400" y="-70" width="800" height="36" rx="18" fill="#fff" opacity="0.2"/><g transform="translate(-320,-5)"><circle r="62" fill="#fff" stroke="${OUT}" stroke-width="6"/><g transform="scale(1.7)">${ICON['NARIZ']}</g></g><text x="50" y="26" font-family="Anton" font-size="62" text-anchor="middle" fill="#fff">B · ARREGLAR LA NARIZ</text></g>`;
+  const c1 = pop(t, T.cta1, 0.3), c2 = pop(t, T.cta2, 0.3);
+  if (c1 > 0) s += `<g transform="translate(540,1400) scale(${c1})"><rect x="-400" y="-44" width="800" height="88" rx="44" fill="#ffe14d" stroke="${OUT}" stroke-width="7"/><path d="M-352,-18 h60 a10,10 0 0 1 10,10 v22 a10,10 0 0 1 -10,10 h-34 l-16,14 v-14 h-10 a10,10 0 0 1 -10,-10 v-22 a10,10 0 0 1 10,-10Z" fill="#fff" stroke="${OUT}" stroke-width="5" transform="translate(0,-4)"/><text x="40" y="18" font-family="Anton" font-size="50" text-anchor="middle" fill="${OUT}">COMENTA TU ELECCIÓN</text></g>`;
+  if (c2 > 0) s += `<g transform="translate(540,1510) scale(${c2})"><rect x="-400" y="-44" width="800" height="88" rx="44" fill="#fff" stroke="${OUT}" stroke-width="7"/><circle cx="-338" cy="0" r="30" fill="#ff4d8d" stroke="${OUT}" stroke-width="5"/><path d="M-338,-14 v28 M-352,0 h28" stroke="#fff" stroke-width="8" stroke-linecap="round"/><text x="40" y="18" font-family="Anton" font-size="50" text-anchor="middle" fill="${OUT}">SÍGUEME PARA EL DÍA 9</text></g>`;
+  return s;
+}
+// ---------------- FRAME ----------------
+function frame(t) {
+  const P = pose(t), cam = camAt(t), sc = sceneAt(t), lp = lazyPlace(t), clinic = sc === 'clinic';
+  const py = lp.fy - 790 * lp.S;
+  const lazySvg = drawLazy(P);
+  const lazy = lp.vis ? `<g transform="translate(${lp.x},${py}) scale(${lp.S})">${lazySvg}</g>` : '';
+  const shadowLz = lp.vis ? `<g transform="translate(${lp.x + 90},${lp.fy - 30}) skewX(-32) scale(${lp.S * 0.9},${0.2 * lp.S}) translate(0,-790)" opacity="0.3" filter="url(#shf)">${lazySvg}</g>` : '';
+  const sm = (h, tt) => { const o = { L: { x: 0, y: 0 }, R: { x: 0, y: 0 } }; for (let k = 0; k < 6; k++) { const tg = handsToTargets(h(Math.max(0, tt - k * 0.055))); o.L.x += tg.L.x / 6; o.L.y += tg.L.y / 6; o.R.x += tg.R.x / 6; o.R.y += tg.R.y / 6; } return o; };
+  const ds = dermState(t), ms = memoState(t);
+  const char = (st, fn, look, seed, who) => { if (!st) return ''; const { ch } = st; const hs = (tt) => { const q = who === 'D' ? dermState(tt) : memoState(tt); return q ? q.hands : 'none'; }; const nsm = sm(hs, t);
+    const base = { ...st, elbowDown: true, armL: nsm.L, armR: nsm.R, blink: blinkOf(t, seed), look, t };
+    const shd = `<ellipse cx="${ch.x + 30 * ch.s}" cy="${ch.y + 712 * ch.s}" rx="${150 * ch.s}" ry="${22 * ch.s}" fill="#000" opacity="0.34" filter="url(#b10)"/><ellipse cx="${ch.x}" cy="${ch.y + 708 * ch.s}" rx="${110 * ch.s}" ry="${14 * ch.s}" fill="#000" opacity="0.3"/>`;
+    return `${shd}<g transform="translate(${ch.x},${ch.y}) scale(${ch.s})">${fn({ ...base, part: 'body' })}</g><g transform="translate(${ch.x},${ch.y}) scale(${ch.s})">${fn({ ...base, part: 'tool' })}</g>`; };
+  const derm = char(ds, drawDerm, -0.7, 1.9, 'D'), memo = char(ms, drawMemo, 0.7, 0.6, 'M');
+  const icons = (ds ? talkIcon(t, 'S', ds.ch.x - 110 * ds.ch.s, ds.ch.y - 150 * ds.ch.s) : '') + (ms ? talkIcon(t, 'E', ms.ch.x + 110 * ms.ch.s, ms.ch.y - 150 * ms.ch.s) : '');
+  const chairG = (g) => `<g transform="translate(540,1690) scale(${K}) translate(-540,-1660)">${g}</g>`;
+  const par = (f) => `translate(540,960) scale(${1 + (cam.z - 1) * f}) translate(${-(540 + (cam.x - 540) * f)},${-(960 + (cam.y - 960) * f)})`;
+  const bgLayer = `<g transform="${par(0.85)}"><image href="${platePng[sc]}" width="${W}" height="${H}" preserveAspectRatio="none"/>${feeds(t)}</g>`;
+  const patchOn = t > T.serumA + 2.4 ? `<g transform="translate(${facePt(t, 108, 70).x},${facePt(t, 108, 70).y}) rotate(-12) scale(${lp.S * pop(t, T.serumA + 2.4, 0.3)})"><rect x="-26" y="-14" width="52" height="28" rx="10" fill="#f2c9a6" stroke="#b98a66" stroke-width="3"/><circle cx="-10" cy="-4" r="2" fill="#b98a66"/><circle cx="2" cy="4" r="2" fill="#b98a66"/><circle cx="12" cy="-4" r="2" fill="#b98a66"/></g>` : '';
+  const world = `${bgLayer}<g transform="translate(540,960) scale(${cam.z}) translate(${-cam.x},${-cam.y})">${clinic ? chairG(chairBack()) : ''}${clinic ? shadowLz : ''}${derm}${memo}${lazy}${patchOn}${clinic ? chairG(chairFront()) : ''}${clinic ? icons : mFigure(t)}${flashFx(t)}${glitterBurst(t)}</g>`;
+  const vignette = `<defs><radialGradient id="vgn" cx="0.5" cy="0.5" r="0.75"><stop offset="0.55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#05030a" stop-opacity="0.5"/></radialGradient><filter id="b10"><feGaussianBlur stdDeviation="10"/></filter></defs><rect width="${W}" height="${H}" fill="url(#vgn)"/>`;
+  const chipTop = t < 4.0 ? '' : `<g transform="translate(540,300)"><defs><linearGradient id="chg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fffbe0"/><stop offset="0.5" stop-color="#ffd84a"/><stop offset="1" stop-color="#b8780f"/></linearGradient></defs><rect x="-226" y="-40" width="440" height="88" rx="44" fill="#000" opacity="0.3"/><rect x="-230" y="-46" width="440" height="88" rx="44" fill="#1a1024" stroke="#d4a24c" stroke-width="6"/><text x="0" y="18" font-family="Bungee" font-size="48" text-anchor="middle" letter-spacing="3" fill="url(#chg)" stroke="${OUT}" stroke-width="4" paint-order="stroke">DÍA 8/30</text></g>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${charDefs}<defs><filter id="b10"><feGaussianBlur stdDeviation="10"/></filter><filter id="shf" x="-40%" y="-40%" width="180%" height="180%"><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0"/><feGaussianBlur stdDeviation="9"/></filter></defs>${world}${lairFx(t)}${vignette}${titleIntro(t)}
+    ${chipTop}${insPlane(t)}${insNote(t)}${insNumb(t)}${insDermo(t)}${insDrone(t)}${insLaser(t)}${insSerum(t)}${stepBanners.map(([n, tx, a, b, c]) => banner(t, n, tx, a, b, c)).join('')}${mirrorOverlay(t)}${letterbox(t)}
+    ${t < T.vote ? captions(t) : ''}${endCard(t)}${flashScreen(t)}
+    <image href="${grainPng}" width="${W}" height="${H}"/></svg>`;
+  return new Resvg(svg, ropt).render().asPng();
+}
+
+if (process.argv[2] === 'audit') {
+  let n = 0, shrunk = 0, worst = 0;
+  for (const l of DATA.lines) { const groups = []; let g = []; l.words.forEach(([ww]) => { g.push(ww); if (g.length === 3 || /[.?!:]$|\.\.\.$/.test(ww)) { groups.push(g); g = []; } }); if (g.length) groups.push(g);
+    for (const gr of groups) { const txt = esc(gr.map((x) => x.replace(/\.\.\./g, '').toUpperCase()).join(' ')); let fs = 84, wd = inkWidth(txt, fs); if (wd > SAFE_W) { fs = Math.max(44, Math.floor(fs * SAFE_W / wd)); wd = inkWidth(txt, fs); shrunk++; } n++; worst = Math.max(worst, wd); } }
+  console.log('grupos', n, 'ajustados', shrunk, 'ancho maximo', worst, '(limite', SAFE_W + ')');
+} else if (process.argv[2] === 'preview') {
+  for (const s of process.argv.slice(3)) writeFileSync(path.join(B, `p_${s}.png`), frame(parseFloat(s)));
+  console.log('preview ok', 'DUR', DUR.toFixed(2), 'frames', Math.round(DUR * FPS));
+} else {
+  const a0 = parseInt(process.argv[2] ?? '0'), total = Math.round(DUR * FPS), a1 = process.argv[3] && parseInt(process.argv[3]) >= 0 ? Math.min(parseInt(process.argv[3]), total) : total;
+  const out = process.argv[4] || path.join(B, 'video_mudo.mp4');
+  const ff = spawn('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(FPS), '-i', '-', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '18', '-preset', 'medium', '-g', '30', out], { stdio: ['pipe', 'inherit', 'inherit'] });
+  for (let i = a0; i < a1; i++) { if (!ff.stdin.write(frame(i / FPS))) await new Promise((r) => ff.stdin.once('drain', r)); if ((i - a0) % 60 === 0) console.log('frame', i, '/', a1); }
+  ff.stdin.end(); await new Promise((r) => ff.on('close', r)); console.log('listo', out);
+}

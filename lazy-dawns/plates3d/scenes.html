@@ -217,6 +217,79 @@ if (scene_name === 'ballroom') {
   // destellos flotantes (champan / confeti dorado)
   for (let i = 0; i < 90; i++) { const x = ((i * 37) % 26) - 13, y = 1 + ((i * 53) % 90) / 10, z = -18 + ((i * 29) % 36); glow(x, y, z, 0.18 + (i % 4) * 0.08, i % 3 ? 0xffe0a0 : 0xffc0e0, 0.9); }
 }
+
+if (scene_name === 'clinic') {
+  sc.background = new THREE.Color(0xdfeaf0); sc.fog = new THREE.Fog(0xdfeaf0, 18, 55);
+  cam.position.set(0, 3.0, 11.5); cam.lookAt(0, 2.6, -6);
+  const rnd = (s) => () => (s = (s * 16807) % 2147483647) / 2147483647;
+  // piso de porcelanato pulido con juntas y vetas
+  const flT = tex((c, w, h) => { const R = rnd(5); for (let i = 0; i < 6; i++) for (let j = 0; j < 6; j++) { const g = 168 + ((i * 7 + j * 13) % 5) * 5; c.fillStyle = `rgb(${g},${g + 6},${g + 14})`; c.fillRect(i * w / 6, j * h / 6, w / 6, h / 6); for (let k = 0; k < 14; k++) { c.strokeStyle = `rgba(150,165,180,${0.05 + R() * 0.07})`; c.lineWidth = 1 + R() * 2; c.beginPath(); c.moveTo(i * w / 6 + R() * w / 6, j * h / 6); c.bezierCurveTo(i * w / 6 + R() * w / 6, j * h / 6 + 30, i * w / 6 + R() * w / 6, j * h / 6 + 90, i * w / 6 + R() * w / 6, (j + 1) * h / 6); c.stroke(); } c.strokeStyle = 'rgba(120,140,155,.55)'; c.lineWidth = 3; c.strokeRect(i * w / 6, j * h / 6, w / 6, h / 6); } }, 1024, 1024); flT.wrapS = flT.wrapT = THREE.RepeatWrapping; flT.repeat.set(5, 5);
+  add(Box(40, 0.3, 40), M(0xffffff, 0.12, 0.08, { map: flT }), 0, -0.15, 4, sc, false).receiveShadow = true;
+  // pared del fondo: yeso menta con boiserie y zocalo
+  const wT = tex((c, w, h) => { const R = rnd(9); const g = c.createLinearGradient(0, 0, 0, h); g.addColorStop(0, '#bfe0d8'); g.addColorStop(1, '#8fc3b8'); c.fillStyle = g; c.fillRect(0, 0, w, h); for (let i = 0; i < 6000; i++) { c.fillStyle = `rgba(${150 + R() * 60},${170 + R() * 60},${170 + R() * 60},${R() * 0.05})`; c.fillRect(R() * w, R() * h, 2 + R() * 4, 2 + R() * 4); } for (let i = 0; i < 4; i++) { c.strokeStyle = 'rgba(255,255,255,.85)'; c.lineWidth = 8; c.strokeRect(40 + i * 250, 280, 210, 380); c.strokeStyle = 'rgba(120,150,150,.35)'; c.lineWidth = 3; c.strokeRect(46 + i * 250, 286, 198, 368); } c.fillStyle = '#b9d2cd'; c.fillRect(0, h - 110, w, 110); }, 1024, 768);
+  add(Box(26, 12, 0.3), M(0xffffff, 0.8, 0, { map: wT }), 0, 6, -9);
+  const sideM = M(0xdcebe8, 0.8); add(Box(0.3, 12, 26), sideM, -13, 6, 3); add(Box(0.3, 12, 26), sideM, 13, 6, 3); add(Box(26, 0.3, 26), M(0xf3f7f8, 0.9), 0, 12, 3);
+  // ventana grande con ciudad y persianas (izquierda)
+  const cityT = tex((c, w, h) => { const g = c.createLinearGradient(0, 0, 0, h); g.addColorStop(0, '#8fc3ee'); g.addColorStop(0.7, '#d6ecf8'); g.addColorStop(1, '#f4e6d0'); c.fillStyle = g; c.fillRect(0, 0, w, h); const R = rnd(21); for (let i = 0; i < 26; i++) { const bw = 40 + R() * 70, bh = 120 + R() * 280, x = i * 40 - 20; c.fillStyle = `rgba(${90 + R() * 40},${110 + R() * 40},${140 + R() * 40},${0.55 + R() * 0.3})`; c.fillRect(x, h - bh, bw, bh); for (let k = 0; k < 14; k++) { c.fillStyle = 'rgba(255,255,255,.35)'; c.fillRect(x + 6 + R() * (bw - 14), h - bh + 10 + R() * (bh - 20), 5, 7); } } }, 512, 512);
+  add(Box(6.6, 5.4, 0.15), M(0xffffff, 0.3, 0, { map: cityT, emissive: 0xffffff, emissiveMap: cityT, emissiveIntensity: 0.3 }), -7.2, 5.3, -8.8, sc, false);
+  const frameM = M(0xf4f4f4, 0.35, 0.2); add(Box(6.9, 0.22, 0.3), frameM, -7.2, 8.05, -8.7); add(Box(6.9, 0.22, 0.3), frameM, -7.2, 2.55, -8.7); add(Box(0.22, 5.6, 0.3), frameM, -10.55, 5.3, -8.7); add(Box(0.22, 5.6, 0.3), frameM, -3.85, 5.3, -8.7); add(Box(0.14, 5.4, 0.25), frameM, -7.2, 5.3, -8.7);
+  for (let i = 0; i < 14; i++) add(Box(6.5, 0.09, 0.5), M(0xf0f0f0, 0.4), -7.2, 7.9 - i * 0.36, -8.45, sc, true).rotation.x = 0.45;
+  // sol: haz calido entrando por la ventana
+  spot(-9, 10, -2, -3, 0, 2, 0xfff0d0, 140, 0.9, 0.9); cone(-6, 5, -4, 10, 3, 0xfff0d0, 0.03, 0, 0);
+  // camilla/silla de exploracion al centro es 2D en el video; aqui: mesa lateral, lampara de techo, gabinete, planta, diplomas, reloj, espejo redondo
+  const steel = M(0xcfd6dc, 0.22, 0.9);
+  // gabinete con puertas de vidrio y frascos (derecha)
+  add(Box(4.2, 5.6, 1.6), M(0xf6f6f6, 0.35, 0.1), 8.6, 2.8, -7.6); add(Box(3.7, 4.0, 0.08), M(0x9fd0e8, 0.05, 0.1, { transparent: true, opacity: 0.35 }), 8.6, 3.5, -6.75, sc, false);
+  for (let r = 0; r < 4; r++) for (let k = 0; k < 5; k++) { const col = [0xe86a92, 0x5eb4e8, 0xf7c948, 0x7ed6a0, 0xffffff][(r + k) % 5]; add(Cyl(0.18, 0.18, 0.5 + (k % 2) * 0.12), M(col, 0.25, 0.1), 7.3 + k * 0.62, 1.95 + r * 0.95, -7.2); add(Cyl(0.1, 0.1, 0.14), steel, 7.3 + k * 0.62, 2.27 + r * 0.95 + (k % 2) * 0.06, -7.2); }
+  // lampara de exploracion con brazo articulado (izquierda-centro)
+  add(Cyl(0.08, 0.08, 4.2), steel, -2.2, 10, -6.2); const arm = add(Box(3.0, 0.14, 0.14), steel, -0.9, 7.8, -6.2); arm.rotation.z = -0.15; add(Sph(0.18), steel, 0.5, 7.5, -6.2); const lampD = add(Cyl(1.15, 1.35, 0.35, 48), M(0xf2f4f6, 0.3, 0.5), 0.5, 7.2, -6.0); lampD.rotation.x = 0.35; add(Cyl(0.95, 0.95, 0.06, 48), M(0xffffff, 0.1, 0, { emissive: 0xfff4d8, emissiveIntensity: 4 }), 0.5, 7.0, -5.8, sc, false).rotation.x = 0.35; glow(0.5, 6.8, -5.7, 5, 0xfff0d0, 0.55);
+  // reloj, diplomas, poster de anatomia de piel, cuadros
+  const clk = tex((c, w, h) => { c.fillStyle = '#fff'; c.beginPath(); c.arc(w / 2, h / 2, w / 2 - 6, 0, 7); c.fill(); c.strokeStyle = '#2b3a42'; c.lineWidth = 14; c.stroke(); c.fillStyle = '#12090a'; c.font = 'bold 54px Georgia'; c.textAlign = 'center'; for (let i = 1; i <= 12; i++) c.fillText(i, w / 2 + Math.sin(i / 12 * 6.283) * 88, h / 2 - Math.cos(i / 12 * 6.283) * 88 + 18); c.lineWidth = 8; c.beginPath(); c.moveTo(w / 2, h / 2); c.lineTo(w / 2 + 40, h / 2 - 50); c.moveTo(w / 2, h / 2); c.lineTo(w / 2 - 10, h / 2 - 80); c.stroke(); }, 256, 256);
+  add(Cyl(1.0, 1.0, 0.12, 48), new THREE.MeshBasicMaterial({ map: clk }), 4.0, 8.2, -8.78, sc, false).rotation.x = Math.PI / 2;
+  const poster = (w, h, title, col) => tex((c, W2, H2) => { c.fillStyle = '#fbfbf8'; c.fillRect(0, 0, W2, H2); c.strokeStyle = col; c.lineWidth = 10; c.strokeRect(12, 12, W2 - 24, H2 - 24); c.fillStyle = col; c.font = 'bold 40px Georgia'; c.textAlign = 'center'; c.fillText(title, W2 / 2, 70); c.fillStyle = '#f2c9a8'; c.fillRect(60, 100, W2 - 120, H2 - 200); for (let i = 0; i < 4; i++) { c.fillStyle = `rgba(${200 - i * 30},${120 - i * 20},${90 - i * 10},0.6)`; c.fillRect(60, 100 + i * (H2 - 200) / 4, W2 - 120, (H2 - 200) / 4); } c.strokeStyle = '#555'; c.lineWidth = 2; for (let i = 0; i < 6; i++) { c.beginPath(); c.moveTo(W2 / 2, 140 + i * 40); c.lineTo(W2 - 40, 130 + i * 40); c.stroke(); } }, 320, 420);
+  add(Box(2.0, 2.6, 0.08), new THREE.MeshBasicMaterial({ map: poster(2, 2.6, 'PIEL', '#2e8b8b') }), 0.4, 6.2, -8.75, sc, false); add(Box(2.0, 2.6, 0.08), new THREE.MeshBasicMaterial({ map: poster(2, 2.6, 'DERMIS', '#8b4a2e') }), 2.8, 6.0, -8.75, sc, false);
+  for (const x of [-0.1, 0.9, 1.9]) { add(Box(0.9, 1.15, 0.05), M(0xd4a24c, 0.3, 0.8), x + 4.6, 5.0, -8.8, sc, false); add(Box(0.74, 0.98, 0.06), M(0xfffdf4, 0.7), x + 4.6, 5.0, -8.77, sc, false); }
+  // planta grande, carrito con instrumentos, lavabo
+  const pot = add(Cyl(0.7, 0.55, 1.1), M(0xd7d2c8, 0.5), -11.0, 0.55, -6.4); for (let i = 0; i < 18; i++) { const a = i / 18 * 6.283; const l = add(Sph(0.5), M(i % 3 ? 0x2f8f4a : 0x3fae5a, 0.55), -11.0 + Math.cos(a) * 0.7, 1.7 + (i % 4) * 0.55, -6.4 + Math.sin(a) * 0.55); l.scale.set(0.7, 1.7, 0.45); l.rotation.z = Math.cos(a) * 0.5; }
+  add(Box(2.2, 0.12, 1.2), steel, 5.0, 2.0, -3.4); for (const [x, z] of [[-1, -0.5], [1, -0.5], [-1, 0.5], [1, 0.5]]) add(Cyl(0.05, 0.05, 2.0), steel, 5.0 + x, 1.0, -3.4 + z * 0.9); add(Box(2.0, 0.08, 1.0), steel, 5.0, 0.7, -3.4);
+  for (let i = 0; i < 5; i++) add(Cyl(0.04, 0.04, 0.9), steel, 4.4 + i * 0.28, 2.5, -3.4).rotation.z = 0.3 - i * 0.12;
+  add(Box(1.0, 0.5, 0.7), M(0xfff6d8, 0.4), 5.9, 2.35, -3.5); add(Cyl(0.3, 0.3, 0.5), M(0x5eb4e8, 0.2, 0.2), 5.5, 2.35, -3.1);
+  // zocalo LED y luces de techo empotradas
+  add(Box(26, 0.08, 0.1), M(0xffffff, 0.2, 0, { emissive: 0x9ff0e0, emissiveIntensity: 2.4 }), 0, 0.5, -8.7, sc, false); glow(0, 0.55, -8.6, 14, 0x9ff0e0, 0.18);
+  for (let i = -3; i <= 3; i++) for (const z of [-5, 0, 5]) { add(Cyl(0.35, 0.35, 0.05, 32), M(0xffffff, 0.1, 0, { emissive: 0xfff6e0, emissiveIntensity: 1.6 }), i * 3, 11.8, z, sc, false); }
+  sc.add(new THREE.AmbientLight(0xdfeeff, 0.28)); sc.add(new THREE.HemisphereLight(0xffffff, 0x8a98a0, 0.35)); r.toneMappingExposure = 0.8;
+  spot(0, 11, 8, 0, 0, -3, 0xfff6e8, 110, 0.9, 0.9); spot(7, 9, 3, 4, 2, -6, 0xcfe4ff, 40, 0.9, 0.9);
+}
+if (scene_name === 'lair') {
+  sc.background = new THREE.Color(0x05030a); sc.fog = new THREE.Fog(0x08040c, 10, 36);
+  cam.position.set(0, 2.6, 11); cam.lookAt(0, 3.0, -6); r.toneMappingExposure = 1.1;
+  const rnd = (s) => () => (s = (s * 16807) % 2147483647) / 2147483647;
+  // piso negro humedo con reflejos de las pantallas
+  const flT = tex((c, w, h) => { c.fillStyle = '#0b0710'; c.fillRect(0, 0, w, h); const R = rnd(4); for (let i = 0; i < 260; i++) { c.strokeStyle = `rgba(120,60,90,${R() * 0.12})`; c.lineWidth = 1 + R() * 3; c.beginPath(); c.moveTo(R() * w, R() * h); c.lineTo(R() * w, R() * h); c.stroke(); } c.strokeStyle = 'rgba(255,60,90,.25)'; c.lineWidth = 3; for (let i = 0; i <= 8; i++) { c.beginPath(); c.moveTo(i * w / 8, 0); c.lineTo(i * w / 8, h); c.stroke(); c.beginPath(); c.moveTo(0, i * h / 8); c.lineTo(w, i * h / 8); c.stroke(); } }, 1024, 1024); flT.wrapS = flT.wrapT = THREE.RepeatWrapping; flT.repeat.set(4, 4);
+  add(Box(40, 0.3, 40), M(0xffffff, 0.08, 0.6, { map: flT }), 0, -0.15, 4, sc, false).receiveShadow = true;
+  const wallT = tex((c, w, h) => { c.fillStyle = '#0d0813'; c.fillRect(0, 0, w, h); const R = rnd(33); for (let i = 0; i < 7000; i++) { c.fillStyle = `rgba(${20 + R() * 30},${10 + R() * 20},${30 + R() * 30},${R() * 0.15})`; c.fillRect(R() * w, R() * h, 2 + R() * 6, 2 + R() * 6); } c.strokeStyle = 'rgba(160,40,70,.35)'; c.lineWidth = 3; for (let i = 0; i < 9; i++) { c.beginPath(); c.moveTo(0, 70 + i * 82); c.lineTo(w, 70 + i * 82); c.stroke(); } }, 1024, 768);
+  add(Box(30, 13, 0.3), M(0xffffff, 0.8, 0.1, { map: wallT }), 0, 6.5, -9.2); add(Box(0.3, 13, 30), M(0x0b0610, 0.8), -13, 6.5, 3); add(Box(0.3, 13, 30), M(0x0b0610, 0.8), 13, 6.5, 3); add(Box(30, 0.3, 30), M(0x08040c, 0.9), 0, 13, 3);
+  // muro de monitores 5x3 con widgets: radar, graficas, codigo, mapas, rostro central grande
+  const widgets = (seed, kind) => tex((c, w, h) => { const R = rnd(seed); c.fillStyle = '#05060c'; c.fillRect(0, 0, w, h); const hue = kind === 3 ? '255,60,90' : ['60,220,255', '80,255,160', '255,190,60'][seed % 3]; c.strokeStyle = `rgba(${hue},.8)`; c.fillStyle = `rgba(${hue},.8)`; c.lineWidth = 2;
+    if (kind === 0) { c.beginPath(); c.arc(w / 2, h / 2, h * 0.38, 0, 7); c.stroke(); c.beginPath(); c.arc(w / 2, h / 2, h * 0.2, 0, 7); c.stroke(); c.beginPath(); c.moveTo(w / 2, h / 2); c.lineTo(w / 2 + 90, h / 2 - 60); c.stroke(); for (let i = 0; i < 6; i++) c.fillRect(R() * w, R() * h, 6, 6); }
+    else if (kind === 1) { c.beginPath(); c.moveTo(10, h - 20); for (let i = 0; i < 24; i++) c.lineTo(10 + i * (w - 20) / 23, h - 20 - R() * (h - 50)); c.stroke(); for (let i = 0; i < 6; i++) c.fillRect(14 + i * 40, h - 12, 28, 4); }
+    else if (kind === 2) { c.font = '14px monospace'; for (let i = 0; i < 16; i++) c.fillText(Array.from({ length: 20 }, () => 'abcdef0123456789x#$%'[Math.floor(R() * 20)]).join(''), 12, 24 + i * 15); }
+    else { c.fillStyle = 'rgba(255,60,90,.15)'; c.fillRect(0, 0, w, h); c.font = 'bold 64px Arial'; c.textAlign = 'center'; c.fillStyle = 'rgba(255,60,90,.9)'; c.fillText('OBJETIVO', w / 2, h / 2 + 10); c.font = '22px monospace'; c.fillText('LAZY // SIGUIENDO', w / 2, h / 2 + 46); c.strokeStyle = 'rgba(255,60,90,.9)'; c.lineWidth = 4; c.strokeRect(14, 14, w - 28, h - 28); }
+    for (let y = 0; y < h; y += 4) { c.fillStyle = 'rgba(0,0,0,.18)'; c.fillRect(0, y, w, 2); } }, 320, 220);
+  const screens = []; for (let rI = 0; rI < 3; rI++) for (let cI = 0; cI < 5; cI++) { const x = -6.4 + cI * 3.2, y = 3.0 + rI * 2.5; const kind = (rI === 1 && cI === 2) ? 3 : (rI + cI) % 3; add(Box(3.0, 2.2, 0.22), M(0x0c0c14, 0.3, 0.6), x, y, -8.9); add(Box(2.8, 2.0, 0.05), new THREE.MeshBasicMaterial({ map: widgets(rI * 7 + cI + 3, kind) }), x, y, -8.76, sc, false); const col = kind === 3 ? 0xff2a4a : [0x38d8ff, 0x50ffa0, 0xffbe3c][(rI + cI) % 3]; glow(x, y, -8.5, 4.2, col, kind === 3 ? 0.55 : 0.28); screens.push([x, y, kind]); }
+  // neon rojo "M" en la pared (arriba) y tubos de luz
+  const mneon = tex((c, w, h) => { c.clearRect(0, 0, w, h); c.shadowColor = '#ff2a4a'; c.shadowBlur = 40; c.fillStyle = '#ff7a8a'; c.font = 'bold 300px Georgia'; c.textAlign = 'center'; c.fillText('M', w / 2, h * 0.78); c.shadowBlur = 0; c.strokeStyle = '#fff'; c.lineWidth = 4; c.strokeText('M', w / 2, h * 0.78); }, 512, 512);
+  const mm = new THREE.Mesh(new THREE.PlaneGeometry(4.6, 4.6), new THREE.MeshBasicMaterial({ map: mneon, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false })); mm.position.set(0, 11.3, -9.0); sc.add(mm); glow(0, 11.2, -8.8, 12, 0xff2a4a, 0.4);
+  // escritorio curvo con teclado luminoso, silla de cuero de espaldar alto
+  add(Box(14, 0.25, 3.0), M(0x14101c, 0.25, 0.7), 0, 1.15, -4.2); add(Box(13.6, 1.1, 2.7), M(0x0c0a12, 0.4, 0.5), 0, 0.55, -4.2); add(Box(5.0, 0.06, 1.0), M(0x0a0a10, 0.3, 0.2, { emissive: 0xff2a4a, emissiveIntensity: 0.6 }), 0, 1.3, -3.6, sc, false);
+  add(Box(2.6, 3.4, 0.5), M(0x08060c, 0.55, 0.1), 0, 3.0, -1.2); add(Box(2.6, 0.5, 2.0), M(0x14101a, 0.55, 0.1), 0, 1.4, -0.4); add(Cyl(0.12, 0.12, 1.2), M(0x333, 0.3, 0.9), 0, 0.6, -0.4); add(Cyl(1.0, 1.0, 0.12), M(0x222, 0.3, 0.9), 0, 0.06, -0.4);
+  // luces rojas/azules de contra, niebla de haces
+  sc.add(new THREE.AmbientLight(0x2a1830, 0.8)); sc.add(new THREE.HemisphereLight(0x5a3a6a, 0x120818, 0.6));
+  spot(-8, 9, 4, -2, 3, -6, 0xff2a4a, 280, 0.8, 0.9); spot(8, 9, 4, 2, 3, -6, 0x2a9aff, 220, 0.8, 0.9); spot(0, 12, -2, 0, 0, -2, 0xff6a7a, 160, 0.5, 0.8);
+  cone(-5, 6, -3, 12, 3, 0xff2a4a, 0.05); cone(5, 6, -3, 12, 3, 0x2a9aff, 0.04);
+  for (let i = 0; i < 120; i++) glow(((i * 37) % 26) - 13, 0.5 + ((i * 53) % 110) / 10, -9 + ((i * 29) % 20), 0.14 + (i % 3) * 0.06, i % 2 ? 0xff7a8a : 0x7ac0ff, 0.7);
+  window.__proj = screens.map(([x, y, k]) => { const v = new THREE.Vector3(x, y, -8.76).project(cam); return [x, y, k, (v.x + 1) / 2 * 1080, (1 - v.y) / 2 * 1920]; });
+}
 r.render(sc, cam);
 window.__done = true;
 </script></body></html>
