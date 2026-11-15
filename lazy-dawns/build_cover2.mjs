@@ -2,7 +2,7 @@
 import { Resvg } from '@resvg/resvg-js';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path'; import { fileURLToPath } from 'node:url';
-import { defs } from './lazy_lib.mjs'; import { drawLazy, solveArm } from './rig.mjs'; import { drawMari, drawDoc, drawDentist, drawStylist, drawDante, drawKarla, drawNina, drawMemo, drawPia, drawDerm, salonTool } from './chars.mjs';
+import { defs } from './lazy_lib.mjs'; import { drawLazy, solveArm } from './rig.mjs'; import { drawTadeo, drawMei, drawMari, drawDoc, drawDentist, drawStylist, drawDante, drawKarla, drawNina, drawMemo, drawPia, drawDerm, salonTool } from './chars.mjs';
 const here = path.dirname(fileURLToPath(import.meta.url)); mkdirSync(path.join(here, 'portadas'), { recursive: true });
 const FD = path.join(here, '../assets/fonts/');
 const ropt = { font: { fontFiles: ['Anton-Regular.ttf', 'Bungee-Regular.ttf', 'Righteous-Regular.ttf'].map((f) => FD + f), loadSystemFonts: true, defaultFontFamily: 'Inter' } };
@@ -23,6 +23,7 @@ const STATE = {
   6: (p) => { p.skin = { ...SKIN }; p.mouth.teeth = TEETH; p.hair = { s: 1, len: 1, shine: 0.9, sway: 0.3 }; p.browStyle = { k: 1, kl: 1, kr: 1, red: 0, shortL: 0 }; p.outfit = { kind: 'gown', prog: 1, jewel: 1 }; suspense(p, { gx: 0.8 }); },
   7: (p) => { STATE[6](p); p.makeup = { ...LOOKD }; p.mouth.lip = '#b0206a'; suspense(p, { gx: 0.8, smile: -0.05 }); },
   8: (p) => { p.skin = { ...SKIN }; p.mouth.teeth = TEETH; p.hair = { hd: 'long', len: 0.82, shine: 1, cp: 1, grow: 1, sway: 0.2 }; p.browStyle = { k: 1, kl: 1, kr: 1, red: 0, shortL: 0 }; p.outfit = { kind: 'gown', prog: 1, jewel: 1 }; p.makeup = { ...LOOKD, mole: 0 }; p.mouth.lip = '#b0206a'; suspense(p, { gx: 0.8 }); },
+  9: (p) => { p.skin = { ...SKIN }; p.mouth.teeth = TEETH; p.hair = { hd: 'long', len: 0.82, shine: 1, cp: 1, grow: 1, sway: 0.2 }; p.outfit = { kind: 'gown', prog: 1, jewel: 1, loose: 1.2 }; p.slim = 3.8; p.faceWrinkle = 0.8; p.bodyWrinkle = 1; p.makeup = { ...LOOKD, mole: 0 }; p.mouth.lip = '#b0206a'; p.mouth.tstyle = 'A'; },
   sp: (p) => { STATE[8](p); p.makeup = { ...LOOKD, mole: 1, glitter: 1 }; p.mouth.open = 0.6; p.mouth.smile = 1; p.mouth.wide = 0.8; p.brow = { l: { r: 0.4, i: 0.1 }, r: { r: 0.4, i: 0.1 } }; p.squint = 0.4; p.pitch = -0.3; p.yaw = 0; p.gaze = { x: 0, y: 0 }; p.hair.wind = 0.5; },
 };
 const CFG = {
@@ -34,6 +35,7 @@ const CFG = {
   d6: { st: 6, bg: 'plates3d/boutique_dof.png', tint: '#ffcf70', glow: '#ffe08a', titleY: 450, badge: 6, tag: 'ALGUIEN LA ESTÁ ESPERANDO' },
   d7: { st: 7, bg: 'plates3d/backstage_dof.png', tint: '#b48cff', glow: '#d4b8ff', titleY: 450, badge: 7, tag: 'BRILLO Y SOMBRA', sil: true },
   d8: { st: 8, bg: 'plates3d/lair_dof.png', tint: '#ff2a4a', glow: '#ff5a6a', titleY: 430, badge: 8, tag: 'ALGUIEN LO ESTÁ VIENDO TODO', sil: true, patch: true },
+  d9: { st: 9, bg: 'plates3d/gym_dof.png', tint: '#ff4d9c', glow: '#ff7ac0', titleY: 450, badge: 9, tag: '' },
   sp: { st: 'sp', bg: 'plates3d/ballroom_dof.png', tint: '#ffd070', glow: '#ffe08a', titleY: 450, badge: 0, tag: 'UNA GRAN REVELACIÓN' },
 };
 const sil = `<g opacity="0.75" transform="translate(900,1180) scale(0.9)"><path d="M-110,420 Q-130,40 -40,-10 L40,-10 Q130,40 110,420Z" fill="#000"/><ellipse cx="0" cy="-60" rx="62" ry="68" fill="#000"/><ellipse cx="0" cy="-118" rx="118" ry="20" fill="#000"/><path d="M-60,-122 Q0,-214 60,-122Z" fill="#000"/><circle cx="-22" cy="-70" r="7" fill="#ef4444"/><circle cx="22" cy="-70" r="7" fill="#ef4444"/></g>`;
@@ -78,6 +80,7 @@ const UQ = {
   d6: { hands: 'hips', mood: 'proud', x: 650, y: 1170, s: 0.84, flip: 1, comp: { fn: drawPia, x: 250, y: 960, s: 0.72, st: { mood: 'happy' } }, titleSide: 'R' },
   d7: { hands: 'fist', mood: 'serious', x: 400, y: 1190, s: 0.88, flip: 1, comp: { fn: drawNina, x: 880, y: 930, s: 0.74, st: { mood: 'worry' } }, sil: true, titleSide: 'L' },
   d8: { hands: 'chin', mood: 'worry', x: 410, y: 1180, s: 0.9, flip: 1, comp: null, sil: true, titleSide: 'L' },
+  d9: { hands: 'cheeks', mood: 'worry', x: 420, y: 1190, s: 0.9, flip: 1, comp: { fn: drawTadeo, x: 880, y: 930, s: 0.78, st: { mood: 'worry' } }, titleSide: 'L' },
   sp: { hands: 'up', mood: 'joy', x: 540, y: 1280, s: 0.74, flip: 1, comp: { fn: drawDante, x: 190, y: 980, s: 0.7, st: { mood: 'shock' } }, comp2: { fn: drawMemo, x: 890, y: 980, s: 0.7, st: { mood: 'grin' } }, titleSide: 'L' },
 };
 export function coverV(id, opt, guide = false) { const c = CFG[id]; const p = common(); STATE[c.st](p); const u = UQ[id]; const L = u ? { hands: u.hands, mood: u.mood } : LAY[opt]; hands(p, L.hands); mood(p, L.mood); if (id === 'sp') p.hair.wind = 0.6;
