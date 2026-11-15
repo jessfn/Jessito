@@ -165,3 +165,7 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
 ## Regla permanente: PORTADA con cada video (decision del creador)
 - Cada vez que se entregue un video (dia o especial) se entrega TAMBIEN su portada 1080x1920 (TikTok/Reels/Shorts), tematica del dia, sin spoilers y UNICA: expresion, manos, personajes y composicion distintos a las demas.
 - Todo dentro de la zona segura (caja 3:4 central, margen >= 60 px); sin texto en la parte inferior; logo oficial (logo_lazydawns.png) pequeno arriba al centro, titulo 3D, cuadro DIA N bien visible. Los personajes (Lazy y acompanantes) deben verse completos dentro del margen, con reaccion en la cara. Generador: build_cover2.mjs (CFG/UQ por episodio).
+
+## Reglas permanentes: espejo y tarjeta de votacion (decision del creador)
+- ESPEJO: cuando aparece el espejo (marco ovalado), Lazy debe verse COMPLETA y centrada dentro del ovalo (cabeza y cuerpo), sin cortarse; camara ajustada para eso. Nada de la UI (chip de DIA) tapando el marco.
+- TARJETA DE VOTACION: fondo limpio y opaco (degradado oscuro con brillitos), sin personajes ni pantallas detras; solo la pregunta, las 2 opciones y los botones de comentar/seguir.
