@@ -14,8 +14,9 @@ const LID = '#a1613a';
 
 // ---------- IK de 2 huesos (hombro -> codo -> mano) ----------
 const L1 = 165, L2 = 145;
+export function setSlim(v) { SLIM = v; }
 export function solveArm(side, target) {
-  const S = { x: side * 296, y: 58 };
+  const S = { x: side * 296 * Math.max(0.46, 1 - 0.115 * SLIM), y: 58 };
   let dx = target.x - S.x, dy = target.y - S.y;
   let d = Math.hypot(dx, dy); const dmax = L1 + L2 - 2, dmin = Math.abs(L1 - L2) + 2;
   const dc = clamp(d, dmin, dmax); if (d > 0) { dx *= dc / d; dy *= dc / d; } d = dc;
@@ -399,17 +400,18 @@ function legSvg(side, leg) {
 function armSvg(side, arm) {
   const k = arm.rot1 !== undefined ? { S: { x: side * 296 * Math.max(0.46, 1 - 0.115 * SLIM), y: 58 }, rot1: arm.rot1, rot2: arm.rot2 } : solveArm(side, arm.t);
   const wrist = arm.w || 0;
-  const sleeve = `<g transform="translate(0,-26)"><path d="${taper(112, 82, 84, 74)}" fill="${SHIRT}" ${O8}/><path d="${taper(112, 82, 84, 74)}" fill="url(#pantG)" opacity="0.55"/>
+  const aw = Math.max(0.5, 1 - 0.12 * SLIM), sw = Math.max(0.62, 1 - 0.07 * SLIM), hs = 0.95 * Math.max(0.74, 1 - 0.06 * SLIM);
+  const sleeve = `<g transform="translate(0,-26) scale(${sw},1)"><path d="${taper(112, 82, 84, 74)}" fill="${SHIRT}" ${O8}/><path d="${taper(112, 82, 84, 74)}" fill="url(#pantG)" opacity="0.55"/>
       ${GYM ? `<path d="M-76,96 Q0,116 76,96 L72,118 Q0,138 -72,118Z" fill="#8a919d" stroke="${OUT}" stroke-width="5"/>${[0,1,2,3,4,5].map((i) => `<path d="M${-58 + i * 23},100 v18" stroke="#fff" stroke-opacity="0.35" stroke-width="2.4"/>`).join('')}` : `<path d="M-72,74 Q0,92 72,74" stroke="#2ecc71" stroke-width="16" fill="none" opacity="0.9"/><path d="M-76,100 Q0,122 76,100 L72,122 Q0,144 -72,122Z" fill="#c95f12" stroke="${OUT}" stroke-width="5" transform="translate(0,-8)"/>`}</g>`;
   return `<g transform="translate(${k.S.x},${k.S.y}) rotate(${k.rot1})">
     <path d="${taper(L1 + 6, 58 * Math.max(0.5, 1 - 0.12 * SLIM), 62 * Math.max(0.5, 1 - 0.12 * SLIM), 46 * Math.max(0.55, 1 - 0.1 * SLIM))}" fill="${SKINB}" ${O8}/><path d="${taper(L1 + 6, 58 * Math.max(0.5, 1 - 0.12 * SLIM), 62 * Math.max(0.5, 1 - 0.12 * SLIM), 46 * Math.max(0.55, 1 - 0.1 * SLIM))}" fill="url(#limbG)"/>
     <g transform="translate(0,${L1}) rotate(${k.rot2})">
-      <path d="${taper(L2 + 8, 46, 50, 34)}" fill="${SKINB}" ${O8}/><path d="${taper(L2 + 8, 46, 50, 34)}" fill="url(#limbG)"/>
+      <path d="${taper(L2 + 8, 46 * aw, 50 * aw, 34 * aw)}" fill="${SKINB}" ${O8}/><path d="${taper(L2 + 8, 46 * aw, 50 * aw, 34 * aw)}" fill="url(#limbG)"/>
       <path d="M-26,8 q26,18 52,0" stroke="#000" stroke-opacity="0.25" stroke-width="4" fill="none"/><ellipse cx="${-side * 10}" cy="2" rx="14" ry="9" fill="#fff" opacity="0.12"/>
       <path d="M-26,70 q-6,26 0,52 M10,66 q8,28 2,56" stroke="#000" stroke-opacity="0.12" stroke-width="5" fill="none" stroke-linecap="round"/>
       <g transform="translate(0,${L2}) rotate(${wrist})">
-        <ellipse cx="0" cy="-4" rx="38" ry="10" fill="#ff7ab6" stroke="${OUT}" stroke-width="4"/>${[-24, -8, 8, 24].map((x) => `<circle cx="${x}" cy="-4" r="4.5" fill="#ffe14d" stroke="${OUT}" stroke-width="1.5"/>`).join('')}
-        <g transform="scale(0.95)">${hand(0, 34, side, O8, SKINB, true, arm.curl ?? 0.3, arm.spread ?? 0.15, arm.tt || 0)}</g>
+        <ellipse cx="0" cy="-4" rx="${38 * aw}" ry="10" fill="#ff7ab6" stroke="${OUT}" stroke-width="4"/>${[-24, -8, 8, 24].map((x) => `<circle cx="${x * aw}" cy="-4" r="4.5" fill="#ffe14d" stroke="${OUT}" stroke-width="1.5"/>`).join('')}
+        <g transform="scale(${hs})">${hand(0, 34, side, O8, SKINB, true, arm.curl ?? 0.3, arm.spread ?? 0.15, arm.tt || 0)}</g>
       </g>
     </g>
     ${sleeve}
