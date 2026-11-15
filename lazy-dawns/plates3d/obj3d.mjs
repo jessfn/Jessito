@@ -9,6 +9,6 @@ const br = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftsh
 const dims = name === 'title' ? { width: 1080, height: 460 } : { width: 800, height: 800 };
 const pg = await br.newPage({ viewport: dims });
 pg.on('pageerror', (e) => console.log('pageerror', e.message)); pg.on('console', (m) => { if (m.type() === 'error') console.log('console', m.text()); });
-await pg.goto(`http://localhost:${port}/objects.html?o=${name}`); await pg.waitForFunction('window.__done === true', null, { timeout: 120000 });
+await pg.goto(`http://localhost:${port}/objects.html?o=${name}&d=${process.argv[4] || 3}`); await pg.waitForFunction('window.__done === true', null, { timeout: 120000 });
 for (let i = 0; i < n; i++) { await pg.evaluate((u) => window.setFrame(u), n === 1 ? 0.5 : i / (n - 1)); await pg.locator('#c').screenshot({ path: path.join(here, 'obj', name, `f${String(i).padStart(3, '0')}.png`), omitBackground: true }); }
 await br.close(); srv.kill(); console.log('ok', name, n);

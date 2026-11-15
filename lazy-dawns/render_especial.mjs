@@ -24,9 +24,9 @@ const pop = (t, t0, d = 0.35) => { const x = (t - t0) / d; if (x <= 0) return 0;
 const win = (t, a, b, fi = 0.25, fo = 0.25) => clamp((t - a) / fi) * clamp((b - t) / fo);
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
 const OUT = '#12090a';
-const OBJN = { title: 72, box: 36, note: 24, spray: 30, creamgel: 30, strands: 36, diffuser: 30, glove: 24 };
+let OBJN = {};
 const imgCache = new Map();
-const obj3 = (name, u, cx, cy, w, h = w) => { const i = Math.min(OBJN[name] - 1, Math.max(0, Math.round(clamp(u) * (OBJN[name] - 1)))); const key = name + i; if (!imgCache.has(key)) imgCache.set(key, 'data:image/png;base64,' + readFileSync(path.join(here, 'plates3d/obj', name, 'f' + String(i).padStart(3, '0') + '.png')).toString('base64')); return `<image href="${imgCache.get(key)}" x="${cx - w / 2}" y="${cy - h / 2}" width="${w}" height="${h}"/>`; };
+const obj3 = (name, u, cx, cy, w, h = w) => { const i = Math.min(OBJN[name] - 1, Math.max(0, Math.round(clamp(u) * (OBJN[name] - 1)))); const key = name + i; if (!imgCache.has(key)) imgCache.set(key, 'data:image/png;base64,' + readFileSync(path.join(here, 'plates3d/obj', name, 'f' + String(i).padStart(3, '0') + '.png')).toString('base64')); if (name === 'title') return `<image href="${imgCache.get(key)}" x="${cx - w / 2}" y="${cy - h / 2}" width="${w}" height="${h}"/>`; return `<defs><radialGradient id="mk${name}" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#fff"/><stop offset="0.62" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient><mask id="mm${name}" maskUnits="userSpaceOnUse" x="${cx - w / 2}" y="${cy - h / 2}" width="${w}" height="${h}"><rect x="${cx - w / 2}" y="${cy - h / 2}" width="${w}" height="${h}" fill="url(#mk${name})"/></mask></defs><image href="${imgCache.get(key)}" x="${cx - w / 2}" y="${cy - h / 2}" width="${w}" height="${h}" mask="url(#mm${name})"/>`; };
 const nm = (x) => x.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-zñ0-9]/g, '');
 const rnd = (i) => { const s = Math.sin(i * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
 
@@ -44,6 +44,9 @@ const T = {
 };
 T.arrive = T.countA - 0.4; T.noteB = T.noteA + 2.6; T.sprayB = T.creamA - 0.2; T.creamB = L.l4.end + 0.4; T.coilB = L.l5.end + 0.4; T.diffB = T.diffA + 3.6; T.boxB = T.boxA + 2.6; T.gloveB = T.gloveA + 2.4;
 T.walks = [[T.walkA, T.arrive]];
+const OBJD = { title: 4.0, box: T.boxB - (T.boxA - 0.2), note: T.noteB - T.noteA, spray: T.sprayB - (T.sprayA - 0.2), creamgel: T.creamB - (T.creamA - 0.2), strands: T.coilB - (T.coilA - 0.2), diffuser: T.diffB - (T.diffA - 0.2), glove: T.gloveB - T.gloveA };
+OBJN = Object.fromEntries(Object.entries(OBJD).map(([k, v]) => [k, Math.ceil(v * 30)]));
+writeFileSync(path.join(B, 'objdur.json'), JSON.stringify(OBJD));
 T.scenes = [T.slateEnd, T.boxA, T.noteA, T.enter, T.wrap, T.sprayA, T.creamA, T.coilA, T.diffA, T.hallA, T.countA, T.reveal, T.calmA, T.mEnter, T.gloveA, T.vote];
 writeFileSync(path.join(B, 'timeline.json'), JSON.stringify({ T, DUR }));
 const pose = makeDirector({ L, T, DUR });
@@ -53,7 +56,8 @@ const b64 = (buf) => 'data:image/png;base64,' + Buffer.from(buf).toString('base6
 const grainPng = b64(new Resvg(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><filter id="g" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="7"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.9 -0.42"/></filter><rect width="${W}" height="${H}" filter="url(#g)" opacity="0.28"/></svg>`, ropt).render().asPng());
 const charDefs = defs('e3d');
 const PL = (n) => b64(readFileSync(path.join(here, 'plates3d', n + '.png')));
-const platePng = { backstage: PL('backstage'), ballroom: PL('ballroom') };
+const platePng = { backstage: PL('backstage_dof'), ballroom: PL('ballroom_dof') };
+const plateSharp = { backstage: PL('backstage'), ballroom: PL('ballroom') };
 const VIN = `<linearGradient id="vin" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#be185d"/><stop offset="0.35" stop-color="#ec4899"/><stop offset="0.7" stop-color="#db2777"/><stop offset="1" stop-color="#831843"/></linearGradient><linearGradient id="chrome" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9ca3af"/><stop offset="0.4" stop-color="#f3f4f6"/><stop offset="1" stop-color="#6b7280"/></linearGradient>`;
 function chairBack() { return `<defs>${VIN}</defs><ellipse cx="540" cy="1650" rx="330" ry="34" fill="#000" opacity="0.3"/><rect x="496" y="1490" width="88" height="170" fill="url(#chrome)" stroke="${OUT}" stroke-width="7"/><ellipse cx="540" cy="1660" rx="210" ry="30" fill="url(#chrome)" stroke="${OUT}" stroke-width="7"/>
   <rect x="300" y="820" width="480" height="470" rx="120" fill="url(#vin)" stroke="${OUT}" stroke-width="8"/><path d="M336,870 Q336,846 400,846" stroke="#fff" stroke-opacity="0.35" stroke-width="12" fill="none" stroke-linecap="round"/><rect x="236" y="1080" width="96" height="46" rx="22" fill="#831843" stroke="${OUT}" stroke-width="7"/><rect x="748" y="1080" width="96" height="46" rx="22" fill="#831843" stroke="${OUT}" stroke-width="7"/>`; }
@@ -170,7 +174,7 @@ function insCoil(t) { return wrapIns(t, T.coilA - 0.2, T.coilB, (u) => `${obj3('
 function insDiffuser(t) { return wrapIns(t, T.diffA - 0.2, T.diffB, (u) => `${obj3('diffuser', u, 540, 690, 1160)}${[...Array(12)].map((_, i) => { const ph = (u * 2.4 + i * 0.137) % 1; return `<circle cx="${230 + (i * 61) % 620}" cy="${1000 - ph * 300}" r="${5 + (i % 3) * 3}" fill="#ffd9a8" opacity="${(1 - ph) * 0.7}"/>`; }).join('')}${insLabel('DIFUSOR', '#ffcf8a', 1330)}`, '#170d10'); }
 function insGlove(t) { return wrapIns(t, T.gloveA, T.gloveB, (u) => `<circle cx="540" cy="820" r="470" fill="#2a0a14" opacity="0.5"/>${[...Array(14)].map((_, i) => `<circle cx="${540 + Math.cos(i * 0.9 + u * 2) * (230 + i * 10)}" cy="${820 + Math.sin(i * 1.3 + u * 2) * (200 + i * 8)}" r="${40 + (i % 4) * 16}" fill="#475569" opacity="0.16"/>`).join('')}${obj3('glove', u, 540, 690, 1100)}${insLabel('¿QUIÉN ES M?', '#fca5a5', 1330)}`, '#0e0710'); }
 // ---------------- titulo de apertura 3D (sin spoilers) ----------------
-function titleIntro(t) { const END = 4.0; if (t > END) return ''; const k = win(t, 0, END, 0.01, 0.7); const u = clamp(t / 2.4); const sub = pop(t, 1.9, 0.4), pill = pop(t, 2.4, 0.4), hold = clamp((t - 2.4) / 1.4);
+function titleIntro(t) { const END = 4.0; if (t > END) return ''; const k = win(t, 0, END, 0.01, 0.7); const u = clamp(t / 4.0); const sub = pop(t, 1.9, 0.4), pill = pop(t, 2.4, 0.4), hold = clamp((t - 2.4) / 1.4);
   return `<g opacity="${k}"><rect width="${W}" height="${H}" fill="#05030a" opacity="${0.78 * k}"/>
     <defs><radialGradient id="tg1" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#ffd870" stop-opacity="0.75"/><stop offset="1" stop-color="#ffd870" stop-opacity="0"/></radialGradient></defs>
     <circle cx="540" cy="700" r="${520 + 40 * Math.sin(t * 5)}" fill="url(#tg1)" opacity="${clamp(u * 1.5)}"/>
@@ -256,13 +260,16 @@ function frame(t) {
   const ds = danteState(t), ms = memoState(t);
   const char = (st, fn, look, seed, who) => { if (!st) return ''; const { ch } = st; const hs = (tt) => { const q = who === 'D' ? danteState(tt) : memoState(tt); return q ? q.hands : 'none'; }; const nsm = sm(hs, t);
     const base = { ...st, elbowDown: true, armL: nsm.L, armR: st.armR || nsm.R, blink: blinkOf(t, seed), look, t };
-    const sh = sceneAt(t) === 'ballroom' ? `<ellipse cx="${ch.x}" cy="${ch.y + 708 * ch.s}" rx="${120 * ch.s}" ry="${18 * ch.s}" fill="#000" opacity="0.4"/>` : '';
+    const sh = `<ellipse cx="${ch.x + 30 * ch.s}" cy="${ch.y + 712 * ch.s}" rx="${150 * ch.s}" ry="${22 * ch.s}" fill="#000" opacity="0.38" filter="url(#b10)"/><ellipse cx="${ch.x}" cy="${ch.y + 708 * ch.s}" rx="${110 * ch.s}" ry="${14 * ch.s}" fill="#000" opacity="0.35"/>`;
     return `${sh}<g transform="translate(${ch.x},${ch.y}) scale(${ch.s})">${fn({ ...base, part: 'body' })}</g><g transform="translate(${ch.x},${ch.y}) scale(${ch.s})">${fn({ ...base, part: 'tool' })}</g>`; };
   const dante = char(ds, drawDante, -0.7, 1.9, 'D'), memo = char(ms, drawMemo, 0.7, 0.6, 'M');
   const icons = (ds ? talkIcon(t, 'T', ds.ch.x - 110 * ds.ch.s, ds.ch.y - 150 * ds.ch.s) : '') + (ms ? talkIcon(t, 'E', ms.ch.x + 110 * ms.ch.s, ms.ch.y - 150 * ms.ch.s) : '');
   const chairG = (g) => `<g transform="translate(540,1690) scale(${K}) translate(-540,-1660)">${g}</g>`;
   const back = sc === 'backstage';
-  const world = `<g transform="translate(540,960) scale(${cam.z}) translate(${-cam.x},${-cam.y})"><image href="${platePng[sc]}" width="${W}" height="${H}" preserveAspectRatio="none"/>${mirrorGlow(t)}${stageLights(t)}${back ? chairG(chairBack()) : crowd(t) + mystery(t) + godRays(t)}${dante}${memo}${lazy}${back ? chairG(chairFront()) : ''}${icons}${spotDark(t)}${flashFx(t)}${glitterBurst(t)}${flyTurban(t)}</g>`;
+  const par = (f) => `translate(540,960) scale(${1 + (cam.z - 1) * f}) translate(${-(540 + (cam.x - 540) * f)},${-(960 + (cam.y - 960) * f)})`;
+  const bgLayer = `<g transform="${par(0.85)}"><image href="${platePng[sc]}" width="${W}" height="${H}" preserveAspectRatio="none"/>${mirrorGlow(t)}${stageLights(t)}</g>`;
+  const midLayer = '';
+  const world = `${bgLayer}${midLayer}<g transform="translate(540,960) scale(${cam.z}) translate(${-cam.x},${-cam.y})">${back ? chairG(chairBack()) : crowd(t) + mystery(t) + godRays(t)}${dante}${memo}${lazy}${back ? chairG(chairFront()) : ''}${icons}${spotDark(t)}${flashFx(t)}${glitterBurst(t)}${flyTurban(t)}</g>`;
   const vignette = `<defs><radialGradient id="vgn" cx="0.5" cy="0.5" r="0.75"><stop offset="0.55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#05030a" stop-opacity="0.5"/></radialGradient><filter id="b10"><feGaussianBlur stdDeviation="10"/></filter></defs><rect width="${W}" height="${H}" fill="url(#vgn)"/>`;
   const chipOp = 1 - Math.max(win(t, T.countA - 0.6, T.calmA + 3.2, 0.3, 0.3), win(t, T.mEnter - 0.2, T.mGone + 0.5, 0.3, 0.3));
   const chipTop = t < 4.0 ? '' : `<g opacity="${chipOp}" transform="translate(540,300)"><defs><linearGradient id="chg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fffbe0"/><stop offset="0.5" stop-color="#ffd84a"/><stop offset="1" stop-color="#b8780f"/></linearGradient></defs><rect x="-226" y="-40" width="440" height="88" rx="44" fill="#000" opacity="0.3"/><rect x="-230" y="-46" width="440" height="88" rx="44" fill="#1a1024" stroke="#d4a24c" stroke-width="6"/><text x="0" y="18" font-family="Bungee" font-size="50" text-anchor="middle" letter-spacing="3" fill="url(#chg)" stroke="${OUT}" stroke-width="4" paint-order="stroke">ESPECIAL</text><path d="M-196,-2 l8,-14 l8,14 l-8,14Z M164,-2 l8,-14 l8,14 l-8,14Z" fill="#ffd84a"/></g>`;
