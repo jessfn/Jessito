@@ -149,7 +149,7 @@ function mouthSvg(m, yaw) {
   const cr = { x: w, y: -smile * 24 + asym * 8 + press * 3 + open * 8 };
   const mid = (cl.y + cr.y) / 2;
   const up = mid + 6 - open * 12;
-  const lo = mid + 8 + open * 105 * (1 - 0.3 * Math.max(0, wide)) + (smile > 0.5 ? 14 : 0);
+  const lo = Math.min(58, mid + 8 + open * 90 * (1 - 0.3 * Math.max(0, wide)) + (smile > 0.5 ? 14 : 0));
   const shape = `M${cl.x},${cl.y} Q0,${up} ${cr.x},${cr.y} Q0,${lo} ${cl.x},${cl.y}Z`;
   const showTeeth = open > 0.08 || smile > 0.3;
   const tq = m.teeth || { clean: 0, braces: 0, crooked: 1 };
