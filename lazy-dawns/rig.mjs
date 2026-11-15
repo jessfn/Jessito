@@ -397,12 +397,12 @@ function legSvg(side, leg) {
 }
 
 function armSvg(side, arm) {
-  const k = arm.rot1 !== undefined ? { S: { x: side * 296 * (1 - 0.115 * SLIM), y: 58 }, rot1: arm.rot1, rot2: arm.rot2 } : solveArm(side, arm.t);
+  const k = arm.rot1 !== undefined ? { S: { x: side * 296 * Math.max(0.46, 1 - 0.115 * SLIM), y: 58 }, rot1: arm.rot1, rot2: arm.rot2 } : solveArm(side, arm.t);
   const wrist = arm.w || 0;
   const sleeve = `<g transform="translate(0,-26)"><path d="${taper(112, 82, 84, 74)}" fill="${SHIRT}" ${O8}/><path d="${taper(112, 82, 84, 74)}" fill="url(#pantG)" opacity="0.55"/>
       ${GYM ? `<path d="M-76,96 Q0,116 76,96 L72,118 Q0,138 -72,118Z" fill="#8a919d" stroke="${OUT}" stroke-width="5"/>${[0,1,2,3,4,5].map((i) => `<path d="M${-58 + i * 23},100 v18" stroke="#fff" stroke-opacity="0.35" stroke-width="2.4"/>`).join('')}` : `<path d="M-72,74 Q0,92 72,74" stroke="#2ecc71" stroke-width="16" fill="none" opacity="0.9"/><path d="M-76,100 Q0,122 76,100 L72,122 Q0,144 -72,122Z" fill="#c95f12" stroke="${OUT}" stroke-width="5" transform="translate(0,-8)"/>`}</g>`;
   return `<g transform="translate(${k.S.x},${k.S.y}) rotate(${k.rot1})">
-    <path d="${taper(L1 + 6, 58 * (1 - 0.12 * SLIM), 62 * (1 - 0.12 * SLIM), 46 * (1 - 0.1 * SLIM))}" fill="${SKINB}" ${O8}/><path d="${taper(L1 + 6, 58 * (1 - 0.12 * SLIM), 62 * (1 - 0.12 * SLIM), 46 * (1 - 0.1 * SLIM))}" fill="url(#limbG)"/>
+    <path d="${taper(L1 + 6, 58 * Math.max(0.5, 1 - 0.12 * SLIM), 62 * Math.max(0.5, 1 - 0.12 * SLIM), 46 * Math.max(0.55, 1 - 0.1 * SLIM))}" fill="${SKINB}" ${O8}/><path d="${taper(L1 + 6, 58 * Math.max(0.5, 1 - 0.12 * SLIM), 62 * Math.max(0.5, 1 - 0.12 * SLIM), 46 * Math.max(0.55, 1 - 0.1 * SLIM))}" fill="url(#limbG)"/>
     <g transform="translate(0,${L1}) rotate(${k.rot2})">
       <path d="${taper(L2 + 8, 46, 50, 34)}" fill="${SKINB}" ${O8}/><path d="${taper(L2 + 8, 46, 50, 34)}" fill="url(#limbG)"/>
       <path d="M-26,8 q26,18 52,0" stroke="#000" stroke-opacity="0.25" stroke-width="4" fill="none"/><ellipse cx="${-side * 10}" cy="2" rx="14" ry="9" fill="#fff" opacity="0.12"/>
@@ -466,7 +466,7 @@ export function drawLazy(p) {
   const of = p.outfit && p.outfit.kind && p.outfit.kind !== 'gym' ? p.outfit : null; const gownOn = of && (of.prog ?? 1) > 0.02; SHIRT = of && (of.prog ?? 1) >= 1 ? (of.kind === 'neon' ? 'url(#neonG)' : 'url(#gownG)') : 'url(#shirt)';
   SLIM = p.slim || 0; LOOSE = (p.outfit && p.outfit.loose) || 0; FACEW = p.faceWrinkle || 0; GYM = (p.outfit && p.outfit.kind === 'gym') ? p.outfit : null; PANTS = GYM ? 'url(#gyPant)' : 'url(#pants)'; if (GYM) SHIRT = GYM.top === 'white' ? 'url(#gyTopW)' : GYM.top === 'black' ? 'url(#gyTopK)' : 'url(#gyTop)';
   const lg = p.legs || { l: {}, r: {} };
-  const slimK = 1 - 0.115 * (p.slim || 0);
+  const slimK = Math.max(0.46, 1 - 0.115 * (p.slim || 0));
   const chest = `<g transform="translate(0,230) scale(${(1 + 0.012 * br) * slimK},${1 + 0.016 * br}) translate(0,-230)">
     <!-- cadera + panza -->
     <path d="M-262,470 C-300,510 -296,556 -236,582 L236,582 C296,556 300,510 262,470 Z" fill="${PANTS}" ${O8}/><path d="M-262,470 C-300,510 -296,556 -236,582 L236,582 C296,556 300,510 262,470 Z" fill="url(#pantG)" opacity="0.6"/>
