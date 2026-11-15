@@ -154,3 +154,10 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
 ## Ajuste dia 7 (creador)
 - La historia NO menciona el lunar (se quito la frase de Nina y la de la narradora). El lunar solo aparece como opcion final de votacion: "QUITAR EL LUNAR" (se ve feo).
 - Los RIZOS ya NO son opcion. Opciones del dia 8: A = QUITAR EL LUNAR, B = UNAS Y MANOS.
+
+## Reglas nuevas (especial de rizos)
+- TODOS los objetos que el narrador menciona en un insert (caja, frascos, atomizador, difusor, guante, nota, etc.) se muestran en 3D real: se modelan en Three.js (`plates3d/objects.html`, render con `plates3d/obj3d.mjs`) con materiales PBR (oro cepillado, raso, vidrio, cuero, pergamino), luces y entorno propio, y se insertan como secuencias PNG con fondo transparente (`plates3d/obj/<nombre>/fNNN.png`).
+- Titulos grandes (por ejemplo "ESPECIAL") en 3D real con `TextGeometry` + fuente Bungee (OFL), con barrido de luz y entrada escalonada. Nada de spoilers en los titulos: frases de suspenso ("UNA GRAN REVELACION").
+- Rotulos de inserts siempre por encima de las etiquetas de personaje/subtitulos (sin traslapes).
+- Texturas: los sitios de texturas (PolyHaven/ambientCG) estan bloqueados desde este entorno; se usan texturas procedurales generadas en canvas (y archivos de GitHub cuando sirven).
+- Los videos "especial" no cuentan como dia; terminan pidiendo comentarios sobre cambiar/mejorar SOLO lo ya arreglado (piel, dientes, pelo, cejas, ropa, maquillaje). Lunar y nariz son para los videos normales.

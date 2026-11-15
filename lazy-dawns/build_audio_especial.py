@@ -49,7 +49,7 @@ with wave.open('build/especial/musica.wav', 'wb') as f:
     f.setnchannels(2); f.setsampwidth(2); f.setframerate(SR); f.writeframes((mus * 32767).astype('<i2').tobytes())
 S = 'build/especial/sfx/'; ev = []
 def add(f, t, v=0.6, dur=None): ev.append((f, t, v, dur))
-add('clap', 0.7, 0.9); add('whoosh', T['slateEnd'] - 0.1, 0.5)
+add('epic_boom', 0.35, 0.8, 3.5); add('sparkle', 1.0, 0.6); add('shine', 1.9, 0.6); add('whoosh', 2.3, 0.5)
 t0 = T['slateEnd']
 while t0 < T['hallA']: add('backstage_amb', t0, 0.35, 10.0); t0 += 10.0
 add('knock3', T['boxA'] - 1.0, 0.8); add('rustle', T['boxA'] - 0.5, 0.4); add('box_open', T['boxA'], 0.9, 2.6); add('sparkle', T['boxA'] + 1.2, 0.55); add('whoosh', T['noteA'] - 0.2, 0.5); add('paper_slide', T['noteA'], 0.8)
