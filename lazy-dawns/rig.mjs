@@ -1,6 +1,7 @@
 // Rig de Lazy Dawns: personaje articulado (cuello, hombros, codos, muñecas con IK), cara con parpadeo,
 // miradas, cejas, boca por visemas, mejillas/pliegues (pomulos, mandibula) y respiracion.
 import { hand, foot } from './lazy_lib.mjs';
+import { hdDefs, hdBack, hdTop, hdFront } from './hair_hd.mjs';
 import { hairDefs, hairCurly, hairBehind, hairTop, hairCurtains, hairRinglets, HAIR_DEFAULT } from './hair.mjs';
 
 const OUT = '#12090a';
@@ -237,14 +238,14 @@ function headSvg(p) {
   const furrow = Math.max(0, -(brL.i + brR.i) / 2);
   const wrinkle = Math.max(0, (brL.r + brR.r) / 2 - 0.35);
   const ear = (s) => `<ellipse cx="${s * (205 + (s > 0 ? -yaw * 24 : -yaw * 12))}" cy="8" rx="${32 * (s > 0 ? 1 - 0.3 * Math.max(0, yaw) : 1 + 0.1 * Math.max(0, yaw))}" ry="50" fill="${SKINB}" ${O8}/>`;
-  return `<g>${hairBehind(hr)}
+  return `<g>${hr.hd ? hdBack(hr) : hairBehind(hr)}
     <ellipse cx="${yaw * 6}" cy="${60 + jaw * 0.6}" rx="188" ry="${170 + jaw * 0.6}" fill="${SKINB}" ${O8}/>
     <ellipse cx="${yaw * 4}" cy="${150 + jaw * 0.9}" rx="130" ry="22" fill="#000" opacity="0.16" filter="url(#blur8)"/>
     <ellipse cx="${yaw * 4}" cy="0" rx="208" ry="210" fill="${SKIN}" ${O8}/>
     <ellipse cx="${-70 + yaw * 10}" cy="-70" rx="110" ry="80" fill="#fff" opacity="0.13" filter="url(#blur20)"/>
     <ellipse cx="${90 + yaw * 10}" cy="${130 + jaw * 0.6}" rx="150" ry="70" fill="#000" opacity="0.18" filter="url(#blur20)"/>
     ${ear(-1)}${ear(1)}
-    <g transform="translate(${yaw * 10},0)">${hairCurly(hr)}${hairTop(hr)}</g>
+    ${hr.hd ? `<g transform="translate(${yaw * 10},0)">${hdTop(hr, yaw)}</g>` : `<g transform="translate(${yaw * 10},0)">${hairCurly(hr)}${hairTop(hr)}</g>`}
     <g transform="translate(${fx},${(p.pitch || 0) * 12})">
       <!-- pomulos / mejillas -->
       <ellipse cx="-124" cy="${58 - up * 14}" rx="${52 + up * 10}" ry="${34 + up * 6}" fill="#e0624a" opacity="${0.4 + up * 0.15}"/><ellipse cx="124" cy="${58 - up * 14}" rx="${52 + up * 10}" ry="${34 + up * 6}" fill="#e0624a" opacity="${0.4 + up * 0.15}"/>
@@ -392,7 +393,7 @@ export function drawLazy(p) {
   </g>`;
   const rollY = -100;
   return `<g transform="rotate(${p.sway || 0} 0 770)">
-    ${SHADE_DEFS}${OUTFIT_DEFS}<defs>${hairDefs({ ...HAIR_DEFAULT, ...(p.hair || {}) })}</defs>
+    ${SHADE_DEFS}${OUTFIT_DEFS}<defs>${hairDefs({ ...HAIR_DEFAULT, ...(p.hair || {}) })}${hdDefs(p.hair || {})}</defs>
     <clipPath id="eyeClip"><ellipse rx="36" ry="40"/></clipPath>
     <ellipse cx="0" cy="780" rx="420" ry="46" fill="#000" opacity="0.4" filter="url(#blur20)"/>
     <g transform="translate(0,${p.hop || 0})">${of && (of.prog ?? 1) >= 0.9 ? '' : legSvg(-1, lg.l) + legSvg(1, lg.r)}<g transform="translate(${p.lean || 0},0)">${chest}
@@ -400,7 +401,7 @@ export function drawLazy(p) {
       <path d="M-62,-150 C-70,-110 -86,-96 -110,-84 L110,-84 C86,-96 70,-110 62,-150Z" fill="${SKINB}" ${O8}/>
       <path d="M-40,-90 C-30,-70 30,-70 40,-90" stroke="#000" stroke-opacity="0.2" stroke-width="6" fill="none"/>
       <ellipse cx="0" cy="-60" rx="104" ry="24" fill="#000" opacity="0.18" filter="url(#blur8)"/>
-      <g transform="translate(0,${rollY}) rotate(${p.roll || 0}) translate(0,${-rollY}) translate(0,${-215 + (p.pitch || 0) * 10 + (p.bob || 0)})">${headSvg(p)}${hairCurtains({ ...HAIR_DEFAULT, ...(p.hair || {}) }, p.yaw || 0)}${hairRinglets({ ...HAIR_DEFAULT, ...(p.hair || {}) }, p.yaw || 0, p.tearT || 0)}${jewelHead(p.outfit)}</g>
+      <g transform="translate(0,${rollY}) rotate(${p.roll || 0}) translate(0,${-rollY}) translate(0,${-215 + (p.pitch || 0) * 10 + (p.bob || 0)})">${headSvg(p)}${(p.hair || {}).hd ? hdFront(p.hair, p.yaw || 0, p.tearT || 0) : hairCurtains({ ...HAIR_DEFAULT, ...(p.hair || {}) }, p.yaw || 0) + hairRinglets({ ...HAIR_DEFAULT, ...(p.hair || {}) }, p.yaw || 0, p.tearT || 0)}${jewelHead(p.outfit)}</g>
     </g>
     <g transform="translate(0,${-sh})">${armSvg(-1, p.armL)}${armSvg(1, p.armR)}</g>
   </g></g></g>`;
