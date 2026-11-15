@@ -367,3 +367,50 @@ export function drawCat(p) {
     <path d="M-46,10 L-110,-2 M-46,20 L-112,26 M46,10 L110,-2 M46,20 L112,26" stroke="${OUT}" stroke-width="3" stroke-linecap="round"/><ellipse cx="0" cy="38" rx="30" ry="18" fill="${WH}" opacity="0.8"/>
   </g>`;
 }
+
+// ---------- Coach Tadeo (entrenador): hombros anchos, calvo, barba pelirroja, cejas gruesas, pecas, cinta blanca, silbato ----------
+export function drawTadeo(p) {
+  const m = MOODS[p.mood || 'calm'], t = p.t || 0, bob = Math.sin(t * 1.7 + 2) * 2, blink = p.blink || 0;
+  const SK = '#f1c4a0', SKD = '#d9a47e', RED = '#b4530f';
+  const tool = p.tool && p.tool !== 'none' ? `<g transform="translate(${toolAnchor(p).x},${toolAnchor(p).y}) rotate(${p.toolR ?? 70}) ${p.toolS ? `scale(${p.toolS})` : ''}">${salonTool(p.tool, { k: t })}${p.noHand ? '' : `<g transform="translate(0,${p.gripY ?? 4})">${gripHand(SK)}</g>`}</g>` : '';
+  if (p.part === 'tool') return `<g transform="translate(0,${bob})">${armsLayer(p, { sleeve: SK, skin: SK }, 'tool')}${tool}</g>`;
+  return `<g transform="translate(0,${bob})">
+    <rect x="-96" y="470" width="82" height="200" rx="28" fill="#1f2937" ${O}/><rect x="14" y="470" width="82" height="200" rx="28" fill="#1f2937" ${O}/><path d="M-88,500 v150 M88,500 v150" stroke="#ef4444" stroke-width="9" stroke-linecap="round"/>
+    <ellipse cx="-56" cy="684" rx="64" ry="26" fill="#f8fafc" ${O}/><ellipse cx="56" cy="684" rx="64" ry="26" fill="#f8fafc" ${O}/><path d="M-100,686 h92 M8,686 h96" stroke="#ef4444" stroke-width="8"/>
+    <path d="M-180,200 Q-176,150 -110,146 L110,146 Q176,150 180,200 L164,560 L-164,560Z" fill="#dc2626" ${O}/><path d="M-96,146 Q0,230 96,146 L88,560 L-88,560Z" fill="#b91c1c" ${O}/><path d="M-30,236 L30,236" stroke="#fff" stroke-width="10" stroke-linecap="round" opacity="0.85"/><text x="0" y="400" font-family="Anton" font-size="96" text-anchor="middle" fill="#fff" opacity="0.95">GYM</text>
+    <path d="M-62,150 Q0,230 62,150" fill="${SKD}" ${O}/><rect x="-34" y="96" width="68" height="62" fill="${SKD}" ${O}/>
+    <path d="M0,196 Q-60,300 -50,360" stroke="#fde047" stroke-width="5" fill="none"/><circle cx="-50" cy="366" r="14" fill="#fde047" ${O}/>
+    <path d="M-110,-20 Q-116,-118 0,-124 Q116,-118 110,-20 Q104,70 70,112 Q0,142 -70,112 Q-104,70 -110,-20Z" fill="${SK}" ${O}/><ellipse cx="-114" cy="8" rx="15" ry="24" fill="${SK}" ${O}/><ellipse cx="114" cy="8" rx="15" ry="24" fill="${SK}" ${O}/>
+    <path d="M-104,-70 Q0,-96 104,-70 L106,-46 Q0,-72 -106,-46Z" fill="#f8fafc" ${O}/><path d="M-100,-64 Q0,-88 100,-64" stroke="#e5e7eb" stroke-width="4" fill="none"/>
+    <path d="M-104,-40 Q-110,10 -100,52 Q-64,112 0,122 Q64,112 100,52 Q110,10 104,-40 Q80,40 0,54 Q-80,40 -104,-40Z" fill="${RED}" ${O}/>
+    ${[...Array(16)].map((_, i) => `<circle cx="${-84 + (i * 37) % 170}" cy="${-14 + (i * 23) % 30}" r="2.6" fill="#c2410c" opacity="0.8"/>`).join('')}
+    ${eyes(40, -10, blink, p.look || 0, m.big, m.b)}<path d="M-82,-38 l16,-8 M82,-38 l-16,-8" stroke="${RED}" stroke-width="12" stroke-linecap="round"/><path d="M-82,-38 l16,-8 M82,-38 l-16,-8" stroke="${OUT}" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
+    <ellipse cx="-62" cy="30" rx="22" ry="11" fill="#f87171" opacity="0.45"/><ellipse cx="62" cy="30" rx="22" ry="11" fill="#f87171" opacity="0.45"/>
+    ${mouth(m.m, 66, t)}
+    <path d="M-30,56 Q0,46 30,56 Q0,70 -30,56Z" fill="${RED}" ${O}/>
+    ${armsLayer(p, { sleeve: SK, skin: SK }, 'body')}
+  </g>`;
+}
+// ---------- Mei (recepcion del gym): coleta alta con mechon morado, flequillo recto, visera, pecas y ojos rasgados, top turquesa ----------
+export function drawMei(p) {
+  const m = MOODS[p.mood || 'calm'], t = p.t || 0, bob = Math.sin(t * 2.1 + 1) * 2.8, blink = p.blink || 0;
+  const SK = '#ecc8a4', SKD = '#d3ab87', HR = '#15101c';
+  const tool = p.tool && p.tool !== 'none' ? `<g transform="translate(${toolAnchor(p).x},${toolAnchor(p).y}) rotate(${p.toolR ?? 70}) ${p.toolS ? `scale(${p.toolS})` : ''}">${salonTool(p.tool, { k: t })}${p.noHand ? '' : `<g transform="translate(0,${p.gripY ?? 4})">${gripHand(SK)}</g>`}</g>` : '';
+  if (p.part === 'tool') return `<g transform="translate(0,${bob})">${armsLayer(p, { sleeve: '#0d9488', skin: SK }, 'tool')}${tool}</g>`;
+  return `<g transform="translate(0,${bob})">
+    <rect x="-70" y="470" width="58" height="200" rx="24" fill="#1e293b" ${O}/><rect x="12" y="470" width="58" height="200" rx="24" fill="#1e293b" ${O}/><path d="M-60,480 v170 M60,480 v170" stroke="#a78bfa" stroke-width="6" stroke-linecap="round"/>
+    <ellipse cx="-42" cy="684" rx="52" ry="22" fill="#a78bfa" ${O}/><ellipse cx="42" cy="684" rx="52" ry="22" fill="#a78bfa" ${O}/>
+    <path d="M-120,560 Q-120,170 -66,150 L66,150 Q120,170 120,560Z" fill="#0d9488" ${O}/><path d="M-60,330 L60,330 L74,560 L-74,560Z" fill="#115e59" ${O}/><path d="M-50,150 L-40,250 M50,150 L40,250" stroke="#14b8a6" stroke-width="12"/>
+    <rect x="-96" y="392" width="192" height="62" rx="12" fill="#f8fafc" ${O}/><text x="0" y="438" font-family="Anton" font-size="38" text-anchor="middle" fill="#0f766e" letter-spacing="3">RECEPCIÓN</text><circle cx="-80" cy="276" r="12" fill="#f8fafc" ${O}/>
+    <path d="M-40,150 Q0,200 40,150" fill="${SKD}" ${O}/><rect x="-20" y="96" width="40" height="60" fill="${SKD}" ${O}/>
+    <path d="M60,-138 Q150,-210 200,-90 Q220,0 180,70 Q170,20 150,-10 Q130,-80 60,-100Z" fill="${HR}" ${O}/><path d="M120,-130 Q184,-150 196,-60" stroke="#a78bfa" stroke-width="14" fill="none" stroke-linecap="round"/><ellipse cx="62" cy="-118" rx="22" ry="12" fill="#fb7185" ${O}/>
+    <ellipse cx="0" cy="0" rx="96" ry="112" fill="${SK}" ${O}/><ellipse cx="-100" cy="10" rx="13" ry="22" fill="${SK}" ${O}/><ellipse cx="100" cy="10" rx="13" ry="22" fill="${SK}" ${O}/><circle cx="-100" cy="38" r="7" fill="#fbbf24" ${O}/><circle cx="100" cy="38" r="7" fill="#fbbf24" ${O}/>
+    <path d="M-100,-10 Q-104,-108 0,-116 Q104,-108 100,-10 L100,-30 Q60,-60 0,-60 Q-60,-60 -100,-30Z" fill="${HR}" ${O}/><path d="M-98,-52 L98,-52 L100,-24 Q0,-42 -100,-24Z" fill="${HR}" ${O}/>
+    <path d="M-110,-84 Q0,-148 110,-84 L112,-66 Q0,-110 -112,-66Z" fill="#a78bfa" ${O}/><path d="M-60,-100 Q0,-130 100,-92 L150,-84 Q100,-66 40,-72Z" fill="#7c3aed" ${O}/>
+    ${eyes(38, -4, Math.max(blink, 0.18), p.look || 0, m.big * 0.5, m.b)}<path d="M-72,-22 q18,-12 40,-4 M72,-22 q-18,-12 -40,-4" stroke="${OUT}" stroke-width="5" fill="none" stroke-linecap="round"/>
+    ${[...Array(12)].map((_, i) => `<circle cx="${-52 + (i * 31) % 104}" cy="${24 + (i * 13) % 22}" r="2.4" fill="#b9805a" opacity="0.75"/>`).join('')}
+    <ellipse cx="-56" cy="34" rx="20" ry="10" fill="#fb7185" opacity="0.5"/><ellipse cx="56" cy="34" rx="20" ry="10" fill="#fb7185" opacity="0.5"/>
+    ${(() => { const mm = mouth(m.m, 54, t); return mm.replace(/fill="#7a1f2a"/g, 'fill="#9f1239"'); })()}
+    ${armsLayer(p, { sleeve: '#0d9488', skin: SK }, 'body')}
+  </g>`;
+}

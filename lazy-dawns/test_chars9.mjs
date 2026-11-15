@@ -1,0 +1,4 @@
+import { Resvg } from '@resvg/resvg-js'; import { writeFileSync } from 'node:fs'; import { defs } from './lazy_lib.mjs'; import { drawTadeo, drawMei, drawNina, drawDante } from './chars.mjs';
+const fn = [drawTadeo, drawMei, drawNina, drawDante]; const mo = ['grin', 'happy', 'happy', 'happy'];
+const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900">${defs('e3d')}<rect width="100%" height="100%" fill="#2a2036"/>${fn.map((f, i) => `<g transform="translate(${200 + i * 400},120) scale(0.6)">${f({ mood: mo[i], t: 1, part: 'body', look: 0, hands: 'none' })}${f({ mood: mo[i], t: 1, part: 'tool' })}</g>`).join('')}</svg>`;
+writeFileSync('build/chars9.png', new Resvg(svg, { font: { fontFiles: ['/home/user/Jessito/assets/fonts/Anton-Regular.ttf'], loadSystemFonts: true } }).render().asPng());

@@ -9,7 +9,7 @@ const O8 = `stroke="${OUT}" stroke-width="8" stroke-linejoin="round"`;
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 const lerp = (a, b, k) => a + (b - a) * k;
 let SHIRT = 'url(#shirt)';
-const SKIN = 'url(#skin)', SKINB = 'url(#skinB)', HAIR = 'url(#hair)'; let PANTS = 'url(#pants)'; let GYM = null; let SLIM = 0; let LOOSE = 0; let FACEW = 0;
+const SKIN = 'url(#skin)', SKINB = 'url(#skinB)', HAIR = 'url(#hair)'; let PANTS = 'url(#pants)'; let GYM = null; let SLIM = 0; let LOOSE = 0; let FACEW = 0; let BODYW = 0;
 const LID = '#a1613a';
 
 // ---------- IK de 2 huesos (hombro -> codo -> mano) ----------
@@ -209,7 +209,7 @@ function faceWrinkles(L, yaw) { if (L <= 0.02) return '';
   const sides = [-1, 1].map((s) => `
     <ellipse cx="${s * 112}" cy="104" rx="40" ry="26" fill="#1a0a04" opacity="${0.2 * k}" filter="url(#blur8)"/><ellipse cx="${s * 132}" cy="40" rx="30" ry="12" fill="#ffd9b8" opacity="${0.22 * k}" filter="url(#blur8)" transform="rotate(${s * -24} ${s * 132} 40)"/>
     ${ln(`M${s * 36},66 Q${s * 62},86 ${s * 88},124`, 6, 0.5)}${hl(`M${s * 42},64 Q${s * 68},84 ${s * 94},120`, 3, 0.5)}${ln(`M${s * 40},72 Q${s * 58},90 ${s * 78},118`, 3, 0.35)}
-    ${ln(`M${s * 84},132 Q${s * 78},150 ${s * 66},168`, 5, 0.38)}${ln(`M${s * 98},124 Q${s * 96},146 ${s * 84},160`, 3, 0.25)}
+    ${ln(`M${s * 84},132 Q${s * 78},150 ${s * 66},168`, 4, 0.2)}
     ${ln(`M${s * 52},38 Q${s * 78},56 ${s * 108},36`, 4, 0.4)}${ln(`M${s * 56},48 Q${s * 80},64 ${s * 104},46`, 3, 0.28)}
     ${ln(`M${s * 124},-14 l${s * 24},-8 M${s * 126},-2 l${s * 28},2 M${s * 124},10 l${s * 24},12`, 3.4, 0.4)}`).join('');
   const fore = [0, 1, 2].map((i) => ln(`M-90,${-122 + i * 16} Q0,${-136 + i * 16} 90,${-122 + i * 16}`, 3.4 - i * 0.4, 0.3 - i * 0.04)).join('');
@@ -400,14 +400,14 @@ function legSvg(side, leg) {
 function armSvg(side, arm) {
   const k = arm.rot1 !== undefined ? { S: { x: side * 296 * Math.max(0.46, 1 - 0.115 * SLIM), y: 58 }, rot1: arm.rot1, rot2: arm.rot2 } : solveArm(side, arm.t);
   const wrist = arm.w || 0;
-  const aw = Math.max(0.5, 1 - 0.12 * SLIM), sw = Math.max(0.62, 1 - 0.07 * SLIM), hs = 0.95 * Math.max(0.74, 1 - 0.06 * SLIM);
+  const aw0 = Math.max(0.5, 1 - 0.12 * SLIM), aw = Math.max(0.5, 1 - 0.12 * SLIM), sw = Math.max(0.62, 1 - 0.07 * SLIM), hs = 0.95 * Math.max(0.74, 1 - 0.06 * SLIM);
   const sleeve = `<g transform="translate(0,-26) scale(${sw},1)"><path d="${taper(112, 82, 84, 74)}" fill="${SHIRT}" ${O8}/><path d="${taper(112, 82, 84, 74)}" fill="url(#pantG)" opacity="0.55"/>
       ${GYM ? `<path d="M-76,96 Q0,116 76,96 L72,118 Q0,138 -72,118Z" fill="#8a919d" stroke="${OUT}" stroke-width="5"/>${[0,1,2,3,4,5].map((i) => `<path d="M${-58 + i * 23},100 v18" stroke="#fff" stroke-opacity="0.35" stroke-width="2.4"/>`).join('')}` : `<path d="M-72,74 Q0,92 72,74" stroke="#2ecc71" stroke-width="16" fill="none" opacity="0.9"/><path d="M-76,100 Q0,122 76,100 L72,122 Q0,144 -72,122Z" fill="#c95f12" stroke="${OUT}" stroke-width="5" transform="translate(0,-8)"/>`}</g>`;
   return `<g transform="translate(${k.S.x},${k.S.y}) rotate(${k.rot1})">
-    <path d="${taper(L1 + 6, 58 * Math.max(0.5, 1 - 0.12 * SLIM), 62 * Math.max(0.5, 1 - 0.12 * SLIM), 46 * Math.max(0.55, 1 - 0.1 * SLIM))}" fill="${SKINB}" ${O8}/><path d="${taper(L1 + 6, 58 * Math.max(0.5, 1 - 0.12 * SLIM), 62 * Math.max(0.5, 1 - 0.12 * SLIM), 46 * Math.max(0.55, 1 - 0.1 * SLIM))}" fill="url(#limbG)"/>
+    <path d="${taper(L1 + 6, 58 * Math.max(0.5, 1 - 0.12 * SLIM), 62 * Math.max(0.5, 1 - 0.12 * SLIM), 46 * Math.max(0.55, 1 - 0.1 * SLIM))}" fill="${SKINB}" ${O8}/><path d="${taper(L1 + 6, 58 * Math.max(0.5, 1 - 0.12 * SLIM), 62 * Math.max(0.5, 1 - 0.12 * SLIM), 46 * Math.max(0.55, 1 - 0.1 * SLIM))}" fill="url(#limbG)"/>${BODYW > 0.02 ? `<g opacity="${(0.55 * BODYW).toFixed(2)}" stroke="#2a1208" stroke-linecap="round" fill="none">${[0,1,2,3,4,5].map((i) => `<path d="M${-18 * aw0},${40 + i * 18} q${18 * aw0},${6 + (i % 2) * 5} ${36 * aw0},${(i % 3) - 1}" stroke-width="${2.6 + (i % 2)}"/>`).join('')}<path d="M${-22 * aw0},${L1 - 30} q${20 * aw0},22 ${44 * aw0},0" stroke-width="4"/></g>` : ''}
     <g transform="translate(0,${L1}) rotate(${k.rot2})">
       <path d="${taper(L2 + 8, 46 * aw, 50 * aw, 34 * aw)}" fill="${SKINB}" ${O8}/><path d="${taper(L2 + 8, 46 * aw, 50 * aw, 34 * aw)}" fill="url(#limbG)"/>
-      <path d="M-26,8 q26,18 52,0" stroke="#000" stroke-opacity="0.25" stroke-width="4" fill="none"/><ellipse cx="${-side * 10}" cy="2" rx="14" ry="9" fill="#fff" opacity="0.12"/>
+      <path d="M-26,8 q26,18 52,0" stroke="#000" stroke-opacity="0.25" stroke-width="4" fill="none"/>${BODYW > 0.02 ? `<g opacity="${(0.5 * BODYW).toFixed(2)}" stroke="#2a1208" stroke-linecap="round" fill="none">${[0,1,2,3,4].map((i) => `<path d="M${-16 * aw},${30 + i * 20} q${16 * aw},${5 + (i % 2) * 4} ${32 * aw},${(i % 3) - 1}" stroke-width="${2.4 + (i % 2)}"/>`).join('')}</g>` : ''}<ellipse cx="${-side * 10}" cy="2" rx="14" ry="9" fill="#fff" opacity="0.12"/>
       <path d="M-26,70 q-6,26 0,52 M10,66 q8,28 2,56" stroke="#000" stroke-opacity="0.12" stroke-width="5" fill="none" stroke-linecap="round"/>
       <g transform="translate(0,${L2}) rotate(${wrist})">
         <ellipse cx="0" cy="-4" rx="${38 * aw}" ry="10" fill="#ff7ab6" stroke="${OUT}" stroke-width="4"/>${[-24, -8, 8, 24].map((x) => `<circle cx="${x * aw}" cy="-4" r="4.5" fill="#ffe14d" stroke="${OUT}" stroke-width="1.5"/>`).join('')}
@@ -466,7 +466,7 @@ function heelsLayer(of, p) {
 export function drawLazy(p) {
   const br = p.breath || 0, sh = (p.shoulders || 0) * 14;
   const of = p.outfit && p.outfit.kind && p.outfit.kind !== 'gym' ? p.outfit : null; const gownOn = of && (of.prog ?? 1) > 0.02; SHIRT = of && (of.prog ?? 1) >= 1 ? (of.kind === 'neon' ? 'url(#neonG)' : 'url(#gownG)') : 'url(#shirt)';
-  SLIM = p.slim || 0; LOOSE = (p.outfit && p.outfit.loose) || 0; FACEW = p.faceWrinkle || 0; GYM = (p.outfit && p.outfit.kind === 'gym') ? p.outfit : null; PANTS = GYM ? 'url(#gyPant)' : 'url(#pants)'; if (GYM) SHIRT = GYM.top === 'white' ? 'url(#gyTopW)' : GYM.top === 'black' ? 'url(#gyTopK)' : 'url(#gyTop)';
+  SLIM = p.slim || 0; LOOSE = (p.outfit && p.outfit.loose) || 0; FACEW = p.faceWrinkle || 0; BODYW = p.bodyWrinkle || 0; GYM = (p.outfit && p.outfit.kind === 'gym') ? p.outfit : null; PANTS = GYM ? 'url(#gyPant)' : 'url(#pants)'; if (GYM) SHIRT = GYM.top === 'white' ? 'url(#gyTopW)' : GYM.top === 'black' ? 'url(#gyTopK)' : 'url(#gyTop)';
   const lg = p.legs || { l: {}, r: {} };
   const slimK = Math.max(0.46, 1 - 0.115 * (p.slim || 0));
   const chest = `<g transform="translate(0,230) scale(${(1 + 0.012 * br) * slimK},${1 + 0.016 * br}) translate(0,-230)">
