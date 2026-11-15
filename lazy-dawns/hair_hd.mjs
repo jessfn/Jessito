@@ -7,7 +7,7 @@ const lerp = (a, b, k) => a + (b - a) * k;
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 const f1 = (n) => n.toFixed(1);
 const rng = (seed) => { let s = seed >>> 0; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; };
-export const hdDefs = (h) => `<radialGradient id="hdBase" cx="0.4" cy="0.3" r="0.9"><stop offset="0" stop-color="#2e221d"/><stop offset="0.6" stop-color="#150f0d"/><stop offset="1" stop-color="#070404"/></radialGradient>
+export const hdDefs = (h) => `<radialGradient id="hdScr" cx="0.35" cy="0.3" r="0.9"><stop offset="0" stop-color="#ff9ad0"/><stop offset="0.6" stop-color="#ec4899"/><stop offset="1" stop-color="#9d174d"/></radialGradient><radialGradient id="hdBase" cx="0.4" cy="0.3" r="0.9"><stop offset="0" stop-color="#2e221d"/><stop offset="0.6" stop-color="#150f0d"/><stop offset="1" stop-color="#070404"/></radialGradient>
   <linearGradient id="hdGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff0a8"/><stop offset="0.5" stop-color="#d4a24c"/><stop offset="1" stop-color="#8a5f1c"/></linearGradient>`;
 const LIGHT = [-0.55, -0.83];
 let CUR = { cp: 1, bounce: 0, wind: 0, grow: 1 };
@@ -47,7 +47,7 @@ function clump(p0, ang, L, g, W, R, n = 3, o = {}) { let s = ''; for (let k = 0;
 const scalp = (a, rx = 186, ry = 186) => [Math.cos(a) * rx, -24 + Math.sin(a) * ry];
 const deg = (d) => d * Math.PI / 180;
 
-export function hdBack(h) { const st = styleOf(h); if (!st || st === 'turban') return ''; return memo('b', h, () => hdBackI(h, st)); }
+export function hdBack(h) { const st = styleOf(h); if (!st || st === 'turban' || st === 'twin' || st === 'twinhigh') return ''; return memo('b', h, () => hdBackI(h, st)); }
 function hdBackI(h, st) { const R = rng(11);
   let o = `<ellipse cx="0" cy="-24" rx="${st === 'afro' ? 262 : 226}" ry="${st === 'afro' ? 258 : 232}" fill="url(#hdBase)" stroke="${OUT}" stroke-width="8"/>`;
   if (st === 'afro') { for (let a = 150; a <= 390; a += 7) o += clump(scalp(deg(a), 200, 200), deg(a), 130 + R() * 50, 0.0009, 22, R, 3); return `<g>${o}</g>`; }
@@ -56,7 +56,7 @@ function hdBackI(h, st) { const R = rng(11);
   for (let a = 325; a <= 390; a += 13) o += clump(scalp(deg(a), 196, 150), lerp(deg(a), Math.PI / 2, 0.6), (200 + R() * 60) * (0.7 + 0.5 * hang) * 0.55, 0.0030, 19, R, 3);
   return `<g>${o}</g>`; }
 
-export function hdTop(h, yaw = 0) { const st = styleOf(h); if (!st) return ''; if (st === 'turban') return turban(h); return memo('t', h, () => hdTopI(h, st)); }
+export function hdTop(h, yaw = 0) { const st = styleOf(h); if (!st) return ''; if (st === 'turban') return turban(h); if (st === 'twin' || st === 'twinhigh') return memo('t', h, () => twinTop(h, st)); return memo('t', h, () => hdTopI(h, st)); }
 function hdTopI(h, st) { const R = rng(23);
   const cap = (m) => `<path d="M0,-218 C${m * 140},-218 ${m * 218},-146 ${m * 212},-24 C${m * 208},8 ${m * 204},30 ${m * 198},48 C${m * 194},-34 ${m * 154},-100 ${m * 92},-134 C${m * 52},-152 ${m * 20},-162 0,-178Z" fill="url(#hdBase)" stroke="${OUT}" stroke-width="7" stroke-linejoin="round"/>`;
   let o = `<g>${cap(-1)}${cap(1)}`;
@@ -78,7 +78,7 @@ function hdTopI(h, st) { const R = rng(23);
   if (st === 'afro') o += `<g><path d="M-212,-52 Q0,-248 212,-52" stroke="${OUT}" stroke-width="40" fill="none" stroke-linecap="round"/><path d="M-212,-52 Q0,-248 212,-52" stroke="url(#hdGold)" stroke-width="28" fill="none" stroke-linecap="round"/><path d="M-196,-62 Q0,-236 196,-62" stroke="#fff" stroke-width="6" fill="none" opacity="0.5" stroke-linecap="round"/>${[-120, -60, 0, 60, 120].map((x, i) => `<g transform="translate(${x},${-151 - (1 - Math.pow(x / 120, 2)) * 18 + (Math.abs(x) > 100 ? 4 : 0)})"><circle r="${i === 2 ? 15 : 10}" fill="${['#34d399', '#f472b6', '#fde68a', '#f472b6', '#34d399'][i]}" stroke="${OUT}" stroke-width="4"/><circle cx="-3" cy="-4" r="3.4" fill="#fff" opacity="0.8"/></g>`).join('')}</g>`;
   return o + '</g>'; }
 
-export function hdFront(h, yaw = 0, t = 0) { const st = styleOf(h); if (!st || st === 'turban') return ''; return `<g transform="translate(${yaw * 10},0)">${memo('f', h, () => hdFrontI(h, st))}</g>`; }
+export function hdFront(h, yaw = 0, t = 0) { const st = styleOf(h); if (!st || st === 'turban') return ''; if (st === 'twin' || st === 'twinhigh') return `<g transform="translate(${yaw * 10},0)">${memo('f', h, () => twinFront(h, st))}</g>`; return `<g transform="translate(${yaw * 10},0)">${memo('f', h, () => hdFrontI(h, st))}</g>`; }
 function hdFrontI(h, st) { const R = rng(41), sw = (h.sway || 0), L = clamp(h.len ?? 1); let o = '';
   const sway = (g) => g; void sway;
   if (st === 'afro') { for (const m of [-1, 1]) for (let i = 0; i < 3; i++) o += clump([m * (196 + i * 4), -6 + i * 36], deg(90 - m * 14), 90 + i * 16, 0.0004, 18, R, 2); return o; }
@@ -105,3 +105,21 @@ function turban(h) { const w = h.tw || 0;
 export function demoLock(x, y, len, W, cp, ph = 0, ang = Math.PI / 2, g = 0.0004) { CUR = { cp, bounce: 0, wind: 0, grow: 1 }; const R = rng(5 + Math.round(ph * 10));
   const sp = spine([x, y], ang, len / (1 + 0.45 * (1 - cp)) / (0.5 + 0.5), g, R, 6);
   return lock(sp, W, W * 0.62, W * 3.2, ph, R, { taper: 0.25 }); }
+
+// ---- coletas: casquete liso con raya central, rizos barridos hacia las coletas, y dos coletas rizadas con liga ----
+function twinTop(h, st) { const R = rng(31); const cap = (m) => `<path d="M0,-218 C${m * 140},-218 ${m * 218},-146 ${m * 212},-24 C${m * 208},8 ${m * 204},30 ${m * 198},48 C${m * 194},-34 ${m * 154},-100 ${m * 92},-134 C${m * 52},-152 ${m * 20},-162 0,-178Z" fill="url(#hdBase)" stroke="${OUT}" stroke-width="7" stroke-linejoin="round"/>`;
+  let o = `<g>${cap(-1)}${cap(1)}`;
+  // hebras largas y brillantes barridas desde la raya hacia atras-lateral (pelo recogido)
+  for (const m of [-1, 1]) for (let i = 0; i < 9; i++) { const u = i / 8, a = deg(lerp(-86, -8, u)) * 1; const sx = m * 8, sy = -186 + u * 6; const ex = m * lerp(60, 205, u), ey = lerp(-150, -64, u * u);
+    o += `<path d="M${sx},${sy} Q${m * lerp(30, 140, u)},${lerp(-196, -150, u)} ${ex},${ey}" stroke="${OUT}" stroke-width="13" fill="none" stroke-linecap="round" opacity="0.9"/><path d="M${sx},${sy} Q${m * lerp(30, 140, u)},${lerp(-196, -150, u)} ${ex},${ey}" stroke="#2a1d17" stroke-width="9" fill="none" stroke-linecap="round"/><path d="M${sx},${sy - 2} Q${m * lerp(30, 140, u)},${lerp(-198, -152, u)} ${ex},${ey - 2}" stroke="#a87a54" stroke-width="2.4" fill="none" stroke-linecap="round" opacity="0.6"/>`; }
+  o += `<path d="M0,-198 L0,-168" stroke="#b07a54" stroke-width="7" stroke-linecap="round" opacity="0.9"/>`;
+  // rizos sueltos delante de las orejas y en la linea de nacimiento (pequenos)
+  for (const m of [-1, 1]) for (let i = 0; i < 3; i++) { const sp = spine([m * (182 + i * 4), -86 + i * 22], deg(90 - m * 12), 60 + i * 16, 0.0006, R, 3); o += lock(sp, 9, 6.5, 22, R() * 6, R, { taper: 0.3 }); }
+  return o + '</g>'; }
+function twinFront(h, st) { const R = rng(37); let o = ''; const high = st === 'twinhigh';
+  for (const m of [-1, 1]) { const tx = m * (high ? 176 : 206), ty = high ? -134 : -52; const base = deg(90 + m * (high ? -62 : -26));
+    // masa trasera de la coleta
+    for (let k = 0; k < 11; k++) { const a = base + m * (k - 5) * 0.09; o += clump([tx + m * (k - 5) * 3.4, ty], a, (high ? 270 : 300) * (0.85 + R() * 0.25), high ? 0.0046 : 0.0028, 22, R, 3); }
+    // liga/scrunchie
+    o += `<g transform="translate(${tx},${ty}) rotate(${m * 20})"><ellipse rx="30" ry="22" fill="url(#hdScr)" stroke="${OUT}" stroke-width="6"/>${[-18, -6, 6, 18].map((x) => `<path d="M${x},-17 Q${x + 6},0 ${x},17" stroke="#fff" stroke-width="2.4" fill="none" opacity="0.5"/>`).join('')}<ellipse cx="-8" cy="-8" rx="10" ry="4" fill="#fff" opacity="0.5"/></g>`; }
+  return o; }

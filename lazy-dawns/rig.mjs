@@ -9,7 +9,7 @@ const O8 = `stroke="${OUT}" stroke-width="8" stroke-linejoin="round"`;
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 const lerp = (a, b, k) => a + (b - a) * k;
 let SHIRT = 'url(#shirt)';
-const SKIN = 'url(#skin)', SKINB = 'url(#skinB)', PANTS = 'url(#pants)', HAIR = 'url(#hair)';
+const SKIN = 'url(#skin)', SKINB = 'url(#skinB)', HAIR = 'url(#hair)'; let PANTS = 'url(#pants)'; let GYM = null;
 const LID = '#a1613a';
 
 // ---------- IK de 2 huesos (hombro -> codo -> mano) ----------
@@ -321,6 +321,7 @@ const SHADE_DEFS = `<defs>
   <clipPath id="shirtClip"><path d="${SHIRT_PATH()}"/></clipPath>
 </defs>`;
 function SHIRT_PATH() {
+  if (GYM) return `M-78,-96 C-150,-92 -262,-52 -312,34 C-352,110 -368,190 -364,270 C-362,340 -352,420 -330,500 Q0,540 330,500 C352,420 362,340 364,270 C368,190 352,110 312,34 C262,-52 150,-92 78,-96 Z`;
   const hem = []; for (let i = 0; i <= 15; i++) { const x = -330 + i * 44; hem.push(`L${x},${i % 2 ? 404 : 378}`); }
   return `M-78,-96 C-150,-92 -262,-52 -312,34 C-352,110 -368,190 -364,270 C-362,320 -350,352 -330,374 ${hem.join(' ')} L330,374 C350,352 362,320 364,270 C368,190 352,110 312,34 C262,-52 150,-92 78,-96 Z`;
 }
@@ -338,20 +339,25 @@ const SHIRT_DETAIL = `
   <ellipse cx="-60" cy="300" rx="110" ry="44" fill="#4a2f14" opacity="0.32" filter="url(#blur8)"/>
   <g fill="#4a2f14" opacity="0.5">${[[-250, 120, 9], [-215, 150, 6], [40, 90, 8], [90, 310, 11], [-120, 350, 8], [250, 280, 7], [10, 345, 9], [-300, 300, 6]].map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}"/>`).join('')}</g>`;
 
+function gymTopDetail(g) { const c = g.top === 'white' ? '#9ca3af' : g.top === 'black' ? '#ff4d8d' : '#fff';
+  return `<rect x="-380" y="-110" width="760" height="520" fill="url(#gyKnit)" opacity="0.5"/><path d="M-120,-96 Q0,-40 120,-96 L120,-60 Q0,-6 -120,-60Z" fill="${c}" opacity="0.55"/><path d="M-330,150 Q0,230 330,150" stroke="#000" stroke-opacity="0.2" stroke-width="10" fill="none"/><path d="M-330,380 Q0,420 330,380" stroke="${c}" stroke-width="16" fill="none" opacity="0.8"/><path d="M-260,40 Q-300,200 -280,360" stroke="#fff" stroke-opacity="0.12" stroke-width="14" fill="none" stroke-linecap="round"/>${g.logo ? `<text x="0" y="250" font-family="Anton" font-size="84" text-anchor="middle" fill="${c}" opacity="0.9" letter-spacing="6">GYM</text>` : ''}`; }
+function gymShoe(side) { const s = side; const lace = [0, 1, 2, 3].map((i) => `<path d="M${s * (-30 + i * 22) - 12},${610 + i * 3} l24,-10" stroke="#fff" stroke-width="5" stroke-linecap="round"/>`).join('');
+  return `<g><ellipse cx="0" cy="690" rx="136" ry="22" fill="#000" opacity="0.28"/><path d="M-124,672 Q-132,640 -88,624 Q-30,600 10,606 Q70,606 112,640 Q140,664 130,688 Q0,712 -124,690Z" fill="#f8fafc" stroke="${OUT}" stroke-width="8" stroke-linejoin="round"/><path d="M-124,684 Q0,722 130,684 L132,700 Q0,742 -126,700Z" fill="#ec4899" stroke="${OUT}" stroke-width="8" stroke-linejoin="round"/><path d="M-100,640 Q-10,600 84,634" stroke="#ec4899" stroke-width="16" fill="none" stroke-linecap="round"/><path d="M-60,646 Q0,622 66,650" stroke="#fff" stroke-width="5" fill="none" opacity="0.7"/><ellipse cx="-30" cy="626" rx="34" ry="8" fill="#fff" opacity="0.75"/>${lace}<path d="M-120,680 q12,-6 24,0 M-86,684 q12,-6 24,0" stroke="#bda9a0" stroke-width="3" fill="none"/></g>`; }
+function gymPantDetail(len, w1) { return `<rect x="${-w1}" y="0" width="${2 * w1}" height="${len}" fill="url(#gyKnit)" opacity="0.55"/>`; }
 function legSvg(side, leg) {
   const hx = side * 100, hy = 520;
   const thighRot = leg.thigh || 0, kneeRot = leg.knee || 0;
-  const pant = (len, w0, wm, w1) => `<path d="${taper(len, w0, wm, w1)}" fill="${PANTS}" ${O8}/><path d="${taper(len, w0, wm, w1)}" fill="url(#pantG)"/>`;
+  const pant = (len, w0, wm, w1) => `<path d="${taper(len, w0, wm, w1)}" fill="${PANTS}" ${O8}/><path d="${taper(len, w0, wm, w1)}" fill="url(#pantG)"/>${GYM ? `<clipPath id="lc${side}"><path d="${taper(len, w0, wm, w1)}"/></clipPath><g clip-path="url(#lc${side})">${gymPantDetail(len, w0)}<path d="M${-side * (w0 * 0.55)},0 L${-side * (w1 * 0.55)},${len}" stroke="#fff" stroke-width="8" opacity="0.85"/></g>` : ''}`;
   return `<g transform="translate(${hx},${hy}) rotate(${thighRot})">
     ${pant(112, 92, 88, 66)}
     <g transform="translate(0,108) rotate(${kneeRot})">
       <path d="${taper(96, 56, 56, 40)}" fill="${SKINB}" ${O8} transform="translate(0,20)"/><path d="${taper(96, 56, 56, 40)}" fill="url(#limbG)" transform="translate(0,20)"/>
       <path d="${taper(62, 70, 66, 62)}" fill="${PANTS}" ${O8} transform="translate(0,-8)"/><path d="${taper(62, 70, 66, 62)}" fill="url(#pantG)" transform="translate(0,-8)"/>
-      <path d="M-62,62 l9,-8 l7,10 l8,-9 l9,10 l8,-9 l9,10 l8,-9 l8,10 l8,-9 l8,8" stroke="#e9d9b8" stroke-width="3" fill="none"/>
-      <ellipse cx="0" cy="-6" rx="38" ry="28" fill="${SKINB}" stroke="${OUT}" stroke-width="5"/><path d="M-30,-14 l8,6 l6,-8 l7,8 l7,-8 l7,8 l8,-6" stroke="#e9d9b8" stroke-width="3" fill="none"/>
+      ${GYM ? `<rect x="-62" y="52" width="124" height="22" rx="6" fill="#8a919d" stroke="${OUT}" stroke-width="5"/>${[...Array(9)].map((_, i) => `<path d="M${-54 + i * 13.5},54 v18" stroke="#fff" stroke-opacity="0.35" stroke-width="2.4"/>`).join('')}` : '<path d="M-62,62 l9,-8 l7,10 l8,-9 l9,10 l8,-9 l9,10 l8,-9 l8,10 l8,-9 l8,8" stroke="#e9d9b8" stroke-width="3" fill="none"/>'}
+      ${GYM ? '' : `<ellipse cx="0" cy="-6" rx="38" ry="28" fill="${SKINB}" stroke="${OUT}" stroke-width="5"/><path d="M-30,-14 l8,6 l6,-8 l7,8 l7,-8 l7,8 l8,-6" stroke="#e9d9b8" stroke-width="3" fill="none"/>`}
       <path d="M-18,0 q18,12 36,0" stroke="#000" stroke-opacity="0.22" stroke-width="4" fill="none"/>
       <ellipse cx="${-side * 22}" cy="62" rx="9" ry="12" fill="#fff" opacity="0.1"/>
-      <g transform="translate(0,120) rotate(${-(thighRot + kneeRot)}) translate(0,-650)">${foot(0, O8, SKINB, true, side < 0 ? '#e8629c' : '#7fb069')}</g>
+      <g transform="translate(0,120) rotate(${-(thighRot + kneeRot)}) translate(0,-650)">${GYM ? gymShoe(side) : foot(0, O8, SKINB, true, side < 0 ? '#e8629c' : '#7fb069')}</g>
     </g>
   </g>`;
 }
@@ -360,7 +366,7 @@ function armSvg(side, arm) {
   const k = arm.rot1 !== undefined ? { S: { x: side * 296, y: 58 }, rot1: arm.rot1, rot2: arm.rot2 } : solveArm(side, arm.t);
   const wrist = arm.w || 0;
   const sleeve = `<g transform="translate(0,-26)"><path d="${taper(112, 82, 84, 74)}" fill="${SHIRT}" ${O8}/><path d="${taper(112, 82, 84, 74)}" fill="url(#pantG)" opacity="0.55"/>
-      <path d="M-72,74 Q0,92 72,74" stroke="#2ecc71" stroke-width="16" fill="none" opacity="0.9"/><path d="M-76,100 Q0,122 76,100 L72,122 Q0,144 -72,122Z" fill="#c95f12" stroke="${OUT}" stroke-width="5" transform="translate(0,-8)"/></g>`;
+      ${GYM ? `<path d="M-76,96 Q0,116 76,96 L72,118 Q0,138 -72,118Z" fill="#8a919d" stroke="${OUT}" stroke-width="5"/>${[0,1,2,3,4,5].map((i) => `<path d="M${-58 + i * 23},100 v18" stroke="#fff" stroke-opacity="0.35" stroke-width="2.4"/>`).join('')}` : `<path d="M-72,74 Q0,92 72,74" stroke="#2ecc71" stroke-width="16" fill="none" opacity="0.9"/><path d="M-76,100 Q0,122 76,100 L72,122 Q0,144 -72,122Z" fill="#c95f12" stroke="${OUT}" stroke-width="5" transform="translate(0,-8)"/>`}</g>`;
   return `<g transform="translate(${k.S.x},${k.S.y}) rotate(${k.rot1})">
     <path d="${taper(L1 + 6, 58, 62, 46)}" fill="${SKINB}" ${O8}/><path d="${taper(L1 + 6, 58, 62, 46)}" fill="url(#limbG)"/>
     <g transform="translate(0,${L1}) rotate(${k.rot2})">
@@ -379,6 +385,11 @@ function armSvg(side, arm) {
 
 // ---------- ropa elegante / traje neon / joyas / tacones ----------
 const GOWN_PATH = 'M-78,-96 C-150,-92 -262,-52 -312,34 C-352,110 -368,190 -364,270 C-360,330 -346,380 -352,430 C-362,520 -396,640 -424,742 Q0,800 424,742 C396,640 362,520 352,430 C346,380 360,330 364,270 C368,190 352,110 312,34 C262,-52 150,-92 78,-96 Z';
+const GYM_DEFS = `<defs><linearGradient id="gyPant" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6b7280"/><stop offset="0.45" stop-color="#a8afb9"/><stop offset="1" stop-color="#69707c"/></linearGradient>
+  <pattern id="gyKnit" width="9" height="9" patternUnits="userSpaceOnUse"><rect width="9" height="9" fill="none"/><path d="M0,9 L4.5,0 L9,9" stroke="#fff" stroke-opacity="0.16" stroke-width="1.6" fill="none"/><circle cx="2" cy="3" r="0.8" fill="#3b4150" fill-opacity="0.5"/><circle cx="6.5" cy="6.5" r="0.8" fill="#fff" fill-opacity="0.25"/></pattern>
+  <linearGradient id="gyTop" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff8fc6"/><stop offset="0.5" stop-color="#ec4899"/><stop offset="1" stop-color="#a21d63"/></linearGradient>
+  <linearGradient id="gyTopW" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="0.6" stop-color="#e5e7eb"/><stop offset="1" stop-color="#b6bcc6"/></linearGradient>
+  <linearGradient id="gyTopK" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3a3f4c"/><stop offset="0.5" stop-color="#1f232d"/><stop offset="1" stop-color="#0f1218"/></linearGradient></defs>`;
 const OUTFIT_DEFS = `<defs>
   <linearGradient id="gownG" x1="0" y1="0" x2="1" y2="0.2"><stop offset="0" stop-color="#064e3b"/><stop offset="0.22" stop-color="#10b981"/><stop offset="0.38" stop-color="#6ee7b7"/><stop offset="0.52" stop-color="#059669"/><stop offset="0.8" stop-color="#065f46"/><stop offset="1" stop-color="#022c22"/></linearGradient>
   <linearGradient id="neonG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff2bd6"/><stop offset="0.5" stop-color="#fff200"/><stop offset="1" stop-color="#00f0ff"/></linearGradient>
@@ -412,25 +423,27 @@ function heelsLayer(of, p) {
 
 export function drawLazy(p) {
   const br = p.breath || 0, sh = (p.shoulders || 0) * 14;
-  const of = p.outfit && p.outfit.kind ? p.outfit : null; const gownOn = of && (of.prog ?? 1) > 0.02; SHIRT = of && (of.prog ?? 1) >= 1 ? (of.kind === 'neon' ? 'url(#neonG)' : 'url(#gownG)') : 'url(#shirt)';
+  const of = p.outfit && p.outfit.kind && p.outfit.kind !== 'gym' ? p.outfit : null; const gownOn = of && (of.prog ?? 1) > 0.02; SHIRT = of && (of.prog ?? 1) >= 1 ? (of.kind === 'neon' ? 'url(#neonG)' : 'url(#gownG)') : 'url(#shirt)';
+  GYM = (p.outfit && p.outfit.kind === 'gym') ? p.outfit : null; PANTS = GYM ? 'url(#gyPant)' : 'url(#pants)'; if (GYM) SHIRT = GYM.top === 'white' ? 'url(#gyTopW)' : GYM.top === 'black' ? 'url(#gyTopK)' : 'url(#gyTop)';
   const lg = p.legs || { l: {}, r: {} };
-  const chest = `<g transform="translate(0,230) scale(${1 + 0.012 * br},${1 + 0.016 * br}) translate(0,-230)">
+  const slimK = 1 - 0.07 * (p.slim || 0);
+  const chest = `<g transform="translate(0,230) scale(${(1 + 0.012 * br) * slimK},${1 + 0.016 * br}) translate(0,-230)">
     <!-- cadera + panza -->
     <path d="M-262,470 C-300,510 -296,556 -236,582 L236,582 C296,556 300,510 262,470 Z" fill="${PANTS}" ${O8}/><path d="M-262,470 C-300,510 -296,556 -236,582 L236,582 C296,556 300,510 262,470 Z" fill="url(#pantG)" opacity="0.6"/>
     <path d="M-334,368 C-362,420 -342,492 -262,520 C-120,548 120,548 262,520 C342,492 362,420 334,368 Z" fill="${SKINB}" ${O8}/>
     <path d="M-334,368 C-362,420 -342,492 -262,520 C-120,548 120,548 262,520 C342,492 362,420 334,368 Z" fill="url(#limbG)" opacity="0.8"/>
     <ellipse cx="0" cy="448" rx="24" ry="9" fill="#2a1608" opacity="0.7"/><path d="M-230,490 Q0,540 230,490" stroke="#000" stroke-opacity="0.25" stroke-width="7" fill="none"/><path d="M-300,420 Q-250,470 -170,478" stroke="#fff" stroke-opacity="0.14" stroke-width="9" fill="none" stroke-linecap="round"/>
-    <path d="M-262,520 Q0,560 262,520" stroke="#e9d9b8" stroke-width="12" fill="none" opacity="0.9"/>
+    ${GYM ? `<path d="M-262,500 Q0,548 262,500 L262,540 Q0,584 -262,540Z" fill="#7f8693" stroke="${OUT}" stroke-width="7" stroke-linejoin="round"/>${[...Array(30)].map((_, i) => `<path d="M${-250 + i * 17.3},${512 + Math.sin(i * 0.11) * 4} v34" stroke="#fff" stroke-opacity="0.22" stroke-width="3"/>`).join('')}<path d="M-26,538 Q-48,600 -40,640 M26,538 Q50,596 42,636" stroke="#fff" stroke-width="7" fill="none" stroke-linecap="round"/><circle cx="-40" cy="644" r="9" fill="#fff" stroke="${OUT}" stroke-width="3"/><circle cx="42" cy="640" r="9" fill="#fff" stroke="${OUT}" stroke-width="3"/>` : '<path d="M-262,520 Q0,560 262,520" stroke="#e9d9b8" stroke-width="12" fill="none" opacity="0.9"/>'}
     <!-- playera -->
     <path d="${SHIRT_PATH()}" fill="${SHIRT}" ${O8}/>
-    <g clip-path="url(#shirtClip)">${STRIPES}${DOTS}${SHIRT_DETAIL}</g>
+    <clipPath id="shirtClip2"><path d="${SHIRT_PATH()}"/></clipPath><g clip-path="url(#shirtClip2)">${GYM ? gymTopDetail(GYM) : STRIPES + DOTS + SHIRT_DETAIL}</g>
     <path d="${SHIRT_PATH()}" fill="none" stroke="${OUT}" stroke-width="8" stroke-linejoin="round"/>
-    <path d="M-118,-96 Q0,-50 118,-96" fill="${SKINB}" stroke="${OUT}" stroke-width="8"/><path d="M-120,-100 Q0,-56 120,-100" stroke="#c95f12" stroke-width="16" fill="none"/>
+    <path d="M-118,-96 Q0,-50 118,-96" fill="${SKINB}" stroke="${OUT}" stroke-width="8"/>${GYM ? `<path d="M-122,-100 Q0,-54 122,-100" stroke="${GYM.top === 'white' ? '#9ca3af' : GYM.top === 'black' ? '#ff4d8d' : '#fff'}" stroke-width="16" fill="none"/>` : `<path d="M-120,-100 Q0,-56 120,-100" stroke="#c95f12" stroke-width="16" fill="none"/>`}
     ${gownOn ? outfitLayer(of, p.tearT || 0) : ''}
   </g>`;
   const rollY = -100;
   return `<g transform="rotate(${p.sway || 0} 0 770)">
-    ${SHADE_DEFS}${OUTFIT_DEFS}<defs>${hairDefs({ ...HAIR_DEFAULT, ...(p.hair || {}) })}${hdDefs(p.hair || {})}</defs>
+    ${SHADE_DEFS}${OUTFIT_DEFS}${GYM_DEFS}<defs>${hairDefs({ ...HAIR_DEFAULT, ...(p.hair || {}) })}${hdDefs(p.hair || {})}</defs>
     <clipPath id="eyeClip"><ellipse rx="36" ry="40"/></clipPath>
     <ellipse cx="0" cy="780" rx="420" ry="46" fill="#000" opacity="0.4" filter="url(#blur20)"/>
     <g transform="translate(0,${p.hop || 0})">${of && (of.prog ?? 1) >= 0.9 ? '' : legSvg(-1, lg.l) + legSvg(1, lg.r)}<g transform="translate(${p.lean || 0},0)">${chest}
