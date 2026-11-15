@@ -109,15 +109,16 @@ function browSvg(side, r, i, k = 0, shortF = 0) {
 
 // ---------- dientes y lengua realistas ----------
 // Proporciones (literatura odontologica): lateral ~ 66% del central, canino ~ 84% del central visto de frente; premolares algo mas angostos.
-function realTeethSvg(pts, w, open, smile, N) {
+function realTeethSvg(pts, w, open, smile, N, sty = 'A') {
+  const ST = { A: { W0: 19, hu: 21, hl: 14, can: 0.55, wl: 0.8 }, B: { W0: 22, hu: 17, hl: 12, can: 0.4, wl: 0.85 }, C: { W0: 20, hu: 19, hl: 13, can: 0.25, wl: 0.9 } }[sty] || { W0: 19, hu: 21, hl: 14, can: 0.55, wl: 0.8 };
   const at = (x) => { const t = clamp((x / w + 1) / 2, 0, 1), f = t * N, i = Math.min(N - 1, Math.floor(f)), k = f - i; const a = pts[i], b = pts[i + 1]; return { yu: a.yu + (b.yu - a.yu) * k, yl: a.yl + (b.yl - a.yl) * k }; };
-  const W0 = 21, SP = [[1.0, 1.0], [0.66, 0.84], [0.84, 0.86], [0.7, 0.72], [0.66, 0.66]];   // [ancho rel., alto rel.]
+  const W0 = ST.W0, SP = [[1.0, 1.0], [0.66, 0.84], [0.84, 0.86], [0.7, 0.72], [0.66, 0.66]];   // [ancho rel., alto rel.]
   const tooth = (cx, wd, ht, up, k, isCanine) => { const s = up ? 1 : -1, hw = wd / 2; const y0 = 0, y1 = s * ht; const cor = Math.min(hw * 0.9, 6);
     const edge = isCanine ? `L${hw - 1},${y1 - s * 6} L0,${y1 + s * 3} L${-hw + 1},${y1 - s * 6}` : `Q${hw * 0.9},${y1 + s * 1} ${hw - cor},${y1} L${-hw + cor},${y1} Q${-hw * 0.9},${y1 + s * 1} ${-hw},${y1 - s * cor}`;
     return `<g transform="translate(${cx.toFixed(1)},0)"><path d="M${-hw},${y0} L${hw},${y0} L${hw},${y1 - s * cor} ${isCanine ? '' : `Q${hw * 0.98},${y1} ${hw - cor},${y1}`} ${isCanine ? edge.replace(/^L[^L]*/, '') : ''}${isCanine ? '' : ''}Z" fill="none"/></g>`; };
   void tooth;
-  const toothPath = (wd, ht, up, canine) => { const s = up ? 1 : -1, hw = wd / 2, c = Math.min(6, hw * 0.8);
-    if (canine) return `M${-hw},0 L${hw},0 L${hw * 0.98},${s * ht * 0.62} Q${hw * 0.5},${s * ht * 0.9} 0,${s * (ht + 4)} Q${-hw * 0.5},${s * ht * 0.9} ${-hw * 0.98},${s * ht * 0.62}Z`;
+  const canK = ST.can; const toothPath = (wd, ht, up, canine) => { const s = up ? 1 : -1, hw = wd / 2, c = Math.min(6, hw * 0.8);
+    if (canine) return `M${-hw},0 L${hw},0 L${hw * 0.98},${s * ht * 0.62} Q${hw * 0.5},${s * ht * 0.9} 0,${s * (ht + 4 * canK)} Q${-hw * 0.5},${s * ht * 0.9} ${-hw * 0.98},${s * ht * 0.62}Z`;
     return `M${-hw},0 L${hw},0 L${hw},${s * (ht - c)} Q${hw},${s * ht} ${hw - c},${s * ht} L${-hw + c},${s * ht} Q${-hw},${s * ht} ${-hw},${s * (ht - c)}Z`; };
   const defsT = `<linearGradient id="enU" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f1dfc2"/><stop offset="0.28" stop-color="#fbf3e2"/><stop offset="0.7" stop-color="#ffffff"/><stop offset="1" stop-color="#e3eef2"/></linearGradient>
     <linearGradient id="enL" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#eadfca"/><stop offset="0.3" stop-color="#f8f1e2"/><stop offset="0.75" stop-color="#ffffff"/><stop offset="1" stop-color="#e6eff2"/></linearGradient>
@@ -125,7 +126,7 @@ function realTeethSvg(pts, w, open, smile, N) {
     <radialGradient id="tng" cx="0.5" cy="0.25" r="0.85"><stop offset="0" stop-color="#f19aa4"/><stop offset="0.55" stop-color="#d9687b"/><stop offset="1" stop-color="#9c3345"/></radialGradient>
     <linearGradient id="cav" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1a0407"/><stop offset="1" stop-color="#4a1018"/></linearGradient>`;
   const row = (up) => { let out = '', shadow = '', gums = ''; const items = [];
-    for (const sg of [-1, 1]) { let x = 0; for (let i = 0; i < 5; i++) { const [rw, rh] = SP[i]; const wd = W0 * rw * (up ? 1 : 0.78), ht = (up ? 29 : 19) * rh; const cx = (i === 0 ? sg * wd / 2 : x + sg * wd / 2); items.push({ cx: sg === 1 ? cx : cx, wd, ht, i, sg }); x = (i === 0 ? sg * wd : x + sg * wd); if (Math.abs(x) > w * 0.86) break; } }
+    for (const sg of [-1, 1]) { let x = 0; for (let i = 0; i < 5; i++) { const [rw, rh] = SP[i]; const wd = W0 * rw * (up ? 1 : ST.wl * 0.92), ht = (up ? ST.hu : ST.hl) * rh; const cx = (i === 0 ? sg * wd / 2 : x + sg * wd / 2); items.push({ cx: sg === 1 ? cx : cx, wd, ht, i, sg }); x = (i === 0 ? sg * wd : x + sg * wd); if (Math.abs(x) > w * 0.86) break; } }
     items.sort((a, b) => Math.abs(b.cx) - Math.abs(a.cx));
     for (const it of items) { const e = at(it.cx), y = up ? e.yu + 1 : e.yl - 1, canine = it.i === 2 && up; const depth = 1 - Math.abs(it.cx) / w; const tilt = it.sg * (it.i * 1.6);
       const path = toothPath(it.wd - 1.2, it.ht, up, canine); const dark = clamp(Math.abs(it.cx) / w * 0.75);
@@ -148,7 +149,7 @@ function mouthSvg(m, yaw) {
   const cr = { x: w, y: -smile * 24 + asym * 8 + press * 3 };
   const mid = (cl.y + cr.y) / 2;
   const up = mid + 6 - open * 6;
-  const lo = mid + 8 + open * 150 * (1 - 0.3 * Math.max(0, wide)) + (smile > 0.5 ? 14 : 0);
+  const lo = mid + 8 + open * 105 * (1 - 0.3 * Math.max(0, wide)) + (smile > 0.5 ? 14 : 0);
   const shape = `M${cl.x},${cl.y} Q0,${up} ${cr.x},${cr.y} Q0,${lo} ${cl.x},${cl.y}Z`;
   const showTeeth = open > 0.08 || smile > 0.3;
   const tq = m.teeth || { clean: 0, braces: 0, crooked: 1 };
@@ -178,7 +179,7 @@ function mouthSvg(m, yaw) {
   const top = pts.map((p) => `${p.x.toFixed(1)},${(p.yu - tU(p)).toFixed(1)}`), upE = pts.map((p) => `${p.x.toFixed(1)},${p.yu.toFixed(1)}`);
   const loE = pts.map((p) => `${p.x.toFixed(1)},${p.yl.toFixed(1)}`), bot = pts.map((p) => `${p.x.toFixed(1)},${(p.yl + tL(p)).toFixed(1)}`);
   const upperPoly = 'M' + top.join(' L') + ' L' + upE.slice().reverse().join(' L') + 'Z', lowerPoly = 'M' + loE.join(' L') + ' L' + bot.slice().reverse().join(' L') + 'Z';
-  const RT = perfect ? realTeethSvg(pts, w, open, smile, N) : null;
+  const RT = perfect ? realTeethSvg(pts, w, open, smile, N, m.tstyle) : null;
   const base = lipC || '#9a4a44', dark = lipC ? shade2(lipC, 0.4) : '#5e2a2a', light = lipC ? shade2(lipC, -0.35) : '#c0766a';
   const gid = 'lp' + (lipC || 'n').replace('#', '');
   const defsLip = `<defs><linearGradient id="${gid}U" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${shade2(base, 0.04)}"/><stop offset="1" stop-color="${shade2(base, 0.24)}"/></linearGradient>
