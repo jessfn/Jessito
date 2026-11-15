@@ -52,8 +52,8 @@ function hdBackI(h, st) { const R = rng(11);
   let o = `<ellipse cx="0" cy="-24" rx="${st === 'afro' ? 262 : 226}" ry="${st === 'afro' ? 258 : 232}" fill="url(#hdBase)" stroke="${OUT}" stroke-width="8"/>`;
   if (st === 'afro') { for (let a = 150; a <= 390; a += 7) o += clump(scalp(deg(a), 200, 200), deg(a), 130 + R() * 50, 0.0009, 22, R, 3); return `<g>${o}</g>`; }
   const hang = st === 'half' ? 0.8 : st === 'side' ? 0.62 : 1;
-  for (let a = 150; a <= 215; a += 13) o += clump(scalp(deg(a), 196, 150), deg(a) + 0.05, (200 + R() * 60) * (0.7 + 0.5 * hang) * 0.55, 0.0030, 19, R, 3);
-  for (let a = 325; a <= 390; a += 13) o += clump(scalp(deg(a), 196, 150), deg(a) - 0.05, (200 + R() * 60) * (0.7 + 0.5 * hang) * 0.55, 0.0030, 19, R, 3);
+  for (let a = 150; a <= 215; a += 13) o += clump(scalp(deg(a), 196, 150), lerp(deg(a), Math.PI / 2, 0.6), (200 + R() * 60) * (0.7 + 0.5 * hang) * 0.55, 0.0030, 19, R, 3);
+  for (let a = 325; a <= 390; a += 13) o += clump(scalp(deg(a), 196, 150), lerp(deg(a), Math.PI / 2, 0.6), (200 + R() * 60) * (0.7 + 0.5 * hang) * 0.55, 0.0030, 19, R, 3);
   return `<g>${o}</g>`; }
 
 export function hdTop(h, yaw = 0) { const st = styleOf(h); if (!st) return ''; if (st === 'turban') return turban(h); return memo('t', h, () => hdTopI(h, st)); }
@@ -62,7 +62,7 @@ function hdTopI(h, st) { const R = rng(23);
   let o = `<g>${cap(-1)}${cap(1)}`;
   const part = st === 'side' ? -0.32 : 0;           // posicion de la raya (-1..1 sobre el arco)
   // bloques de rizos del nacimiento del pelo hacia la coronilla, saliendo hacia afuera y cayendo
-  const ringA = (a0, a1, step, rx, ry, L, g, W, n) => { for (let a = a0; a <= a1; a += step) { const aa = deg(a + (R() - 0.5) * 6); const flow = st === 'afro' ? 0.25 : 0.95; o += clump(scalp(aa, rx, ry), aa + (a < 270 ? -1 : 1) * flow * (0.55 + 0.45 * Math.abs(Math.cos(aa))), L * (0.8 + R() * 0.4), g, W * (0.85 + R() * 0.3), R, n); } };
+  const ringA = (a0, a1, step, rx, ry, L, g, W, n) => { for (let a = a0; a <= a1; a += step) { const aa = deg(a + (R() - 0.5) * 6); const flow = st === 'afro' ? 0.25 : 0.6; o += clump(scalp(aa, rx, ry), aa + (a < 270 ? -1 : 1) * flow * (0.55 + 0.45 * Math.abs(Math.cos(aa))), L * (0.8 + R() * 0.4), g, W * (0.85 + R() * 0.3), R, n); } };
   if (st === 'afro') { ringA(160, 380, 7, 208, 206, 170, 0.0012, 22, 3); ringA(172, 368, 9, 178, 176, 140, 0.0012, 19, 3); }
   else if (st === 'half') { ringA(160, 380, 9, 206, 204, 200, 0.0030, 19, 3); ringA(176, 364, 11, 178, 176, 160, 0.0028, 17, 3); }
   else if (st === 'side') { ringA(160, 380, 8, 206, 204, 240, 0.0030, 19, 3); ringA(176, 364, 10, 176, 172, 200, 0.0028, 17, 3); }
