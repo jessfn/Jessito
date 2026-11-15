@@ -2,7 +2,7 @@
 import { Resvg } from '@resvg/resvg-js';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path'; import { fileURLToPath } from 'node:url';
-import { defs } from './lazy_lib.mjs'; import { drawLazy, solveArm } from './rig.mjs'; import { drawTadeo, drawMei, drawMari, drawDoc, drawDentist, drawStylist, drawDante, drawKarla, drawNina, drawMemo, drawPia, drawDerm, salonTool } from './chars.mjs';
+import { defs } from './lazy_lib.mjs'; import { drawLazy, solveArm, setSlim } from './rig.mjs'; import { drawTadeo, drawMei, drawMari, drawDoc, drawDentist, drawStylist, drawDante, drawKarla, drawNina, drawMemo, drawPia, drawDerm, salonTool } from './chars.mjs';
 const here = path.dirname(fileURLToPath(import.meta.url)); mkdirSync(path.join(here, 'portadas'), { recursive: true });
 const FD = path.join(here, '../assets/fonts/');
 const ropt = { font: { fontFiles: ['Anton-Regular.ttf', 'Bungee-Regular.ttf', 'Righteous-Regular.ttf'].map((f) => FD + f), loadSystemFonts: true, defaultFontFamily: 'Inter' } };
@@ -60,7 +60,7 @@ for (const id of ids) { const svg = cover(id); writeFileSync(path.join(here, 'po
 
 const logo = b64('logo_lazydawns.png');
 const hands = (p, kind) => { const set = (sd, t) => { const k = solveArm(sd, t); return { rot1: k.rot1, rot2: k.rot2, w: 0, curl: kind === 'fist' ? 0.9 : 0.35, spread: kind === 'fist' ? 0 : 0.7 }; };
-  if (kind === 'cheeks') { p.armL = set(-1, { x: -150, y: 40 }); p.armR = set(1, { x: 150, y: 40 }); } if (kind === 'chin') { p.armL = set(-1, { x: -60, y: 120 }); p.armR = set(1, { x: 120, y: 330 }); } if (kind === 'hips') { p.armL = set(-1, { x: -165, y: 300 }); p.armR = set(1, { x: 165, y: 300 }); } if (kind === 'up') { p.armL = set(-1, { x: -270, y: -90 }); p.armR = set(1, { x: 270, y: -90 }); } if (kind === 'point') { p.armL = set(-1, { x: -150, y: 330 }); p.armR = set(1, { x: 300, y: 20 }); } if (kind === 'mouth') { p.armL = set(-1, { x: -50, y: 140 }); p.armR = set(1, { x: 50, y: 140 }); } if (kind === 'fist') { p.armL = set(-1, { x: -200, y: 160 }); p.armR = set(1, { x: 200, y: 160 }); } };
+  if (kind === 'cheeks') { p.armL = set(-1, { x: -150, y: 40 }); p.armR = set(1, { x: 150, y: 40 }); } if (kind === 'chin') { p.armL = set(-1, { x: -60, y: 120 }); p.armR = set(1, { x: 120, y: 330 }); } if (kind === 'shy') { setSlim(p.slim || 0); const f = (sd) => { const k = solveArm(sd, { x: sd * 44, y: -96 }); return { rot1: k.rot1, rot2: k.rot2, w: sd * -14, curl: 0.2, spread: 0.9 }; }; p.armL = f(-1); p.armR = f(1); } if (kind === 'hips') { p.armL = set(-1, { x: -165, y: 300 }); p.armR = set(1, { x: 165, y: 300 }); } if (kind === 'up') { p.armL = set(-1, { x: -270, y: -90 }); p.armR = set(1, { x: 270, y: -90 }); } if (kind === 'point') { p.armL = set(-1, { x: -150, y: 330 }); p.armR = set(1, { x: 300, y: 20 }); } if (kind === 'mouth') { p.armL = set(-1, { x: -50, y: 140 }); p.armR = set(1, { x: 50, y: 140 }); } if (kind === 'fist') { p.armL = set(-1, { x: -200, y: 160 }); p.armR = set(1, { x: 200, y: 160 }); } };
 const safeGuide = (on) => on ? `<g opacity="0.55" fill="none" stroke="#00ff9d" stroke-width="3" stroke-dasharray="14 10"><rect x="0" y="240" width="1080" height="1440"/><rect x="60" y="150" width="960" height="1500" stroke="#ffe14d"/></g><text x="16" y="232" font-family="Inter" font-size="22" fill="#00ff9d">zona 3:4 del perfil (1080x1440)</text><text x="16" y="1712" font-family="Inter" font-size="22" fill="#00ff9d">abajo: título/botones de TikTok</text>` : '';
 const LAY = { A: { pos: 'translate(540,1130) scale(1.28) translate(0,215)', hands: 'cheeks', mood: 'shock' }, B: { pos: 'translate(420,1170) scale(0.95) translate(0,215)', hands: 'chin', mood: 'worry' }, C: { pos: 'translate(540,1290) scale(1.8) translate(0,215)', hands: 'fist', mood: 'glare' } };
 const mood = (p, m) => { if (m === 'shock') { p.brow = { l: { r: 0.95, i: 0.8 }, r: { r: 0.95, i: 0.8 } }; p.lid = { l: 1.28, r: 1.28 }; p.mouth.open = 0.55; p.mouth.smile = -0.2; p.mouth.wide = -0.2; p.shoulders = 0.7; p.pitch = -0.3; p.gaze = { x: 0.7, y: -0.1 }; }
@@ -80,7 +80,7 @@ const UQ = {
   d6: { hands: 'hips', mood: 'proud', x: 650, y: 1170, s: 0.84, flip: 1, comp: { fn: drawPia, x: 250, y: 960, s: 0.72, st: { mood: 'happy' } }, titleSide: 'R' },
   d7: { hands: 'fist', mood: 'serious', x: 400, y: 1190, s: 0.88, flip: 1, comp: { fn: drawNina, x: 880, y: 930, s: 0.74, st: { mood: 'worry' } }, sil: true, titleSide: 'L' },
   d8: { hands: 'chin', mood: 'worry', x: 410, y: 1180, s: 0.9, flip: 1, comp: null, sil: true, titleSide: 'L' },
-  d9: { hands: 'cheeks', mood: 'worry', x: 420, y: 1190, s: 0.9, flip: 1, comp: { fn: drawTadeo, x: 880, y: 930, s: 0.78, st: { mood: 'worry' } }, titleSide: 'L' },
+  d9: { hands: 'shy', mood: 'worry', x: 420, y: 1190, s: 0.9, flip: 1, comp: { fn: drawTadeo, x: 880, y: 930, s: 0.78, st: { mood: 'worry' } }, titleSide: 'L' },
   sp: { hands: 'up', mood: 'joy', x: 540, y: 1280, s: 0.74, flip: 1, comp: { fn: drawDante, x: 190, y: 980, s: 0.7, st: { mood: 'shock' } }, comp2: { fn: drawMemo, x: 890, y: 980, s: 0.7, st: { mood: 'grin' } }, titleSide: 'L' },
 };
 export function coverV(id, opt, guide = false) { const c = CFG[id]; const p = common(); STATE[c.st](p); const u = UQ[id]; const L = u ? { hands: u.hands, mood: u.mood } : LAY[opt]; hands(p, L.hands); mood(p, L.mood); if (id === 'sp') p.hair.wind = 0.6;
