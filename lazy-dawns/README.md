@@ -169,3 +169,4 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
 ## Reglas permanentes: espejo y tarjeta de votacion (decision del creador)
 - ESPEJO: cuando aparece el espejo (marco ovalado), Lazy debe verse COMPLETA y centrada dentro del ovalo (cabeza y cuerpo), sin cortarse; camara ajustada para eso. Nada de la UI (chip de DIA) tapando el marco.
 - TARJETA DE VOTACION: fondo limpio y opaco (degradado oscuro con brillitos), sin personajes ni pantallas detras; solo la pregunta, las 2 opciones y los botones de comentar/seguir.
+- ICONOS DE LA VOTACION: cada opcion lleva un icono que represente EXACTAMENTE lo que se vota (por ejemplo: piel = carita con arrugas y brillo; vestido = vestido verde con cinturon; nariz = nariz; unas = mano con unas; gimnasio = mancuerna). Nunca reutilizar el icono de otra opcion.
