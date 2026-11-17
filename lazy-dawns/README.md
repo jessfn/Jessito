@@ -170,3 +170,8 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
 - ESPEJO: cuando aparece el espejo (marco ovalado), Lazy debe verse COMPLETA y centrada dentro del ovalo (cabeza y cuerpo), sin cortarse; camara ajustada para eso. Nada de la UI (chip de DIA) tapando el marco.
 - TARJETA DE VOTACION: fondo limpio y opaco (degradado oscuro con brillitos), sin personajes ni pantallas detras; solo la pregunta, las 2 opciones y los botones de comentar/seguir.
 - ICONOS DE LA VOTACION: cada opcion lleva un icono que represente EXACTAMENTE lo que se vota (por ejemplo: piel = carita con arrugas y brillo; vestido = vestido verde con cinturon; nariz = nariz; unas = mano con unas; gimnasio = mancuerna). Nunca reutilizar el icono de otra opcion.
+
+## Dia 10 (El regalo perfecto): decisiones
+- Look fijo desde ahora: cuerpo "C" (cintura marcada, clavículas) con brazos/manos "A" continuos (silueta unica, sin bolas) y vestido muy arrugado/flojo (loose 2: arrugas, cinturon caido, tono apagado). Rostro femenino ovalado (fem 1, piel "cristal"). NO se usan las opciones de hombros (se descartaron).
+- Historia: spa Aura (Dante la manda), Dra. Renata (nueva, plateada con lentes) e Isa (nueva, rizos cobrizos), frasco dorado falso, 3 semanas, espejo y cortinas, tonico de Dante -> el cabello se cae; Dante es aliado de M (el sello de la invitacion ya llevaba una M). Voto: CABELLO vs VESTIDO (siguiente: dia 11).
+- Voces nuevas: Renata = Rachel (21m00Tcm4TlvDq8ikWAM), Isa = Elli (MF3mGyEYCl7XYWbV9V6O). Pipeline: render_dia10.mjs + director11.mjs + build_audio_dia10.py + resume_dia10.sh.
