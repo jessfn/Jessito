@@ -1,0 +1,3 @@
+import { Resvg } from '@resvg/resvg-js'; import { writeFileSync } from 'node:fs'; import { DEFS } from './character.mjs'; import { MDEFS, defaultM, renderM } from './m_character.mjs';
+const P = defaultM(); const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1536" viewBox="0 0 1024 1536">${DEFS}${MDEFS}<defs><radialGradient id="bgM" cx="0.5" cy="0.45" r="0.75"><stop offset="0" stop-color="#4a0614"/><stop offset="0.6" stop-color="#1c030a"/><stop offset="1" stop-color="#050102"/></radialGradient></defs><rect width="1024" height="1536" fill="url(#bgM)"/>${renderM(P)}</svg>`;
+writeFileSync('/tmp/m_rest.png', new Resvg(svg).render().asPng());
