@@ -1,0 +1,375 @@
+{
+ "canvas": {
+  "width": 1024,
+  "height": 1536
+ },
+ "bones": [
+  {
+   "name": "root",
+   "parent": null,
+   "pivot": [
+    512,
+    1500
+   ]
+  },
+  {
+   "name": "hips",
+   "parent": "root",
+   "pivot": [
+    512,
+    775
+   ]
+  },
+  {
+   "name": "spine",
+   "parent": "hips",
+   "pivot": null
+  },
+  {
+   "name": "chest",
+   "parent": "spine",
+   "pivot": [
+    512,
+    640
+   ]
+  },
+  {
+   "name": "neck",
+   "parent": "chest",
+   "pivot": [
+    512,
+    445
+   ]
+  },
+  {
+   "name": "head",
+   "parent": "neck",
+   "pivot": [
+    512,
+    425
+   ]
+  },
+  {
+   "name": "jaw",
+   "parent": "head",
+   "pivot": [
+    512,
+    330
+   ]
+  },
+  {
+   "name": "shoulder_L",
+   "parent": "chest",
+   "pivot": [
+    432,
+    482
+   ]
+  },
+  {
+   "name": "upper_arm_L",
+   "parent": "shoulder_L",
+   "pivot": [
+    432,
+    482
+   ]
+  },
+  {
+   "name": "forearm_L",
+   "parent": "upper_arm_L",
+   "pivot": [
+    380,
+    652
+   ]
+  },
+  {
+   "name": "hand_L",
+   "parent": "forearm_L",
+   "pivot": [
+    330,
+    835
+   ]
+  },
+  {
+   "name": "shoulder_R",
+   "parent": "chest",
+   "pivot": [
+    592,
+    482
+   ]
+  },
+  {
+   "name": "upper_arm_R",
+   "parent": "shoulder_R",
+   "pivot": [
+    592,
+    482
+   ]
+  },
+  {
+   "name": "forearm_R",
+   "parent": "upper_arm_R",
+   "pivot": [
+    644,
+    652
+   ]
+  },
+  {
+   "name": "hand_R",
+   "parent": "forearm_R",
+   "pivot": [
+    694,
+    835
+   ]
+  },
+  {
+   "name": "thumb_L_1",
+   "parent": "hand_L",
+   "pivot": null
+  },
+  {
+   "name": "thumb_L_2",
+   "parent": "thumb_L_1",
+   "pivot": null
+  },
+  {
+   "name": "index_L_1",
+   "parent": "hand_L",
+   "pivot": null
+  },
+  {
+   "name": "index_L_2",
+   "parent": "index_L_1",
+   "pivot": null
+  },
+  {
+   "name": "middle_L_1",
+   "parent": "hand_L",
+   "pivot": null
+  },
+  {
+   "name": "middle_L_2",
+   "parent": "middle_L_1",
+   "pivot": null
+  },
+  {
+   "name": "ring_L_1",
+   "parent": "hand_L",
+   "pivot": null
+  },
+  {
+   "name": "ring_L_2",
+   "parent": "ring_L_1",
+   "pivot": null
+  },
+  {
+   "name": "pinky_L_1",
+   "parent": "hand_L",
+   "pivot": null
+  },
+  {
+   "name": "pinky_L_2",
+   "parent": "pinky_L_1",
+   "pivot": null
+  },
+  {
+   "name": "thumb_R_1",
+   "parent": "hand_R",
+   "pivot": null
+  },
+  {
+   "name": "thumb_R_2",
+   "parent": "thumb_R_1",
+   "pivot": null
+  },
+  {
+   "name": "index_R_1",
+   "parent": "hand_R",
+   "pivot": null
+  },
+  {
+   "name": "index_R_2",
+   "parent": "index_R_1",
+   "pivot": null
+  },
+  {
+   "name": "middle_R_1",
+   "parent": "hand_R",
+   "pivot": null
+  },
+  {
+   "name": "middle_R_2",
+   "parent": "middle_R_1",
+   "pivot": null
+  },
+  {
+   "name": "ring_R_1",
+   "parent": "hand_R",
+   "pivot": null
+  },
+  {
+   "name": "ring_R_2",
+   "parent": "ring_R_1",
+   "pivot": null
+  },
+  {
+   "name": "pinky_R_1",
+   "parent": "hand_R",
+   "pivot": null
+  },
+  {
+   "name": "pinky_R_2",
+   "parent": "pinky_R_1",
+   "pivot": null
+  },
+  {
+   "name": "thigh_L",
+   "parent": "hips",
+   "pivot": [
+    482,
+    780
+   ]
+  },
+  {
+   "name": "shin_L",
+   "parent": "thigh_L",
+   "pivot": [
+    470,
+    1110
+   ]
+  },
+  {
+   "name": "foot_L",
+   "parent": "shin_L",
+   "pivot": [
+    440,
+    1400
+   ]
+  },
+  {
+   "name": "thigh_R",
+   "parent": "hips",
+   "pivot": [
+    548,
+    780
+   ]
+  },
+  {
+   "name": "shin_R",
+   "parent": "thigh_R",
+   "pivot": [
+    566,
+    1110
+   ]
+  },
+  {
+   "name": "foot_R",
+   "parent": "shin_R",
+   "pivot": [
+    590,
+    1400
+   ]
+  },
+  {
+   "name": "hair_sway_L",
+   "parent": "head",
+   "pivot": null
+  },
+  {
+   "name": "hair_sway_R",
+   "parent": "head",
+   "pivot": null
+  },
+  {
+   "name": "hair_top",
+   "parent": "head",
+   "pivot": null
+  },
+  {
+   "name": "skirt_sway_L",
+   "parent": "hips",
+   "pivot": null
+  },
+  {
+   "name": "skirt_sway_R",
+   "parent": "hips",
+   "pivot": null
+  },
+  {
+   "name": "earring_L",
+   "parent": "head",
+   "pivot": null
+  },
+  {
+   "name": "earring_R",
+   "parent": "head",
+   "pivot": null
+  },
+  {
+   "name": "pendant",
+   "parent": "chest",
+   "pivot": null
+  }
+ ],
+ "ik": {
+  "arms": "ik2(shoulder, elbowRest, wristRest, target, bendSign) -> {r1, r2}",
+  "legs": "rotaciones r1/r2 por pierna (ik2 reutilizable)"
+ },
+ "face_controls": {
+  "eyes": [
+   "blinkL",
+   "blinkR",
+   "lookX",
+   "lookY",
+   "squint",
+   "wide"
+  ],
+  "brows": [
+   "Lraise",
+   "Rraise",
+   "Lfrown",
+   "Rfrown"
+  ],
+  "mouth": [
+   "open",
+   "wide",
+   "round",
+   "smile",
+   "upperTeeth",
+   "lowerTeeth",
+   "tongue",
+   "fv",
+   "press"
+  ],
+  "head": [
+   "rot",
+   "yaw",
+   "pitch"
+  ],
+  "expressions": [
+   "neutral",
+   "smile",
+   "happy",
+   "surprised",
+   "sad",
+   "angry",
+   "worried",
+   "laughing"
+  ],
+  "visemes": [
+   "rest",
+   "A",
+   "E",
+   "I",
+   "O",
+   "U",
+   "FV",
+   "L",
+   "MBP"
+  ]
+ },
+ "secondary_motion": [
+  "hair.swayL/swayR/top (resortes en anim_test.mjs)",
+  "skirt.swayL/swayR/hem/ruffle (deformacion de vertices)",
+  "acc.earL/earR/pendant (pendulos)"
+ ]
+}

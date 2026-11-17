@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1536" viewBox="0 0 1024 1536"><defs>
+<linearGradient id="zSkin" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9a5a32"/><stop offset="0.28" stop-color="#d89a68"/><stop offset="0.6" stop-color="#c98a5a"/><stop offset="1" stop-color="#8a4e2b"/></linearGradient>
+<radialGradient id="zFace" cx="0.5" cy="0.4" r="0.7"><stop offset="0" stop-color="#cc7f4a"/><stop offset="0.7" stop-color="#be7143"/><stop offset="1" stop-color="#a45f36"/></radialGradient>
+<linearGradient id="zCor" x1="0" y1="0" x2="1" y2="0.2"><stop offset="0" stop-color="#4a0009"/><stop offset="0.3" stop-color="#8e0612"/><stop offset="0.5" stop-color="#b3101f"/><stop offset="0.75" stop-color="#780612"/><stop offset="1" stop-color="#3d0008"/></linearGradient>
+<linearGradient id="zSk" x1="0" y1="0" x2="1" y2="0.3"><stop offset="0" stop-color="#6a000e"/><stop offset="0.35" stop-color="#b00a1e"/><stop offset="0.55" stop-color="#cc1a2e"/><stop offset="0.8" stop-color="#8a0314"/><stop offset="1" stop-color="#4c0008"/></linearGradient>
+<linearGradient id="zGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff0a0"/><stop offset="0.5" stop-color="#e0a820"/><stop offset="1" stop-color="#9a6a08"/></linearGradient>
+<radialGradient id="zIris" cx="0.5" cy="0.35" r="0.8"><stop offset="0" stop-color="#a0602e"/><stop offset="0.55" stop-color="#6a3418"/><stop offset="1" stop-color="#2a1208"/></radialGradient>
+<linearGradient id="zLip" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e86cb8"/><stop offset="1" stop-color="#b02a86"/></linearGradient>
+<filter id="soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="9"/></filter>
+</defs><defs>
+  <radialGradient id="skin" cx="0.35" cy="0.3" r="0.85"><stop offset="0" stop-color="#c98a5a"/><stop offset="0.55" stop-color="#9a5a32"/><stop offset="1" stop-color="#5e2f15"/></radialGradient>
+  <radialGradient id="skinB" cx="0.35" cy="0.3" r="0.85"><stop offset="0" stop-color="#b87648"/><stop offset="0.55" stop-color="#8a4e2b"/><stop offset="1" stop-color="#4f2711"/></radialGradient>
+  <linearGradient id="shirt" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffa63d"/><stop offset="0.6" stop-color="#e8741a"/><stop offset="1" stop-color="#b24f0c"/></linearGradient>
+  <linearGradient id="pants" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8e4fc0"/><stop offset="1" stop-color="#43206a"/></linearGradient>
+  <radialGradient id="hair" cx="0.4" cy="0.25" r="0.9"><stop offset="0" stop-color="#3a2f2c"/><stop offset="0.5" stop-color="#17110f"/><stop offset="1" stop-color="#050303"/></radialGradient>
+  <radialGradient id="eye" cx="0.4" cy="0.35" r="0.8"><stop offset="0" stop-color="#8a5a2e"/><stop offset="0.6" stop-color="#3b2312"/><stop offset="1" stop-color="#150b05"/></radialGradient>
+  <linearGradient id="bg" x1="0" y1="0" x2="0.6" y2="1"><stop offset="0" stop-color="#1b0a3d"/><stop offset="0.55" stop-color="#5b1a7a"/><stop offset="1" stop-color="#d1307f"/></linearGradient>
+  <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#ff7ad9" stop-opacity="0.55"/><stop offset="1" stop-color="#ff7ad9" stop-opacity="0"/></radialGradient>
+  <filter id="grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed="4"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.9 -0.35"/></filter><filter id="blur8" x="-60%" y="-150%" width="220%" height="400%"><feGaussianBlur stdDeviation="8"/></filter>
+  <filter id="blur20" x="-60%" y="-150%" width="220%" height="400%"><feGaussianBlur stdDeviation="20"/></filter>
+  <clipPath id="torso"><path d="M-330,90 C-390,330 -300,570 0,580 C300,570 390,330 330,90 C300,-90 -300,-90 -330,90Z"/></clipPath>
+  <clipPath id="headclip"><ellipse cx="0" cy="0" rx="205" ry="205"/></clipPath>
+  </defs><path d="M528,258 Q570,186.4 612,258 L616,254 Q570,152.4 524,254Z" fill="#a98be0" opacity="0.92"/><path d="M524,256 Q570,164.4 616,256" stroke="#6a3fb0" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.8"/><clipPath id="lcR"><ellipse cx="570" cy="262" rx="39" ry="45"/></clipPath><g clip-path="url(#lcR)"><path d="M528,258 Q570,186.4 612,258 L612,182 L528,182Z" fill="url(#zFace)"/><path d="M528,258 Q570,186.4 612,258" stroke="#140806" stroke-width="5" fill="none" stroke-linecap="round"/></g></svg>

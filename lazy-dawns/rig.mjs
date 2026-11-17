@@ -306,11 +306,11 @@ function headSvg(p) {
   const ear = (s) => `<ellipse cx="${s * (205 * (1 - 0.07 * Math.min(SLIM, 1.4)) + (s > 0 ? -yaw * 24 : -yaw * 12))}" cy="8" rx="${32 * (s > 0 ? 1 - 0.3 * Math.max(0, yaw) : 1 + 0.1 * Math.max(0, yaw))}" ry="50" fill="${SKINB}" ${O8}/>`;
   return `<g>${hr.hd ? hdBack(hr) : hairBehind(hr)}
     ${FEM > 0.02 ? `` : `<ellipse cx="${yaw * 6}" cy="${60 + jaw * 0.6}" rx="${188 * (1 - 0.14 * Math.min(SLIM, 1.4) - 0.06 * FACEW)}" ry="${170 + jaw * 0.6}" fill="${SKINB}" ${O8}/>`}
-    <ellipse cx="${yaw * 4}" cy="${150 + jaw * 0.9}" rx="130" ry="22" fill="#000" opacity="0.16" filter="url(#blur8)"/>
-    ${FEM > 0.02 ? `<path d="${femPathStr(yaw)}" fill="${SKIN}" ${O8}/>` : `<ellipse cx="${yaw * 4}" cy="0" rx="${208 * (1 - 0.07 * Math.min(SLIM, 1.4) - 0.03 * FACEW)}" ry="210" fill="${SKIN}" ${O8}/>`}
-    <ellipse cx="${-70 + yaw * 10}" cy="-70" rx="110" ry="80" fill="#fff" opacity="0.13" filter="url(#blur20)"/>
-    <ellipse cx="${90 + yaw * 10}" cy="${130 + jaw * 0.6}" rx="150" ry="70" fill="#000" opacity="0.18" filter="url(#blur20)"/>
-    ${ear(-1)}${ear(1)}
+    ${p.faceSvg ? '' : `<ellipse cx="${yaw * 4}" cy="${150 + jaw * 0.9}" rx="130" ry="22" fill="#000" opacity="0.16" filter="url(#blur8)"/>`}
+    ${p.faceSvg ? p.faceSvg : FEM > 0.02 ? `<path d="${femPathStr(yaw)}" fill="${SKIN}" ${O8}/>` : `<ellipse cx="${yaw * 4}" cy="0" rx="${208 * (1 - 0.07 * Math.min(SLIM, 1.4) - 0.03 * FACEW)}" ry="210" fill="${SKIN}" ${O8}/>`}
+    ${p.faceSvg ? '' : `    <ellipse cx="${-70 + yaw * 10}" cy="-70" rx="110" ry="80" fill="#fff" opacity="0.13" filter="url(#blur20)"/>
+    <ellipse cx="${90 + yaw * 10}" cy="${130 + jaw * 0.6}" rx="150" ry="70" fill="#000" opacity="0.18" filter="url(#blur20)"/>`}
+    ${p.faceSvg ? '' : ear(-1) + ear(1)}
     ${hr.hd ? `<g transform="translate(${yaw * 10},0)">${hdTop(hr, yaw)}</g>` : `<g transform="translate(${yaw * 10},0)">${hairCurly(hr)}${hairTop(hr)}</g>`}
     <g transform="translate(${fx},${(p.pitch || 0) * 12})">
       <!-- pomulos / mejillas -->
@@ -330,8 +330,8 @@ function headSvg(p) {
         <ellipse cx="0" cy="48" rx="${34 + (p.flare || 0) * 3}" ry="26" fill="#7d4524" ${O8}/><ellipse cx="-9" cy="38" rx="10" ry="6" fill="#fff" opacity="0.4"/>
         <ellipse cx="-12" cy="58" rx="${7 + (p.flare || 0) * 2}" ry="5" fill="#2a130a"/><ellipse cx="12" cy="58" rx="${7 + (p.flare || 0) * 2}" ry="5" fill="#2a130a"/>
       </g>
-      ${FEM > 0.02 ? '<g clip-path="url(#femClip)">' : ''}${glowSvg(sk.glow)}${redSvg(sk.red || 0)}${faceWrinkles(FACEW, yaw)}${femFace(FEM, SKINT && SKINT.tex)}${FEM > 0.02 ? '</g>' : ''}
-      ${FEM > 0.02 ? `<g clip-path="url(#femClip)" fill="none"><path d="${femPathStr(yaw)}" stroke="#3a1a0a" stroke-width="22" opacity="${0.34 * FEM}" filter="url(#blur3)"/><path d="M${yaw * 4 - 128},112 C${yaw * 4 - 104},166 ${yaw * 4 - 64},196 ${yaw * 4 - 26},208 M${yaw * 4 + 128},112 C${yaw * 4 + 104},166 ${yaw * 4 + 64},196 ${yaw * 4 + 26},208" stroke="#ffe2c4" stroke-width="5" stroke-linecap="round" opacity="${0.32 * FEM}"/></g>` : ''}
+      ${FEM > 0.02 ? '<g clip-path="url(#femClip)">' : ''}${glowSvg(sk.glow)}${redSvg(sk.red || 0)}${faceWrinkles(FACEW, yaw)}${p.faceSvg ? '' : femFace(FEM, SKINT && SKINT.tex)}${FEM > 0.02 ? '</g>' : ''}
+      ${FEM > 0.02 && !p.faceSvg ? `<g clip-path="url(#femClip)" fill="none"><path d="${femPathStr(yaw)}" stroke="#3a1a0a" stroke-width="22" opacity="${0.34 * FEM}" filter="url(#blur3)"/><path d="M${yaw * 4 - 128},112 C${yaw * 4 - 104},166 ${yaw * 4 - 64},196 ${yaw * 4 - 26},208 M${yaw * 4 + 128},112 C${yaw * 4 + 104},166 ${yaw * 4 + 64},196 ${yaw * 4 + 26},208" stroke="#ffe2c4" stroke-width="5" stroke-linecap="round" opacity="${0.32 * FEM}"/></g>` : ''}
       <g transform="translate(${yaw * 6},${102 + jaw * 0.8 + (p.mouth.lip ? 14 : 0)}) scale(${1 - 0.3 * FEM})">${(p.mouth.lip && (p.mouth.lipP ?? 1) < 1) ? `<defs><clipPath id="lipSw"><rect x="-130" y="-90" width="${(260 * clamp(p.mouth.lipP)).toFixed(1)}" height="260"/></clipPath></defs>${mouthSvg({ ...p.mouth, lip: null }, yaw)}<g clip-path="url(#lipSw)">${mouthSvg(p.mouth, yaw)}</g>` : mouthSvg(p.mouth, yaw)}</g>
       ${(() => { const mk = p.makeup || {}; const m = mk.mole ?? 1, sc = mk.scab ?? 0; return `${m > 0.02 ? `<g transform="translate(108,70)" opacity="${m}"><circle r="9" fill="#2a1208" stroke="${OUT}" stroke-width="3"/><path d="M-2,-8 q-6,-18 -2,-28 M3,-8 q4,-16 12,-22 M6,-4 q16,-6 24,-4" stroke="#12090a" stroke-width="3" fill="none" stroke-linecap="round"/></g>` : ''}${sc > 0.02 ? `<g transform="translate(124,50)" opacity="${sc}"><circle r="12" fill="#e3342f" opacity="0.35"/><circle r="6.5" fill="#6b2a1a" stroke="#3a1409" stroke-width="2"/></g>` : ''}`; })()}
       ${FEM > 0.02 ? '<g clip-path="url(#femClip)">' : ''}<ellipse cx="-46" cy="-56" rx="30" ry="12" fill="#fff" opacity="0.14" filter="url(#blur8)"/>
@@ -558,6 +558,11 @@ function heelsLayer(of, p) {
   return `<g>${heel(-130, lift.l, 1)}${heel(130, lift.r, -1)}</g>`;
 }
 
+
+// ---- Exportes para el rig2d: la cabeza (rostro, ojos, cejas, nariz, boca, dientes) y el pelo de Lazy tal cual, origen = centro de la cabeza ----
+function headGlobals(p) { const of = p.outfit && p.outfit.kind && p.outfit.kind !== 'gym' ? p.outfit : null; SLIM = p.slim || 0; LOOSE = 0; FACEW = p.faceWrinkle || 0; BODYW = 0; FEM = p.fem || 0; SKINT = p.skinTex || null; if (SKINT && typeof SKINT === 'object') SKINT = { ...SKINT }; GYM = null; BT = null; AST = null; SHT = null; RED = false; return of; }
+export function drawLazyHeadBack(p) { headGlobals(p); const s = `<g transform="translate(0,${(p.pitch || 0) * 10}) scale(${1 - 0.2 * FEM},${1 - 0.14 * FEM})">${headSvg(p)}</g>`; return s; }
+export function drawLazyHeadFront(p) { headGlobals(p); return `<g transform="translate(0,${(p.pitch || 0) * 10}) scale(${1 - 0.2 * FEM},${1 - 0.14 * FEM})">${(p.hair || {}).hd ? hdFront(p.hair, p.yaw || 0, p.tearT || 0) : ''}${jewelHead(p.outfit)}</g>`; }
 export function drawLazy(p) {
   const br = p.breath || 0, sh = (p.shoulders || 0) * 14;
   const of = p.outfit && p.outfit.kind && p.outfit.kind !== 'gym' ? p.outfit : null; const gownOn = of && (of.prog ?? 1) > 0.02; SHIRT = of && (of.prog ?? 1) >= 1 ? (of.kind === 'neon' ? 'url(#neonG)' : of.kind === 'red' ? 'url(#redG)' : 'url(#gownG)') : 'url(#shirt)';
