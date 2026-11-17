@@ -9,14 +9,14 @@ const O8 = `stroke="${OUT}" stroke-width="8" stroke-linejoin="round"`;
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 const lerp = (a, b, k) => a + (b - a) * k;
 let SHIRT = 'url(#shirt)';
-const SKIN = 'url(#skin)', SKINB = 'url(#skinB)', HAIR = 'url(#hair)'; let PANTS = 'url(#pants)'; let GYM = null; let SLIM = 0; let LOOSE = 0; let FACEW = 0; let BODYW = 0; let FEM = 0; let SKINT = null; let BT = null; let AST = null; let SHT = null;
+const SKIN = 'url(#skin)', SKINB = 'url(#skinB)', HAIR = 'url(#hair)'; let PANTS = 'url(#pants)'; let GYM = null; let SLIM = 0; let LOOSE = 0; let FACEW = 0; let BODYW = 0; let FEM = 0; let SKINT = null; let BT = null; let AST = null; let SHT = null; let RED = false;
 const LID = '#a1613a';
 
 // ---------- IK de 2 huesos (hombro -> codo -> mano) ----------
 const L1 = 165, L2 = 145;
 export function setSlim(v) { SLIM = v; }
 export function solveArm(side, target) {
-  const S = { x: side * 296 * Math.max(0.46, 1 - 0.115 * SLIM), y: 58 };
+  const S = { x: side * 296 * Math.max(0.46, 1 - 0.115 * SLIM), y: (SHT ? 22 : 58) };
   let dx = target.x - S.x, dy = target.y - S.y;
   let d = Math.hypot(dx, dy); const dmax = L1 + L2 - 2, dmin = Math.abs(L1 - L2) + 2;
   const dc = clamp(d, dmin, dmax); if (d > 0) { dx *= dc / d; dy *= dc / d; } d = dc;
@@ -351,7 +351,7 @@ const SHADE_DEFS = `<defs>
   <clipPath id="shirtClip"><path d="${SHIRT_PATH()}"/></clipPath>
 </defs>`;
 function SHIRT_PATH() {
-  if (BT && !GYM && SHIRT && String(SHIRT).includes('gownG')) return femGownPath(BT);
+  if (BT && !GYM && SHIRT && (String(SHIRT).includes('gownG') || String(SHIRT).includes('redG'))) return femGownPath(BT);
   if (GYM) return `M-78,-96 C-150,-92 -262,-52 -312,34 C-352,110 -368,190 -364,270 C-362,340 -352,420 -330,500 Q0,540 330,500 C352,420 362,340 364,270 C368,190 352,110 312,34 C262,-52 150,-92 78,-96 Z`;
   const hem = []; for (let i = 0; i <= 15; i++) { const x = -330 + i * 44; hem.push(`L${x},${i % 2 ? 404 : 378}`); }
   return `M-78,-96 C-150,-92 -262,-52 -312,34 C-352,110 -368,190 -364,270 C-362,320 -350,352 -330,374 ${hem.join(' ')} L330,374 C350,352 362,320 364,270 C368,190 352,110 312,34 C262,-52 150,-92 78,-96 Z`;
@@ -437,7 +437,7 @@ function handF(sd, o, S, pass, curl, spread) {
 }
 function armF(side, arm) {
   const S = AS[AST] || AS.A;
-  const k = arm.rot1 !== undefined ? { S: { x: side * 296 * Math.max(0.46, 1 - 0.115 * SLIM), y: 58 }, rot1: arm.rot1, rot2: arm.rot2 } : solveArm(side, arm.t);
+  const k = arm.rot1 !== undefined ? { S: { x: side * 296 * Math.max(0.46, 1 - 0.115 * SLIM), y: (SHT ? 22 : 58) }, rot1: arm.rot1, rot2: arm.rot2 } : solveArm(side, arm.t);
   const wrist = arm.w || 0, curl = arm.curl ?? 0.3, spread = arm.spread ?? 0.15, sw = Math.max(0.62, 1 - 0.07 * SLIM);
   const [u0, um, u1] = S.u, [f0, fm, f1] = S.f;
   const sleeve = `<g transform="translate(0,-26) scale(${sw},1)"><path d="${taper(112, 82, 84, 74)}" fill="${SHIRT}" ${O8}/><path d="${taper(112, 82, 84, 74)}" fill="url(#pantG)" opacity="0.55"/><path d="M-72,74 Q0,92 72,74" stroke="#2ecc71" stroke-width="16" fill="none" opacity="0.9"/></g>`;
@@ -451,12 +451,12 @@ function armF(side, arm) {
     const wristBone = !o && S.bones && !longS ? `<circle cx="${side * 7}" cy="${L2 - 6}" r="5" fill="#fff" opacity="0.2"/><path d="M-5,${L2 - 28} L-4,${L2 - 4} M6,${L2 - 28} L5,${L2 - 4}" stroke="#000" stroke-opacity="0.12" stroke-width="2.4"/>` : '';
     return `<g transform="translate(${k.S.x},${k.S.y}) rotate(${k.rot1})">${P(up)}${upD}
       <g transform="translate(0,${L1}) rotate(${k.rot2})">${P(fo)}${foD}${elbowBone}${wristBone}
-        <g transform="translate(0,${L2}) rotate(${wrist})"><g transform="scale(0.98)">${handF(side, O8, S, ps, curl, spread)}</g></g></g>${o ? '' : sleeveX}</g>`; };
+        <g transform="translate(0,${L2}) rotate(${wrist})"><g transform="scale(0.98)">${handF(side, O8, S, ps, curl, spread)}</g></g>${!o && RED ? `<g transform="translate(0,${L2 - 8})"><ellipse rx="${f1 + 3}" ry="6" fill="url(#goldG)" stroke="${OUT}" stroke-width="3"/><ellipse cx="0" cy="-2" rx="${f1 + 1}" ry="3" fill="#fff" opacity="0.35"/></g>` : ''}</g>${o ? '' : sleeveX}</g>`; };
   return pass('o') + pass('f');
 }
 function armSvg(side, arm) {
   if (AST) return armF(side, arm);
-  const k = arm.rot1 !== undefined ? { S: { x: side * 296 * Math.max(0.46, 1 - 0.115 * SLIM), y: 58 }, rot1: arm.rot1, rot2: arm.rot2 } : solveArm(side, arm.t);
+  const k = arm.rot1 !== undefined ? { S: { x: side * 296 * Math.max(0.46, 1 - 0.115 * SLIM), y: (SHT ? 22 : 58) }, rot1: arm.rot1, rot2: arm.rot2 } : solveArm(side, arm.t);
   const wrist = arm.w || 0;
   const aw0 = Math.max(0.5, 1 - 0.12 * SLIM), aw = Math.max(0.5, 1 - 0.12 * SLIM), sw = Math.max(0.62, 1 - 0.07 * SLIM), hs = 0.95 * Math.max(0.74, 1 - 0.06 * SLIM);
   const sleeve = `<g transform="translate(0,-26) scale(${sw},1)"><path d="${taper(112, 82, 84, 74)}" fill="${SHIRT}" ${O8}/><path d="${taper(112, 82, 84, 74)}" fill="url(#pantG)" opacity="0.55"/>
@@ -487,6 +487,7 @@ const GYM_DEFS = `<defs><linearGradient id="gyPant" x1="0" y1="0" x2="1" y2="0">
 const OUTFIT_DEFS = `<defs>
   <linearGradient id="gownG" x1="0" y1="0" x2="1" y2="0.2"><stop offset="0" stop-color="#064e3b"/><stop offset="0.22" stop-color="#10b981"/><stop offset="0.38" stop-color="#6ee7b7"/><stop offset="0.52" stop-color="#059669"/><stop offset="0.8" stop-color="#065f46"/><stop offset="1" stop-color="#022c22"/></linearGradient>
   <linearGradient id="neonG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff2bd6"/><stop offset="0.5" stop-color="#fff200"/><stop offset="1" stop-color="#00f0ff"/></linearGradient>
+  <linearGradient id="redG" x1="0" y1="0" x2="1" y2="0.3"><stop offset="0" stop-color="#5a0711"/><stop offset="0.3" stop-color="#a8101f"/><stop offset="0.5" stop-color="#d12333"/><stop offset="0.75" stop-color="#8e0c1a"/><stop offset="1" stop-color="#4a050e"/></linearGradient>
   <linearGradient id="goldG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff3b0"/><stop offset="0.5" stop-color="#d4a017"/><stop offset="1" stop-color="#8a6508"/></linearGradient>
   <clipPath id="gownClip"><path d="${GOWN_PATH}"/></clipPath></defs>`;
 function jewelHead(of) {
@@ -508,7 +509,29 @@ function femGownPath(k) { const S = BTS[k] || BTS.A;
   let d = `M${f(P0)}` + seg.map((s) => ` C${f(s[0])} ${f(s[1])} ${f(s[2])}`).join('') + ' Q0,800 -424,742';
   for (let i = seg.length - 1; i >= 0; i--) { const s = seg[i], e = pts[i]; d += ` C${f([-s[1][0], s[1][1]])} ${f([-s[0][0], s[0][1]])} ${f([-e[0], e[1]])}`; }
   return (bare ? d.replace(/^M/, 'M') + ` Q0,${P0[1] + 40} ${P0[0]},${P0[1]}` : d) + ' Z'; }
+function redLayer(of, t) {
+  const S = BTS[BT || 'C'] || BTS.C, xt = S.sh - 30, wa = S.wa, bu = S.bu, hp = S.hp;
+  const f = (n) => n.toFixed(1);
+  const mir = (pts) => pts;
+  const corset = `M${-xt},46 Q${-xt * 0.55},18 ${-xt * 0.14},54 Q0,74 ${xt * 0.14},54 Q${xt * 0.55},18 ${xt},46 C${xt + 8},100 ${bu},112 ${bu - 4},152 C${bu - 12},205 ${wa + 10},232 ${wa + 6},266 L${-wa - 6},266 C${-wa - 10},232 ${-bu + 12},205 ${-bu + 4},152 C${-bu},112 ${-xt - 8},100 ${-xt},46Z`;
+  const skin = `<path d="M-66,-136 L66,-136 C130,-118 ${xt - 20},-84 ${xt + 8},-30 L${xt + 12},80 L${-xt - 12},80 L${-xt - 8},-30 C${-xt + 20},-84 -130,-118 -66,-136Z" fill="${SKINB}" stroke="${OUT}" stroke-width="8" stroke-linejoin="round"/><path d="M-66,-136 L66,-136 C130,-118 ${xt - 20},-84 ${xt + 8},-30" fill="none" stroke="#fff" stroke-opacity="0.1" stroke-width="10" transform="translate(0,12)"/>
+    <path d="M${-wa - 6},262 L${wa + 6},262 L${wa + 2},310 L${-wa - 2},310Z" fill="${SKINB}" stroke="${OUT}" stroke-width="6"/><path d="M${-wa - 4},262 L${-wa - 2},310 M${wa + 4},262 L${wa + 2},310" stroke="${OUT}" stroke-width="7"/><ellipse cx="0" cy="292" rx="5" ry="7" fill="#2a1208" opacity="0.6"/>`;
+  const bones = [-0.8, -0.55, -0.3, -0.1, 0.1, 0.3, 0.55, 0.8].map((k) => `<path d="M${f(k * xt)},${k === 0 ? 70 : 78} C${f(k * bu)},150 ${f(k * wa * 1.05)},215 ${f(k * wa)},258" stroke="#2a050a" stroke-opacity="0.45" stroke-width="4" fill="none"/>`).join('');
+  const cor = `<path d="${corset}" fill="url(#redG)" stroke="${OUT}" stroke-width="8" stroke-linejoin="round"/><clipPath id="corClip"><path d="${corset}"/></clipPath><g clip-path="url(#corClip)">${bones}<path d="M${-bu + 40},90 C${-bu + 50},170 ${-wa + 30},220 ${-wa + 30},258" stroke="#ff8a96" stroke-opacity="0.35" stroke-width="12" fill="none" stroke-linecap="round"/><path d="M${-xt},46 Q${-xt * 0.55},18 ${-xt * 0.14},54 Q0,74 ${xt * 0.14},54 Q${xt * 0.55},18 ${xt},46" stroke="#ff8a96" stroke-opacity="0.4" stroke-width="6" fill="none"/></g>`;
+  const skirtL = `M${-wa - 4},296 C${-wa - 12},350 ${-hp},400 ${-hp},452 C${-hp},560 ${-hp - 20},640 ${-hp - 50},684 C${-hp - 90},720 -330,742 -430,750`;
+  const skirt = `${skirtL} Q0,806 430,750 C330,742 ${hp + 90},720 ${hp + 50},684 C${hp + 20},640 ${hp},560 ${hp},452 C${hp},400 ${wa + 12},350 ${wa + 4},296Z`;
+  const legPath = `M66,456 C74,540 66,620 78,716 L132,722 C134,630 146,540 148,452Z`;
+  const slit = `M52,460 C66,560 60,660 46,756 L196,756 C176,660 160,560 152,452Z`;
+  const ruffle = (() => { let o = '', y = 452; const N = 9; const xs = (yy) => 168 + (yy - 452) * 0.2; for (let k = 0; k < 2; k++) { let d = `M${xs(452) - 4 + k * 6},${452 + k * 8}`; for (let i = 0; i < N; i++) { const y0 = 452 + k * 8 + i * 34, y1 = y0 + 34; d += ` Q${xs(y0) + 120 - k * 34 + i * 7},${y0 + 10} ${xs(y1) + 20 - k * 8},${y1}`; } d += ` L${xs(756) - 36},760 L${xs(452) - 6},452Z`; o += `<path d="${d}" fill="${k ? '#c11a2b' : '#8e0c1a'}" stroke="${OUT}" stroke-width="5" stroke-linejoin="round"/>`; } return o + `<path d="M${xs(470) + 14},470 Q${xs(560) + 60},560 ${xs(700) + 40},740" stroke="#ff8a96" stroke-opacity="0.3" stroke-width="6" fill="none" stroke-linecap="round"/>`; })();
+  const drape = [[-40, 330, -120, 640], [10, 330, -20, 700], [-100, 340, -250, 700], [-60, 400, -190, 720]].map(([a, b, c, d]) => `<path d="M${a},${b} Q${(a + c) / 2 - 24},${(b + d) / 2} ${c},${d}" stroke="#2a050a" stroke-opacity="0.35" stroke-width="9" fill="none" stroke-linecap="round"/><path d="M${a + 12},${b + 4} Q${(a + c) / 2 - 12},${(b + d) / 2} ${c + 12},${d - 4}" stroke="#ff8a96" stroke-opacity="0.22" stroke-width="5" fill="none" stroke-linecap="round"/>`).join('') + `<path d="M${-hp - 20},560 q40,40 60,110 M${hp},560 q-10,60 20,120" stroke="#2a050a" stroke-opacity="0.3" stroke-width="8" fill="none" stroke-linecap="round"/>`;
+  const rose = `<g transform="translate(62,318)"><circle r="40" fill="#7d0a17" stroke="${OUT}" stroke-width="5"/><circle r="31" fill="#b8132a" stroke="#4a050e" stroke-width="3"/><circle r="22" fill="#d1202f" stroke="#4a050e" stroke-width="3"/><path d="M-14,2 a14,14 0 1,1 16,13 a8,8 0 1,1 -9,-9" stroke="#4a050e" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M-26,-14 Q0,-40 28,-18" stroke="#ff8a96" stroke-opacity="0.5" stroke-width="5" fill="none" stroke-linecap="round"/></g>`;
+  const dots = [-1, -0.6, -0.2, 0.2, 0.6, 1].map((k) => `<circle cx="${f(k * 66)}" cy="${f(-100 + 30 * (1 - k * k) + 0)}" r="5.5" fill="url(#goldG)" stroke="${OUT}" stroke-width="2"/>`).join('');
+  const necklace = `<g><path d="M-70,-102 Q0,-34 70,-102" stroke="url(#goldG)" stroke-width="6" fill="none" stroke-linecap="round"/>${[-52, -34, -16, 0, 16, 34, 52].map((x) => `<circle cx="${x}" cy="${-98 + 56 * (1 - Math.pow(x / 70, 2)) * 0.62 - 0}" r="5" fill="url(#goldG)" stroke="${OUT}" stroke-width="2"/>`).join('')}<path d="M0,-52 l-13,18 l13,22 l13,-22Z" fill="#d1202f" stroke="${OUT}" stroke-width="4" stroke-linejoin="round"/><path d="M-6,-40 l5,-8" stroke="#ffd2d8" stroke-width="3" stroke-linecap="round"/></g>`;
+  const lk = LOOSE ? 1 + 0.15 * LOOSE : 1;
+  return `<g transform="scale(${lk.toFixed(3)},1)">${skin}<path d="${skirt}" fill="url(#redG)" stroke="${OUT}" stroke-width="8" stroke-linejoin="round"/><clipPath id="skClip"><path d="${skirt}"/></clipPath><g clip-path="url(#skClip)">${drape}<path d="${slit}" fill="#3b0510"/><path d="${legPath}" fill="${SKINB}" stroke="${OUT}" stroke-width="6" stroke-linejoin="round"/><path d="${legPath}" fill="url(#limbG)"/><path d="M${-hp},452 L${-hp - 60},700" stroke="#2a050a" stroke-opacity="0.2" stroke-width="10"/></g><path d="${slit}" fill="none" stroke="${OUT}" stroke-width="6" stroke-linejoin="round" opacity="0.0"/>${ruffle}${rose}${cor}${necklace}</g>`;
+}
 function outfitLayer(of, t) {
+  if (of && of.kind === 'red') return redLayer(of, t);
   const GP = BT ? femGownPath(BT) : GOWN_PATH;
   const bareSkin = BT && SHT === 'B' ? (() => { const s = (BTS[BT] || BTS.A).sh - 4; return `<path d="M-66,-136 L66,-136 C130,-118 ${s - 30},-84 ${s},-30 L${s},70 L${-s},70 L${-s},-30 C${-s + 30},-84 -130,-118 -66,-136Z" fill="${SKINB}" stroke="${OUT}" stroke-width="8" stroke-linejoin="round"/><path d="M-66,-136 L66,-136 C130,-118 ${s - 30},-84 ${s},-30" fill="none" stroke="#fff" stroke-opacity="0.12" stroke-width="10" transform="translate(0,12)"/>`; })() : '';
   if (!of || !of.kind) return '';
@@ -530,15 +553,15 @@ function outfitLayer(of, t) {
 }
 function heelsLayer(of, p) {
   if (!of || !of.kind || (of.prog ?? 1) < 0.9) return '';
-  const lift = p.heel || { l: 0, r: 0 }; const col = of.kind === 'neon' ? '#ff2bd6' : '#111827';
+  const lift = p.heel || { l: 0, r: 0 }; const col = of.kind === 'neon' ? '#ff2bd6' : of.kind === 'red' ? '#a50f1f' : '#111827';
   const heel = (x, up, s) => `<g transform="translate(${x},${748 - up})"><path d="M${-s * 56},0 C${-s * 70},-26 ${-s * 20},-52 ${s * 14},-34 L${s * 90},-6 Q${s * 110},6 ${s * 80},16 L${-s * 48},16 Q${-s * 70},10 ${-s * 56},0Z" fill="${col}" stroke="${OUT}" stroke-width="6" stroke-linejoin="round"/><path d="M${-s * 52},12 L${-s * 66},58 L${-s * 46},58 L${-s * 30},16Z" fill="url(#goldG)" stroke="${OUT}" stroke-width="5" stroke-linejoin="round"/><path d="M${-s * 30},-30 Q${s * 10},-44 ${s * 60},-12" stroke="#fff" stroke-opacity="0.35" stroke-width="5" fill="none"/></g>`;
   return `<g>${heel(-130, lift.l, 1)}${heel(130, lift.r, -1)}</g>`;
 }
 
 export function drawLazy(p) {
   const br = p.breath || 0, sh = (p.shoulders || 0) * 14;
-  const of = p.outfit && p.outfit.kind && p.outfit.kind !== 'gym' ? p.outfit : null; const gownOn = of && (of.prog ?? 1) > 0.02; SHIRT = of && (of.prog ?? 1) >= 1 ? (of.kind === 'neon' ? 'url(#neonG)' : 'url(#gownG)') : 'url(#shirt)';
-  SLIM = p.slim || 0; LOOSE = (p.outfit && p.outfit.loose) || 0; FACEW = p.faceWrinkle || 0; BODYW = p.bodyWrinkle || 0; FEM = p.fem || 0; BT = p.bodyT || null; AST = p.armStyle || null; SHT = p.shoulderT || null; SKINT = p.skinTex || null; if (SKINT && typeof SKINT === 'object') { SKINT = { ...SKINT }; } GYM = (p.outfit && p.outfit.kind === 'gym') ? p.outfit : null; PANTS = GYM ? 'url(#gyPant)' : 'url(#pants)'; if (GYM) SHIRT = GYM.top === 'white' ? 'url(#gyTopW)' : GYM.top === 'black' ? 'url(#gyTopK)' : 'url(#gyTop)';
+  const of = p.outfit && p.outfit.kind && p.outfit.kind !== 'gym' ? p.outfit : null; const gownOn = of && (of.prog ?? 1) > 0.02; SHIRT = of && (of.prog ?? 1) >= 1 ? (of.kind === 'neon' ? 'url(#neonG)' : of.kind === 'red' ? 'url(#redG)' : 'url(#gownG)') : 'url(#shirt)';
+  SLIM = p.slim || 0; LOOSE = (p.outfit && p.outfit.loose) || 0; FACEW = p.faceWrinkle || 0; BODYW = p.bodyWrinkle || 0; FEM = p.fem || 0; BT = p.bodyT || null; AST = p.armStyle || null; SHT = p.shoulderT || (of && of.kind === 'red' ? 'B' : null); RED = !!(of && of.kind === 'red'); SKINT = p.skinTex || null; if (SKINT && typeof SKINT === 'object') { SKINT = { ...SKINT }; } GYM = (p.outfit && p.outfit.kind === 'gym') ? p.outfit : null; PANTS = GYM ? 'url(#gyPant)' : 'url(#pants)'; if (GYM) SHIRT = GYM.top === 'white' ? 'url(#gyTopW)' : GYM.top === 'black' ? 'url(#gyTopK)' : 'url(#gyTop)';
   const lg = p.legs || { l: {}, r: {} };
   const slimK = Math.max(0.46, 1 - 0.115 * (p.slim || 0));
   const chest = `<g transform="translate(0,230) scale(${(1 + 0.012 * br) * slimK},${1 + 0.016 * br}) translate(0,-230)">
