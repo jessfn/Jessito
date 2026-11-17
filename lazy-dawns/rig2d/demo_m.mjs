@@ -1,0 +1,5 @@
+import { spawn } from 'node:child_process'; import { CLIPS, poseClip } from './m_clips.mjs'; import { mPng } from './m_scene.mjs';
+const seq = ['idle', 'look_left_right', 'wave', 'point', 'walk', 'run', 'jump', 'attack_slash', 'cast_magic', 'hurt', 'surprised', 'angry', 'laugh', 'defeat', 'vanish']; const FPS = 30;
+const ff = spawn('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(FPS), '-i', '-', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '19', '-preset', 'medium', 'out/M_clips_demo.mp4'], { stdio: ['pipe', 'inherit', 'inherit'] });
+let T = 0; for (const name of seq) { const c = CLIPS[name]; const len = Math.max(1.5, c.dur + 0.3); const n = Math.round(len * FPS); for (let i = 0; i < n; i++) { const t = i / FPS; const P = poseClip(name, t); if (!ff.stdin.write(mPng(P, T + t, { label: name.replace(/_/g, ' ') }))) await new Promise((r) => ff.stdin.once('drain', r)); } T += len; console.log(name); }
+ff.stdin.end(); await new Promise((r) => ff.on('close', r)); console.log('listo');

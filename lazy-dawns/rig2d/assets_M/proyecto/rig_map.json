@@ -1,0 +1,87 @@
+{
+ "canvas": {
+  "width": 1024,
+  "height": 1536
+ },
+ "pivots": {
+  "hips": [
+   520,
+   745
+  ],
+  "chest": [
+   520,
+   600
+  ],
+  "neck": [
+   518,
+   392
+  ],
+  "head": [
+   518,
+   330
+  ],
+  "shoulderL": [
+   430,
+   440
+  ],
+  "elbowL": [
+   362,
+   612
+  ],
+  "wristL": [
+   318,
+   800
+  ],
+  "shoulderR": [
+   610,
+   440
+  ],
+  "elbowR": [
+   682,
+   612
+  ],
+  "wristR": [
+   722,
+   792
+  ]
+ },
+ "hierarchy_implemented": [
+  "hips",
+  "chest(torso)",
+  "neck",
+  "head",
+  "hat",
+  "shoulder_L/R -> upper_arm -> forearm -> hand(+5 dedos 2 falanges)",
+  "leg_L/R (rotacion en la cadera con boton de elevacion)",
+  "cape_front",
+  "cape_back_L/R (vertices con retardo)"
+ ],
+ "controls": {
+  "eyes": [
+   "open",
+   "glow",
+   "look",
+   "brow"
+  ],
+  "mouth": "smile (profundidad de la sonrisa cosida)",
+  "head": [
+   "rot",
+   "yaw"
+  ],
+  "hat": [
+   "rot",
+   "lift"
+  ],
+  "cape": [
+   "swayL",
+   "swayR",
+   "flap"
+  ],
+  "arms": "ik2 (hombro-codo-muneca)",
+  "hands": [
+   "curl x5",
+   "spread",
+   "wig"
+  ]
+ }
+}

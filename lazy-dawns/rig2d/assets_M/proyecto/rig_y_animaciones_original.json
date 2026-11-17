@@ -1,0 +1,302 @@
+{
+  "project": "Personaje maestro 2D - videojuego",
+  "version": "1.0",
+  "language": "es",
+  "visual_identity": {
+    "silhouette": "figura humanoide oscura, sombrero negro de ala ancha con cinta dorada y capa negra larga rasgada",
+    "face": "rostro negro sin rasgos humanos realistas, ojos rojos luminosos, cejas angulares y sonrisa roja curva",
+    "costume": "capa larga negra con ribetes rojos, broche rojo, camisa oscura abotonada, cinturón, pantalón holgado, guantes y botas negras",
+    "palette": [
+      "negro",
+      "carbón",
+      "rojo neón",
+      "rojo oscuro",
+      "dorado"
+    ],
+    "consistency_rule": "No cambiar identidad, silueta, sombrero, rostro, capa, broche, colores ni proporciones entre escenas."
+  },
+  "coordinate_and_rig_convention": {
+    "view": "frontal 2D; permitir perfiles y tres cuartos solo cuando la acción lo requiera",
+    "origin": "centro de la pelvis",
+    "units": "porcentaje del alto del personaje",
+    "hierarchy": [
+      "root",
+      "pelvis",
+      "torso",
+      "neck",
+      "head",
+      "hat",
+      "face",
+      "eyes_left",
+      "eyes_right",
+      "brows_left",
+      "brows_right",
+      "mouth",
+      "shoulder_left",
+      "upper_arm_left",
+      "forearm_left",
+      "hand_left",
+      "shoulder_right",
+      "upper_arm_right",
+      "forearm_right",
+      "hand_right",
+      "thigh_left",
+      "shin_left",
+      "foot_left",
+      "thigh_right",
+      "shin_right",
+      "foot_right",
+      "cloak_collar",
+      "cloak_front_left",
+      "cloak_front_right",
+      "cloak_back_left",
+      "cloak_back_right",
+      "cloak_tail_left",
+      "cloak_tail_right"
+    ],
+    "separate_art_layers_required": [
+      "sombrero_corona",
+      "sombrero_ala",
+      "cinta_dorada",
+      "cabeza",
+      "ojo_izquierdo",
+      "ojo_derecho",
+      "pupilas",
+      "cejas",
+      "boca",
+      "cuello",
+      "torso",
+      "broche",
+      "capa_cuello",
+      "capa_panel_izquierdo",
+      "capa_panel_derecho",
+      "capa_trasera_izquierda",
+      "capa_trasera_derecha",
+      "puntas_capa",
+      "brazo_superior_izquierdo",
+      "antebrazo_izquierdo",
+      "mano_izquierda",
+      "brazo_superior_derecho",
+      "antebrazo_derecho",
+      "mano_derecha",
+      "pulgar_y_dedos_individuales_de_cada_mano",
+      "pelvis",
+      "muslo_izquierdo",
+      "pantorrilla_izquierda",
+      "bota_izquierda",
+      "muslo_derecho",
+      "pantorrilla_derecha",
+      "bota_derecha"
+    ],
+    "important": "Las capas ocultas deben reconstruirse detrás de las piezas superpuestas. No basta con recortar la imagen plana. La imagen y el atlas incluidos son referencias visuales; no deben presentarse como un rig ya separado y terminado."
+  },
+  "animation_clips": {
+    "idle": {
+      "loop": true,
+      "duration_sec": 2.4,
+      "actions": [
+        "respiración sutil",
+        "subida y bajada mínima de hombros",
+        "parpadeo ocasional",
+        "movimiento secundario de la capa"
+      ]
+    },
+    "blink": {
+      "loop": false,
+      "duration_sec": 0.18,
+      "actions": [
+        "ojos abiertos",
+        "párpados bajan",
+        "ojos cerrados",
+        "ojos abiertos"
+      ]
+    },
+    "look_left_right": {
+      "loop": false,
+      "duration_sec": 0.8,
+      "actions": [
+        "ojos miran a la izquierda",
+        "cabeza acompaña ligeramente",
+        "regresa al centro",
+        "mira a la derecha",
+        "regresa"
+      ]
+    },
+    "talk": {
+      "loop": true,
+      "duration_sec": 1.0,
+      "actions": [
+        "boca cerrada",
+        "boca entreabierta",
+        "boca abierta",
+        "sonrisa",
+        "sincronizar con audio si existe"
+      ]
+    },
+    "walk": {
+      "loop": true,
+      "duration_sec": 0.9,
+      "actions": [
+        "alternar piernas",
+        "brazos opuestos",
+        "balanceo de torso",
+        "capa con retraso e inercia"
+      ]
+    },
+    "run": {
+      "loop": true,
+      "duration_sec": 0.62,
+      "actions": [
+        "zancada amplia",
+        "inclinación del torso",
+        "brazos bombeando",
+        "capa extendida hacia atrás"
+      ]
+    },
+    "jump": {
+      "loop": false,
+      "duration_sec": 0.85,
+      "actions": [
+        "anticipación",
+        "despegue",
+        "pose aérea",
+        "aterrizaje con flexión",
+        "recuperación"
+      ]
+    },
+    "land_heavy": {
+      "loop": false,
+      "duration_sec": 0.55,
+      "actions": [
+        "compresión de rodillas",
+        "capa rebota",
+        "recuperación"
+      ]
+    },
+    "wave": {
+      "loop": false,
+      "duration_sec": 1.2,
+      "actions": [
+        "elevar brazo",
+        "girar muñeca",
+        "mover mano",
+        "bajar brazo"
+      ]
+    },
+    "point": {
+      "loop": false,
+      "duration_sec": 0.65,
+      "actions": [
+        "elevar antebrazo",
+        "extender índice",
+        "mantener gesto",
+        "volver a reposo"
+      ]
+    },
+    "attack_slash": {
+      "loop": false,
+      "duration_sec": 0.7,
+      "actions": [
+        "anticipación",
+        "giro de torso",
+        "barrido de brazo",
+        "estela roja opcional",
+        "recuperación"
+      ]
+    },
+    "cast_magic": {
+      "loop": false,
+      "duration_sec": 1.4,
+      "actions": [
+        "abrir manos",
+        "ojos intensifican brillo",
+        "capa se eleva",
+        "pulso rojo",
+        "efecto se disipa"
+      ]
+    },
+    "hurt": {
+      "loop": false,
+      "duration_sec": 0.45,
+      "actions": [
+        "retroceso breve",
+        "cabeza y torso reaccionan",
+        "capa sigue el movimiento"
+      ]
+    },
+    "dodge": {
+      "loop": false,
+      "duration_sec": 0.55,
+      "actions": [
+        "agacharse",
+        "desplazamiento lateral",
+        "recuperar equilibrio"
+      ]
+    },
+    "surprised": {
+      "loop": false,
+      "duration_sec": 0.6,
+      "actions": [
+        "ojos se abren",
+        "cejas suben",
+        "cabeza retrocede"
+      ]
+    },
+    "angry": {
+      "loop": true,
+      "duration_sec": 0.8,
+      "actions": [
+        "cejas se inclinan",
+        "ojos aumentan intensidad",
+        "puños se cierran"
+      ]
+    },
+    "laugh": {
+      "loop": false,
+      "duration_sec": 1.5,
+      "actions": [
+        "boca cambia a sonrisa abierta",
+        "hombros se mueven",
+        "cabeza se inclina levemente"
+      ]
+    },
+    "defeat": {
+      "loop": false,
+      "duration_sec": 1.8,
+      "actions": [
+        "cuerpo pierde fuerza",
+        "rodillas ceden",
+        "capa cae",
+        "pose final"
+      ]
+    },
+    "vanish": {
+      "loop": false,
+      "duration_sec": 1.2,
+      "actions": [
+        "borde rojo se intensifica",
+        "silueta se fragmenta en humo oscuro y rojo",
+        "desvanecer"
+      ]
+    }
+  },
+  "secondary_motion": {
+    "cloak": "La capa debe tener segmentos independientes con retardo, flexión y seguimiento; evitar que atraviese piernas o brazos.",
+    "hat": "Mantener anclado a la cabeza; permitir pequeño rebote al correr, saltar o aterrizar.",
+    "glow": "El brillo de ojos y contorno puede pulsar sin alterar la forma base.",
+    "hands": "Preparar poses de mano abierta, puño, señalar, saludar y lanzar magia; dedos separados cuando el plano lo permita."
+  },
+  "export_targets": [
+    "PNG transparente por pieza",
+    "PSD/ORA con capas nombradas",
+    "atlas PNG con celdas uniformes",
+    "JSON de animaciones",
+    "spritesheets por acción"
+  ],
+  "engine_notes": {
+    "generic": "Usar jerarquía de huesos o deformadores 2D. Si el destino es un generador de video, tratar los clips como guías de movimiento y conservar la referencia maestra.",
+    "godot": "Skeleton2D + Bone2D o spritesheets por acción.",
+    "unity": "2D Animation: bones, weights y clips; o spritesheets.",
+    "spine_or_similar": "Importar piezas PNG transparentes, definir slots, huesos, constraints y skins."
+  }
+}

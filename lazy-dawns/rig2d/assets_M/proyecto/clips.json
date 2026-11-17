@@ -1,0 +1,190 @@
+{
+ "idle": {
+  "duration_sec": 2.4,
+  "loop": true,
+  "spec_actions": [
+   "respiración sutil",
+   "subida y bajada mínima de hombros",
+   "parpadeo ocasional",
+   "movimiento secundario de la capa"
+  ]
+ },
+ "blink": {
+  "duration_sec": 0.18,
+  "loop": false,
+  "spec_actions": [
+   "ojos abiertos",
+   "párpados bajan",
+   "ojos cerrados",
+   "ojos abiertos"
+  ]
+ },
+ "look_left_right": {
+  "duration_sec": 0.8,
+  "loop": false,
+  "spec_actions": [
+   "ojos miran a la izquierda",
+   "cabeza acompaña ligeramente",
+   "regresa al centro",
+   "mira a la derecha",
+   "regresa"
+  ]
+ },
+ "talk": {
+  "duration_sec": 1,
+  "loop": true,
+  "spec_actions": [
+   "boca cerrada",
+   "boca entreabierta",
+   "boca abierta",
+   "sonrisa",
+   "sincronizar con audio si existe"
+  ]
+ },
+ "walk": {
+  "duration_sec": 0.9,
+  "loop": true,
+  "spec_actions": [
+   "alternar piernas",
+   "brazos opuestos",
+   "balanceo de torso",
+   "capa con retraso e inercia"
+  ]
+ },
+ "run": {
+  "duration_sec": 0.62,
+  "loop": true,
+  "spec_actions": [
+   "zancada amplia",
+   "inclinación del torso",
+   "brazos bombeando",
+   "capa extendida hacia atrás"
+  ]
+ },
+ "jump": {
+  "duration_sec": 0.85,
+  "loop": false,
+  "spec_actions": [
+   "anticipación",
+   "despegue",
+   "pose aérea",
+   "aterrizaje con flexión",
+   "recuperación"
+  ]
+ },
+ "land_heavy": {
+  "duration_sec": 0.55,
+  "loop": false,
+  "spec_actions": [
+   "compresión de rodillas",
+   "capa rebota",
+   "recuperación"
+  ]
+ },
+ "wave": {
+  "duration_sec": 1.2,
+  "loop": false,
+  "spec_actions": [
+   "elevar brazo",
+   "girar muñeca",
+   "mover mano",
+   "bajar brazo"
+  ]
+ },
+ "point": {
+  "duration_sec": 0.65,
+  "loop": false,
+  "spec_actions": [
+   "elevar antebrazo",
+   "extender índice",
+   "mantener gesto",
+   "volver a reposo"
+  ]
+ },
+ "attack_slash": {
+  "duration_sec": 0.7,
+  "loop": false,
+  "spec_actions": [
+   "anticipación",
+   "giro de torso",
+   "barrido de brazo",
+   "estela roja opcional",
+   "recuperación"
+  ]
+ },
+ "cast_magic": {
+  "duration_sec": 1.4,
+  "loop": false,
+  "spec_actions": [
+   "abrir manos",
+   "ojos intensifican brillo",
+   "capa se eleva",
+   "pulso rojo",
+   "efecto se disipa"
+  ]
+ },
+ "hurt": {
+  "duration_sec": 0.45,
+  "loop": false,
+  "spec_actions": [
+   "retroceso breve",
+   "cabeza y torso reaccionan",
+   "capa sigue el movimiento"
+  ]
+ },
+ "dodge": {
+  "duration_sec": 0.55,
+  "loop": false,
+  "spec_actions": [
+   "agacharse",
+   "desplazamiento lateral",
+   "recuperar equilibrio"
+  ]
+ },
+ "surprised": {
+  "duration_sec": 0.6,
+  "loop": false,
+  "spec_actions": [
+   "ojos se abren",
+   "cejas suben",
+   "cabeza retrocede"
+  ]
+ },
+ "angry": {
+  "duration_sec": 0.8,
+  "loop": true,
+  "spec_actions": [
+   "cejas se inclinan",
+   "ojos aumentan intensidad",
+   "puños se cierran"
+  ]
+ },
+ "laugh": {
+  "duration_sec": 1.5,
+  "loop": false,
+  "spec_actions": [
+   "boca cambia a sonrisa abierta",
+   "hombros se mueven",
+   "cabeza se inclina levemente"
+  ]
+ },
+ "defeat": {
+  "duration_sec": 1.8,
+  "loop": false,
+  "spec_actions": [
+   "cuerpo pierde fuerza",
+   "rodillas ceden",
+   "capa cae",
+   "pose final"
+  ]
+ },
+ "vanish": {
+  "duration_sec": 1.2,
+  "loop": false,
+  "spec_actions": [
+   "borde rojo se intensifica",
+   "silueta se fragmenta en humo oscuro y rojo",
+   "desvanecer"
+  ]
+ }
+}

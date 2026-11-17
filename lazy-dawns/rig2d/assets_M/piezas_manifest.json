@@ -1,0 +1,382 @@
+{
+ "antebrazo_L.png": {
+  "offset_x": 289,
+  "offset_y": 577,
+  "width": 108,
+  "height": 252,
+  "canvas": [
+   1024,
+   1536
+  ]
+ },
+ "antebrazo_R.png": {
+  "offset_x": 647,
+  "offset_y": 577,
+  "width": 104,
+  "height": 244,
+  "canvas": [
+   1024,
+   1536
+  ]
+ },
+ "boca_sonrisa.png": {
+  "offset_x": 430,
+  "offset_y": 299,
+  "width": 176,
+  "height": 67,
+  "canvas": [
+   1024,
+   1536
+  ]
+ },
+ "bota_L.png": {
+  "offset_x": 570,
+  "offset_y": 1356,
+  "width": 256,
+  "height": 180,
+  "canvas": [
+   1024,
+   1536
+  ]
+ },
+ "bota_R.png": {
+  "offset_x": 214,
+  "offset_y": 1356,
+  "width": 256,
+  "height": 180,
+  "canvas": [
+   1024,
+   1536
+  ]
+ },
+ "brazo_superior_L.png": {
+  "offset_x": 327,
+  "offset_y": 397,
+  "width": 146,
+  "height": 250,
+  "canvas": [
+   1024,
+   1536
+  ]
+ },
+ "brazo_superior_R.png": {
+  "offset_x": 567,
+  "offset_y": 397,
+  "width": 150,
+  "height": 250,
+  "canvas": [
+   1024,
+   1536
+  ]
+ },
+ "cabeza.png": {
+  "offset_x": 400,
+  "offset_y": 222,
+  "width": 236,
+  "height": 194,
+  "canvas": [
+   1024,
+   1536
+  ]
+ },
+ "capa_cuello_y_broche.png": {
+  "offset_x": 399,
+  "offset_y": 342,
+  "width": 238,
+  "height": 155,
+  "canvas": [
+   1024,
+   1536
+  ]
+ },
+ "capa_paneles_hombros.png": {
+  "offset_x": 255,
+  "offset_y": 340,
+  "width": 528,
+  "height": 256,
+  "canvas": [
+   1024,
+   1536
+  ]
+ },
+ "capa_trasera_L.png": {
+  "offset_x": 59,
+  "offset_y": 368,
+  "width": 918,
+  "height": 1068,
+  "canvas": [
+   1024,
+   1536
+  ]
+ },
+ "capa_trasera_R.png": {
+  "offset_x": 59,
+  "offset_y": 368,
+  "width": 918,
+  "height": 1068,
+  "canvas": [
+   1024,
+   1536
+  ]
+ },
+ "ceja_L.png": {
+  "offset_x": 422,
+  "offset_y": 223,
+  "width": 88,
+  "height": 24,
+  "canvas": [
+   1024,
+   1536
+  ]
+ },
+ "ceja_R.png": {
+  "offset_x": 526,
+  "offset_y": 223,
+  "width": 88,
+  "height": 24,
+  "canvas": [
+   1024,
+   1536
+  ]
+ },
+ "cinta_dorada.png": {
+  "offset_x": 413,
+  "offset_y": 117,
+  "width": 216,
+  "height": 39,
+  "canvas": [
+   1024,
+   1536
+  ]
+ },
+ "cinturon.png": {
+  "offset_x": 423,
+  "offset_y": 697,
+  "width": 196,
+  "height": 52,
+  "canvas": [
+   1024,
+   1536
+  ]
+ },
+ "mano_L_dedo_index.png": {
+  "offset_x": 323,
+  "offset_y": 870,
+  "width": 31,
+  "height": 55,
+  "canvas": [
+   1024,
+   1536
+  ]
+ },
+ "mano_L_dedo_middle.png": {
+  "offset_x": 308,
+  "offset_y": 875,
+  "width": 29,
+  "height": 59,
+  "canvas": [
+   1024,
+   1536
+  ]
+ },
+ "mano_L_dedo_pinky.png": {
+  "offset_x": 281,
+  "offset_y": 866,
+  "width": 25,
+  "height": 46,
+  "canvas": [
+   1024,
+   1536
+  ]
+ },
+ "mano_L_dedo_ring.png": {
+  "offset_x": 294,
+  "offset_y": 873,
+  "width": 25,
+  "height": 54,
+  "canvas": [
+   1024,
+   1536
+  ]
+ },
+ "mano_L_dedo_thumb.png": {
+  "offset_x": 330,
+  "offset_y": 827,
+  "width": 43,
+  "height": 51,
+  "canvas": [
+   1024,
+   1536
+  ]
+ },
+ "mano_L_palma.png": {
+  "offset_x": 281,
+  "offset_y": 805,
+  "width": 75,
+  "height": 93,
+  "canvas": [
+   1024,
+   1536
+  ]
+ },
+ "mano_R_dedo_index.png": {
+  "offset_x": 686,
+  "offset_y": 862,
+  "width": 31,
+  "height": 55,
+  "canvas": [
+   1024,
+   1536
+  ]
+ },
+ "mano_R_dedo_middle.png": {
+  "offset_x": 703,
+  "offset_y": 867,
+  "width": 29,
+  "height": 59,
+  "canvas": [
+   1024,
+   1536
+  ]
+ },
+ "mano_R_dedo_pinky.png": {
+  "offset_x": 734,
+  "offset_y": 858,
+  "width": 25,
+  "height": 46,
+  "canvas": [
+   1024,
+   1536
+  ]
+ },
+ "mano_R_dedo_ring.png": {
+  "offset_x": 721,
+  "offset_y": 865,
+  "width": 25,
+  "height": 54,
+  "canvas": [
+   1024,
+   1536
+  ]
+ },
+ "mano_R_dedo_thumb.png": {
+  "offset_x": 667,
+  "offset_y": 819,
+  "width": 43,
+  "height": 51,
+  "canvas": [
+   1024,
+   1536
+  ]
+ },
+ "mano_R_palma.png": {
+  "offset_x": 684,
+  "offset_y": 797,
+  "width": 75,
+  "height": 93,
+  "canvas": [
+   1024,
+   1536
+  ]
+ },
+ "muslo_pantorrilla_L.png": {
+  "offset_x": 308,
+  "offset_y": 741,
+  "width": 221,
+  "height": 648,
+  "canvas": [
+   1024,
+   1536
+  ]
+ },
+ "muslo_pantorrilla_R.png": {
+  "offset_x": 516,
+  "offset_y": 741,
+  "width": 230,
+  "height": 648,
+  "canvas": [
+   1024,
+   1536
+  ]
+ },
+ "ojo_L.png": {
+  "offset_x": 401,
+  "offset_y": 215,
+  "width": 146,
+  "height": 106,
+  "canvas": [
+   1024,
+   1536
+  ]
+ },
+ "ojo_R.png": {
+  "offset_x": 489,
+  "offset_y": 215,
+  "width": 146,
+  "height": 106,
+  "canvas": [
+   1024,
+   1536
+  ]
+ },
+ "pelvis.png": {
+  "offset_x": 426,
+  "offset_y": 742,
+  "width": 196,
+  "height": 96,
+  "canvas": [
+   1024,
+   1536
+  ]
+ },
+ "puno_manga_L.png": {
+  "offset_x": 281,
+  "offset_y": 780,
+  "width": 75,
+  "height": 46,
+  "canvas": [
+   1024,
+   1536
+  ]
+ },
+ "puno_manga_R.png": {
+  "offset_x": 684,
+  "offset_y": 772,
+  "width": 75,
+  "height": 46,
+  "canvas": [
+   1024,
+   1536
+  ]
+ },
+ "sombrero_ala.png": {
+  "offset_x": 258,
+  "offset_y": 136,
+  "width": 520,
+  "height": 96,
+  "canvas": [
+   1024,
+   1536
+  ]
+ },
+ "sombrero_corona.png": {
+  "offset_x": 431,
+  "offset_y": 2,
+  "width": 174,
+  "height": 162,
+  "canvas": [
+   1024,
+   1536
+  ]
+ },
+ "torso_camisa.png": {
+  "offset_x": 423,
+  "offset_y": 406,
+  "width": 198,
+  "height": 343,
+  "canvas": [
+   1024,
+   1536
+  ]
+ }
+}
