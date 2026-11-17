@@ -2,6 +2,7 @@
 // Sistema de coordenadas = lienzo de referencia 1024x1536 (origen arriba-izquierda). Cada pieza se dibuja en coordenadas absolutas de reposo
 // y se mueve con grupos anidados  translate(pivote) rotate(angulo) translate(-pivote)  (jerarquia de huesos).
 // Lado L = izquierda de la pantalla, R = derecha de la pantalla.
+import { Resvg } from '@resvg/resvg-js';
 import { drawLazyHeadBack, drawLazyHeadFront } from '../rig.mjs';
 import { defs as oldDefs } from '../lazy_lib.mjs';
 export const OUT = '#140806';
@@ -32,6 +33,7 @@ export const DEFS = `<defs>
 <linearGradient id="zGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff0a0"/><stop offset="0.5" stop-color="#e0a820"/><stop offset="1" stop-color="#9a6a08"/></linearGradient>
 <radialGradient id="zIris" cx="0.5" cy="0.35" r="0.8"><stop offset="0" stop-color="#a0602e"/><stop offset="0.55" stop-color="#6a3418"/><stop offset="1" stop-color="#2a1208"/></radialGradient>
 <linearGradient id="zLip" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e86cb8"/><stop offset="1" stop-color="#b02a86"/></linearGradient>
+<radialGradient id="zHi" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#fff" stop-opacity="0.2"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
 <filter id="soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="9"/></filter>
 </defs>`;
 
@@ -126,9 +128,9 @@ export function hairFront(P) { const h = P.hair; return `<g id="hair_front"><g t
 const EYE = { L: [454, 262], R: [570, 262] };
 const jawDrop = (P) => P.jaw * 1 + P.mouth.open * 30;
 function facePath(P) { const y = P.head.yaw, jd = jawDrop(P) * 0.85, sh = y * 10, nw = 1 - Math.abs(y) * 0.05;
-  const X = (dx) => f1(512 + sh + dx * nw);
+  const X = (dx) => f1(512 + sh + dx * nw * 0.93);
   return `M${X(0)},116 C${X(92)},116 ${X(132)},186 ${X(128)},268 C${X(124)},340 ${X(82)},${f1(408 + jd * 0.8)} ${X(0)},${f1(414 + jd)} C${X(-82)},${f1(408 + jd * 0.8)} ${X(-124)},340 ${X(-128)},268 C${X(-132)},186 ${X(-92)},116 ${X(0)},116Z`; }
-export function part_face(P) { const fp = facePath(P); return `<g id="face"><path d="${fp}" fill="url(#zFace)" stroke="${OUT}" stroke-width="8" stroke-linejoin="round"/><clipPath id="faceClip"><path d="${fp}"/></clipPath><g clip-path="url(#faceClip)"><ellipse cx="512" cy="410" rx="120" ry="30" fill="#8f4f2b" opacity="0.22"/><path d="M400,300 Q420,380 512,404 Q604,380 624,300" stroke="#8f4f2b" stroke-opacity="0.2" stroke-width="16" fill="none"/></g></g>`; }
+export function part_face(P, fillRef = 'url(#zFace)') { const fp = facePath(P); return `<g id="face"><path d="${fp}" fill="${fillRef}" stroke="${OUT}" stroke-width="8" stroke-linejoin="round"/><clipPath id="faceClip"><path d="${fp}"/></clipPath><g clip-path="url(#faceClip)"><ellipse cx="500" cy="230" rx="110" ry="130" fill="url(#zHi)"/><ellipse cx="512" cy="410" rx="120" ry="30" fill="#8f4f2b" opacity="0.22"/><path d="M400,300 Q420,380 512,404 Q604,380 624,300" stroke="#8f4f2b" stroke-opacity="0.2" stroke-width="16" fill="none"/></g></g>`; }
 export function part_ear(side, P) { const x = side === 'L' ? 384 : 640, s = side === 'L' ? -1 : 1; return `<g id="ear_${side}" transform="translate(${P.head.yaw * 8 * 0},0)"><path d="M${x},268 C${x + s * 22},262 ${x + s * 30},310 ${x + s * 12},340 C${x + s * 4},350 ${x},344 ${x},336Z" fill="${C.skin}" stroke="${OUT}" stroke-width="6"/><path d="M${x + s * 6},286 q${s * 10},18 ${s * 0},38" stroke="#8f4f2b" stroke-width="4" fill="none"/></g>`; }
 export function part_cheeks(P) { const sh = P.head.yaw * 14; return `<g id="cheeks"><radialGradient id="zBl" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#e05a4e" stop-opacity="0.85"/><stop offset="1" stop-color="#e05a4e" stop-opacity="0"/></radialGradient><circle cx="${f1(428 + sh)}" cy="338" r="52" fill="url(#zBl)"/><circle cx="${f1(598 + sh)}" cy="338" r="52" fill="url(#zBl)"/></g>`; }
 export function part_eye(side, P) { // devuelve {sclera,iris,pupil,lidUp,lidLow,lashes,all}
@@ -269,9 +271,13 @@ export function oldHeadPose(P, withFace = true) { const e = P.eyes, b = P.brows,
   return { yaw: P.head.yaw, pitch: P.head.pitch * 0.3, roll: 0, bob: 0, sway: 0, breath: P.chest.breath, shoulders: 0, flare: 0, squint: e.squint, tears: 0, tearT: 0, gaze: { x: e.lookX, y: e.lookY },
     lid: { l: 1 + e.wide * 0.25, r: 1 + e.wide * 0.25 }, blink: { l: e.blinkL, r: e.blinkR }, brow: { l: br(b.Lraise, b.Lfrown), r: br(b.Rraise, b.Rfrown) },
     mouth: { open: clamp(m.open), wide: m.round > 0.5 ? -0.8 * m.round : clamp(m.wide, -1, 1), smile: m.smile, asym: 0, press: m.press || 0, teeth: { clean: 1, braces: 0, crooked: 0, extra: 0, shine: true }, lip: '#b0206a', tstyle: 'A' },
-    skin: { acne: 0, mask: 0, dry: 0, foam: 0, patch: 0, glow: 1, red: 0 }, hair: { hd: 'long', len: 0.82, shine: 1, cp: 1, grow: 1, bounce: h.bounce, wind: 0, sway: clamp(hs / 18 + Math.sin(h.t * 1.3) * 0.12, -0.6, 0.6) },
+    skin: { acne: 0, mask: 0, dry: 0, foam: 0, patch: 0, glow: 1, red: 0 }, lidColor: lidColor(), hair: { hd: 'long', len: 0.82, shine: 1, cp: 1, grow: 1, bounce: h.bounce, wind: 0, sway: clamp(hs / 18 + Math.sin(h.t * 1.3) * 0.12, -0.6, 0.6) },
     makeup: LOOK, browStyle: { k: 1, kl: 1, kr: 1, red: 0, shortL: 0 }, fem: 1, skinTex: { tex: 'glass', shape: 'A' }, slim: 3.8, outfit: { kind: 'gown', prog: 1, jewel: 1 }, faceWrinkle: 0,
-    faceSvg: withFace ? `<g transform="scale(${f1(1000 / (HEAD_SCALE * 0.8)) / 1000},${f1(1000 / (HEAD_SCALE * 0.86)) / 1000}) translate(${-HEAD_POS[0]},${-HEAD_POS[1]})">${part_ear('L', P)}${part_ear('R', P)}${part_face(P)}</g>` : undefined }; }
+    faceSvg: withFace ? `<g transform="scale(${f1(1000 / (HEAD_SCALE * 0.8)) / 1000},${f1(1000 / (HEAD_SCALE * 0.86)) / 1000}) translate(${-HEAD_POS[0]},${-HEAD_POS[1]})">${part_ear('L', P)}${part_ear('R', P)}${part_face(P, lidColor())}</g>` : undefined }; }
+let LIDC = null;
+function lidColor() { if (LIDC) return LIDC; const P = defaultPose(); const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1536" viewBox="0 0 1024 1536">${oldDefs('e3d')}${DEFS}${part_face(P, 'url(#skin)')}</svg>`;
+  const im = new Resvg(svg).render(), px = im.pixels; let R = 0, G = 0, B = 0, n = 0; for (const [x, y] of [[460, 219], [564, 219], [460, 298], [564, 298], [460, 258], [564, 258]]) { const i = (y * im.width + x) * 4; R += px[i]; G += px[i + 1]; B += px[i + 2]; n++; }
+  LIDC = '#' + [R, G, B].map((v) => Math.round(v / n).toString(16).padStart(2, '0')).join(''); return LIDC; }
 const headWrap = (P, inner) => `<g transform="${rot(P.head.rot, SK.neck)} translate(${HEAD_POS[0]},${HEAD_POS[1]}) scale(${HEAD_SCALE})">${inner}</g>`;
 export const headBack = (P) => headWrap(P, drawLazyHeadBack(oldHeadPose(P)));
 export const headFront = (P) => headWrap(P, drawLazyHeadFront(oldHeadPose(P)));

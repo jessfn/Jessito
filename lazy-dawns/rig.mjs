@@ -10,7 +10,7 @@ const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 const lerp = (a, b, k) => a + (b - a) * k;
 let SHIRT = 'url(#shirt)';
 const SKIN = 'url(#skin)', SKINB = 'url(#skinB)', HAIR = 'url(#hair)'; let PANTS = 'url(#pants)'; let GYM = null; let SLIM = 0; let LOOSE = 0; let FACEW = 0; let BODYW = 0; let FEM = 0; let SKINT = null; let BT = null; let AST = null; let SHT = null; let RED = false;
-const LID = '#a1613a';
+let LID = '#a1613a';
 
 // ---------- IK de 2 huesos (hombro -> codo -> mano) ----------
 const L1 = 165, L2 = 145;
@@ -266,9 +266,8 @@ function redSvg(r) {
 }
 function glowSvg(g) {
   if (g <= 0.02) return '';
-  return `<g opacity="${clamp(g)}"><ellipse cx="0" cy="40" rx="190" ry="180" fill="#ffe2b8" opacity="0.12" filter="url(#blur20)"/>
-    <ellipse cx="-24" cy="-92" rx="84" ry="26" fill="#fff" opacity="0.38" filter="url(#blur8)"/><ellipse cx="-120" cy="34" rx="46" ry="24" fill="#fff" opacity="0.34" filter="url(#blur8)"/><ellipse cx="120" cy="34" rx="46" ry="24" fill="#fff" opacity="0.3" filter="url(#blur8)"/>
-    <ellipse cx="0" cy="36" rx="18" ry="8" fill="#fff" opacity="0.5" filter="url(#blur8)"/><ellipse cx="0" cy="152" rx="44" ry="12" fill="#fff" opacity="0.3" filter="url(#blur8)"/></g>`;
+  const e = (cx, cy, rx, ry, op, t = 'glowR') => `<ellipse cx="${cx}" cy="${cy}" rx="${rx * 1.5}" ry="${ry * 1.5}" fill="url(#${t})" opacity="${op}"/>`;
+  return `<g opacity="${clamp(g)}"><defs><radialGradient id="glowR" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient><radialGradient id="glowT" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#ffe2b8"/><stop offset="1" stop-color="#ffe2b8" stop-opacity="0"/></radialGradient></defs>${e(0, 40, 190, 180, 0.12, 'glowT')}${e(-24, -92, 84, 26, 0.38)}${e(-120, 34, 46, 24, 0.34)}${e(120, 34, 46, 24, 0.3)}${e(0, 36, 18, 8, 0.5)}${e(0, 152, 44, 12, 0.3)}</g>`;
 }
 const CURLS = (() => { const a = []; for (let i = 0; i < 26; i++) { const t = Math.PI * (1.05 + (i / 25) * 0.9), r = 200 + (i % 3) * 18; a.push(`<circle cx="${Math.cos(t) * r * 1.02}" cy="${Math.sin(t) * r * 0.95 - 8}" r="${46 + (i % 4) * 7}" fill="${HAIR}" ${O8}/>`); } return a.join(''); })();
 const HAIRHI = `<g opacity="0.35">${[...Array(8)].map((_, i) => `<path d="M${-150 + i * 40},${-215 - (i % 3) * 14} q25,-20 44,2" stroke="#9a8782" stroke-width="5" fill="none" stroke-linecap="round"/>`).join('')}</g>`;
@@ -560,8 +559,8 @@ function heelsLayer(of, p) {
 
 
 // ---- Exportes para el rig2d: la cabeza (rostro, ojos, cejas, nariz, boca, dientes) y el pelo de Lazy tal cual, origen = centro de la cabeza ----
-function headGlobals(p) { const of = p.outfit && p.outfit.kind && p.outfit.kind !== 'gym' ? p.outfit : null; SLIM = p.slim || 0; LOOSE = 0; FACEW = p.faceWrinkle || 0; BODYW = 0; FEM = p.fem || 0; SKINT = p.skinTex || null; if (SKINT && typeof SKINT === 'object') SKINT = { ...SKINT }; GYM = null; BT = null; AST = null; SHT = null; RED = false; return of; }
-export function drawLazyHeadBack(p) { headGlobals(p); const s = `<g transform="translate(0,${(p.pitch || 0) * 10}) scale(${1 - 0.2 * FEM},${1 - 0.14 * FEM})">${headSvg(p)}</g>`; return s; }
+function headGlobals(p) { LID = p.lidColor || '#a1613a'; const of = p.outfit && p.outfit.kind && p.outfit.kind !== 'gym' ? p.outfit : null; SLIM = p.slim || 0; LOOSE = 0; FACEW = p.faceWrinkle || 0; BODYW = 0; FEM = p.fem || 0; SKINT = p.skinTex || null; if (SKINT && typeof SKINT === 'object') SKINT = { ...SKINT }; GYM = null; BT = null; AST = null; SHT = null; RED = false; return of; }
+export function drawLazyHeadBack(p) { headGlobals(p); const s = `${SHADE_DEFS}<defs>${SHIM_DEFS}</defs><defs>${hairDefs({ ...HAIR_DEFAULT, ...(p.hair || {}) })}${hdDefs(p.hair || {})}</defs><clipPath id="eyeClip"><ellipse rx="36" ry="40"/></clipPath><g transform="translate(0,${(p.pitch || 0) * 10}) scale(${1 - 0.2 * FEM},${1 - 0.14 * FEM})">${headSvg(p)}</g>`; return s; }
 export function drawLazyHeadFront(p) { headGlobals(p); return `<g transform="translate(0,${(p.pitch || 0) * 10}) scale(${1 - 0.2 * FEM},${1 - 0.14 * FEM})">${(p.hair || {}).hd ? hdFront(p.hair, p.yaw || 0, p.tearT || 0) : ''}${jewelHead(p.outfit)}</g>`; }
 export function drawLazy(p) {
   const br = p.breath || 0, sh = (p.shoulders || 0) * 14;
