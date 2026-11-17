@@ -2,96 +2,108 @@
  {
   "id": "l1",
   "who": "N",
-  "text": "Día diez. Eligieron la piel. Y esa mañana llegó una invitación dorada, enviada por Dante.",
+  "text": "Día diez. Eligieron la piel. Bajé veintiocho kilos, pero mi piel no se recogió: colgaba, arrugada y floja.",
   "pad": 0.25
  },
  {
   "id": "l2",
-  "who": "T",
-  "text": "Lazy, querida. Te reservé el spa Aura. Ve, que tu piel merece lo mejor.",
+  "who": "N",
+  "text": "Esa mañana, alguien dejó en mi puerta una invitación dorada.",
   "pad": 0.2
  },
  {
   "id": "l3",
-  "who": "N",
-  "text": "Entré al spa. Vapor, velas, silencio... y la doctora Renata me esperaba.",
+  "who": "T",
+  "text": "Lazy, querida. Me enteré de lo que pasó. Te reservé el spa Aura: tu piel merece lo mejor.",
   "pad": 0.2
  },
  {
   "id": "l4",
-  "who": "R",
-  "text": "Bienvenida. Soy la doctora Renata. Primero, una limpieza profunda. Tu piel lo agradecerá.",
-  "pad": 0.15
+  "who": "N",
+  "text": "En el spa me esperaba la doctora Renata.",
+  "pad": 0.2
  },
  {
   "id": "l5",
-  "who": "N",
-  "text": "Vapor, mascarilla de arcilla y exfoliante suave. Todo iba perfecto, hasta que Isa abrió el frasco dorado.",
-  "pad": 0.2
+  "who": "R",
+  "text": "Bienvenida. Cuando se baja tanto de peso, la piel pierde firmeza. Vamos a reafirmarla, paso a paso.",
+  "pad": 0.15
  },
  {
   "id": "l6",
-  "who": "I",
-  "text": "Doctora, este frasco vino en el paquete de regalo. Huele muy raro.",
-  "pad": 0.15
- },
- {
-  "id": "l7",
-  "who": "R",
-  "text": "¡No lo uses! Tiene una etiqueta falsa. Alguien quiso arruinar el tratamiento.",
-  "pad": 0.15
- },
- {
-  "id": "l8",
   "who": "N",
-  "text": "Renata lo cambió por un sérum verdadero: vitamina C, ácido hialurónico y mucho protector solar.",
+  "text": "Primero, vapor y limpieza. Después, radiofrecuencia para activar el colágeno, y una mascarilla de arcilla.",
   "pad": 0.2
  },
  {
-  "id": "l9",
+  "id": "l7",
   "who": "N",
-  "text": "Pasaron tres semanas. Mis granitos se fueron, mis manchas se aclararon, y mi piel empezó a brillar como cristal.",
-  "pad": 0.25
+  "text": "Todo iba perfecto, hasta que Isa abrió el sérum que venía en el paquete de regalo.",
+  "pad": 0.2
+ },
+ {
+  "id": "l8",
+  "who": "I",
+  "text": "Doctora, este frasco dorado vino en el paquete de Dante. Huele muy raro.",
+  "pad": 0.15
+ },
+ {
+  "id": "l9",
+  "who": "R",
+  "text": "¡No lo uses! La etiqueta es falsa. Esto habría quemado su piel.",
+  "pad": 0.15
  },
  {
   "id": "l10",
   "who": "N",
-  "text": "Las cortinas se abrieron. Me miré al espejo: piel hermosa, rostro fino, cuerpo nuevo. ¡Era yo!",
-  "pad": 0.3
- },
- {
-  "id": "l11",
-  "who": "T",
-  "text": "¡Perfecta! Solo falta un último regalo: mi tónico especial para tu cabello.",
+  "text": "Renata lo cambió por un sérum verdadero: colágeno, ácido hialurónico y mucho protector solar. Alguien quería arruinarme... pero ¿quién?",
   "pad": 0.2
  },
  {
+  "id": "l11",
+  "who": "N",
+  "text": "Pasaron tres semanas. Mi piel floja se fue recogiendo, las arrugas se suavizaron, y empezó a brillar como cristal.",
+  "pad": 0.25
+ },
+ {
   "id": "l12",
+  "who": "N",
+  "text": "Las cortinas se abrieron. Me miré al espejo: piel firme, rostro fino, cuerpo nuevo. ¡Era yo!",
+  "pad": 0.3
+ },
+ {
+  "id": "l13",
+  "who": "T",
+  "text": "¡Perfecta! Solo falta un último regalo: mi tónico de brillo para tu cabello.",
+  "pad": 0.2
+ },
+ {
+  "id": "l14",
   "who": "N",
   "text": "Apenas lo roció, mi cabello empezó a caerse. Mechón tras mechón.",
   "pad": 0.2
  },
  {
-  "id": "l13",
+  "id": "l15",
   "who": "D",
   "text": "Buen trabajo, Dante. Lo hiciste tal como lo planeamos.",
   "pad": 0.3,
   "fx": "asetrate=44100*0.8,aresample=44100,atempo=1.25,aecho=0.8:0.7:70|140:0.4|0.25,highpass=f=80"
  },
  {
-  "id": "l14",
-  "who": "N",
-  "text": "Dante sonrió. Él mandó el spa, el paquete y el frasco. Siempre fue aliado de M.",
-  "pad": 0.2
- },
- {
-  "id": "l15",
-  "who": "N",
-  "text": "Mi vestido colgaba flojo y gastado, igual que mi ánimo.",
-  "pad": 0.2
- },
- {
   "id": "l16",
+  "who": "N",
+  "text": "Dante sonrió. Él mandó la invitación, el paquete, el frasco y el tónico. Siempre fue aliado de M.",
+  "pad": 0.2
+ },
+ {
+  "id": "l17",
+  "who": "N",
+  "text": "Y mi vestido, flojo y gastado, colgaba aún más triste.",
+  "pad": 0.2
+ },
+ {
+  "id": "l18",
   "who": "N",
   "text": "¿Qué arreglamos mañana: el cabello o el vestido? Comenta tu elección, y sígueme para el día once.",
   "pad": 0.3

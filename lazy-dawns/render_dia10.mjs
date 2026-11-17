@@ -35,14 +35,14 @@ const L = Object.fromEntries(DATA.lines.map((l) => [l.id, l]));
 const DUR = DATA.total;
 const w = (id, word, n = 0) => { const r = L[id].words.filter((x) => nm(x[0]) === nm(word))[n]; if (!r) throw new Error('palabra no encontrada ' + id + ' ' + word); return r[1]; };
 const T = {
-  slateEnd: 1.4, noteA: w('l1', 'invitacion') - 0.5, danteA: L.l2.start - 0.2, spaA: L.l3.start - 0.2, renA: L.l4.start, isaA: w('l5', 'Isa') - 1.2, maskA: w('l5', 'mascarilla') - 0.2, fakeA: w('l5', 'frasco') - 0.2,
-  realA: L.l8.start + 0.4, weeksA: L.l9.start, revealA: L.l10.start - 0.1, tonicA: w('l11', 'tonico') - 0.3, fallA: L.l12.start, mvoice: L.l13.start, lairA: L.l13.start - 0.15, danteB: L.l14.start, homeA: L.l15.start - 0.2,
-  vote: w('l16', 'Que') - 0.1, optA: w('l16', 'cabello'), optB: w('l16', 'vestido'), cta1: w('l16', 'Comenta'), cta2: w('l16', 'sigueme'),
+  slateEnd: 1.4, noteA: w('l2', 'invitacion') - 0.4, danteA: L.l3.start - 0.2, spaA: L.l4.start - 0.2, renA: L.l5.start, dermoA: w('l6', 'radiofrecuencia') - 0.3, maskA: w('l6', 'mascarilla') - 0.3, isaA: L.l9.start - 0.6, fakeA: w('l7', 'serum') - 0.2,
+  realA: w('l10', 'serum') - 0.2, weeksA: L.l11.start, revealA: L.l12.start - 0.1, tonicA: w('l13', 'tonico') - 0.3, fallA: L.l14.start, mvoice: L.l15.start, lairA: L.l15.start - 0.15, danteB: L.l16.start, homeA: L.l17.start - 0.2,
+  vote: w('l18', 'Que') - 0.1, optA: w('l18', 'cabello'), optB: w('l18', 'vestido'), cta1: w('l18', 'Comenta'), cta2: w('l18', 'sigueme'),
 };
-T.noteB = T.noteA + 2.8; T.maskB = T.maskA + 2.7; T.fakeB = T.fakeA + 2.8; T.realB = T.realA + 2.8; T.tonicB = T.tonicA + 2.4; T.hairA = T.fallA + 3.0; T.hairB = T.hairA + 1.9; T.isaB = T.tonicA - 0.2; T.mirrorA = T.revealA + 1.0; T.mirrorB = T.tonicA - 0.1;
+T.noteB = T.noteA + 2.8; T.dermoB = T.dermoA + 2.6; T.maskB = T.maskA + 2.5; T.fakeB = T.fakeA + 2.8; T.realB = T.realA + 2.8; T.tonicB = T.tonicA + 2.4; T.hairA = T.fallA + 3.0; T.hairB = T.hairA + 1.9; T.isaB = T.tonicA - 0.2; T.mirrorA = T.revealA + 1.0; T.mirrorB = T.tonicA - 0.1;
 T.walks = [];
-T.scenes = [T.slateEnd, T.noteA, T.danteA, T.spaA, T.renA, T.maskA, T.fakeA, T.realA, T.weeksA, T.revealA, T.tonicA, T.fallA, T.lairA, T.danteB, T.homeA, T.vote];
-const OBJF = { slate10: 'slate10', note10: 'note10', mask: 'creamgel', fake: 'serum', real: 'serum', tonic: 'spray', hair: 'strands' };
+T.scenes = [T.slateEnd, T.noteA, T.danteA, T.spaA, T.renA, T.dermoA, T.maskA, T.fakeA, T.realA, T.weeksA, T.revealA, T.tonicA, T.fallA, T.lairA, T.danteB, T.homeA, T.vote];
+const OBJF = { slate10: 'slate10', note10: 'note10', mask: 'creamgel', dermo: 'dermo', fake: 'serum', real: 'serum', tonic: 'spray', hair: 'strands' };
 const OBJN = Object.fromEntries(Object.entries(OBJF).map(([k, v]) => [k, readdirSync(path.join(here, 'plates3d/obj', v)).filter((f) => f.endsWith('.png')).length]));
 writeFileSync(path.join(B, 'timeline.json'), JSON.stringify({ T, DUR }));
 const pose = makeDirector({ L, T, DUR });
@@ -69,20 +69,20 @@ function danState(t) { const home = t >= T.danteA && t < T.spaA, spa = t >= T.to
   if (home) { mood = 'happy'; hands = 'wave'; } if (spa) { mood = t >= T.fallA ? 'amused' : 'proud'; hands = t >= T.fallA ? 'clasp' : 'hips'; } if (lair) { mood = 'amused'; hands = 'clasp'; } if (t >= T.danteB) mood = 'grin';
   return { mood, hands, tool: 'none', ch }; }
 function renState(t) { if (t < T.spaA - 0.3 || t >= T.fallA + 3.4) return null; const ch = renCh(t); let mood = 'happy', hands = 'clasp';
-  if (t >= T.maskA) { mood = 'focus'; hands = 'none'; } if (t >= L.l7.start) { mood = 'worry'; hands = 'hips'; } if (t >= T.realA) { mood = 'calm'; hands = 'none'; } if (t >= T.revealA) { mood = 'proud'; hands = 'clasp'; } if (t >= T.fallA) { mood = 'shock'; hands = 'cheeks'; }
+  if (t >= T.maskA) { mood = 'focus'; hands = 'none'; } if (t >= L.l9.start) { mood = 'worry'; hands = 'hips'; } if (t >= T.realA) { mood = 'calm'; hands = 'none'; } if (t >= T.revealA) { mood = 'proud'; hands = 'clasp'; } if (t >= T.fallA) { mood = 'shock'; hands = 'cheeks'; }
   return { mood, hands, tool: 'none', ch }; }
 function isaState(t) { if (t < T.isaA - 0.3 || t >= T.isaB + 1) return null; const ch = isaCh(t); let mood = 'happy', hands = 'wave';
-  if (t >= T.fakeA) { mood = 'worry'; hands = 'none'; } if (t >= L.l6.start) { mood = 'worry'; hands = 'cheeks'; } if (t >= T.realA) { mood = 'happy'; hands = 'clasp'; } if (t >= T.revealA) { mood = 'proud'; hands = 'wave'; }
+  if (t >= T.fakeA) { mood = 'worry'; hands = 'none'; } if (t >= L.l8.start) { mood = 'worry'; hands = 'cheeks'; } if (t >= T.realA) { mood = 'happy'; hands = 'clasp'; } if (t >= T.revealA) { mood = 'proud'; hands = 'wave'; }
   return { mood, hands, tool: 'none', ch }; }
 
 const blinkOf = (t, seed) => { const m = (t + seed) % 3.4; return m < 0.14 ? Math.sin((m / 0.14) * Math.PI) : 0; };
 // camara cinematografica: empujes, grua, empuje extremo al lunar, movimientos de paralaje
-const CAM = [[0, 1.0, 540, 960], [T.slateEnd, 1.0, 540, 960], [T.noteA, 1.1, 560, 900], [T.noteB, 1.0, 540, 960], [T.danteA + 1, 1.12, 640, 940], [T.spaA, 1.0, 540, 960], [T.renA, 1.12, 440, 950], [T.maskA - 0.2, 1.3, 540, 760], [T.fakeA - 0.3, 1.15, 640, 930], [L.l7.start, 1.15, 440, 940], [T.realA, 1.1, 540, 960],
+const CAM = [[0, 1.0, 540, 960], [T.slateEnd, 1.0, 540, 960], [4.6, 1.0, 540, 960], [7.0, 1.28, 540, 1120], [T.noteA, 1.1, 560, 900], [T.noteB, 1.0, 540, 960], [T.danteA + 1, 1.12, 640, 940], [T.spaA, 1.0, 540, 960], [T.renA, 1.12, 440, 950], [T.maskA - 0.2, 1.3, 540, 760], [T.fakeA - 0.3, 1.15, 640, 930], [L.l9.start, 1.15, 440, 940], [T.realA, 1.1, 540, 960],
   [T.weeksA, 1.0, 540, 960], [T.weeksA + 4.5, 1.1, 540, 900], [T.revealA, 1.0, 540, 960], [T.mirrorA, 1.1, 540, 1090], [T.mirrorA + 3.0, 1.22, 540, 1030], [T.tonicA - 0.1, 1.05, 640, 940], [T.fallA, 1.15, 540, 860], [T.fallA + 1.8, 1.4, 540, 800], [T.fallA + 3.6, 1.1, 540, 960],
   [T.lairA, 1.0, 540, 960], [T.danteB, 1.1, 640, 960], [T.homeA - 0.1, 1.0, 540, 960], [T.homeA + 1.5, 1.2, 540, 1000], [T.vote - 0.2, 1.1, 540, 960], [9999, 1.1, 540, 960]];
 function camAt(t) {
   let i = 0; while (i < CAM.length - 1 && CAM[i + 1][0] <= t) i++; const a = CAM[i], b = CAM[Math.min(i + 1, CAM.length - 1)]; const u = smooth((t - a[0]) / Math.max(1e-3, b[0] - a[0]));
-  const shake = win(t, T.fallA + 1.8, T.fallA + 2.9, 0.02, 0.4) * 10 + win(t, L.l7.start, L.l7.start + 0.3, 0.02, 0.3) * 4 + win(t, T.mvoice, T.mvoice + 0.4, 0.02, 0.3) * 6;
+  const shake = win(t, T.fallA + 1.8, T.fallA + 2.9, 0.02, 0.4) * 10 + win(t, L.l9.start, L.l9.start + 0.3, 0.02, 0.3) * 4 + win(t, T.mvoice, T.mvoice + 0.4, 0.02, 0.3) * 6;
   const sway = Math.sin(t * 0.55) * 8;
   return { z: lerp(a[1], b[1], u) * (1 + 0.012 * Math.sin(t * 0.7)), x: lerp(a[2], b[2], u) + Math.sin(t * 61) * shake * 0.6 + sway, y: lerp(a[3], b[3], u) + Math.cos(t * 53) * shake * 0.6 };
 }
@@ -129,6 +129,7 @@ const SPK = (u, n, x0, y0, wv, hv, op = 1) => [...Array(n)].map((_, i) => sparkl
 function ins3(t, a, b, name, label, col, cy = 700, size = 1160) { return wrapIns(t, a, b, (u) => `${obj3(name, u, 540, cy, size)}${SPK(u, 9, 200, 260, 680, 520, 0.7)}${insLabel(label, col, 1330)}`); }
 const insNote = (t) => ins3(t, T.noteA, T.noteB, 'note10', 'INVITACIÓN DE DANTE', '#fde68a', 700, 1180);
 const insMask = (t) => ins3(t, T.maskA, T.maskB, 'mask', 'MASCARILLA DE ARCILLA', '#a7f3d0', 720, 1180);
+const insDermo = (t) => ins3(t, T.dermoA, T.dermoB, 'dermo', 'RADIOFRECUENCIA', '#fde68a', 720, 1180);
 const insFake = (t) => ins3(t, T.fakeA, T.fakeB, 'fake', 'EL FRASCO DORADO', '#fca5a5', 720, 1180);
 const insReal = (t) => ins3(t, T.realA, T.realB, 'real', 'SÉRUM VERDADERO', '#86efac', 720, 1180);
 const insTonic = (t) => ins3(t, T.tonicA, T.tonicB, 'tonic', 'TÓNICO ESPECIAL', '#e9d5ff', 700, 1180);
@@ -172,7 +173,7 @@ const SPEAK8 = { D: { col: '#ff5a6a', name: 'M' } };
 Object.assign(SPEAK, SPEAK8);
 function counterChip(t) { const marks = [[T.weeksA + 0.1, 'SEMANA 1'], [T.weeksA + 2.0, 'SEMANA 2'], [T.weeksA + 4.0, 'SEMANA 3']]; let cur = null; for (const [a, tx] of marks) if (t >= a) cur = [a, tx]; if (!cur || t > T.weeksA + 6.4) return ''; const p = pop(t, cur[0], 0.3);
   return `<g transform="translate(540,392) scale(${p})"><rect x="-200" y="-34" width="400" height="68" rx="34" fill="#12090a" fill-opacity="0.85" stroke="#99f6e4" stroke-width="5"/><text x="0" y="16" font-family="Bungee" font-size="42" text-anchor="middle" fill="#99f6e4" letter-spacing="2">${cur[1]}</text></g>`; }
-const stepBanners = [['1', 'LIMPIEZA PROFUNDA', T.maskA - 1.0, T.maskA + 2.0, '#a5f3fc'], ['2', 'TRATAMIENTO', T.realA, T.realB, '#bbf7d0'], ['3', 'TRES SEMANAS DESPUÉS', T.weeksA, T.weeksA + 2.4, '#fbcfe8']];
+const stepBanners = [['!', 'PIEL FLOJA TRAS −28 KG', 4.6, T.noteA - 0.4, '#fecaca'], ['1', 'PIEL FLOJA: REAFIRMAR', L.l6.start, T.maskB, '#a5f3fc'], ['2', 'SÉRUM VERDADERO', T.realA, T.realB, '#bbf7d0'], ['3', 'TRES SEMANAS DESPUÉS', T.weeksA, T.weeksA + 2.4, '#fbcfe8']];
 function banner(t, n, text, a, b, col) { const k = win(t, a, b, 0.25, 0.25); if (k <= 0) return '';
   return `<g transform="translate(540,300) scale(${pop(t, a, 0.3)})" opacity="${k}"><rect x="-330" y="-50" width="660" height="100" rx="50" fill="#000" opacity="0.3" transform="translate(4,6)"/><rect x="-330" y="-50" width="660" height="100" rx="50" fill="${col}" stroke="${OUT}" stroke-width="8"/><circle cx="-272" cy="0" r="36" fill="${OUT}"/><text x="-272" y="17" font-family="Anton" font-size="50" text-anchor="middle" fill="#fff">${n}</text><text x="34" y="20" font-family="Anton" font-size="${text.length > 11 ? 50 : 62}" text-anchor="middle" fill="${OUT}" letter-spacing="2">${esc(text)}</text></g>`; }
 // ---------------- villano M: figura de espaldas / de frente, silla giratoria, guante, pantallas con feed de Lazy ----------------
@@ -248,7 +249,7 @@ function frame(t) {
   const vignette = `<defs><radialGradient id="vgn" cx="0.5" cy="0.5" r="0.75"><stop offset="0.55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#05030a" stop-opacity="0.5"/></radialGradient><filter id="b10"><feGaussianBlur stdDeviation="10"/></filter></defs><rect width="${W}" height="${H}" fill="url(#vgn)"/>`;
   const bnOn = stepBanners.some(([n, tx, a, b]) => t > a - 0.1 && t < b + 0.1); const chipTop = (t < 4.5 || bnOn || (t > T.mirrorA && t < T.mirrorB + 0.3)) ? '' : `<g transform="translate(540,300)"><defs><linearGradient id="chg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fffbe0"/><stop offset="0.5" stop-color="#ffd84a"/><stop offset="1" stop-color="#b8780f"/></linearGradient></defs><rect x="-226" y="-40" width="440" height="88" rx="44" fill="#000" opacity="0.3"/><rect x="-230" y="-46" width="440" height="88" rx="44" fill="#1a1024" stroke="#d4a24c" stroke-width="6"/><text x="0" y="18" font-family="Bungee" font-size="48" text-anchor="middle" letter-spacing="3" fill="url(#chg)" stroke="${OUT}" stroke-width="4" paint-order="stroke">DÍA 10/30</text></g>`;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${charDefs}<defs><filter id="b10"><feGaussianBlur stdDeviation="10"/></filter><filter id="shf" x="-40%" y="-40%" width="180%" height="180%"><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0"/><feGaussianBlur stdDeviation="9"/></filter></defs>${world}${lairFx(t)}${vignette}${slateIntro(t)}
-    ${chipTop}${counterChip(t)}${insNote(t)}${insMask(t)}${insFake(t)}${insReal(t)}${insTonic(t)}${insHair(t)}${curtainsFx(t)}${stepBanners.map(([n, tx, a, b, c]) => banner(t, n, tx, a, b, c)).join('')}${mirrorOverlay(t)}${letterbox(t)}
+    ${chipTop}${counterChip(t)}${insNote(t)}${insDermo(t)}${insMask(t)}${insFake(t)}${insReal(t)}${insTonic(t)}${insHair(t)}${curtainsFx(t)}${stepBanners.map(([n, tx, a, b, c]) => banner(t, n, tx, a, b, c)).join('')}${mirrorOverlay(t)}${letterbox(t)}
     ${t < T.vote ? captions(t) : ''}${endCard(t)}${flashScreen(t)}
     <image href="${grainPng}" width="${W}" height="${H}"/></svg>`;
   return new Resvg(svg, ropt).render().asPng();

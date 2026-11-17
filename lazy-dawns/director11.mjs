@@ -61,13 +61,13 @@ export function makeDirector({ L, T, DUR }) {
   const saccAt = (t) => { let i = 0; while (i < sacc.length - 1 && sacc[i + 1].t <= t) i++; const a = sacc[i], p = sacc[Math.max(0, i - 1)]; const u = smooth((t - a.t) / 0.06); return { x: lerp(p.x, a.x, u), y: lerp(p.y, a.y, u) }; };
   const gazeKF = [[0, 0, 0]], yawKF = [[0, 0]];
   Object.keys(L).forEach((id) => { const l = L[id]; const gx = l.who === 'K' ? 0.7 : 0; gazeKF.push([l.start - 0.12, gx, 0.05]); yawKF.push([l.start - 0.12, gx * 0.3]); });
-  gazeKF.push([T.noteA, 0.0, 0.5], [T.danteA, 0.7, 0], [T.spaA, -0.4, 0], [T.renA, -0.7, 0], [T.maskA, 0, -0.1], [T.fakeA, 0.6, 0.2], [T.realA, -0.6, 0], [T.weeksA, 0, 0.1], [T.revealA, 0, 0.1], [T.tonicA, 0.7, 0], [T.fallA, 0, 0.4], [T.mvoice, 0.8, 0], [T.homeA, 0, 0.3], [W('l16', 'Que'), 0, 0]); yawKF.push([T.renA, -0.2], [T.danteA, 0.2], [T.tonicA, 0.2], [T.mvoice, 0.25], [T.homeA, 0]);
+  gazeKF.push([T.noteA, 0.0, 0.5], [T.danteA, 0.7, 0], [T.spaA, -0.4, 0], [T.renA, -0.7, 0], [T.maskA, 0, -0.1], [T.fakeA, 0.6, 0.2], [T.realA, -0.6, 0], [T.weeksA, 0, 0.1], [T.revealA, 0, 0.1], [T.tonicA, 0.7, 0], [T.fallA, 0, 0.4], [T.mvoice, 0.8, 0], [T.homeA, 0, 0.3], [W('l18', 'Que'), 0, 0]); yawKF.push([T.renA, -0.2], [T.danteA, 0.2], [T.tonicA, 0.2], [T.mvoice, 0.25], [T.homeA, 0]);
 
   gazeKF.sort((a, b) => a[0] - b[0]); yawKF.sort((a, b) => a[0] - b[0]); gazeKF.push([DUR, 0, 0]); yawKF.push([DUR, 0]);
   const kfAt = (K, t, n) => { let i = 0; while (i < K.length - 1 && K[i + 1][0] <= t) i++; const a = K[i], b = K[Math.min(i + 1, K.length - 1)]; const u = smooth((t - a[0]) / Math.max(1e-3, Math.min(0.3, b[0] - a[0]))); return Array.from({ length: n }, (_, k) => lerp(a[1 + k], b[1 + k], u)); };
   gazeKF.forEach((g) => { if (Math.hypot(g[1], g[2]) > 0.5) blinkStarts.push(g[0] + 0.02); });
 
-  const emoScript = [[0, 'sad'], [T.slateEnd, 'wince'], [T.noteA, 'surprise'], [T.danteA, 'hopeful'], [T.spaA, 'happy'], [T.renA, 'touched'], [T.maskA, 'relaxed'], [T.fakeA, 'wince'], [L.l7.start, 'scared'], [T.realA, 'relaxed'], [T.weeksA, 'hopeful'], [T.weeksA + 3.5, 'happy'], [T.revealA, 'touched'], [T.revealA + 2.2, 'radiant'], [T.tonicA, 'proud'], [T.fallA + 0.7, 'scared'], [T.fallA + 1.8, 'scream'], [T.fallA + 3.6, 'sad'], [T.mvoice, 'hurt'], [T.homeA, 'sad'], [W('l16', 'Que') - 0.1, 'wince'], [W('l16', 'Comenta') - 0.1, 'hopeful']];
+  const emoScript = [[0, 'sad'], [T.slateEnd, 'wince'], [T.noteA, 'surprise'], [T.danteA, 'hopeful'], [T.spaA, 'happy'], [T.renA, 'touched'], [T.dermoA, 'numb'], [T.maskA, 'relaxed'], [T.fakeA, 'wince'], [L.l9.start, 'scared'], [T.realA, 'relaxed'], [T.weeksA, 'hopeful'], [T.weeksA + 3.5, 'happy'], [T.revealA, 'touched'], [T.revealA + 2.2, 'radiant'], [T.tonicA, 'proud'], [T.fallA + 0.7, 'scared'], [T.fallA + 1.8, 'scream'], [T.fallA + 3.6, 'sad'], [T.mvoice, 'hurt'], [T.homeA, 'sad'], [W('l18', 'Que') - 0.1, 'wince'], [W('l18', 'Comenta') - 0.1, 'hopeful']];
   emoScript.sort((a, b) => a[0] - b[0]);
   const emoAt = (t) => { let i = 0; while (i < emoScript.length - 1 && emoScript[i + 1][0] <= t) i++;
     const cur = EMO[emoScript[i][1]], prev = EMO[emoScript[Math.max(0, i - 1)][1]]; const dur = mag(cur) >= mag(prev) ? 0.25 : 0.7; const u = smooth((t - emoScript[i][0]) / dur); const o = {};
@@ -75,10 +75,11 @@ export function makeDirector({ L, T, DUR }) {
 
   const IDLE_L = { x: -392, y: 335 }, IDLE_R = { x: 392, y: 335 };
   const G = [
+    { arm: 'B', t0: 4.6, t1: T.noteA - 0.3, tgt: (t, s) => ({ x: s * 330, y: 150 + 14 * Math.sin(t * 3 + s) }), curl: 0.3, spread: 0.4 },
     { arm: 'B', t0: T.revealA + 0.4, t1: T.tonicA - 0.2, tgt: (t, s) => ({ x: s * 345, y: 235 + 14 * Math.sin(t * 2 + s) }), curl: 0.2, spread: 0.5 },
     { arm: 'B', t0: T.fallA + 0.6, t1: T.mvoice - 0.2, tgt: (t, s) => ({ x: s * 250, y: -140 + 12 * Math.sin(t * 17 + s) }), curl: 0.8, spread: 0.1 },
     { arm: 'B', t0: T.mvoice, t1: T.homeA + 1.5, tgt: (t, s) => ({ x: s * 180, y: 340 }), curl: 0.3, spread: 0.1 },
-    { arm: 'R', t0: W('l16', 'sigueme'), t1: DUR + 1, tgt: (t) => ({ x: 440 + Math.sin(t * 9) * 30, y: -205 }), curl: 0.05, spread: 0.7, wr: (t) => Math.sin(t * 9) * 16 },
+    { arm: 'R', t0: W('l18', 'sigueme'), t1: DUR + 1, tgt: (t) => ({ x: 440 + Math.sin(t * 9) * 30, y: -205 }), curl: 0.05, spread: 0.7, wr: (t) => Math.sin(t * 9) * 16 },
   ];
   const armTarget = (t, side) => {
     const idle = side < 0 ? IDLE_L : IDLE_R; const wa = walkAmp(t), ph = walkPh(t);
@@ -88,7 +89,7 @@ export function makeDirector({ L, T, DUR }) {
       const k = smooth((t - g.t0) / 0.3) * (1 - smooth((t - (g.t1 - 0.3)) / 0.3)); if (k <= 0) continue; const tg = g.tgt(t, side); x = lerp(x, tg.x, k); y = lerp(y, tg.y, k); curl = lerp(curl, g.curl ?? 0.3, k); spread = lerp(spread, g.spread ?? 0.15, k); if (g.wr) w = lerp(w, g.wr(t), k); }
     return { x, y, w, curl, spread };
   };
-  const EV = [{ t: T.noteA, type: 'recoil' }, { t: T.revealA + 0.3, type: 'nod', amp: 0.4 }, { t: T.fallA + 0.7, type: 'recoil' }, { t: T.mvoice, type: 'recoil' }, { t: W('l16', 'sigueme'), type: 'nod', amp: 0.35 }];
+  const EV = [{ t: T.noteA, type: 'recoil' }, { t: T.revealA + 0.3, type: 'nod', amp: 0.4 }, { t: T.fallA + 0.7, type: 'recoil' }, { t: T.mvoice, type: 'recoil' }, { t: W('l18', 'sigueme'), type: 'nod', amp: 0.35 }];
   const evAt = (t) => { let yaw = 0, pitch = 0, hop = 0;
     for (const e of EV) { const d = t - e.t; if (d < 0 || d > 1.4) continue;
       if (e.type === 'nod') pitch += e.amp * Math.sin(2 * Math.PI * 2.0 * d) * Math.exp(-2.6 * d);
@@ -138,7 +139,7 @@ export function makeDirector({ L, T, DUR }) {
   const outfitAt = (t) => ({ kind: 'gown', prog: 1, jewel: 1, loose: 2 });
   const browS = { k: 1, kl: 1, kr: 1, red: 0, shortL: 0 };
   const TEETH = { clean: 1, braces: 0, crooked: 0, extra: 0, shine: true };
-  const skinAt = (t) => { const k = ramp(t, T.realA + 0.5, T.weeksA + 4.5); const clay = (t > T.maskA + 0.3 && t < T.maskA + 2.6) ? 1 : 0; return { acne: lerp(0.5, 0, k), mask: clay, dry: lerp(0.35, 0, k), foam: 0, patch: 0, glow: lerp(0.3, 1, k), red: lerp(0.3, 0, k) }; };
+  const skinAt = (t) => { const k = ramp(t, T.weeksA + 0.3, T.weeksA + 4.8); const clay = (t > T.maskB + 0.2 && t < T.maskB + 2.2) ? 1 : 0; return { acne: 0, mask: clay, dry: lerp(0.5, 0, k), foam: 0, patch: 0, glow: lerp(0.3, 1, k), red: 0 }; };
   const HAIR = { s: 1, len: 1, cut: 0, foam: 0, frizz: 0, wet: 0, green: 0, shine: 0.95, sway: 0.3 };
 
   return (t) => {
@@ -155,7 +156,7 @@ export function makeDirector({ L, T, DUR }) {
       gaze: { x: T0.ex, y: T0.ey }, lid: { l: e.lid - lidDrop, r: e.lid - lidDrop }, blink: { l: bl, r: bl },
       brow: { l: { r: e.bl, i: e.bli }, r: { r: e.br, i: e.bri } },
       mouth: { open: e.baseOpen, wide: clamp(e.wide, -1, 1), smile: e.smile, asym: e.asym, press: e.press * (1 - e.baseOpen), teeth: TEETH, lip, tstyle: 'A' },
-      armL: T0.L, armR: T0.R, skin: skinAt(t), hair: hairAt(t), makeup: makeupAt(t), browStyle: browS, outfit: outfitAt(t), slim: slimAt(t), faceWrinkle: 0.8 * (1 - ramp(t, T.realA + 0.5, T.weeksA + 3)), bodyWrinkle: 1,
+      armL: T0.L, armR: T0.R, skin: skinAt(t), hair: hairAt(t), makeup: makeupAt(t), browStyle: browS, outfit: outfitAt(t), slim: slimAt(t), faceWrinkle: 0.8 * (1 - ramp(t, T.weeksA + 0.3, T.weeksA + 4.8)), bodyWrinkle: lerp(1, 0.25, ramp(t, T.weeksA + 0.3, T.weeksA + 4.8)),
       fem: femAt(t), skinTex: { tex: 'glass', shape: 'A' }, bodyT: 'C', armStyle: 'A',
       heel: { l: wa * Math.max(0, Math.sin(ph)) * 20, r: wa * Math.max(0, -Math.sin(ph)) * 20 }, walk: wa, walkPh: ph,
       legs: { l: { thigh: T0.lean * 0.12, knee: Math.max(0, T0.lean) * 0.15 }, r: { thigh: T0.lean * 0.12, knee: Math.max(0, -T0.lean) * 0.15 } },
