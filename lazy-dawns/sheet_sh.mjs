@@ -1,0 +1,2 @@
+import { execSync } from 'node:child_process';
+execSync(`ffmpeg -y -loglevel error -i build/sh_A.png -i build/sh_B.png -i build/sh_C.png -filter_complex "[0]crop=520:980:340:10[a];[1]crop=520:980:340:10[b];[2]crop=520:980:340:10[c];[a][b][c]hstack=3,drawtext=text='A':x=240:y=20:fontsize=60:fontcolor=white:borderw=4:bordercolor=black,drawtext=text='B':x=760:y=20:fontsize=60:fontcolor=white:borderw=4:bordercolor=black,drawtext=text='C':x=1280:y=20:fontsize=60:fontcolor=white:borderw=4:bordercolor=black" OpcionesHombros.png`);
