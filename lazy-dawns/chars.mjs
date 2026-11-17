@@ -461,3 +461,27 @@ export function drawIsa(p) {
     ${armsLayer(p, { sleeve: '#f9a8d4', skin: SK }, 'body')}
   </g>`;
 }
+
+// Greta (modista, 62 anos): mono gris con moño, lentes con cadena, cinta metrica al cuello, uniforme violeta.
+export function drawGreta(p) {
+  const m = MOODS[p.mood || 'calm'], t = p.t || 0, bob = Math.sin(t * 2.3 + 4) * 3, blink = p.blink || 0;
+  const SK = '#e6bd9c', SKD = '#c99f80', HR = '#b9bcc9';
+  const tool = p.tool && p.tool !== 'none' ? `<g transform="translate(${toolAnchor(p).x},${toolAnchor(p).y}) rotate(${p.toolR ?? 70}) ${p.toolS ? `scale(${p.toolS})` : ''}">${salonTool(p.tool, { k: t })}${p.noHand ? '' : `<g transform="translate(0,${p.gripY ?? 4})">${gripHand(SK)}</g>`}</g>` : '';
+  if (p.part === 'tool') return `<g transform="translate(0,${bob})">${armsLayer(p, { sleeve: '#a78bfa', skin: SK }, 'tool')}${tool}</g>`;
+  return `<g transform="translate(0,${bob})">
+    <rect x="-66" y="470" width="56" height="200" rx="24" fill="#4c1d95" ${O}/><rect x="10" y="470" width="56" height="200" rx="24" fill="#4c1d95" ${O}/>
+    <ellipse cx="-40" cy="684" rx="50" ry="22" fill="#c4b5fd" ${O}/><ellipse cx="40" cy="684" rx="50" ry="22" fill="#c4b5fd" ${O}/>
+    <path d="M-112,560 Q-114,170 -62,150 L62,150 Q114,170 112,560Z" fill="#a78bfa" ${O}/><path d="M-62,150 L0,230 L62,150" fill="${SKD}" ${O}/><path d="M-40,300 L40,300 L46,560 L-46,560Z" fill="#7c3aed" ${O}/>
+    <path d="M-50,150 Q-40,250 -20,300 M50,150 Q40,250 20,300" stroke="#facc15" stroke-width="9" fill="none"/><rect x="-54" y="370" width="108" height="44" rx="10" fill="#fff" ${O}/><text x="0" y="402" font-family="Anton" font-size="28" text-anchor="middle" fill="#4c1d95" letter-spacing="3">GRETA · ATELIER</text>
+    <rect x="-18" y="96" width="36" height="60" fill="${SKD}" ${O}/>
+    <circle cx="0" cy="-196" r="62" fill="${HR}" ${O}/>${[[0,-262],[-30,-236],[30,-236]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="26" fill="${HR}" stroke="${OUT}" stroke-width="5"/>`).join('')}
+    <ellipse cx="0" cy="0" rx="98" ry="110" fill="${SK}" ${O}/><ellipse cx="-102" cy="10" rx="13" ry="22" fill="${SK}" ${O}/><ellipse cx="102" cy="10" rx="13" ry="22" fill="${SK}" ${O}/>
+    <circle cx="-108" cy="50" r="24" fill="none" stroke="#fbbf24" stroke-width="7"/><circle cx="108" cy="50" r="24" fill="none" stroke="#fbbf24" stroke-width="7"/>
+    <path d="M-100,-20 Q-106,-116 0,-124 Q106,-116 100,-20 Q70,-84 0,-90 Q-70,-84 -100,-20Z" fill="${HR}" ${O}/><path d="M-106,-80 Q0,-132 106,-80 L108,-60 Q0,-108 -108,-60Z" fill="#7c3aed" ${O}/>
+    ${eyes(38, -2, blink, p.look || 0, m.big * 0.7, m.b)}<circle cx="-38" cy="-2" r="36" fill="#fff" fill-opacity="0.15" stroke="#111827" stroke-width="6"/><circle cx="38" cy="-2" r="36" fill="#fff" fill-opacity="0.15" stroke="#111827" stroke-width="6"/><path d="M-2,-6 h4 M-74,-4 l-26,-6 M74,-4 l26,-6" stroke="#111827" stroke-width="5"/><path d="M-100,-10 Q-120,80 -60,150 M100,-10 Q120,80 60,150" stroke="#d4a24c" stroke-width="3" fill="none"/>
+    <path d="M-70,34 q8,6 14,0 M60,34 q8,6 14,0" stroke="#8c5a3a" stroke-width="3" fill="none" opacity="0.6"/>
+    <circle cx="-52" cy="30" r="2.4" fill="#7a3f1d"/><ellipse cx="-58" cy="36" rx="20" ry="10" fill="#c4b5fd" opacity="0.5"/><ellipse cx="58" cy="36" rx="20" ry="10" fill="#c4b5fd" opacity="0.5"/>
+    ${(() => { const mm = mouth(m.m, 54, t); return mm.replace(/fill="#7a1f2a"/g, 'fill="#4c1d95"'); })()}
+    ${armsLayer(p, { sleeve: '#a78bfa', skin: SK }, 'body')}
+  </g>`;
+}

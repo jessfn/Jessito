@@ -1,0 +1,81 @@
+[
+ {
+  "id": "l1",
+  "who": "N",
+  "text": "Día once. Eligieron el vestido. Mi cabello seguía cayéndose, y mi vestido verde colgaba flojo, como un trapo viejo.",
+  "pad": 0.25
+ },
+ {
+  "id": "l2",
+  "who": "N",
+  "text": "Ya no podía confiar en nadie, ni en Dante. Así que fui sola a la boutique más famosa de la ciudad.",
+  "pad": 0.2
+ },
+ {
+  "id": "l3",
+  "who": "G",
+  "text": "Pase, querida. Soy la modista Greta. Ese vestido verde ya no da más. Vamos a tomar sus medidas.",
+  "pad": 0.2
+ },
+ {
+  "id": "l4",
+  "who": "N",
+  "text": "Greta midió cada centímetro. Y me mostró una tela roja, intensa, que brillaba como un incendio.",
+  "pad": 0.2
+ },
+ {
+  "id": "l5",
+  "who": "G",
+  "text": "Rojo, para una mujer que vuelve a empezar. Lo coseré esta misma noche.",
+  "pad": 0.15
+ },
+ {
+  "id": "l6",
+  "who": "N",
+  "text": "Pero esa noche, un dron negro entró por la ventana, y con su láser rasgó la tela en mil pedazos.",
+  "pad": 0.2
+ },
+ {
+  "id": "l7",
+  "who": "G",
+  "text": "¡Mi tela! ¡Esto es obra de M! Pero no se preocupe, tengo una idea.",
+  "pad": 0.15
+ },
+ {
+  "id": "l8",
+  "who": "N",
+  "text": "Greta juntó los pedazos y los cosió, uno por uno, con hilo dorado, hasta crear un vestido aún más hermoso.",
+  "pad": 0.2
+ },
+ {
+  "id": "l9",
+  "who": "D",
+  "text": "Mi dron falló. No importa. Su cabello sigue cayéndose.",
+  "pad": 0.3,
+  "fx": "asetrate=44100*0.8,aresample=44100,atempo=1.25,aecho=0.8:0.7:70|140:0.4|0.25,highpass=f=80"
+ },
+ {
+  "id": "l10",
+  "who": "N",
+  "text": "Llegó la mañana. Me puse el vestido rojo, con su corsé, su falda con abertura y sus olanes. Me miré al espejo... ¡y era otra!",
+  "pad": 0.25
+ },
+ {
+  "id": "l11",
+  "who": "N",
+  "text": "Pero entonces, mi cabello se cayó todavía más. Mechón tras mechón, sobre mis hombros.",
+  "pad": 0.2
+ },
+ {
+  "id": "l12",
+  "who": "N",
+  "text": "El vestido era perfecto, pero mi cabello era un desastre. Y alguien ya me esperaba, en las sombras.",
+  "pad": 0.2
+ },
+ {
+  "id": "l13",
+  "who": "N",
+  "text": "¿Qué arreglamos mañana: el cabello o la nariz? Comenta tu elección, y sígueme para el día doce.",
+  "pad": 0.3
+ }
+]

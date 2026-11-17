@@ -175,3 +175,7 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
 - Look fijo desde ahora: cuerpo "C" (cintura marcada, clavículas) con brazos/manos "A" continuos (silueta unica, sin bolas) y vestido muy arrugado/flojo (loose 2: arrugas, cinturon caido, tono apagado). Rostro femenino ovalado (fem 1, piel "cristal"). NO se usan las opciones de hombros (se descartaron).
 - Historia (logica con el dia 9): -28 kg dejaron la piel floja y arrugada (sin granos); Dante invita al spa Aura (sello con D, Lazy aun no sabe que es aliado de M), radiofrecuencia + colageno, sérum falso del paquete, 3 semanas, espejo, tonico -> cabello se cae, M revela a Dante. Musica distinta por escena (build_audio_dia10.py).
 - Voces nuevas: Renata = Rachel (21m00Tcm4TlvDq8ikWAM), Isa = Elli (MF3mGyEYCl7XYWbV9V6O). Pipeline: render_dia10.mjs + director11.mjs + build_audio_dia10.py + resume_dia10.sh.
+
+## Dia 11 (Un hilo de esperanza): decisiones
+- Voto del dia 10 = vestido. Empieza con la Lazy anterior (vestido verde flojo, pelo caido) y termina con la Lazy nueva (rig2d, vestido rojo) con el pelo cada vez mas feo y calvas. Voto: CABELLO vs NARIZ (dia 12).
+- Personajes: Greta (modista nueva, voz Charlotte), M (rig2d/m_character.mjs) en la guarida con voz de villano. Pipeline: render_dia11.mjs + director12.mjs + build_audio_dia11.py + resume_dia11.sh. Duracion 1:36.

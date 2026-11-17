@@ -13,7 +13,8 @@ VOICES = {'N': 'cgSgspJ2msm6clMCkdW9',   # Narrador: Jessica (FIJA, no cambiar)
           'C': 'IKne3meq5aSn9XLyUdCD',   # Coach Tadeo: Charlie (natural, relajado)
           'W': 'XrExE9yKIg1WjnnlVkGX',
           'R': '21m00Tcm4TlvDq8ikWAM',   # Dra. Renata (dermatologa): Rachel
-          'I': 'MF3mGyEYCl7XYWbV9V6O'}  # Isa (esteticista): Elli  # Mei (recepcion): Matilda (calida)   # Nina (maquilladora): Sarah
+          'I': 'MF3mGyEYCl7XYWbV9V6O',
+          'G': 'XB0fDUnXU5powFXDhCwa'}   # Greta (modista): Charlotte  # Isa (esteticista): Elli  # Mei (recepcion): Matilda (calida)   # Nina (maquilladora): Sarah
 VS = {'N': dict(stability=0.5, similarity_boost=0.75, style=0.0, use_speaker_boost=True),
       'M': dict(stability=0.4, similarity_boost=0.75, style=0.3, use_speaker_boost=True),
       'D': dict(stability=0.55, similarity_boost=0.75, style=0.15, use_speaker_boost=True),
@@ -26,6 +27,7 @@ VS = {'N': dict(stability=0.5, similarity_boost=0.75, style=0.0, use_speaker_boo
       'C': dict(stability=0.42, similarity_boost=0.8, style=0.22, use_speaker_boost=True),
       'R': dict(stability=0.5, similarity_boost=0.8, style=0.2, use_speaker_boost=True),
       'I': dict(stability=0.38, similarity_boost=0.8, style=0.4, use_speaker_boost=True),
+      'G': dict(stability=0.45, similarity_boost=0.8, style=0.3, use_speaker_boost=True),
       'W': dict(stability=0.45, similarity_boost=0.8, style=0.2, use_speaker_boost=True)}
 lines = json.load(open(script)); os.makedirs(out + '/lines', exist_ok=True)
 for L in lines:
@@ -65,7 +67,7 @@ json.dump({'lines': lines, 'total': total}, open(out + '/lines.json', 'w'), ensu
 inp = []; fc = []; labs = []
 for i, L in enumerate(lines):
     inp += ['-i', f"{out}/lines/{L['id']}.mp3"]; ms = int(L['start'] * 1000)
-    gain = {'N': 1.0, 'M': 1.0, 'D': 1.1, 'V': 1.05, 'E': 1.0, 'S': 1.05, 'K': 1.05, 'B': 1.05, 'T': 1.05, 'C': 1.05, 'W': 1.05, 'R': 1.05, 'I': 1.05}[L['who']]
+    gain = {'N': 1.0, 'M': 1.0, 'D': 1.1, 'V': 1.05, 'E': 1.0, 'S': 1.05, 'K': 1.05, 'B': 1.05, 'T': 1.05, 'C': 1.05, 'W': 1.05, 'R': 1.05, 'I': 1.05, 'G': 1.05}[L['who']]
     fx = (',' + L['fx']) if L.get('fx') else ''
     fc.append(f"[{i}:a]loudnorm=I=-17:TP=-1.5:LRA=7,aresample=44100{fx},pan=stereo|c0=c0|c1=c0,volume={gain},adelay={ms}|{ms}[v{i}]"); labs.append(f"[v{i}]")
 fc.append(''.join(labs) + f"amix=inputs={len(labs)}:normalize=0:duration=longest,apad=whole_dur={total}[a]")
