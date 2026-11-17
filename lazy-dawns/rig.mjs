@@ -9,7 +9,7 @@ const O8 = `stroke="${OUT}" stroke-width="8" stroke-linejoin="round"`;
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 const lerp = (a, b, k) => a + (b - a) * k;
 let SHIRT = 'url(#shirt)';
-const SKIN = 'url(#skin)', SKINB = 'url(#skinB)', HAIR = 'url(#hair)'; let PANTS = 'url(#pants)'; let GYM = null; let SLIM = 0; let LOOSE = 0; let FACEW = 0; let BODYW = 0;
+const SKIN = 'url(#skin)', SKINB = 'url(#skinB)', HAIR = 'url(#hair)'; let PANTS = 'url(#pants)'; let GYM = null; let SLIM = 0; let LOOSE = 0; let FACEW = 0; let BODYW = 0; let FEM = 0; let SKINT = null;
 const LID = '#a1613a';
 
 // ---------- IK de 2 huesos (hombro -> codo -> mano) ----------
@@ -204,6 +204,20 @@ function mouthSvg(m, yaw) {
 const shade2 = (hex, k) => { const A = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)); const f = (v) => Math.max(0, Math.min(255, Math.round(k >= 0 ? v * (1 - k) : v + (255 - v) * -k))); return '#' + A.map((v) => f(v).toString(16).padStart(2, '0')).join(''); };
 
 const PIM_DATA = [[-75, -20, 15], [-4, 20, 17], [-150, 78, 13], [148, 70, 14], [-22, -112, 11], [60, -132, 12], [112, -70, 11], [-40, 128, 11], [62, -42, 13], [108, 26, 16], [-118, 38, 12], [24, 56, 14], [-34, -78, 12], [88, -96, 13], [-98, -92, 11], [2, -4, 10], [54, 100, 12], [-60, 92, 10], [130, -20, 9]];
+function femFace(F, tex) { if (F <= 0.02) return '';
+  const k = F, sd = '#5a2a18', hl = '#ffe2c4';
+  const sides = [-1, 1].map((s) => `
+    <path d="M${s * 150},60 Q${s * 112},118 ${s * 58},150" stroke="${sd}" stroke-width="30" fill="none" stroke-linecap="round" opacity="${(0.2 * k).toFixed(2)}" filter="url(#blur8)"/>
+    <ellipse cx="${s * 128}" cy="30" rx="44" ry="15" fill="${hl}" opacity="${(0.5 * k).toFixed(2)}" filter="url(#blur8)" transform="rotate(${s * -26} ${s * 128} 30)"/>
+    <path d="M${s * 170},100 Q${s * 150},180 ${s * 70},214" stroke="${sd}" stroke-width="14" fill="none" stroke-linecap="round" opacity="${(0.28 * k).toFixed(2)}" filter="url(#blur8)"/>
+    <ellipse cx="${s * 22}" cy="-34" rx="12" ry="40" fill="${hl}" opacity="${(0.22 * k).toFixed(2)}" filter="url(#blur8)"/>`).join('');
+  const nose = `<path d="M-8,-30 Q0,10 -14,40 M8,-30 Q0,10 14,40" stroke="${sd}" stroke-width="8" fill="none" stroke-linecap="round" opacity="${(0.12 * k).toFixed(2)}" filter="url(#blur3)"/>`;
+  const chin = `<ellipse cx="0" cy="196" rx="30" ry="12" fill="${hl}" opacity="${(0.28 * k).toFixed(2)}" filter="url(#blur8)"/><path d="M-64,190 Q0,232 64,190" stroke="${sd}" stroke-width="10" fill="none" opacity="${(0.15 * k).toFixed(2)}" filter="url(#blur8)"/>`;
+  let t = '';
+  if (tex === 'glass') t = `<ellipse cx="-24" cy="-92" rx="70" ry="22" fill="#fff" opacity="0.5" filter="url(#blur8)"/><ellipse cx="60" cy="-6" rx="26" ry="14" fill="#fff" opacity="0.45" filter="url(#blur8)"/><ellipse cx="0" cy="44" rx="14" ry="7" fill="#fff" opacity="0.6" filter="url(#blur3)"/><ellipse cx="0" cy="152" rx="26" ry="9" fill="#fff" opacity="0.4" filter="url(#blur8)"/>${[...Array(24)].map((_, i) => `<circle cx="${(i * 53) % 340 - 170}" cy="${(i * 37) % 280 - 90}" r="1.3" fill="#fff" opacity="0.28"/>`).join('')}`;
+  if (tex === 'freckle') t = [-1, 1].map((s) => [...Array(16)].map((_, i) => `<circle cx="${s * (30 + (i * 11) % 78) + (i % 3)}" cy="${6 + (i * 7) % 30}" r="${1.6 + (i % 3) * 0.6}" fill="#7a3b1c" opacity="${0.45 + (i % 4) * 0.08}"/>`).join('')).join('') + `<ellipse cx="0" cy="-90" rx="80" ry="24" fill="#ffd9b0" opacity="0.28" filter="url(#blur8)"/>`;
+  if (tex === 'pore') t = [...Array(120)].map((_, i) => `<circle cx="${(i * 61) % 330 - 165}" cy="${(i * 43) % 270 - 90}" r="0.95" fill="#6a3418" opacity="0.28"/>`).join('') + `<ellipse cx="-30" cy="-80" rx="60" ry="18" fill="#fff" opacity="0.18" filter="url(#blur8)"/><ellipse cx="0" cy="40" rx="150" ry="140" fill="url(#shim)" opacity="0.4"/>`;
+  return `<g>${sides}${nose}${chin}${t}</g>`; }
 function faceWrinkles(L, yaw) { if (L <= 0.02) return '';
   const k = L, dk = '#2a1208', ln = (d, w, o, col = dk) => `<path d="${d}" stroke="${col}" stroke-width="${w}" fill="none" stroke-linecap="round" opacity="${(o * k).toFixed(2)}"/>`, hl = (d, w, o) => ln(d, w, o, '#ffd9b8');
   const sides = [-1, 1].map((s) => `
@@ -214,6 +228,7 @@ function faceWrinkles(L, yaw) { if (L <= 0.02) return '';
     ${ln(`M${s * 124},-14 l${s * 24},-8 M${s * 126},-2 l${s * 28},2 M${s * 124},10 l${s * 24},12`, 3.4, 0.4)}`).join('');
   const fore = [0, 1, 2].map((i) => ln(`M-90,${-122 + i * 16} Q0,${-136 + i * 16} 90,${-122 + i * 16}`, 3.4 - i * 0.4, 0.3 - i * 0.04)).join('');
   return `<g>${sides}${fore}${ln('M-44,172 Q0,186 44,172', 5, 0.35)}${ln('M-30,196 Q0,208 30,196', 3.4, 0.28)}${ln('M-50,112 Q-20,124 0,120', 2.4, 0.18)}</g>`; }
+const SHIM_DEFS = '<linearGradient id="shim" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd9a8" stop-opacity="0"/><stop offset="0.5" stop-color="#fff3d8" stop-opacity="0.5"/><stop offset="1" stop-color="#ffd9a8" stop-opacity="0"/></linearGradient>';
 function pimplesSvg(acne) {
   const N = PIM_DATA.length;
   return PIM_DATA.map(([x, y, r], i) => { const k = clamp((acne - (i / N) * 0.75) / 0.25) * (0.45 + 0.55 * clamp(acne)); if (k < 0.05) return ''; const q = r * k;
@@ -287,9 +302,9 @@ function headSvg(p) {
   const wrinkle = Math.max(0, (brL.r + brR.r) / 2 - 0.35);
   const ear = (s) => `<ellipse cx="${s * (205 * (1 - 0.07 * Math.min(SLIM, 1.4)) + (s > 0 ? -yaw * 24 : -yaw * 12))}" cy="8" rx="${32 * (s > 0 ? 1 - 0.3 * Math.max(0, yaw) : 1 + 0.1 * Math.max(0, yaw))}" ry="50" fill="${SKINB}" ${O8}/>`;
   return `<g>${hr.hd ? hdBack(hr) : hairBehind(hr)}
-    <ellipse cx="${yaw * 6}" cy="${60 + jaw * 0.6}" rx="${188 * (1 - 0.14 * Math.min(SLIM, 1.4) - 0.06 * FACEW)}" ry="${170 + jaw * 0.6}" fill="${SKINB}" ${O8}/>
+    ${FEM > 0.02 ? `<path d="M${yaw * 6 - 188 * (1 - 0.14 * Math.min(SLIM, 1.4))},50 C${yaw * 6 - 188 * (1 - 0.14 * Math.min(SLIM, 1.4))},${150 + jaw * 0.4} ${yaw * 6 - 120 * (1 - 0.3 * FEM)},${214 + jaw * 0.6} ${yaw * 6},${226 + jaw * 0.6} C${yaw * 6 + 120 * (1 - 0.3 * FEM)},${214 + jaw * 0.6} ${yaw * 6 + 188 * (1 - 0.14 * Math.min(SLIM, 1.4))},${150 + jaw * 0.4} ${yaw * 6 + 188 * (1 - 0.14 * Math.min(SLIM, 1.4))},50Z" fill="${SKINB}" ${O8}/>` : `<ellipse cx="${yaw * 6}" cy="${60 + jaw * 0.6}" rx="${188 * (1 - 0.14 * Math.min(SLIM, 1.4) - 0.06 * FACEW)}" ry="${170 + jaw * 0.6}" fill="${SKINB}" ${O8}/>`}
     <ellipse cx="${yaw * 4}" cy="${150 + jaw * 0.9}" rx="130" ry="22" fill="#000" opacity="0.16" filter="url(#blur8)"/>
-    <ellipse cx="${yaw * 4}" cy="0" rx="${208 * (1 - 0.07 * Math.min(SLIM, 1.4) - 0.03 * FACEW)}" ry="210" fill="${SKIN}" ${O8}/>
+    ${FEM > 0.02 ? `<path d="M${yaw * 4},-210 C${yaw * 4 + 118 * (1 - 0.07 * Math.min(SLIM, 1.4) - 0.03 * FACEW)},-210 ${yaw * 4 + 208 * (1 - 0.07 * Math.min(SLIM, 1.4) - 0.03 * FACEW)},-124 ${yaw * 4 + 208 * (1 - 0.07 * Math.min(SLIM, 1.4) - 0.03 * FACEW)},-14 C${yaw * 4 + 208 * (1 - 0.07 * Math.min(SLIM, 1.4) - 0.03 * FACEW)},84 ${yaw * 4 + (158 - 26 * FEM) * (1 - 0.07 * Math.min(SLIM, 1.4) - 0.03 * FACEW)},168 ${yaw * 4 + (92 - 26 * FEM) * (1 - 0.07 * Math.min(SLIM, 1.4) - 0.03 * FACEW)},208 Q${yaw * 4},${246 + 4 * FEM} ${yaw * 4 - (92 - 26 * FEM) * (1 - 0.07 * Math.min(SLIM, 1.4) - 0.03 * FACEW)},208 C${yaw * 4 - (158 - 26 * FEM) * (1 - 0.07 * Math.min(SLIM, 1.4) - 0.03 * FACEW)},168 ${yaw * 4 - 208 * (1 - 0.07 * Math.min(SLIM, 1.4) - 0.03 * FACEW)},84 ${yaw * 4 - 208 * (1 - 0.07 * Math.min(SLIM, 1.4) - 0.03 * FACEW)},-14 C${yaw * 4 - 208 * (1 - 0.07 * Math.min(SLIM, 1.4) - 0.03 * FACEW)},-124 ${yaw * 4 - 118 * (1 - 0.07 * Math.min(SLIM, 1.4) - 0.03 * FACEW)},-210 ${yaw * 4},-210Z" fill="${SKIN}" ${O8}/>` : `<ellipse cx="${yaw * 4}" cy="0" rx="${208 * (1 - 0.07 * Math.min(SLIM, 1.4) - 0.03 * FACEW)}" ry="210" fill="${SKIN}" ${O8}/>`}
     <ellipse cx="${-70 + yaw * 10}" cy="-70" rx="110" ry="80" fill="#fff" opacity="0.13" filter="url(#blur20)"/>
     <ellipse cx="${90 + yaw * 10}" cy="${130 + jaw * 0.6}" rx="150" ry="70" fill="#000" opacity="0.18" filter="url(#blur20)"/>
     ${ear(-1)}${ear(1)}
@@ -312,7 +327,7 @@ function headSvg(p) {
         <ellipse cx="0" cy="48" rx="${34 + (p.flare || 0) * 3}" ry="26" fill="#7d4524" ${O8}/><ellipse cx="-9" cy="38" rx="10" ry="6" fill="#fff" opacity="0.4"/>
         <ellipse cx="-12" cy="58" rx="${7 + (p.flare || 0) * 2}" ry="5" fill="#2a130a"/><ellipse cx="12" cy="58" rx="${7 + (p.flare || 0) * 2}" ry="5" fill="#2a130a"/>
       </g>
-      ${glowSvg(sk.glow)}${redSvg(sk.red || 0)}${faceWrinkles(FACEW, yaw)}
+      ${glowSvg(sk.glow)}${redSvg(sk.red || 0)}${faceWrinkles(FACEW, yaw)}${femFace(FEM, SKINT)}
       <g transform="translate(${yaw * 6},${102 + jaw * 0.8 + (p.mouth.lip ? 14 : 0)})">${(p.mouth.lip && (p.mouth.lipP ?? 1) < 1) ? `<defs><clipPath id="lipSw"><rect x="-130" y="-90" width="${(260 * clamp(p.mouth.lipP)).toFixed(1)}" height="260"/></clipPath></defs>${mouthSvg({ ...p.mouth, lip: null }, yaw)}<g clip-path="url(#lipSw)">${mouthSvg(p.mouth, yaw)}</g>` : mouthSvg(p.mouth, yaw)}</g>
       ${(() => { const mk = p.makeup || {}; const m = mk.mole ?? 1, sc = mk.scab ?? 0; return `${m > 0.02 ? `<g transform="translate(108,70)" opacity="${m}"><circle r="9" fill="#2a1208" stroke="${OUT}" stroke-width="3"/><path d="M-2,-8 q-6,-18 -2,-28 M3,-8 q4,-16 12,-22 M6,-4 q16,-6 24,-4" stroke="#12090a" stroke-width="3" fill="none" stroke-linecap="round"/></g>` : ''}${sc > 0.02 ? `<g transform="translate(124,50)" opacity="${sc}"><circle r="12" fill="#e3342f" opacity="0.35"/><circle r="6.5" fill="#6b2a1a" stroke="#3a1409" stroke-width="2"/></g>` : ''}`; })()}
       <ellipse cx="-46" cy="-56" rx="30" ry="12" fill="#fff" opacity="0.14" filter="url(#blur8)"/>
@@ -466,7 +481,7 @@ function heelsLayer(of, p) {
 export function drawLazy(p) {
   const br = p.breath || 0, sh = (p.shoulders || 0) * 14;
   const of = p.outfit && p.outfit.kind && p.outfit.kind !== 'gym' ? p.outfit : null; const gownOn = of && (of.prog ?? 1) > 0.02; SHIRT = of && (of.prog ?? 1) >= 1 ? (of.kind === 'neon' ? 'url(#neonG)' : 'url(#gownG)') : 'url(#shirt)';
-  SLIM = p.slim || 0; LOOSE = (p.outfit && p.outfit.loose) || 0; FACEW = p.faceWrinkle || 0; BODYW = p.bodyWrinkle || 0; GYM = (p.outfit && p.outfit.kind === 'gym') ? p.outfit : null; PANTS = GYM ? 'url(#gyPant)' : 'url(#pants)'; if (GYM) SHIRT = GYM.top === 'white' ? 'url(#gyTopW)' : GYM.top === 'black' ? 'url(#gyTopK)' : 'url(#gyTop)';
+  SLIM = p.slim || 0; LOOSE = (p.outfit && p.outfit.loose) || 0; FACEW = p.faceWrinkle || 0; BODYW = p.bodyWrinkle || 0; FEM = p.fem || 0; SKINT = p.skinTex || null; GYM = (p.outfit && p.outfit.kind === 'gym') ? p.outfit : null; PANTS = GYM ? 'url(#gyPant)' : 'url(#pants)'; if (GYM) SHIRT = GYM.top === 'white' ? 'url(#gyTopW)' : GYM.top === 'black' ? 'url(#gyTopK)' : 'url(#gyTop)';
   const lg = p.legs || { l: {}, r: {} };
   const slimK = Math.max(0.46, 1 - 0.115 * (p.slim || 0));
   const chest = `<g transform="translate(0,230) scale(${(1 + 0.012 * br) * slimK},${1 + 0.016 * br}) translate(0,-230)">
@@ -485,7 +500,7 @@ export function drawLazy(p) {
   </g>`;
   const rollY = -100;
   return `<g transform="rotate(${p.sway || 0} 0 770)">
-    ${SHADE_DEFS}${OUTFIT_DEFS}${GYM_DEFS}<defs>${hairDefs({ ...HAIR_DEFAULT, ...(p.hair || {}) })}${hdDefs(p.hair || {})}</defs>
+    ${SHADE_DEFS}${OUTFIT_DEFS}${GYM_DEFS}<defs>${SHIM_DEFS}</defs><defs>${hairDefs({ ...HAIR_DEFAULT, ...(p.hair || {}) })}${hdDefs(p.hair || {})}</defs>
     <clipPath id="eyeClip"><ellipse rx="36" ry="40"/></clipPath>
     <ellipse cx="0" cy="780" rx="420" ry="46" fill="#000" opacity="0.4" filter="url(#blur20)"/>
     <g transform="translate(0,${p.hop || 0})">${of && (of.prog ?? 1) >= 0.9 ? '' : legSvg(-1, lg.l) + legSvg(1, lg.r)}<g transform="translate(${p.lean || 0},0)">${chest}
