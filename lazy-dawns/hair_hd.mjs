@@ -49,7 +49,8 @@ const deg = (d) => d * Math.PI / 180;
 
 export function hdBack(h) { const st = styleOf(h); if (!st || st === 'turban' || st === 'twin' || st === 'twinhigh') return ''; return memo('b', h, () => hdBackI(h, st)); }
 function hdBackI(h, st) { const R = rng(11);
-  let o = `<ellipse cx="0" cy="-24" rx="${st === 'afro' ? 262 : 226}" ry="${st === 'afro' ? 258 : 232}" fill="url(#hdBase)" stroke="${OUT}" stroke-width="8"/>`;
+  const g = Math.min(1, Math.max(0, h.grow ?? 1)), sh = g >= 0.99 ? 0 : 1 - g;   // pelo ralo: la masa oscura de atras se encoge (sin halo negro)
+  let o = `<ellipse cx="0" cy="${-24 - 50 * sh}" rx="${(st === 'afro' ? 262 : 226) - 60 * sh}" ry="${(st === 'afro' ? 258 : 232) - 70 * sh}" fill="url(#hdBase)" stroke="${OUT}" stroke-width="${g >= 0.99 ? 8 : 8 * Math.max(0, g - 0.4) / 0.6}"/>`;
   if (st === 'afro') { for (let a = 150; a <= 390; a += 7) o += clump(scalp(deg(a), 200, 200), deg(a), 130 + R() * 50, 0.0009, 22, R, 3); return `<g>${o}</g>`; }
   const hang = st === 'half' ? 0.8 : st === 'side' ? 0.62 : 1;
   for (let a = 150; a <= 215; a += 13) o += clump(scalp(deg(a), 196, 150), lerp(deg(a), Math.PI / 2, 0.6), (200 + R() * 60) * (0.7 + 0.5 * hang) * 0.55, 0.0030, 19, R, 3);
