@@ -2,7 +2,7 @@
 // miradas, cejas, boca por visemas, mejillas/pliegues (pomulos, mandibula) y respiracion.
 import { hand, foot } from './lazy_lib.mjs';
 import { hdDefs, hdBack, hdTop, hdFront } from './hair_hd.mjs';
-import { lacioBack, lacioTop } from './hair_lacio.mjs';
+import { lacioBack, lacioTop, bobBack, bobTop, isBob } from './hair_lacio.mjs';
 import { hairDefs, hairCurly, hairBehind, hairTop, hairCurtains, hairRinglets, HAIR_DEFAULT } from './hair.mjs';
 
 const OUT = '#12090a';
@@ -320,14 +320,14 @@ function headSvg(p) {
   const furrow = Math.max(0, -(brL.i + brR.i) / 2);
   const wrinkle = Math.max(0, (brL.r + brR.r) / 2 - 0.35);
   const ear = (s) => `<ellipse cx="${s * (205 * (1 - 0.07 * Math.min(SLIM, 1.4)) + (s > 0 ? -yaw * 24 : -yaw * 12))}" cy="8" rx="${32 * (s > 0 ? 1 - 0.3 * Math.max(0, yaw) : 1 + 0.1 * Math.max(0, yaw))}" ry="50" fill="${SKINB}" ${O8}/>`;
-  return `<g>${hr.lacio ? lacioBack(hr) : hr.hd ? hdBack(hr) : hairBehind(hr)}
+  return `<g>${hr.lacio ? (isBob(hr) ? bobBack(hr) : lacioBack(hr)) : hr.hd ? hdBack(hr) : hairBehind(hr)}
     ${FEM > 0.02 ? `` : `<ellipse cx="${yaw * 6}" cy="${60 + jaw * 0.6}" rx="${188 * (1 - 0.14 * Math.min(SLIM, 1.4) - 0.06 * FACEW)}" ry="${170 + jaw * 0.6}" fill="${SKINB}" ${O8}/>`}
     ${p.faceSvg ? '' : `<ellipse cx="${yaw * 4}" cy="${150 + jaw * 0.9}" rx="130" ry="22" fill="#000" opacity="0.16" filter="url(#blur8)"/>`}
     ${p.faceSvg ? p.faceSvg : FEM > 0.02 ? `<path d="${femPathStr(yaw)}" fill="${SKIN}" ${O8}/>` : `<ellipse cx="${yaw * 4}" cy="0" rx="${208 * (1 - 0.07 * Math.min(SLIM, 1.4) - 0.03 * FACEW)}" ry="210" fill="${SKIN}" ${O8}/>`}
     ${p.faceSvg ? '' : `    <ellipse cx="${-70 + yaw * 10}" cy="-70" rx="110" ry="80" fill="#fff" opacity="0.13" filter="url(#blur20)"/>
     <ellipse cx="${90 + yaw * 10}" cy="${130 + jaw * 0.6}" rx="150" ry="70" fill="#000" opacity="0.18" filter="url(#blur20)"/>`}
     ${p.faceSvg ? '' : ear(-1) + ear(1)}
-    ${hr.lacio ? lacioTop(hr, yaw) : hr.hd ? `<g transform="translate(${yaw * 10},0)">${hdTop(hr, yaw)}</g>` : `<g transform="translate(${yaw * 10},0)">${hairCurly(hr)}${hairTop(hr)}</g>`}
+    ${hr.lacio ? (isBob(hr) ? bobTop(hr, yaw) : lacioTop(hr, yaw)) : hr.hd ? `<g transform="translate(${yaw * 10},0)">${hdTop(hr, yaw)}</g>` : `<g transform="translate(${yaw * 10},0)">${hairCurly(hr)}${hairTop(hr)}</g>`}
     <g transform="translate(${fx},${(p.pitch || 0) * 12})">
       <!-- pomulos / mejillas -->
       <ellipse cx="-124" cy="${58 - up * 14}" rx="${52 + up * 10}" ry="${34 + up * 6}" fill="#e0624a" opacity="${0.4 + up * 0.15}"/><ellipse cx="124" cy="${58 - up * 14}" rx="${52 + up * 10}" ry="${34 + up * 6}" fill="#e0624a" opacity="${0.4 + up * 0.15}"/>
