@@ -179,3 +179,7 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
 ## Dia 11 (Un hilo de esperanza): decisiones
 - Voto del dia 10 = vestido. Empieza con la Lazy anterior (vestido verde flojo, pelo caido) y termina con la Lazy nueva (rig2d, vestido rojo) con el pelo cada vez mas feo y calvas. Voto: CABELLO vs NARIZ (dia 12).
 - Personajes: Greta (modista nueva, voz Charlotte), M (rig2d/m_character.mjs) en la guarida con voz de villano. Pipeline: render_dia11.mjs + director12.mjs + build_audio_dia11.py + resume_dia11.sh. Duracion 1:36.
+
+## Dia 12 (pendiente de decidir): decisiones guardadas
+- Voto del dia 11 = cabello. Para el dia 12 la nariz se queda la VIEJA; la nariz nueva (opcion D, respingada, puente desvanecido: `noseStyle:'D'` en rig.mjs) se guarda para el dia siguiente (dia 13).
+- Cabello nuevo: LACIO y no tan largo (opciones A-D en hair_lacio.mjs, `hair.lacio:'A'..'D'`), sin halo negro detras del rostro.

@@ -2,6 +2,7 @@
 // miradas, cejas, boca por visemas, mejillas/pliegues (pomulos, mandibula) y respiracion.
 import { hand, foot } from './lazy_lib.mjs';
 import { hdDefs, hdBack, hdTop, hdFront } from './hair_hd.mjs';
+import { lacioBack, lacioTop } from './hair_lacio.mjs';
 import { hairDefs, hairCurly, hairBehind, hairTop, hairCurtains, hairRinglets, HAIR_DEFAULT } from './hair.mjs';
 
 const OUT = '#12090a';
@@ -319,14 +320,14 @@ function headSvg(p) {
   const furrow = Math.max(0, -(brL.i + brR.i) / 2);
   const wrinkle = Math.max(0, (brL.r + brR.r) / 2 - 0.35);
   const ear = (s) => `<ellipse cx="${s * (205 * (1 - 0.07 * Math.min(SLIM, 1.4)) + (s > 0 ? -yaw * 24 : -yaw * 12))}" cy="8" rx="${32 * (s > 0 ? 1 - 0.3 * Math.max(0, yaw) : 1 + 0.1 * Math.max(0, yaw))}" ry="50" fill="${SKINB}" ${O8}/>`;
-  return `<g>${hr.hd ? hdBack(hr) : hairBehind(hr)}
+  return `<g>${hr.lacio ? lacioBack(hr) : hr.hd ? hdBack(hr) : hairBehind(hr)}
     ${FEM > 0.02 ? `` : `<ellipse cx="${yaw * 6}" cy="${60 + jaw * 0.6}" rx="${188 * (1 - 0.14 * Math.min(SLIM, 1.4) - 0.06 * FACEW)}" ry="${170 + jaw * 0.6}" fill="${SKINB}" ${O8}/>`}
     ${p.faceSvg ? '' : `<ellipse cx="${yaw * 4}" cy="${150 + jaw * 0.9}" rx="130" ry="22" fill="#000" opacity="0.16" filter="url(#blur8)"/>`}
     ${p.faceSvg ? p.faceSvg : FEM > 0.02 ? `<path d="${femPathStr(yaw)}" fill="${SKIN}" ${O8}/>` : `<ellipse cx="${yaw * 4}" cy="0" rx="${208 * (1 - 0.07 * Math.min(SLIM, 1.4) - 0.03 * FACEW)}" ry="210" fill="${SKIN}" ${O8}/>`}
     ${p.faceSvg ? '' : `    <ellipse cx="${-70 + yaw * 10}" cy="-70" rx="110" ry="80" fill="#fff" opacity="0.13" filter="url(#blur20)"/>
     <ellipse cx="${90 + yaw * 10}" cy="${130 + jaw * 0.6}" rx="150" ry="70" fill="#000" opacity="0.18" filter="url(#blur20)"/>`}
     ${p.faceSvg ? '' : ear(-1) + ear(1)}
-    ${hr.hd ? `<g transform="translate(${yaw * 10},0)">${hdTop(hr, yaw)}</g>` : `<g transform="translate(${yaw * 10},0)">${hairCurly(hr)}${hairTop(hr)}</g>`}
+    ${hr.lacio ? lacioTop(hr, yaw) : hr.hd ? `<g transform="translate(${yaw * 10},0)">${hdTop(hr, yaw)}</g>` : `<g transform="translate(${yaw * 10},0)">${hairCurly(hr)}${hairTop(hr)}</g>`}
     <g transform="translate(${fx},${(p.pitch || 0) * 12})">
       <!-- pomulos / mejillas -->
       <ellipse cx="-124" cy="${58 - up * 14}" rx="${52 + up * 10}" ry="${34 + up * 6}" fill="#e0624a" opacity="${0.4 + up * 0.15}"/><ellipse cx="124" cy="${58 - up * 14}" rx="${52 + up * 10}" ry="${34 + up * 6}" fill="#e0624a" opacity="${0.4 + up * 0.15}"/>
@@ -577,7 +578,7 @@ function heelsLayer(of, p) {
 // ---- Exportes para el rig2d: la cabeza (rostro, ojos, cejas, nariz, boca, dientes) y el pelo de Lazy tal cual, origen = centro de la cabeza ----
 function headGlobals(p) { LID = p.lidColor || '#a1613a'; const of = p.outfit && p.outfit.kind && p.outfit.kind !== 'gym' ? p.outfit : null; SLIM = p.slim || 0; LOOSE = 0; FACEW = p.faceWrinkle || 0; BODYW = 0; FEM = p.fem || 0; SKINT = p.skinTex || null; if (SKINT && typeof SKINT === 'object') SKINT = { ...SKINT }; GYM = null; BT = null; AST = null; SHT = null; RED = false; return of; }
 export function drawLazyHeadBack(p) { headGlobals(p); const s = `${SHADE_DEFS}<defs>${SHIM_DEFS}</defs><defs>${hairDefs({ ...HAIR_DEFAULT, ...(p.hair || {}) })}${hdDefs(p.hair || {})}</defs><clipPath id="eyeClip"><ellipse rx="36" ry="40"/></clipPath><g transform="translate(0,${(p.pitch || 0) * 10}) scale(${1 - 0.2 * FEM},${1 - 0.14 * FEM})">${headSvg(p)}</g>`; return s; }
-export function drawLazyHeadFront(p) { headGlobals(p); return `<g transform="translate(0,${(p.pitch || 0) * 10}) scale(${1 - 0.2 * FEM},${1 - 0.14 * FEM})">${(p.hair || {}).hd ? hdFront(p.hair, p.yaw || 0, p.tearT || 0) : ''}${jewelHead(p.outfit)}</g>`; }
+export function drawLazyHeadFront(p) { headGlobals(p); return `<g transform="translate(0,${(p.pitch || 0) * 10}) scale(${1 - 0.2 * FEM},${1 - 0.14 * FEM})">${(p.hair || {}).lacio ? '' : (p.hair || {}).hd ? hdFront(p.hair, p.yaw || 0, p.tearT || 0) : ''}${jewelHead(p.outfit)}</g>`; }
 export function drawLazy(p) {
   const br = p.breath || 0, sh = (p.shoulders || 0) * 14;
   const of = p.outfit && p.outfit.kind && p.outfit.kind !== 'gym' ? p.outfit : null; const gownOn = of && (of.prog ?? 1) > 0.02; SHIRT = of && (of.prog ?? 1) >= 1 ? (of.kind === 'neon' ? 'url(#neonG)' : of.kind === 'red' ? 'url(#redG)' : 'url(#gownG)') : 'url(#shirt)';
@@ -608,7 +609,7 @@ export function drawLazy(p) {
       ${FEM > 0.02 ? `<path d="M-54,-210 L54,-210 L54,-110 Q58,-100 66,-92 L-66,-92 Q-58,-100 -54,-110Z" fill="${SKINB}"/><path d="M-54,-210 L-54,-110 Q-58,-100 -66,-92 M54,-210 L54,-110 Q58,-100 66,-92" stroke="${OUT}" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M-54,-190 L54,-190 L54,-130 Q0,-110 -54,-130Z" fill="#000" opacity="0.16" filter="url(#blur8)"/><path d="M-12,-120 L12,-120" stroke="#fff" stroke-opacity="0.18" stroke-width="10" stroke-linecap="round"/>` : `<path d="M-62,-150 C-70,-110 -86,-96 -110,-84 L110,-84 C86,-96 70,-110 62,-150Z" fill="${SKINB}" ${O8}/>`}
       <path d="M-40,-90 C-30,-70 30,-70 40,-90" stroke="#000" stroke-opacity="0.2" stroke-width="6" fill="none"/>
       <ellipse cx="0" cy="-60" rx="104" ry="24" fill="#000" opacity="0.18" filter="url(#blur8)"/>
-      <g transform="translate(0,${rollY}) rotate(${p.roll || 0}) translate(0,${-rollY}) translate(0,${-215 - 100 * FEM + (p.pitch || 0) * 10 + (p.bob || 0)}) scale(${1 - 0.2 * FEM},${1 - 0.14 * FEM}) ">${headSvg(p)}${(p.hair || {}).hd ? hdFront(p.hair, p.yaw || 0, p.tearT || 0) : hairCurtains({ ...HAIR_DEFAULT, ...(p.hair || {}) }, p.yaw || 0) + hairRinglets({ ...HAIR_DEFAULT, ...(p.hair || {}) }, p.yaw || 0, p.tearT || 0)}${jewelHead(p.outfit)}</g>
+      <g transform="translate(0,${rollY}) rotate(${p.roll || 0}) translate(0,${-rollY}) translate(0,${-215 - 100 * FEM + (p.pitch || 0) * 10 + (p.bob || 0)}) scale(${1 - 0.2 * FEM},${1 - 0.14 * FEM}) ">${headSvg(p)}${(p.hair || {}).lacio ? '' : (p.hair || {}).hd ? hdFront(p.hair, p.yaw || 0, p.tearT || 0) : hairCurtains({ ...HAIR_DEFAULT, ...(p.hair || {}) }, p.yaw || 0) + hairRinglets({ ...HAIR_DEFAULT, ...(p.hair || {}) }, p.yaw || 0, p.tearT || 0)}${jewelHead(p.outfit)}</g>
     </g>
     <g transform="translate(0,${-sh})">${armSvg(-1, p.armL)}${armSvg(1, p.armR)}</g>
   </g></g></g>`;
