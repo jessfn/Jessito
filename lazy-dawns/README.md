@@ -194,3 +194,9 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
 - M = Mari (amiga del dia 1). Se revela el dia 29; el dia 28 queda en suspenso. Motivo: alguien que le gustaba la rechazo porque le gustaba Lazy (a quien no le importaba como se viera por fuera); Mari juro que Lazy se arrepentiria, porque Lazy siempre era la mejor (escuela, padres, le "quito" a quien le gustaba). Le dira que no la soporta, y tampoco queria que fuera aun mas bonita que ella. Al intentar agredir a Lazy, llegan los padres de Mari y dicen que la internaran. Dante es aliado de M.
 - Dia 29 (final): invitacion especial a una pasarela mundialmente famosa. Dia 30: Lazy cumple su sueno en la pasarela; llega una mujer elegante de rojo con gafas y la invita a ser actriz en Hollywood (papel importante).
 - Decisiones: la voz de M NO cambia hasta la revelacion final (dia 29). Mari aparece en ALGUNOS dias (no todos) como amiga/pista sutil (dia 13+). Mari termina internada en una clinica con ayuda (final trágico, no cruel). Pistas sugeridas: like/publicacion, perfume, la mujer de rojo con gafas de fondo antes del dia 30.
+
+## REGLAS PERMANENTES (todos los dias, creador)
+- CADA dia: escenarios nuevos (3D, con texturas/profundidad), objetos 3D nuevos, voces nuevas para personajes nuevos, SFX y musica nuevos segun la escena. Nunca reutilizar fondos ni objetos de dias anteriores.
+- Personajes extra nuevos con diseno moderno y distinto, brazos continuos con manos de dedos, boca que habla sincronizada (Lazy NO mueve la boca para hablar; solo expresiones).
+- Algunos personajes YA APARECIDOS pueden volver (Mari, Dante, Greta, Zoe, Kai, Dra. Renata, etc.) con su misma voz y diseno; usarlos con intencion (pistas, giros), no en todos los dias.
+- El proceso (cabello, piel, etc.) se muestra paso a paso en el cuerpo de Lazy con tomas cinematograficas. Gancho constante.
