@@ -183,3 +183,9 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
 ## Dia 12 (pendiente de decidir): decisiones guardadas
 - Voto del dia 11 = cabello. Para el dia 12 la nariz se queda la VIEJA; la nariz nueva (opcion D, respingada, puente desvanecido: `noseStyle:'D'` en rig.mjs) se guarda para el dia siguiente (dia 13).
 - Cabello nuevo: LACIO y no tan largo (opciones A-D en hair_lacio.mjs, `hair.lacio:'A'..'D'`), sin halo negro detras del rostro.
+
+## Dia 12 (Una noche en neon): decisiones
+- Voto del dia 11 = cabello (nariz vieja se queda; la nariz D respingada va en el dia 13). Cabello final: bob lacio C2 (hair_lacio.mjs, mechon al frente sobre el pecho, sin halo negro).
+- REGLAS NUEVAS (creador): NO reutilizar escenas ni objetos; todo nuevo cada dia. Escenas del dia 12: neonstudio12, bedroom12, rooftop12 (plates3d/scenes12.html). Objetos 3D nuevos: scanner, ampoule, ledcap, weft, shears, iron, slate12 (plates3d/objects12.html, obj3d12.mjs). SFX y musica nuevos (build/dia12/sfx, build_audio_dia12.py).
+- Personajes secundarios NUEVOS con voz nueva y BOCA que habla sincronizada (chars12.mjs: Zoe=Aria, Kai=Will); brazos continuos con manos de dedos y herramientas modernas. Lazy NO mueve la boca para hablar.
+- Proceso del cabello visible con tomas cinematograficas: Lazy sentada con capa, escaner, ampolla, casco LED, extensiones, corte a oscuras, alisado con barrido. Pipeline: render_dia12.mjs + director13.mjs.

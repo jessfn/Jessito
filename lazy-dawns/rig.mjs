@@ -327,7 +327,7 @@ function headSvg(p) {
     ${p.faceSvg ? '' : `    <ellipse cx="${-70 + yaw * 10}" cy="-70" rx="110" ry="80" fill="#fff" opacity="0.13" filter="url(#blur20)"/>
     <ellipse cx="${90 + yaw * 10}" cy="${130 + jaw * 0.6}" rx="150" ry="70" fill="#000" opacity="0.18" filter="url(#blur20)"/>`}
     ${p.faceSvg ? '' : ear(-1) + ear(1)}
-    ${hr.lacio ? (isBob(hr) ? bobTop(hr, yaw) : lacioTop(hr, yaw)) : hr.hd ? `<g transform="translate(${yaw * 10},0)">${hdTop(hr, yaw)}</g>` : `<g transform="translate(${yaw * 10},0)">${hairCurly(hr)}${hairTop(hr)}</g>`}
+    ${hr.lacio ? (p.frontHair ? '' : (isBob(hr) ? bobTop(hr, yaw) : lacioTop(hr, yaw))) : hr.hd ? `<g transform="translate(${yaw * 10},0)">${hdTop(hr, yaw)}</g>` : `<g transform="translate(${yaw * 10},0)">${hairCurly(hr)}${hairTop(hr)}</g>`}
     <g transform="translate(${fx},${(p.pitch || 0) * 12})">
       <!-- pomulos / mejillas -->
       <ellipse cx="-124" cy="${58 - up * 14}" rx="${52 + up * 10}" ry="${34 + up * 6}" fill="#e0624a" opacity="${0.4 + up * 0.15}"/><ellipse cx="124" cy="${58 - up * 14}" rx="${52 + up * 10}" ry="${34 + up * 6}" fill="#e0624a" opacity="${0.4 + up * 0.15}"/>
@@ -578,7 +578,7 @@ function heelsLayer(of, p) {
 // ---- Exportes para el rig2d: la cabeza (rostro, ojos, cejas, nariz, boca, dientes) y el pelo de Lazy tal cual, origen = centro de la cabeza ----
 function headGlobals(p) { LID = p.lidColor || '#a1613a'; const of = p.outfit && p.outfit.kind && p.outfit.kind !== 'gym' ? p.outfit : null; SLIM = p.slim || 0; LOOSE = 0; FACEW = p.faceWrinkle || 0; BODYW = 0; FEM = p.fem || 0; SKINT = p.skinTex || null; if (SKINT && typeof SKINT === 'object') SKINT = { ...SKINT }; GYM = null; BT = null; AST = null; SHT = null; RED = false; return of; }
 export function drawLazyHeadBack(p) { headGlobals(p); const s = `${SHADE_DEFS}<defs>${SHIM_DEFS}</defs><defs>${hairDefs({ ...HAIR_DEFAULT, ...(p.hair || {}) })}${hdDefs(p.hair || {})}</defs><clipPath id="eyeClip"><ellipse rx="36" ry="40"/></clipPath><g transform="translate(0,${(p.pitch || 0) * 10}) scale(${1 - 0.2 * FEM},${1 - 0.14 * FEM})">${headSvg(p)}</g>`; return s; }
-export function drawLazyHeadFront(p) { headGlobals(p); return `<g transform="translate(0,${(p.pitch || 0) * 10}) scale(${1 - 0.2 * FEM},${1 - 0.14 * FEM})">${(p.hair || {}).lacio ? '' : (p.hair || {}).hd ? hdFront(p.hair, p.yaw || 0, p.tearT || 0) : ''}${jewelHead(p.outfit)}</g>`; }
+export function drawLazyHeadFront(p) { headGlobals(p); return `<g transform="translate(0,${(p.pitch || 0) * 10}) scale(${1 - 0.2 * FEM},${1 - 0.14 * FEM})">${(p.hair || {}).lacio ? (p.frontHair ? (isBob(p.hair) ? bobTop({ ...HAIR_DEFAULT, ...p.hair }, p.yaw || 0) : '') : '') : (p.hair || {}).hd ? hdFront(p.hair, p.yaw || 0, p.tearT || 0) : ''}${jewelHead(p.outfit)}</g>`; }
 export function drawLazy(p) {
   const br = p.breath || 0, sh = (p.shoulders || 0) * 14;
   const of = p.outfit && p.outfit.kind && p.outfit.kind !== 'gym' ? p.outfit : null; const gownOn = of && (of.prog ?? 1) > 0.02; SHIRT = of && (of.prog ?? 1) >= 1 ? (of.kind === 'neon' ? 'url(#neonG)' : of.kind === 'red' ? 'url(#redG)' : 'url(#gownG)') : 'url(#shirt)';

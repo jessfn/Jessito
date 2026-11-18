@@ -485,3 +485,4 @@ export function drawGreta(p) {
     ${armsLayer(p, { sleeve: '#a78bfa', skin: SK }, 'body')}
   </g>`;
 }
+export { armsLayer, eyes, MOODS, toolAnchor, clamp as clampC };

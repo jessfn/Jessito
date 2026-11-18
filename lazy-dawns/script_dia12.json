@@ -1,0 +1,99 @@
+[
+ {
+  "id": "l1",
+  "who": "N",
+  "text": "Día doce. Eligieron el cabello. Desperté con la almohada llena de mechones, y ya no pude esperar.",
+  "pad": 0.18
+ },
+ {
+  "id": "l2",
+  "who": "N",
+  "text": "Corrí al estudio más moderno de la ciudad: un salón de luces de neón.",
+  "pad": 0.18
+ },
+ {
+  "id": "l3",
+  "who": "Z",
+  "text": "Hola, soy Zoe. Siéntate. Antes de tocarte el pelo, voy a escanear tu cuero cabelludo y ver qué te hicieron.",
+  "pad": 0.15
+ },
+ {
+  "id": "l4",
+  "who": "N",
+  "text": "El escáner proyectó un mapa luminoso: casi todas mis raíces estaban dañadas.",
+  "pad": 0.18
+ },
+ {
+  "id": "l5",
+  "who": "Y",
+  "text": "Zoe, encontré un químico en la muestra. Es un depilatorio, disfrazado de tónico.",
+  "pad": 0.15
+ },
+ {
+  "id": "l6",
+  "who": "Z",
+  "text": "Entonces primero hay que neutralizarlo. Kai, trae la ampolla de keratina.",
+  "pad": 0.15
+ },
+ {
+  "id": "l7",
+  "who": "N",
+  "text": "Aplicaron la ampolla raíz por raíz, y un casco de luz roja despertó mis folículos. Mi cabello empezó a brotar.",
+  "pad": 0.18
+ },
+ {
+  "id": "l8",
+  "who": "N",
+  "text": "Zoe añadió extensiones, mechón por mechón, con clips invisibles.",
+  "pad": 0.18
+ },
+ {
+  "id": "l9",
+  "who": "N",
+  "text": "Justo entonces, todo se apagó. Desde una azotea, M había cortado la luz.",
+  "pad": 0.18
+ },
+ {
+  "id": "l10",
+  "who": "D",
+  "text": "Sin luz, no hay corte. Y sin corte, no hay cambio.",
+  "pad": 0.18,
+  "fx": "asetrate=44100*0.8,aresample=44100,atempo=1.25,aecho=0.8:0.7:70|140:0.4|0.25,highpass=f=80"
+ },
+ {
+  "id": "l11",
+  "who": "Z",
+  "text": "Una estilista de verdad corta hasta a oscuras. Kai, las linternas.",
+  "pad": 0.15
+ },
+ {
+  "id": "l12",
+  "who": "N",
+  "text": "Con la luz de los celulares, Zoe tomó sus tijeras y cortó, capa por capa, hasta el largo perfecto.",
+  "pad": 0.18
+ },
+ {
+  "id": "l13",
+  "who": "N",
+  "text": "Después pasó la plancha, y cada rizo se volvió liso y brillante, como seda.",
+  "pad": 0.18
+ },
+ {
+  "id": "l14",
+  "who": "N",
+  "text": "Giró la silla, y en el espejo estaba yo: cabello lacio, un lado sobre el pecho, y mi vestido rojo brillando.",
+  "pad": 0.18
+ },
+ {
+  "id": "l15",
+  "who": "N",
+  "text": "Pero en el espejo, escrito con labial rojo: la nariz es lo siguiente.",
+  "pad": 0.18
+ },
+ {
+  "id": "l16",
+  "who": "N",
+  "text": "¿Qué arreglamos mañana: la nariz o las uñas? Comenta tu elección, y sígueme para el día trece.",
+  "pad": 0.18
+ }
+]
