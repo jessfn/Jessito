@@ -24,9 +24,8 @@ const BOB = { B1: { Y: 226, curl: 26, asym: 0, fringe: 0, dens: 46 }, B2: { Y: 2
   C1: { Y: 262, curl: 30, asym: 0, fringe: 0, dens: 56, fwd: { m: 1, len: 120, wave: 0 } }, C2: { Y: 262, curl: 40, asym: 0, fringe: 0, dens: 60, fwd: { m: -1, len: 130, wave: 1 } }, C3: { Y: 270, curl: 34, asym: 0, fringe: 0, dens: 56, fwd: { m: 1, len: 90, wave: 1 } }, C4: { Y: 256, curl: 26, asym: 0, fringe: 1, dens: 56, fwd: { m: -1, len: 110, wave: 0 } } };
 export const isBob = (h) => !!BOB[h.lacio];
 const rnd = (i, s) => { const v = Math.sin(i * 127.1 + s * 311.7) * 43758.5453; return v - Math.floor(v); };
-export function bobBack(h) { const S = BOB[h.lacio]; const Y = S.Y - 4;
-  const side = (m, ex) => `<path d="M${m * 64},-40 L${m * 64},${Y} L${m * (180 + ex)},${Y} L${m * (206 + ex)},-30 C${m * 200},-200 ${m * 110},-262 0,-264 C${m * -110},-262 ${m * -200},-200 ${m * -206},-30 Z" fill="url(#lcB)"/>`;
-  return `${LACIO_DEFS}<g><path d="M-206,-30 C-200,-200 -110,-262 0,-264 C110,-262 200,-200 206,-30 L190,60 L-190,60 Z" fill="url(#lcB)"/><path d="M-206,-30 L-180,${Y} L-64,${Y} L-64,60 Z" fill="url(#lcB)"/><path d="M206,-30 L${180 + S.asym},${Y + S.asym * 0.4} L64,${Y} L64,60 Z" fill="url(#lcB)"/></g>`; }
+export function bobBack(h) { const S = BOB[h.lacio]; const Y = S.Y - 24;
+  return `${LACIO_DEFS}<g><path d="M-206,-30 C-200,-200 -110,-262 0,-264 C110,-262 200,-200 206,-30 L190,20 L-190,20 Z" fill="url(#lcB)"/><path d="M-206,-30 L-184,${Y - 10} Q-160,${Y + 6} -100,${Y - 4} L-100,20 Z" fill="url(#lcB)"/><path d="M206,-30 L${184 + S.asym},${Y - 10} Q160,${Y + 6} 100,${Y - 4} L100,20 Z" fill="url(#lcB)"/></g>`; }
 export function bobTop(h, yaw = 0) { const S = BOB[h.lacio]; const sw = (h.sway || 0) * 5;
   const panel = (m) => { const F = S.fwd && S.fwd.m === m, Y = S.Y + (m > 0 ? S.asym : 0) + (F ? S.fwd.len : 0), xo = F ? 190 : 204, cu = S.curl, inn = F ? 112 : 150, wv = F && S.fwd.wave ? 14 : 0;
     const outline = `M${m * 4},-216 C${m * 130},-216 ${m * 214},-150 ${m * 204},-24 C${m * 206},60 ${m * (xo + wv)},${Y * 0.5} ${m * (xo - 8 + sw - wv)},${Y - 12} Q${m * (xo - 20)},${Y + 14} ${m * (xo - cu - 6 + sw)},${Y + 8} Q${m * (xo - cu - 30)},${Y + 2} ${m * (inn + 6)},${Y - 22} C${m * (inn + wv)},${Y * 0.5} ${m * 164},40 ${m * 150},-20 C${m * 122},-96 ${m * 54},-150 ${m * 4},-180 Z`;
