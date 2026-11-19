@@ -96,7 +96,7 @@ const UQ = {
   d11: { hands: 'cheeks', mood: 'shock', x: 420, y: 1190, s: 0.9, flip: 1, comp: { fn: drawGreta, x: 215, y: 840, s: 0.95, st: { mood: 'shock', mouthOpen: 0.5, hands: 'cheeks' } }, titleSide: 'R', props: 'tela_dron' },
   d12: { hands: 'hips', mood: 'proud', x: 420, y: 1190, s: 0.9, flip: 1, comp: { fn: drawZoe, x: 740, y: 840, s: 0.95, st: { mood: 'proud', mouthOpen: 0.45, hands: 'none', tool: 'shears', toolSide: -1, toolX: -165, toolY: 118, toolR: -75, toolS: 0.75, elbowLow: true } }, titleSide: 'L', props: 'apagon' },
   d13: { hands: 'hips', mood: 'proud', x: 420, y: 1190, s: 0.9, flip: 1, comp: { fn: drawMontes, x: 290, y: 840, s: 0.95, st: { mood: 'focus', mouthOpen: 0.3, hands: 'none', tool: 'syringe', toolSide: 1, toolX: 262, toolY: 244, toolR: -62, toolS: 0.6, elbowLow: true } }, titleSide: 'R', props: 'hack' },
-  sp: { hands: 'up', mood: 'joy', x: 540, y: 1330, s: 0.95, flip: 1, comp: { fn: drawDante, x: 170, y: 860, s: 0.9, st: { mood: 'shock' } }, comp2: { fn: drawMemo, x: 910, y: 860, s: 0.9, st: { mood: 'grin' } }, titleSide: 'L', props: 'turbante' },
+  sp: { hands: 'up', mood: 'joy', x: 540, y: 1010, s: 0.82, flip: 1, comp: { fn: drawDante, x: 120, y: 860, s: 0.9, st: { mood: 'shock' } }, comp2: { fn: drawMemo, x: 960, y: 860, s: 0.9, st: { mood: 'grin' } }, titleSide: 'L', props: 'turbante' },
 };
 export function coverV(id, opt, guide = false) { const c = CFG[id]; const p = common(); STATE[c.st](p); const u = UQ[id]; const L = u ? { hands: u.hands, mood: u.mood } : LAY[opt]; hands(p, L.hands); mood(p, L.mood); if (id === 'sp') p.hair.wind = 0.6;
   const lazy = u ? `<g transform="translate(${u.x},${u.y}) scale(${u.s * u.flip},${u.s}) translate(0,215)">${drawLazy(p)}</g>` : `<g transform="${L.pos}">${drawLazy(p)}</g>`;
