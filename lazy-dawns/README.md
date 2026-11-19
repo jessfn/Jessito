@@ -204,3 +204,9 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
 ## Dia 13 (Armonia de perfil): decisiones
 - Voto del dia 12 = nariz (opcion D respingada, puente desvanecido: `noseStyle:'D', noseK:1.35`). Clinica Aurora (sin cirugia: acido hialuronico), Dr. Montes (voz George) y Nuria (voz Nicole) NUEVOS con boca hablante (chars13.mjs). Sabotaje de M por hackeo (pantalla). Pista de Mari: mensajes ("llego tarde", "mañana te alcanzo") sin revelar nada.
 - Escenas nuevas: balcony13, auroraclinic13 (scenes13.html). Objetos nuevos: facearch, syringe, tube, compress, holonose, slate13 (objects13.html). Pipeline: render_dia13.mjs + director14.mjs + build_audio_dia13.py. Siguiente voto: UÑAS vs ZAPATOS (dia 14).
+
+## REGLAS DE LAYOUT (creador, permanentes)
+- NINGUN texto puede salirse de su recuadro/boton/burbuja/banner: SIEMPRE ajustar el tamano de fuente al ancho disponible (fitFs/inkWidth) y partir lineas por palabras. Revisar cada rotulo en los cuadros de prueba.
+- Celulares/mensajes: mostrar SIEMPRE un celular real (cuerpo, barra de estado, encabezado de chat con la FOTO DE PERFIL de la persona, burbujas, barra de mensaje). Mari tiene su foto de perfil (cara de Mari). Nada de tarjetas sueltas.
+- Opciones del final: el icono de cada opcion debe ser EXACTAMENTE la cosa que se quiere arreglar (unas = mano con unas pintadas, zapatos = tacon), centrado dentro del circulo sin salirse.
+- Nada se traslapa: lo que aparece (celular, rotulos, personajes) no debe tapar subtitulos ni caras importantes.
