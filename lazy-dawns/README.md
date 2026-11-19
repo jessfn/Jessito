@@ -211,3 +211,4 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
 - Opciones del final: el icono de cada opcion debe ser EXACTAMENTE la cosa que se quiere arreglar (unas = mano con unas pintadas, zapatos = tacon), centrado dentro del circulo sin salirse.
 - Nada se traslapa: lo que aparece (celular, rotulos, personajes) no debe tapar subtitulos ni caras importantes.
 - SECUENCIA LOGICA (creador): los mensajes y todo evento deben seguir una secuencia coherente (quien escribe, a quien, respuestas en orden; la pista debe tener sentido: ej. Mari felicita la nariz nueva sin que Lazy le haya contado = pista).
+- PORTADAS (creador): la protagonista aparece de medio cuerpo hacia arriba y grande; cada portada con relacion/pose DISTINTA con el/los personajes extra detras.
