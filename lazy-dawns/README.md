@@ -213,3 +213,4 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
 - SECUENCIA LOGICA (creador): los mensajes y todo evento deben seguir una secuencia coherente (quien escribe, a quien, respuestas en orden; la pista debe tener sentido: ej. Mari felicita la nariz nueva sin que Lazy le haya contado = pista).
 - PORTADAS (creador): la protagonista aparece de medio cuerpo hacia arriba y grande; cada portada con relacion/pose DISTINTA con el/los personajes extra detras.
 - PORTADAS DE PELICULA (creador, todas en adelante): protagonista de medio cuerpo hacia arriba; pose y relacion distintas con los extras; incluir objetos/personajes que dan trama (dia 11: tela roja rasgada; dia 12: linterna/apagon; dia 13: pantalla hackeada de M). Props definidos en propsSvg de build_cover2.mjs.
+- PORTADAS: Lazy CERCA (plano medio-cercano, cara grande, hombros arriba); extras y props visibles pero secundarios.
