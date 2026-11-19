@@ -1,0 +1,99 @@
+[
+ {
+  "id": "l1",
+  "who": "N",
+  "text": "Día trece. Eligieron la nariz. Con mi cabello nuevo me veía mejor, pero mi nariz pedía un cambio.",
+  "pad": 0.17
+ },
+ {
+  "id": "l2",
+  "who": "N",
+  "text": "Esa mañana, mi amiga Mari me escribió: hoy te acompaño, pero llego tarde. Empieza sin mí.",
+  "pad": 0.17
+ },
+ {
+  "id": "l3",
+  "who": "N",
+  "text": "La clínica Aurora parecía de otro planeta: cristal, luz blanca y pantallas flotantes.",
+  "pad": 0.17
+ },
+ {
+  "id": "l4",
+  "who": "Q",
+  "text": "Bienvenida, Lazy. Soy el doctor Montes. Aquí no usamos bisturí: modelamos la nariz con ácido hialurónico.",
+  "pad": 0.15
+ },
+ {
+  "id": "l5",
+  "who": "N",
+  "text": "Un arco de luz escaneó mi rostro, y en el aire apareció mi perfil, con docenas de narices.",
+  "pad": 0.17
+ },
+ {
+  "id": "l6",
+  "who": "U",
+  "text": "Doctor, esta es la que Lazy escogió: puente alto, punta respingada, suave y delicada.",
+  "pad": 0.15
+ },
+ {
+  "id": "l7",
+  "who": "N",
+  "text": "Me pusieron crema anestésica, y el doctor cargó la jeringa con gel transparente.",
+  "pad": 0.17
+ },
+ {
+  "id": "l8",
+  "who": "N",
+  "text": "Pero entonces la pantalla parpadeó, y la nariz del holograma se hinchó hasta volverse una nariz de payaso.",
+  "pad": 0.17
+ },
+ {
+  "id": "l9",
+  "who": "D",
+  "text": "Una nariz nueva para una chica nueva. Disfruta tu perfil.",
+  "pad": 0.17,
+  "fx": "asetrate=44100*0.8,aresample=44100,atempo=1.25,aecho=0.8:0.7:70|140:0.4|0.25,highpass=f=80"
+ },
+ {
+  "id": "l10",
+  "who": "U",
+  "text": "¡Hackearon el sistema! ¡El escáner ya no es confiable!",
+  "pad": 0.15
+ },
+ {
+  "id": "l11",
+  "who": "Q",
+  "text": "Entonces lo haré a mano, como se hacía antes. Quédate quieta, Lazy.",
+  "pad": 0.15
+ },
+ {
+  "id": "l12",
+  "who": "N",
+  "text": "Con la yema de los dedos, el doctor levantó mi puente y mi punta, gota a gota.",
+  "pad": 0.17
+ },
+ {
+  "id": "l13",
+  "who": "N",
+  "text": "Una compresa fría, una luz azul, y por fin, el espejo.",
+  "pad": 0.17
+ },
+ {
+  "id": "l14",
+  "who": "N",
+  "text": "Mi nariz era delicada, respingada, perfecta. Y mi rostro, pura armonía.",
+  "pad": 0.17
+ },
+ {
+  "id": "l15",
+  "who": "N",
+  "text": "Mari me escribió: qué linda te ves, amiga. Algo en ese mensaje me pareció raro... pero lo dejé pasar.",
+  "pad": 0.17
+ },
+ {
+  "id": "l16",
+  "who": "N",
+  "text": "¿Qué arreglamos mañana: las uñas o los zapatos? Comenta tu elección, y sígueme para el día catorce.",
+  "pad": 0.17
+ }
+]

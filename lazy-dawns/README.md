@@ -200,3 +200,7 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
 - Personajes extra nuevos con diseno moderno y distinto, brazos continuos con manos de dedos, boca que habla sincronizada (Lazy NO mueve la boca para hablar; solo expresiones).
 - Algunos personajes YA APARECIDOS pueden volver (Mari, Dante, Greta, Zoe, Kai, Dra. Renata, etc.) con su misma voz y diseno; usarlos con intencion (pistas, giros), no en todos los dias.
 - El proceso (cabello, piel, etc.) se muestra paso a paso en el cuerpo de Lazy con tomas cinematograficas. Gancho constante.
+
+## Dia 13 (Armonia de perfil): decisiones
+- Voto del dia 12 = nariz (opcion D respingada, puente desvanecido: `noseStyle:'D', noseK:1.35`). Clinica Aurora (sin cirugia: acido hialuronico), Dr. Montes (voz George) y Nuria (voz Nicole) NUEVOS con boca hablante (chars13.mjs). Sabotaje de M por hackeo (pantalla). Pista de Mari: mensajes ("llego tarde", "mañana te alcanzo") sin revelar nada.
+- Escenas nuevas: balcony13, auroraclinic13 (scenes13.html). Objetos nuevos: facearch, syringe, tube, compress, holonose, slate13 (objects13.html). Pipeline: render_dia13.mjs + director14.mjs + build_audio_dia13.py. Siguiente voto: UÑAS vs ZAPATOS (dia 14).

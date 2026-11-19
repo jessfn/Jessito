@@ -4,6 +4,7 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path'; import { fileURLToPath } from 'node:url';
 import { renderCharacter as rc2, defaultPose as dp2, ik2 as ik2c, SK as SK2c, ALLDEFS as AD2 } from './rig2d/character.mjs';
 import { defs } from './lazy_lib.mjs'; import { drawLazy, solveArm, setSlim } from './rig.mjs'; import { drawZoe } from './chars12.mjs';
+import { drawMontes } from './chars13.mjs';
 import { drawGreta, drawTadeo, drawMei, drawMari, drawDoc, drawDentist, drawStylist, drawDante, drawKarla, drawNina, drawMemo, drawPia, drawDerm, salonTool } from './chars.mjs';
 const here = path.dirname(fileURLToPath(import.meta.url)); mkdirSync(path.join(here, 'portadas'), { recursive: true });
 const FD = path.join(here, '../assets/fonts/');
@@ -29,6 +30,7 @@ const STATE = {
   10: (p) => { p.skin = { ...SKIN }; p.mouth.teeth = TEETH; p.hair = { hd: 'long', len: 0.82, shine: 1, cp: 1, grow: 1, sway: 0.2 }; p.browStyle = { k: 1, kl: 1, kr: 1, red: 0, shortL: 0 }; p.outfit = { kind: 'gown', prog: 1, jewel: 1, loose: 2 }; p.slim = 3.8; p.fem = 1; p.skinTex = { tex: 'glass', shape: 'A' }; p.bodyT = 'C'; p.armStyle = 'A'; p.faceWrinkle = 0; p.bodyWrinkle = 1; p.makeup = { ...LOOKD, mole: 0 }; p.mouth.lip = '#b0206a'; p.mouth.tstyle = 'A'; },
   11: (p) => { p.skin = { ...SKIN }; p.mouth.teeth = TEETH; p.hair = { hd: 'long', len: 0.14, shine: 0.25, cp: 0.3, grow: 0.12, sway: 0.2 }; p.browStyle = { k: 1, kl: 1, kr: 1, red: 0, shortL: 0 }; p.outfit = { kind: 'red', prog: 1, jewel: 1 }; p.slim = 3.8; p.fem = 1; p.skinTex = { tex: 'glass', shape: 'A' }; p.bodyT = 'C'; p.armStyle = 'A'; p.faceWrinkle = 0; p.bodyWrinkle = 1; p.makeup = { ...LOOKD, mole: 0 }; p.mouth.lip = '#b0206a'; p.mouth.tstyle = 'A'; },
   12: (p) => { p.skin = { ...SKIN }; p.mouth.teeth = TEETH; p.hair = { hd: 'long', len: 0.14, shine: 0.25, cp: 0.3, grow: 0.12, sway: 0.2 }; p.browStyle = { k: 1, kl: 1, kr: 1, red: 0, shortL: 0 }; p.outfit = { kind: 'red', prog: 1, jewel: 1 }; p.slim = 3.8; p.fem = 1; p.skinTex = { tex: 'glass', shape: 'A' }; p.bodyT = 'C'; p.armStyle = 'A'; p.faceWrinkle = 0; p.bodyWrinkle = 1; p.makeup = { ...LOOKD, mole: 0 }; p.mouth.lip = '#b0206a'; p.mouth.tstyle = 'A'; },
+  13: (p) => { p.skin = { ...SKIN }; p.mouth.teeth = TEETH; p.hair = { hd: 'long', len: 0.14, shine: 0.25, cp: 0.3, grow: 0.12, sway: 0.2 }; p.browStyle = { k: 1, kl: 1, kr: 1, red: 0, shortL: 0 }; p.outfit = { kind: 'red', prog: 1, jewel: 1 }; p.slim = 3.8; p.fem = 1; p.skinTex = { tex: 'glass', shape: 'A' }; p.bodyT = 'C'; p.armStyle = 'A'; p.faceWrinkle = 0; p.bodyWrinkle = 1; p.makeup = { ...LOOKD, mole: 0 }; p.mouth.lip = '#b0206a'; p.mouth.tstyle = 'A'; },
   sp: (p) => { STATE[8](p); p.makeup = { ...LOOKD, mole: 1, glitter: 1 }; p.mouth.open = 0.6; p.mouth.smile = 1; p.mouth.wide = 0.8; p.brow = { l: { r: 0.4, i: 0.1 }, r: { r: 0.4, i: 0.1 } }; p.squint = 0.4; p.pitch = -0.3; p.yaw = 0; p.gaze = { x: 0, y: 0 }; p.hair.wind = 0.5; },
 };
 const CFG = {
@@ -44,6 +46,7 @@ const CFG = {
   d10: { st: 10, bg: 'plates3d/clinic_dof.png', tint: '#2fe0c4', glow: '#7ff0dc', titleY: 450, badge: 10, tag: '' },
   d11: { st: 11, bg: 'plates3d/boutique_dof.png', tint: '#ff2a4a', glow: '#ff7a8a', titleY: 450, badge: 11, tag: '' },
   d12: { st: 12, bg: 'plates3d/neonstudio12_dof.png', tint: '#22e6d0', glow: '#7ff0ea', titleY: 450, badge: 12, tag: '' },
+  d13: { st: 13, bg: 'plates3d/auroraclinic13_dof.png', tint: '#22c6d8', glow: '#a5f3fc', titleY: 450, badge: 13, tag: '' },
   sp: { st: 'sp', bg: 'plates3d/ballroom_dof.png', tint: '#ffd070', glow: '#ffe08a', titleY: 450, badge: 0, tag: 'UNA GRAN REVELACIÓN' },
 };
 const sil = `<g opacity="0.75" transform="translate(900,1180) scale(0.9)"><path d="M-110,420 Q-130,40 -40,-10 L40,-10 Q130,40 110,420Z" fill="#000"/><ellipse cx="0" cy="-60" rx="62" ry="68" fill="#000"/><ellipse cx="0" cy="-118" rx="118" ry="20" fill="#000"/><path d="M-60,-122 Q0,-214 60,-122Z" fill="#000"/><circle cx="-22" cy="-70" r="7" fill="#ef4444"/><circle cx="22" cy="-70" r="7" fill="#ef4444"/></g>`;
@@ -92,10 +95,14 @@ const UQ = {
   d10: { hands: 'hips', mood: 'proud', x: 420, y: 1190, s: 0.9, flip: 1, comp: { fn: drawDante, x: 880, y: 930, s: 0.78, st: { mood: 'amused' } }, titleSide: 'L' },
   d11: { hands: 'cheeks', mood: 'shock', x: 420, y: 1190, s: 0.9, flip: 1, comp: { fn: drawGreta, x: 880, y: 930, s: 0.78, st: { mood: 'shock' } }, titleSide: 'L' },
   d12: { hands: 'hips', mood: 'proud', x: 420, y: 1190, s: 0.9, flip: 1, comp: { fn: drawZoe, x: 880, y: 930, s: 0.78, st: { mood: 'proud', mouthOpen: 0.5 } }, titleSide: 'L' },
+  d13: { hands: 'hips', mood: 'proud', x: 420, y: 1190, s: 0.9, flip: 1, comp: { fn: drawMontes, x: 880, y: 930, s: 0.78, st: { mood: 'proud', mouthOpen: 0.4 } }, titleSide: 'L' },
   sp: { hands: 'up', mood: 'joy', x: 540, y: 1280, s: 0.74, flip: 1, comp: { fn: drawDante, x: 190, y: 980, s: 0.7, st: { mood: 'shock' } }, comp2: { fn: drawMemo, x: 890, y: 980, s: 0.7, st: { mood: 'grin' } }, titleSide: 'L' },
 };
 export function coverV(id, opt, guide = false) { const c = CFG[id]; const p = common(); STATE[c.st](p); const u = UQ[id]; const L = u ? { hands: u.hands, mood: u.mood } : LAY[opt]; hands(p, L.hands); mood(p, L.mood); if (id === 'sp') p.hair.wind = 0.6;
   const lazy = u ? `<g transform="translate(${u.x},${u.y}) scale(${u.s * u.flip},${u.s}) translate(0,215)">${drawLazy(p)}</g>` : `<g transform="${L.pos}">${drawLazy(p)}</g>`;
+  const cov13 = () => { const P2 = dp2(); P2.eyes.lookX = 0.5; P2.brows.Lraise = 0.2; P2.brows.Rraise = 0.2; P2.mouth.smile = 0.9; P2.mouth.open = 0.2; P2.mouth.wide = 0.5; P2.mouth.upperTeeth = 1; P2.noseStyle = 'D'; P2.noseK = 1.35; P2.hairOv = { lacio: 'C2', len: 0.4, shine: 1, cp: 1, grow: 1 }; P2.hair.t = 1; P2.skirt.t = 1;
+    const kL = ik2c(SK2c.shoulderL, SK2c.elbowL, SK2c.wristL, [372, 700], 1), kR = ik2c(SK2c.shoulderR, SK2c.elbowR, SK2c.wristR, [652, 700], -1); P2.armL.r1 = kL.r1; P2.armL.r2 = kL.r2; P2.armR.r1 = kR.r1; P2.armR.r2 = kR.r2; P2.head.rot = 3;
+    const S = 0.6; return `${AD2}<ellipse cx="400" cy="1735" rx="260" ry="24" fill="#000" opacity="0.4"/><g transform="translate(${400 - 512 * S},${1735 - 1500 * S}) scale(${S})">${rc2(P2)}</g>`; };
   const cov12 = () => { const P2 = dp2(); P2.eyes.lookX = 0.5; P2.brows.Lraise = 0.2; P2.brows.Rraise = 0.2; P2.mouth.smile = 0.9; P2.mouth.open = 0.25; P2.mouth.wide = 0.5; P2.mouth.upperTeeth = 1; P2.hairOv = { lacio: 'C2', len: 0.4, shine: 1, cp: 1, grow: 1 }; P2.hair.t = 1; P2.skirt.t = 1;
     const kL = ik2c(SK2c.shoulderL, SK2c.elbowL, SK2c.wristL, [372, 700], 1), kR = ik2c(SK2c.shoulderR, SK2c.elbowR, SK2c.wristR, [652, 700], -1); P2.armL.r1 = kL.r1; P2.armL.r2 = kL.r2; P2.armR.r1 = kR.r1; P2.armR.r2 = kR.r2; P2.head.rot = 3;
     const S = 0.6; return `${AD2}<ellipse cx="400" cy="1735" rx="260" ry="24" fill="#000" opacity="0.4"/><g transform="translate(${400 - 512 * S},${1735 - 1500 * S}) scale(${S})">${rc2(P2)}</g>`; };
@@ -111,7 +118,7 @@ export function coverV(id, opt, guide = false) { const c = CFG[id]; const p = co
   const base = cover(id).replace(/<svg[^>]*>/, '').replace('</svg>', '');
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${defs('e3d')}<defs><filter id="bl" x="-40%" y="-80%" width="180%" height="260%"><feGaussianBlur stdDeviation="40"/></filter><filter id="bl2" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="30"/></filter><radialGradient id="gl" cx="0.5" cy="0.45" r="0.6"><stop offset="0" stop-color="${c.glow}" stop-opacity="0.6"/><stop offset="1" stop-color="${c.glow}" stop-opacity="0"/></radialGradient><radialGradient id="vg" cx="0.5" cy="0.48" r="0.72"><stop offset="0.4" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#030208" stop-opacity="0.9"/></radialGradient><linearGradient id="gr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c.tint}" stop-opacity="0.35"/><stop offset="1" stop-color="${c.tint}" stop-opacity="0.05"/></linearGradient><linearGradient id="bt2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.8"/></linearGradient></defs>
     <image href="${b64(c.bg)}" width="${W}" height="${H}" preserveAspectRatio="xMidYMid slice"/><rect width="${W}" height="${H}" fill="#04030a" opacity="0.5"/><rect width="${W}" height="${H}" fill="url(#gr)"/><rect width="${W}" height="${H}" fill="url(#gl)"/>${rays(540, 900, c.glow, 18, 0.1)}
-    ${sil2}${compSvg}<ellipse cx="540" cy="${opt === 'A' ? 1000 : 900}" rx="460" ry="300" fill="${c.glow}" opacity="0.18" filter="url(#bl)"/>${id === 'd12' ? cov12() : id === 'd11' ? cov11() : lazy}<rect y="1100" width="${W}" height="820" fill="url(#bt2)"/>
+    ${sil2}${compSvg}<ellipse cx="540" cy="${opt === 'A' ? 1000 : 900}" rx="460" ry="300" fill="${c.glow}" opacity="0.18" filter="url(#bl)"/>${id === 'd13' ? cov13() : id === 'd12' ? cov12() : id === 'd11' ? cov11() : lazy}<rect y="1100" width="${W}" height="820" fill="url(#bt2)"/>
     ${titleImg}<image href="${logo}" ${logoPos} height="${opt === 'B' ? 184 : 236}" preserveAspectRatio="xMidYMid meet"/>${dayBig}
     
     <rect width="${W}" height="${H}" fill="url(#vg)"/>${safeGuide(guide)}</svg>`; }
