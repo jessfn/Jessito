@@ -83,8 +83,8 @@ const mood = (p, m) => { if (m === 'shock') { p.brow = { l: { r: 0.95, i: 0.8 },
   if (m === 'serious') { p.brow = { l: { r: 0, i: -0.3 }, r: { r: 0, i: -0.3 } }; p.lid = { l: 0.9, r: 0.9 }; p.mouth.open = 0; p.mouth.smile = 0.0; p.gaze = { x: -0.8, y: 0 }; p.yaw = -0.15; }
   if (m === 'glare') { p.brow = { l: { r: -0.3, i: -0.8 }, r: { r: -0.3, i: -0.8 } }; p.lid = { l: 0.8, r: 0.8 }; p.mouth.open = 0; p.mouth.smile = 0.15; p.mouth.press = 0.8; p.pitch = -0.35; p.gaze = { x: 0, y: 0 }; p.squint = 0.2; } };
 const UQ = {
-  d1: { hands: 'cheeks', mood: 'shock', x: 600, y: 1400, s: 1.15, flip: 1, comp: { fn: drawMari, x: 190, y: 840, s: 0.95, st: { mood: 'scream' } }, titleSide: 'R', props: 'carta_m' },
-  d2: { hands: 'point', mood: 'worry', x: 600, y: 1400, s: 1.15, flip: 1, comp: { fn: drawDoc, x: 190, y: 840, s: 0.95, st: { mood: 'shock', tool: 'lupa', toolX: 140, toolY: 150, toolR: 70 } }, titleSide: 'R', props: 'frasco' },
+  d1: { hands: 'cheeks', mood: 'shock', x: 540, y: 1090, s: 1.2, flip: 1, comp: null, titleSide: 'R' },
+  d2: { hands: 'point', mood: 'worry', x: 620, y: 1090, s: 1.15, flip: 1, comp: { fn: drawMari, x: 190, y: 840, s: 0.95, st: { mood: 'worry', hands: 'cheeks' } }, titleSide: 'R', props: 'frasco' },
   d3: { hands: 'mouth', mood: 'scream', x: 600, y: 1090, s: 1.15, flip: 1, comp: { fn: drawDentist, x: 190, y: 840, s: 0.95, st: { mood: 'worry' } }, titleSide: 'R', props: 'brackets' },
   d4: { hands: 'chin', mood: 'glare', x: 600, y: 1090, s: 1.15, flip: 1, comp: { fn: drawStylist, x: 190, y: 840, s: 0.95, st: { mood: 'grin', tool: 'scissors', toolX: 150, toolY: 100, toolR: 80 } }, titleSide: 'R', props: 'tijeras' },
   d5: { hands: 'think', mood: 'think', x: 600, y: 1090, s: 1.15, flip: 1, comp: { fn: drawKarla, x: 190, y: 840, s: 0.95, st: { mood: 'amused', tool: 'tweezers', toolX: 130, toolY: 120, toolR: 80 } }, titleSide: 'R', props: 'gato' },
