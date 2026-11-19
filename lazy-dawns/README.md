@@ -210,3 +210,4 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
 - Celulares/mensajes: mostrar SIEMPRE un celular real (cuerpo, barra de estado, encabezado de chat con la FOTO DE PERFIL de la persona, burbujas, barra de mensaje). Mari tiene su foto de perfil (cara de Mari). Nada de tarjetas sueltas.
 - Opciones del final: el icono de cada opcion debe ser EXACTAMENTE la cosa que se quiere arreglar (unas = mano con unas pintadas, zapatos = tacon), centrado dentro del circulo sin salirse.
 - Nada se traslapa: lo que aparece (celular, rotulos, personajes) no debe tapar subtitulos ni caras importantes.
+- SECUENCIA LOGICA (creador): los mensajes y todo evento deben seguir una secuencia coherente (quien escribe, a quien, respuestas en orden; la pista debe tener sentido: ej. Mari felicita la nariz nueva sin que Lazy le haya contado = pista).
