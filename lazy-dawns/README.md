@@ -214,3 +214,12 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
 - PORTADAS (creador): la protagonista aparece de medio cuerpo hacia arriba y grande; cada portada con relacion/pose DISTINTA con el/los personajes extra detras.
 - PORTADAS DE PELICULA (creador, todas en adelante): protagonista de medio cuerpo hacia arriba; pose y relacion distintas con los extras; incluir objetos/personajes que dan trama (dia 11: tela roja rasgada; dia 12: linterna/apagon; dia 13: pantalla hackeada de M). Props definidos en propsSvg de build_cover2.mjs.
 - PORTADAS: Lazy CERCA (plano medio-cercano, cara grande, hombros arriba); extras y props visibles pero secundarios.
+
+## Día 14 — "Alguien del pasado regresó... pero"
+- Votado: uñas. Uñas de Lazy: rojo con glitter dorado, largas y picudas (stiletto), un poco menos largas que la opción F (opción C ajustada). En rig2d: `NAILS.on` (rig2d/character.mjs).
+- Nuevo personaje: **Dustin** (alto, flaco, pelo café ondulado, lentes circulares, piel blanca; voz ElevenLabs "Chris", letra X). Se encuentra con Lazy en la calle Mariposa; no se dice que le gustara. Manda mensaje (con foto de perfil) y luego llega un número desconocido: "Bonitas uñas, Lazy."
+- Nueva extra: **Yaz** (manicurista del salón Rouge; voz "Domi", letra J).
+- Escenas nuevas: calle al atardecer, salón Rouge. Objetos nuevos: lima, esmalte, polvo dorado, lámpara UV, claqueta. Proceso paso a paso con inserts 3D + mano en primer plano (hand14.mjs).
+- Regla nueva: los títulos de cada día deben ser de suspenso ("Alguien del pasado regresó... pero").
+- Votación al final: zapatos o pestañas (día 15).
+- Archivos: render_dia14.mjs, director_d14.mjs, chars14.mjs, build_audio_dia14.py, resume_dia14.sh, script_dia14.json, plates3d/scenes14.html, objects14.html.
