@@ -450,7 +450,7 @@ function handF(sd, o, S, pass, curl, spread) {
   const fill = pass === 'o' ? OUT : SKINB, st = pass === 'o' ? `stroke="${OUT}" stroke-width="8" stroke-linejoin="round"` : '';
   const P = `fill="${fill}" ${st}`;
   const palm = `<path d="M-14,-4 C-20,16 -27,34 -26,52 C-24,64 24,64 26,52 C27,34 20,16 14,-4Z" ${P}/>`;
-  const FING = [[-21, 52, 0.74, -9], [-7, 58, 1.0, -3], [8, 58, 0.96, 3], [22, 52, 0.7, 10]];
+  const FING = [[-27, 52, 0.76, -8], [-9, 58, 1.0, -2.5], [9.5, 58, 0.96, 2.5], [27, 52, 0.7, 9]];
   const fin = FING.map(([dx, y, lk, rot], i) => { const cv = Math.min(1, Math.max(0, curl * (0.9 + 0.15 * i))); const len = S.fl * lk * (1.15 - 0.4 * cv) * 1.25; const rr = (rot + (i - 1.5) * 8 * spread) * sd;
     const w0 = S.fw * (i === 3 ? 0.85 : 1), w1 = w0 * 0.72;
     const g = `<g transform="translate(${dx * sd},${y - 4}) rotate(${rr})"><path d="${fingerPath(w0, w1, len)}" ${P}/>`;
@@ -626,4 +626,4 @@ export function drawLazy(p) {
   </g></g></g>`;
 }
 export function drawHandOnly(style, curl = 0.1, spread = 0.5, sd = 1) { NST = style; AST = 'A'; const S = AS.A; return `<g>${handF(sd, 0, S, 'o', curl, spread)}${handF(sd, 0, S, 'f', curl, spread)}</g>`; }
-export const HAND_DEFS = () => SHADE_DEFS;
+export const HAND_DEFS = () => SHADE_DEFS + OUTFIT_DEFS;
