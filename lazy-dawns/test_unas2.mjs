@@ -1,0 +1,4 @@
+import { Resvg } from '@resvg/resvg-js'; import { writeFileSync } from 'node:fs'; import { defs } from './lazy_lib.mjs'; import { drawHandOnly, HAND_DEFS } from './rig.mjs';
+const names = ['A · Francesa dorada', 'B · Anular de oro', 'C · Glitter dorado', 'D · Líneas doradas', 'E · Almendra con borde'];
+let s = ''; 'ABCDE'.split('').forEach((k, i) => { s += `<g transform="translate(${i * 400 + 190},520) rotate(180) scale(3.0)"><g transform="translate(0,0)">${drawHandOnly(k, 0.05, 0.6)}</g></g><text x="${i * 400 + 190}" y="640" font-family="Anton" font-size="34" text-anchor="middle" fill="#fff">${names[i]}</text>`; });
+writeFileSync('/tmp/unas.png', new Resvg(`<svg xmlns="http://www.w3.org/2000/svg" width="2000" height="660">${defs('e3d')}${HAND_DEFS()}<rect width="2000" height="660" fill="#2a1f3a"/>${s}</svg>`, { font: { loadSystemFonts: true } }).render().asPng());

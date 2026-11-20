@@ -10,7 +10,7 @@ const O8 = `stroke="${OUT}" stroke-width="8" stroke-linejoin="round"`;
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 const lerp = (a, b, k) => a + (b - a) * k;
 let SHIRT = 'url(#shirt)';
-const SKIN = 'url(#skin)', SKINB = 'url(#skinB)', HAIR = 'url(#hair)'; let PANTS = 'url(#pants)'; let GYM = null; let SLIM = 0; let LOOSE = 0; let FACEW = 0; let BODYW = 0; let FEM = 0; let SKINT = null; let BT = null; let AST = null; let SHT = null; let RED = false;
+const SKIN = 'url(#skin)', SKINB = 'url(#skinB)', HAIR = 'url(#hair)'; let PANTS = 'url(#pants)'; let GYM = null; let SLIM = 0; let LOOSE = 0; let FACEW = 0; let BODYW = 0; let FEM = 0; let SKINT = null; let BT = null; let AST = null; let SHT = null; let NST = null; let RED = false;
 let LID = '#a1613a';
 
 // ---------- IK de 2 huesos (hombro -> codo -> mano) ----------
@@ -436,6 +436,16 @@ function legSvg(side, leg) {
 // Brazo continuo (estilo videojuego): silueta unida (pasada de contorno + pasada de relleno), sin cortes ni bolas.
 const AS = { A: { u: [27, 25, 21], f: [21, 18, 13], fl: 46, fw: 8.6, bones: 0, nail: '#e9aab9' }, B: { u: [26, 24, 20], f: [20, 17, 12], fl: 48, fw: 8.2, bones: 1, nail: '#e7b3b8' }, C: { u: [25, 23, 19], f: [19, 16, 11.5], fl: 54, fw: 7.6, bones: 1, nail: '#ff9fb8' } };
 function fingerPath(w0, w1, len) { return `M${-w0},0 L${-w1},${len - w1} A${w1},${w1} 0 0 0 ${w1},${len - w1} L${w0},0Z`; }
+
+function nailSvg(w, len, i, big = false) { const x = w * 0.8, y0 = len - w - 9, y1 = len - 2 + (NST === 'E' ? 7 : 0), id = 'nl' + i + (big ? 'b' : '') + NST;
+  const shape = NST === 'E' ? `M${-x},${y0 + 8} Q${-x},${y0 - 2} 0,${y0 - 3} Q${x},${y0 - 2} ${x},${y0 + 8} L${x * 0.55},${y1} Q0,${y1 + 6} ${-x * 0.55},${y1}Z` : `M${-x},${y0 + 8} Q${-x},${y0 - 2} 0,${y0 - 3} Q${x},${y0 - 2} ${x},${y0 + 8} L${x * 0.9},${y1 - 6} Q0,${y1 + 3} ${-x * 0.9},${y1 - 6}Z`;
+  const gold = 'url(#goldG)', red = 'url(#nailRed)'; let d = '';
+  if (NST === 'A') d = `<rect x="${-x}" y="${y1 - 11}" width="${2 * x}" height="14" fill="${gold}"/>`;
+  else if (NST === 'B') d = i === 2 ? `<rect x="${-x}" y="${y0 - 4}" width="${2 * x}" height="${y1 - y0 + 8}" fill="${gold}"/>${[0, 1, 2, 3, 4].map((k) => `<circle cx="${(k % 2 ? 1 : -1) * x * 0.35}" cy="${y0 + 4 + k * 3.4}" r="1.4" fill="#fff6c0"/>`).join('')}` : '';
+  else if (NST === 'C') d = [...Array(16)].map((_, k) => { const t = k / 15; return `<circle cx="${((k * 37) % 100 / 100 - 0.5) * 2 * x * 0.8}" cy="${y1 - 1 - t * (y1 - y0) * 0.75}" r="${(1.1 + (k % 3) * 0.55).toFixed(2)}" fill="${gold}" opacity="${(0.95 - t * 0.6).toFixed(2)}"/>`; }).join('');
+  else if (NST === 'D') d = `<path d="M${-x},${y0 + 14} L${x},${y0 + 3} M${-x},${y0 + 22} L${x},${y0 + 11}" stroke="${gold}" stroke-width="2" fill="none"/><path d="M${-x * 0.9},${y0 + 6} Q0,${y0 - 3} ${x * 0.9},${y0 + 6}" stroke="${gold}" stroke-width="2.6" fill="none"/>`;
+  else if (NST === 'E') d = `<path d="${shape}" fill="none" stroke="${gold}" stroke-width="2.4"/><path d="M0,${y0 + 2} L0,${y1 - 3}" stroke="${gold}" stroke-width="1.6" opacity="0.8"/>`;
+  return `<defs><clipPath id="${id}"><path d="${shape}"/></clipPath></defs><path d="${shape}" fill="${red}" stroke="#4a0610" stroke-width="1.6"/><g clip-path="url(#${id})">${d}</g><path d="M${-x * 0.45},${y0 + 3} Q${-x * 0.5},${(y0 + y1) / 2} ${-x * 0.3},${y1 - 8}" stroke="#fff" stroke-opacity="0.7" stroke-width="2.4" fill="none" stroke-linecap="round"/>`; }
 function handF(sd, o, S, pass, curl, spread) {
   const fill = pass === 'o' ? OUT : SKINB, st = pass === 'o' ? `stroke="${OUT}" stroke-width="8" stroke-linejoin="round"` : '';
   const P = `fill="${fill}" ${st}`;
@@ -445,8 +455,8 @@ function handF(sd, o, S, pass, curl, spread) {
     const w0 = S.fw * (i === 3 ? 0.85 : 1), w1 = w0 * 0.72;
     const g = `<g transform="translate(${dx * sd},${y - 4}) rotate(${rr})"><path d="${fingerPath(w0, w1, len)}" ${P}/>`;
     if (pass === 'o') return g + '</g>';
-    return g + `<path d="M${-w1 + 2},${len * 0.5} h${2 * w1 - 4}" stroke="#000" stroke-opacity="0.22" stroke-width="2.4"/><path d="M${-w1 * 0.7},${len * 0.2} h${1.4 * w1}" stroke="#000" stroke-opacity="0.16" stroke-width="2"/><path d="M${-w1 * 0.8},${len - w1 - 7} Q0,${len - w1 - 14} ${w1 * 0.8},${len - w1 - 7} L${w1 * 0.65},${len - 5} Q0,${len + 1} ${-w1 * 0.65},${len - 5}Z" fill="${S.nail}" stroke="#7a3b3b" stroke-opacity="0.35" stroke-width="1.5"/></g>`; }).join('');
-  const thumb = `<g transform="translate(${-sd * 24},22) rotate(${sd * -34})"><path d="${fingerPath(S.fw * 1.1, S.fw * 0.82, 44 - 10 * curl)}" ${P}/>${pass === 'o' ? '' : `<path d="M${-S.fw * 0.7},${44 - 10 * curl - 18} Q0,${44 - 10 * curl - 24} ${S.fw * 0.7},${44 - 10 * curl - 18} L${S.fw * 0.55},${44 - 10 * curl - 5} Q0,${44 - 10 * curl} ${-S.fw * 0.55},${44 - 10 * curl - 5}Z" fill="${S.nail}" stroke="#7a3b3b" stroke-opacity="0.35" stroke-width="1.5"/>`}</g>`;
+    return g + `<path d="M${-w1 + 2},${len * 0.5} h${2 * w1 - 4}" stroke="#000" stroke-opacity="0.22" stroke-width="2.4"/><path d="M${-w1 * 0.7},${len * 0.2} h${1.4 * w1}" stroke="#000" stroke-opacity="0.16" stroke-width="2"/>${NST ? nailSvg(w1, len, i) : `<path d="M${-w1 * 0.8},${len - w1 - 7} Q0,${len - w1 - 14} ${w1 * 0.8},${len - w1 - 7} L${w1 * 0.65},${len - 5} Q0,${len + 1} ${-w1 * 0.65},${len - 5}Z" fill="${S.nail}" stroke="#7a3b3b" stroke-opacity="0.35" stroke-width="1.5"/>`}</g>`; }).join('');
+  const thumb = `<g transform="translate(${-sd * 24},22) rotate(${sd * -34})"><path d="${fingerPath(S.fw * 1.1, S.fw * 0.82, 44 - 10 * curl)}" ${P}/>${pass === 'o' ? '' : `${NST ? nailSvg(S.fw * 0.9, 44 - 10 * curl + 4, 9) : `<path d="M${-S.fw * 0.7},${44 - 10 * curl - 18} Q0,${44 - 10 * curl - 24} ${S.fw * 0.7},${44 - 10 * curl - 18} L${S.fw * 0.55},${44 - 10 * curl - 5} Q0,${44 - 10 * curl} ${-S.fw * 0.55},${44 - 10 * curl - 5}Z" fill="${S.nail}" stroke="#7a3b3b" stroke-opacity="0.35" stroke-width="1.5"/>`}`}</g>`;
   if (pass === 'o') return `${thumb}${fin}${palm}`;
   const dets = `<path d="M-20,28 q8,6 14,0 M-4,26 q8,6 14,0 M12,28 q8,6 14,0" stroke="#000" stroke-opacity="0.2" stroke-width="2.4" fill="none"/>${S.bones ? `<g fill="#fff" opacity="0.22">${[-16, -3, 10, 21].map((x) => `<ellipse cx="${x}" cy="40" rx="4.5" ry="3"/>`).join('')}</g><path d="M-8,0 L-8,38 M2,0 L2,38 M11,0 L12,36" stroke="#000" stroke-opacity="0.13" stroke-width="2.4"/>` : ''}<path d="M-10,10 Q0,18 10,10" stroke="#fff" stroke-opacity="0.14" stroke-width="4" fill="none"/>`;
   return `${thumb}${palm}${fin}${dets}`;
@@ -504,6 +514,7 @@ const OUTFIT_DEFS = `<defs>
   <linearGradient id="gownG" x1="0" y1="0" x2="1" y2="0.2"><stop offset="0" stop-color="#064e3b"/><stop offset="0.22" stop-color="#10b981"/><stop offset="0.38" stop-color="#6ee7b7"/><stop offset="0.52" stop-color="#059669"/><stop offset="0.8" stop-color="#065f46"/><stop offset="1" stop-color="#022c22"/></linearGradient>
   <linearGradient id="neonG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff2bd6"/><stop offset="0.5" stop-color="#fff200"/><stop offset="1" stop-color="#00f0ff"/></linearGradient>
   <linearGradient id="redG" x1="0" y1="0" x2="1" y2="0.3"><stop offset="0" stop-color="#5a0711"/><stop offset="0.3" stop-color="#a8101f"/><stop offset="0.5" stop-color="#d12333"/><stop offset="0.75" stop-color="#8e0c1a"/><stop offset="1" stop-color="#4a050e"/></linearGradient>
+  <linearGradient id="nailRed" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff4a5c"/><stop offset="0.5" stop-color="#d0102a"/><stop offset="1" stop-color="#7a0716"/></linearGradient>
   <linearGradient id="goldG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff3b0"/><stop offset="0.5" stop-color="#d4a017"/><stop offset="1" stop-color="#8a6508"/></linearGradient>
   <clipPath id="gownClip"><path d="${GOWN_PATH}"/></clipPath></defs>`;
 function jewelHead(of) {
@@ -582,7 +593,7 @@ export function drawLazyHeadFront(p) { headGlobals(p); return `<g transform="tra
 export function drawLazy(p) {
   const br = p.breath || 0, sh = (p.shoulders || 0) * 14;
   const of = p.outfit && p.outfit.kind && p.outfit.kind !== 'gym' ? p.outfit : null; const gownOn = of && (of.prog ?? 1) > 0.02; SHIRT = of && (of.prog ?? 1) >= 1 ? (of.kind === 'neon' ? 'url(#neonG)' : of.kind === 'red' ? 'url(#redG)' : 'url(#gownG)') : 'url(#shirt)';
-  SLIM = p.slim || 0; LOOSE = (p.outfit && p.outfit.loose) || 0; FACEW = p.faceWrinkle || 0; BODYW = p.bodyWrinkle || 0; FEM = p.fem || 0; BT = p.bodyT || null; AST = p.armStyle || null; SHT = p.shoulderT || (of && of.kind === 'red' ? 'B' : null); RED = !!(of && of.kind === 'red'); SKINT = p.skinTex || null; if (SKINT && typeof SKINT === 'object') { SKINT = { ...SKINT }; } GYM = (p.outfit && p.outfit.kind === 'gym') ? p.outfit : null; PANTS = GYM ? 'url(#gyPant)' : 'url(#pants)'; if (GYM) SHIRT = GYM.top === 'white' ? 'url(#gyTopW)' : GYM.top === 'black' ? 'url(#gyTopK)' : 'url(#gyTop)';
+  SLIM = p.slim || 0; LOOSE = (p.outfit && p.outfit.loose) || 0; FACEW = p.faceWrinkle || 0; BODYW = p.bodyWrinkle || 0; FEM = p.fem || 0; BT = p.bodyT || null; AST = p.armStyle || null; NST = p.nailStyle || null; SHT = p.shoulderT || (of && of.kind === 'red' ? 'B' : null); RED = !!(of && of.kind === 'red'); SKINT = p.skinTex || null; if (SKINT && typeof SKINT === 'object') { SKINT = { ...SKINT }; } GYM = (p.outfit && p.outfit.kind === 'gym') ? p.outfit : null; PANTS = GYM ? 'url(#gyPant)' : 'url(#pants)'; if (GYM) SHIRT = GYM.top === 'white' ? 'url(#gyTopW)' : GYM.top === 'black' ? 'url(#gyTopK)' : 'url(#gyTop)';
   const lg = p.legs || { l: {}, r: {} };
   const slimK = Math.max(0.46, 1 - 0.115 * (p.slim || 0));
   const chest = `<g transform="translate(0,230) scale(${(1 + 0.012 * br) * slimK},${1 + 0.016 * br}) translate(0,-230)">
@@ -614,3 +625,5 @@ export function drawLazy(p) {
     <g transform="translate(0,${-sh})">${armSvg(-1, p.armL)}${armSvg(1, p.armR)}</g>
   </g></g></g>`;
 }
+export function drawHandOnly(style, curl = 0.1, spread = 0.5, sd = 1) { NST = style; AST = 'A'; const S = AS.A; return `<g>${handF(sd, 0, S, 'o', curl, spread)}${handF(sd, 0, S, 'f', curl, spread)}</g>`; }
+export const HAND_DEFS = () => SHADE_DEFS;
