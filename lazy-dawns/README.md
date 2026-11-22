@@ -229,3 +229,10 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
 - Celular/chat: cada pantalla muestra SOLO el chat de UNA persona (nombre, foto de perfil y mensajes de esa persona). Nunca mezclar mensajes de otro contacto en el mismo chat (error del día 14: el mensaje de Dustin aparecía dentro del chat "Número desconocido").
 - Reacciones del rostro coherentes con lo que pasa en cada instante; manos/brazos/objetos coherentes.
 - Pestañas (voto día 14→15): mostrar opciones largas, bien diseñadas, con textura y realistas; el usuario elige antes del video.
+
+## Día 15 — "Alguien me observa desde el inicio"
+- Votado: pestañas (opción C "gatita postiza", llenas, enchinadas, inferiores muy cortas; `LASHX.style='P3'` en rig.mjs). Uñas rojas picudas con dorado se mantienen (NAILS.on).
+- Mari aparece con rig nuevo hablante (chars15.mjs, drawMari2). Nueva extra: Bruna (artista de pestañas, voz Freya "F"). Escenas: Café Luna (terraza), Lash Lab. Objetos: bandeja de abanicos, rizador, pegamento, pinzas, claqueta. Primer plano del ojo con progreso (eye15.mjs).
+- Chats: un solo contacto por pantalla ("Número desconocido" con sus dos mensajes en orden).
+- Pista Mari: guarda su celular rápido mientras llega el mensaje desconocido (sin decir que es ella).
+- Votación: ojos o mandíbula (día 16). Revisión: cuadros cada segundo (86 cuadros) antes de entregar.
