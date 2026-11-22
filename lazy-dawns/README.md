@@ -237,3 +237,6 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
 - Pista Mari: guarda su celular rápido mientras llega el mensaje desconocido (sin decir que es ella).
 - Votación: ojos o mandíbula (día 16). Revisión: cuadros cada segundo (86 cuadros) antes de entregar.
 - REGLA PORTADAS: cada portada con pose, reacción y relación con extras DIFERENTES a las anteriores (d14: saludo con mano junto a la cara; d15: susto sosteniendo celular con Mari sonriendo detrás).
+
+## ROSTRO FINAL DE LAZY (aprobado; usar desde el Día 16)
+- `face_final.mjs` → `applyFinalFace()`: mandíbula R1 (redondeada, ancho 0.95), sin pómulos marcados, sin líneas de sonrisa ni "filtrum", sin marcas en el mentón, boca/sonrisa +14 %, pestañas P3 (gatita postiza). Mentón: se descartó acortarlo/redondearlo más; se queda como en Sonrisa_v2.png.
