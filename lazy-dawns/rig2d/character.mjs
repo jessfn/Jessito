@@ -127,7 +127,7 @@ export function hairFront(P) { const h = P.hair; return `<g id="hair_front"><g t
 // ================= CABEZA Y ROSTRO =================
 const EYE = { L: [454, 262], R: [570, 262] };
 const jawDrop = (P) => P.jaw * 1 + P.mouth.open * 30;
-export const JAW = { style: null, w: 1 };
+export const JAW = { style: null, w: 1, cheek: 0, light: 0 };
 // Mandibulas suaves (solo curvas, sin picos). Cada una: segmentos cubicos del lado derecho desde la mejilla (128,268) hasta el menton.
 const JAWS = {
   O: [[[118, 336], [66, 414], [0, 420]]],
@@ -135,6 +135,11 @@ const JAWS = {
   H: [[[104, 322], [52, 410], [0, 426]]],
   D: [[[128, 322], [122, 356], [104, 384]], [[88, 404], [50, 418], [0, 418]]],
   M: [[[116, 330], [60, 420], [0, 430]]],
+  R1: [[[122, 336], [84, 410], [0, 418]]],
+  R2: [[[120, 330], [78, 408], [0, 420]]],
+  R3: [[[124, 338], [90, 412], [0, 416]]],
+  R4: [[[112, 326], [70, 408], [0, 424]]],
+  R5: [[[128, 320], [124, 350], [108, 378]], [[90, 402], [54, 418], [0, 420]]],
 };
 function jawPath(P, X, jd) { const st = JAW.style, segs = JAWS[st]; const Y = (y) => f1(y + jd * (y > 380 ? 1 : 0.8)); let right = '', left = '';
   segs.forEach(([c1, c2, p]) => { right += ` C${X(c1[0])},${Y(c1[1])} ${X(c2[0])},${Y(c2[1])} ${X(p[0])},${Y(p[1])}`; });
@@ -145,14 +150,18 @@ function facePath(P) { const y = P.head.yaw, jd = jawDrop(P) * 0.85, sh = y * 10
   const X = (dx) => f1(512 + sh + dx * nw * 0.93);
   if (JAW.style && JAWS[JAW.style]) { const { right, left } = jawPath(P, X, jd); return `M${X(0)},116 C${X(92)},116 ${X(132)},186 ${X(128)},268${right}${left} C${X(-132)},186 ${X(-92)},116 ${X(0)},116Z`; }
   return `M${X(0)},116 C${X(92)},116 ${X(132)},186 ${X(128)},268 C${X(124)},340 ${X(82)},${f1(408 + jd * 0.8)} ${X(0)},${f1(414 + jd)} C${X(-82)},${f1(408 + jd * 0.8)} ${X(-124)},340 ${X(-128)},268 C${X(-132)},186 ${X(-92)},116 ${X(0)},116Z`; }
-function jawFx(P) { if (!JAW.style) return ''; const fp = facePath(P); const m = JAW.style; const strong = m === 'M' ? 1 : m === 'D' ? 0.85 : 0.65;
+function jawFx(P) { if (!JAW.style) return ''; const fp = facePath(P);
+  const ck = JAW.cheek || 0, lt = JAW.light || 0; let extra = '';
+  if (ck > 0) extra += `<path d="M396,296 Q428,352 470,380" stroke="#4a2010" stroke-width="24" fill="none" stroke-linecap="round" opacity="${(0.34 * ck).toFixed(2)}" filter="url(#jb8)"/><path d="M628,296 Q596,352 554,380" stroke="#4a2010" stroke-width="24" fill="none" stroke-linecap="round" opacity="${(0.34 * ck).toFixed(2)}" filter="url(#jb8)"/><ellipse cx="428" cy="316" rx="50" ry="13" fill="#ffe8d0" opacity="${(0.5 * ck).toFixed(2)}" filter="url(#jb8)" transform="rotate(-24 428 316)"/><ellipse cx="596" cy="316" rx="50" ry="13" fill="#ffe8d0" opacity="${(0.5 * ck).toFixed(2)}" filter="url(#jb8)" transform="rotate(24 596 316)"/><ellipse cx="428" cy="314" rx="22" ry="5" fill="#fff" opacity="${(0.4 * ck).toFixed(2)}" filter="url(#jb3)" transform="rotate(-24 428 314)"/><ellipse cx="596" cy="314" rx="22" ry="5" fill="#fff" opacity="${(0.4 * ck).toFixed(2)}" filter="url(#jb3)" transform="rotate(24 596 314)"/>`;
+  if (lt > 0) extra += `<defs><linearGradient id="jl" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff1dc" stop-opacity="${(0.28 * lt).toFixed(2)}"/><stop offset="0.5" stop-color="#fff1dc" stop-opacity="0"/><stop offset="1" stop-color="#2a1006" stop-opacity="${(0.4 * lt).toFixed(2)}"/></linearGradient><radialGradient id="jr" cx="0.4" cy="0.35" r="0.7"><stop offset="0.5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#2a1006" stop-opacity="${(0.3 * lt).toFixed(2)}"/></radialGradient></defs><rect x="372" y="116" width="280" height="330" fill="url(#jl)"/><rect x="372" y="116" width="280" height="330" fill="url(#jr)"/><ellipse cx="512" cy="436" rx="86" ry="14" fill="#2a1006" opacity="${(0.35 * lt).toFixed(2)}" filter="url(#jb8)"/>`;
+ const m = JAW.style; const strong = m === 'M' ? 1 : m === 'D' ? 0.85 : 0.65;
   let pores = ''; for (let i = 0; i < 110; i++) { const a = (i * 137.5) % 360 * Math.PI / 180, r = 60 + (i * 53 % 80); pores += `<circle cx="${f1(512 + Math.cos(a) * r * 1.2)}" cy="${f1(330 + Math.sin(a) * r * 0.9 + 40)}" r="${(0.9 + (i % 3) * 0.35).toFixed(2)}" fill="#6a3418" opacity="${(0.14 + (i % 4) * 0.04).toFixed(2)}"/>`; }
   return `<defs><filter id="jb8" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="8"/></filter><filter id="jb3" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="3"/></filter></defs>
   <path d="${fp}" fill="none" stroke="#5a2a14" stroke-width="${f1(34 * strong)}" opacity="${(0.42 * strong).toFixed(2)}" filter="url(#jb8)"/>
   <path d="${fp}" fill="none" stroke="#2a1008" stroke-width="10" opacity="0.3" filter="url(#jb3)"/>
   <path d="M388,330 Q420,392 ${m === 'V' || m === 'H' ? 472 : 458},${m === 'M' ? 418 : 404}" stroke="#ffe6cc" stroke-width="9" fill="none" opacity="${(0.28 * strong).toFixed(2)}" filter="url(#jb3)" transform="translate(0,-6)"/><path d="M636,330 Q604,392 ${m === 'V' || m === 'H' ? 552 : 566},${m === 'M' ? 418 : 404}" stroke="#ffe6cc" stroke-width="9" fill="none" opacity="${(0.28 * strong).toFixed(2)}" filter="url(#jb3)" transform="translate(0,-6)"/>
   <ellipse cx="512" cy="${m === 'M' || m === 'V' ? 402 : 392}" rx="${m === 'D' ? 40 : 28}" ry="10" fill="#fff0e0" opacity="0.32" filter="url(#jb3)"/>
-  <path d="M410,290 Q440,350 512,372 Q584,350 614,290" stroke="#6a3418" stroke-width="14" fill="none" opacity="${(0.16 * strong).toFixed(2)}" filter="url(#jb8)"/>${pores}`; }
+  <path d="M410,290 Q440,350 512,372 Q584,350 614,290" stroke="#6a3418" stroke-width="14" fill="none" opacity="${(0.16 * strong).toFixed(2)}" filter="url(#jb8)"/>${pores}${extra}`; }
 export function part_face(P, fillRef = 'url(#zFace)') { const fp = facePath(P); return `<g id="face"><path d="${fp}" fill="${fillRef}" stroke="${OUT}" stroke-width="8" stroke-linejoin="round"/><clipPath id="faceClip"><path d="${fp}"/></clipPath><g clip-path="url(#faceClip)"><ellipse cx="500" cy="230" rx="110" ry="130" fill="url(#zHi)"/><ellipse cx="512" cy="410" rx="120" ry="30" fill="#8f4f2b" opacity="0.22"/>${jawFx(P)}<path d="M400,300 Q420,380 512,404 Q604,380 624,300" stroke="#8f4f2b" stroke-opacity="0.2" stroke-width="16" fill="none"/></g></g>`; }
 export function part_ear(side, P) { const x = 512 + ((side === 'L' ? 384 : 640) - 512) * (JAW.w || 1), s = side === 'L' ? -1 : 1; return `<g id="ear_${side}" transform="translate(${P.head.yaw * 8 * 0},0)"><path d="M${x},268 C${x + s * 22},262 ${x + s * 30},310 ${x + s * 12},340 C${x + s * 4},350 ${x},344 ${x},336Z" fill="${C.skin}" stroke="${OUT}" stroke-width="6"/><path d="M${x + s * 6},286 q${s * 10},18 ${s * 0},38" stroke="#8f4f2b" stroke-width="4" fill="none"/></g>`; }
 export function part_cheeks(P) { const sh = P.head.yaw * 14; return `<g id="cheeks"><radialGradient id="zBl" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#e05a4e" stop-opacity="0.85"/><stop offset="1" stop-color="#e05a4e" stop-opacity="0"/></radialGradient><circle cx="${f1(428 + sh)}" cy="338" r="52" fill="url(#zBl)"/><circle cx="${f1(598 + sh)}" cy="338" r="52" fill="url(#zBl)"/></g>`; }
