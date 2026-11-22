@@ -236,3 +236,4 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
 - Chats: un solo contacto por pantalla ("Número desconocido" con sus dos mensajes en orden).
 - Pista Mari: guarda su celular rápido mientras llega el mensaje desconocido (sin decir que es ella).
 - Votación: ojos o mandíbula (día 16). Revisión: cuadros cada segundo (86 cuadros) antes de entregar.
+- REGLA PORTADAS: cada portada con pose, reacción y relación con extras DIFERENTES a las anteriores (d14: saludo con mano junto a la cara; d15: susto sosteniendo celular con Mari sonriendo detrás).
