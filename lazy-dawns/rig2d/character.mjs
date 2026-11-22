@@ -137,6 +137,8 @@ const JAWS = {
   M: [[[116, 330], [60, 420], [0, 430]]],
   D1: [[[114, 332], [64, 412], [0, 424]]],
   C1: [[[118, 332], [72, 398], [0, 410]]],
+  B1: [[[112, 326], [78, 382], [44, 397]], [[28, 402], [12, 403], [0, 403]]],
+  B2: [[[112, 326], [84, 378], [52, 395]], [[36, 402], [16, 404], [0, 404]]],
   Q1: [[[116, 332], [92, 386], [50, 402]], [[34, 408], [16, 410], [0, 410]]],
   Q2: [[[116, 332], [96, 380], [58, 400]], [[42, 407], [20, 410], [0, 410]]],
   Q3: [[[116, 334], [100, 380], [66, 398]], [[48, 406], [24, 410], [0, 410]]],
@@ -228,7 +230,7 @@ export function part_head(P) { const hd = P.head; const jd = jawDrop(P) * 0.0;
 export function part_earring(side, P) { const x = side === 'L' ? 380 : 641, a = side === 'L' ? P.acc.earL : P.acc.earR; return `<g id="earring_${side}" transform="${rot(a, [x, 332])}"><circle cx="${x}" cy="332" r="7" fill="url(#zGold)" stroke="${OUT}" stroke-width="3"/><path d="M${x},339 v14" stroke="${C.goldD}" stroke-width="4"/><circle cx="${x}" cy="356" r="6.5" fill="url(#zGold)" stroke="${OUT}" stroke-width="3"/><path d="M${x},364 l-15,22 l15,22 l15,-22Z" fill="url(#zGold)" stroke="${OUT}" stroke-width="4" stroke-linejoin="round"/><path d="M${x},364 l-6,22 l6,10" stroke="#fff6b0" stroke-width="3" fill="none" opacity="0.8"/></g>`; }
 
 // ================= CUERPO: cuello, pecho, corse, abdomen =================
-export function part_neck(P) { return `<g id="neck"><path d="M480,400 L544,400 L548,462 Q512,482 476,462Z" fill="url(#zSkin)" stroke="${OUT}" stroke-width="7" stroke-linejoin="round"/><path d="M478,420 Q512,452 546,420 L546,440 Q512,466 478,440Z" fill="#8f4f2b" opacity="0.28"/></g>`; }
+export function part_neck(P) { return `<g id="neck"><path d="M480,356 L544,356 L548,462 Q512,482 476,462Z" fill="url(#zSkin)" stroke="${OUT}" stroke-width="7" stroke-linejoin="round"/><path d="M478,420 Q512,452 546,420 L546,440 Q512,466 478,440Z" fill="#8f4f2b" opacity="0.28"/></g>`; }
 export function part_chest(P) { return `<g id="torso_chest"><path d="M440,470 Q476,452 512,462 Q548,452 584,470 C600,478 606,500 602,548 L428,548 C424,500 430,478 440,470Z" fill="url(#zSkin)" stroke="${OUT}" stroke-width="7" stroke-linejoin="round"/><path d="M470,474 Q494,486 508,480 M554,474 Q530,486 516,480" stroke="#8f4f2b" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.6"/><path d="M468,480 Q490,492 506,486 M556,480 Q534,492 518,486" stroke="#f0b080" stroke-width="3" fill="none" opacity="0.5" transform="translate(0,4)"/></g>`; }
 const CORSET = 'M429,550 C440,534 458,532 476,540 Q494,548 512,556 Q530,548 548,540 C566,532 584,534 597,550 C601,590 598,640 584,686 Q512,696 440,686 C427,640 425,590 429,550Z';
 export function part_corset(P) { const bones = [-0.78, -0.52, -0.26, 0, 0.26, 0.52, 0.78].map((k) => `<path d="M${f1(512 + k * 76)},${k === 0 ? 556 : 546} C${f1(512 + k * 82)},600 ${f1(512 + k * 66)},650 ${f1(512 + k * 66)},688" stroke="#2a0006" stroke-opacity="0.5" stroke-width="3.4" fill="none"/>`).join('');
