@@ -195,7 +195,7 @@ function mouthSvg(m, yaw) {
   const corners = [-1, 1].map((sg) => `<ellipse cx="${sg * (w + 2)}" cy="${(sg < 0 ? cl.y : cr.y) + 1}" rx="9" ry="6" fill="${shade2('#5a2a22', 0)}" opacity="0.3" filter="url(#blur3)"/>`).join('');
   const philtrum = `<path d="M-9,${yu0 - 36} Q-8,${yu0 - 24} -12,${yu0 - 15} M9,${yu0 - 36} Q8,${yu0 - 24} 12,${yu0 - 15}" stroke="#000" stroke-opacity="0.15" stroke-width="4" fill="none" stroke-linecap="round"/><ellipse cx="0" cy="${yb + tL(pts[Math.round(N / 2)]) + 7}" rx="${w * 0.22}" ry="5" fill="#000" opacity="0.14" filter="url(#blur3)"/>`;
   return `<g><defs><filter id="blur3" x="-150%" y="-150%" width="400%" height="400%"><feGaussianBlur stdDeviation="3"/></filter><clipPath id="mouthClip"><path d="${shape}"/></clipPath></defs>${defsLip}
-    ${philtrum}${corners}
+    ${NOSMILE.on ? '' : philtrum}${corners}
     <path d="${shape}" fill="#3a0c10"/>
     <g clip-path="url(#mouthClip)">${perfect ? `<defs>${RT.defs}</defs>${RT.cav}${open > 0.3 ? tongueSvg(w, botY - 14, open) : ''}${showTeeth ? RT.lower + RT.upper : ''}` : `${showTeeth ? teeth : ''}${open > 0.35 ? `<ellipse cx="0" cy="${lo * 0.62}" rx="${w * 0.55}" ry="${22 + open * 14}" fill="#b84a58"/>` : ''}`}<path d="${shape}" fill="none" stroke="#000" stroke-opacity="0.35" stroke-width="10"/></g>
     <path d="${lowerPoly}" fill="url(#${gid}L)"/><path d="${lowerPoly}" fill="url(#${gid}H)"/><path d="${upperPoly}" fill="url(#${gid}U)"/><path d="${upperPoly}" fill="url(#${gid}H)"/>
