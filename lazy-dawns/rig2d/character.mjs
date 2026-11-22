@@ -127,7 +127,7 @@ export function hairFront(P) { const h = P.hair; return `<g id="hair_front"><g t
 // ================= CABEZA Y ROSTRO =================
 const EYE = { L: [454, 262], R: [570, 262] };
 const jawDrop = (P) => P.jaw * 1 + P.mouth.open * 30;
-export const JAW = { style: null, w: 1, cheek: 0, light: 0, d: 0, noLines: false, mouthK: 1, noChin: false };
+export const JAW = { style: null, w: 1, cheek: 0, light: 0, d: 0, noLines: false, mouthK: 1, noChin: false, mouthUp: 0 };
 // Mandibulas suaves (solo curvas, sin picos). Cada una: segmentos cubicos del lado derecho desde la mejilla (128,268) hasta el menton.
 const JAWS = {
   O: [[[118, 336], [66, 414], [0, 420]]],
@@ -136,6 +136,9 @@ const JAWS = {
   D: [[[128, 322], [122, 356], [104, 384]], [[88, 404], [50, 418], [0, 418]]],
   M: [[[116, 330], [60, 420], [0, 430]]],
   D1: [[[114, 332], [64, 412], [0, 424]]],
+  C1: [[[118, 332], [72, 398], [0, 410]]],
+  C2: [[[112, 326], [62, 392], [0, 402]]],
+  C3: [[[110, 322], [58, 386], [0, 396]]],
   R1: [[[122, 336], [84, 410], [0, 418]]],
   R2: [[[120, 330], [78, 408], [0, 420]]],
   R3: [[[124, 338], [90, 412], [0, 416]]],
@@ -198,7 +201,7 @@ export function part_brow(side, P) { const b = P.brows, r = side === 'L' ? b.Lra
   return `<g id="brow_${side}"><path d="${top}${bot}" fill="#1d0f08" stroke="#120804" stroke-width="3" stroke-linejoin="round"/><path d="M${f1(peak[0] - sg * 10)},${f1(peak[1] - 2)} q${sg * 14},-6 ${sg * 28},0" stroke="#5a3322" stroke-width="2.4" fill="none" stroke-linecap="round" opacity="0.7"/></g>`; }
 export function part_nose(P) { const sh = P.head.yaw * 26; const cx = 512 + sh; return `<g id="nose"><ellipse cx="${cx}" cy="298" rx="29" ry="22" fill="#9b5836" stroke="${OUT}" stroke-width="7"/><ellipse cx="${cx - 4}" cy="290" rx="17" ry="10" fill="#c48258" opacity="0.8"/><ellipse cx="${cx - 9}" cy="287" rx="7" ry="4" fill="#e8b890" opacity="0.8"/><path d="M${cx - 14},308 q14,7 28,0" stroke="#5a2e18" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.6"/></g>`; }
 // Boca: labios independientes, dientes sup/inf, lengua, mandibula
-export function mouthGeom(P) { const m = P.mouth, sh = P.head.yaw * 24, cx = 512 + sh, cy = 352; const w = clamp((46 + 18 * m.wide - 16 * m.round) * (JAW.mouthK || 1), 26, 84), h = m.open * 36 * (1 + ((JAW.mouthK || 1) - 1) * 0.6) + P.jaw * 0.6, up = m.smile * 9, cyc = cy - up * 0.4;
+export function mouthGeom(P) { const m = P.mouth, sh = P.head.yaw * 24, cx = 512 + sh, cy = 352 - (JAW.mouthUp || 0); const w = clamp((46 + 18 * m.wide - 16 * m.round) * (JAW.mouthK || 1), 26, 84), h = m.open * 36 * (1 + ((JAW.mouthK || 1) - 1) * 0.6) + P.jaw * 0.6, up = m.smile * 9, cyc = cy - up * 0.4;
   return { cx, cy: cyc, w, h, cornerY: cyc - m.smile * 7 + Math.max(0, -m.smile) * 0 + 4, thick: 11 + m.round * 5 }; }
 export function part_mouth(P) { const g = mouthGeom(P), m = P.mouth, { cx, w, h } = g, cy = g.cy, cyc = g.cornerY, tU = g.thick, tL = g.thick + 4; const lx = cx - w, rx = cx + w;
   const lineY = cy + 2, lowEdgeY = lineY + h;
