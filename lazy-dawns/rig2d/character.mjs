@@ -127,32 +127,34 @@ export function hairFront(P) { const h = P.hair; return `<g id="hair_front"><g t
 // ================= CABEZA Y ROSTRO =================
 const EYE = { L: [454, 262], R: [570, 262] };
 const jawDrop = (P) => P.jaw * 1 + P.mouth.open * 30;
-export const JAW = { style: null };
-const JAWLOW = { A: [[118, 340], [70, 388], [0, 434]], B: [[122, 342], [78, 400], [0, 418]], C: [[108, 332], [58, 394], [0, 430]], D: null, E: null };
-function jawLowerStr(P, X, jd) { const st = JAW.style;
-  if (!st || st === 'J0') return `C${X(124)},340 ${X(82)},${f1(408 + jd * 0.8)} ${X(0)},${f1(414 + jd)}`;
-  if (st === 'D') return `C${X(128)},318 ${X(122)},352 ${X(100)},378 L${X(52)},${f1(410 + jd * 0.8)} Q${X(0)},${f1(420 + jd)} ${X(0)},${f1(420 + jd)}`;
-  if (st === 'E') return `C${X(126)},322 ${X(112)},356 ${X(88)},384 L${X(34)},${f1(424 + jd * 0.8)} Q${X(0)},${f1(434 + jd)} ${X(0)},${f1(434 + jd)}`;
-  const [a, b, c] = JAWLOW[st]; return `C${X(a[0])},${a[1]} ${X(b[0])},${f1(b[1] + jd * 0.8)} ${X(c[0])},${f1(c[1] + jd)}`; }
-function jawLowerMirror(P, X, jd) { const st = JAW.style;
-  if (!st || st === 'J0') return `C${X(-82)},${f1(408 + jd * 0.8)} ${X(-124)},340 ${X(-128)},268`;
-  if (st === 'D') return `Q${X(0)},${f1(420 + jd)} ${X(-52)},${f1(410 + jd * 0.8)} L${X(-100)},378 C${X(-122)},352 ${X(-128)},318 ${X(-128)},268`;
-  if (st === 'E') return `Q${X(0)},${f1(434 + jd)} ${X(-34)},${f1(424 + jd * 0.8)} L${X(-88)},384 C${X(-112)},356 ${X(-126)},322 ${X(-128)},268`;
-  const [a, b, c] = JAWLOW[st]; return `C${X(-b[0])},${f1(b[1] + jd * 0.8)} ${X(-a[0])},${a[1]} ${X(-128)},268`; }
-function facePath(P) { const y = P.head.yaw, jd = jawDrop(P) * 0.85, sh = y * 10, nw = 1 - Math.abs(y) * 0.05;
+export const JAW = { style: null, w: 1 };
+// Mandibulas suaves (solo curvas, sin picos). Cada una: segmentos cubicos del lado derecho desde la mejilla (128,268) hasta el menton.
+const JAWS = {
+  O: [[[118, 336], [66, 414], [0, 420]]],
+  V: [[[112, 346], [46, 422], [0, 428]]],
+  H: [[[104, 322], [52, 410], [0, 426]]],
+  D: [[[128, 322], [122, 356], [104, 384]], [[88, 404], [50, 418], [0, 418]]],
+  M: [[[116, 330], [60, 420], [0, 430]]],
+};
+function jawPath(P, X, jd) { const st = JAW.style, segs = JAWS[st]; const Y = (y) => f1(y + jd * (y > 380 ? 1 : 0.8)); let right = '', left = '';
+  segs.forEach(([c1, c2, p]) => { right += ` C${X(c1[0])},${Y(c1[1])} ${X(c2[0])},${Y(c2[1])} ${X(p[0])},${Y(p[1])}`; });
+  const pts = [[128, 268], ...segs.map((q) => q[2])];
+  for (let i = segs.length - 1; i >= 0; i--) { const [c1, c2] = segs[i], p0 = pts[i]; left += ` C${X(-c2[0])},${Y(c2[1])} ${X(-c1[0])},${Y(c1[1])} ${X(-p0[0])},${Y(p0[1])}`; }
+  return { right, left }; }
+function facePath(P) { const y = P.head.yaw, jd = jawDrop(P) * 0.85, sh = y * 10, nw = (1 - Math.abs(y) * 0.05) * (JAW.w || 1);
   const X = (dx) => f1(512 + sh + dx * nw * 0.93);
-  const st = JAW.style; if (st && st !== 'J0') { const tip = (st === 'D' || st === 'E') ? '' : ''; return `M${X(0)},116 C${X(92)},116 ${X(132)},186 ${X(128)},268 ${jawLowerStr(P, X, jd)} ${st === 'D' || st === 'E' ? `L${X(0)},${f1((st === 'E' ? 434 : 420) + jd)}` : ''} ${jawLowerMirror(P, X, jd)} C${X(-132)},186 ${X(-92)},116 ${X(0)},116Z`; }
+  if (JAW.style && JAWS[JAW.style]) { const { right, left } = jawPath(P, X, jd); return `M${X(0)},116 C${X(92)},116 ${X(132)},186 ${X(128)},268${right}${left} C${X(-132)},186 ${X(-92)},116 ${X(0)},116Z`; }
   return `M${X(0)},116 C${X(92)},116 ${X(132)},186 ${X(128)},268 C${X(124)},340 ${X(82)},${f1(408 + jd * 0.8)} ${X(0)},${f1(414 + jd)} C${X(-82)},${f1(408 + jd * 0.8)} ${X(-124)},340 ${X(-128)},268 C${X(-132)},186 ${X(-92)},116 ${X(0)},116Z`; }
-function jawFx(P) { if (!JAW.style) return ''; const fp = facePath(P); const m = JAW.style; const strong = m === 'E' ? 1 : m === 'D' ? 0.85 : 0.6;
+function jawFx(P) { if (!JAW.style) return ''; const fp = facePath(P); const m = JAW.style; const strong = m === 'M' ? 1 : m === 'D' ? 0.85 : 0.65;
   let pores = ''; for (let i = 0; i < 110; i++) { const a = (i * 137.5) % 360 * Math.PI / 180, r = 60 + (i * 53 % 80); pores += `<circle cx="${f1(512 + Math.cos(a) * r * 1.2)}" cy="${f1(330 + Math.sin(a) * r * 0.9 + 40)}" r="${(0.9 + (i % 3) * 0.35).toFixed(2)}" fill="#6a3418" opacity="${(0.14 + (i % 4) * 0.04).toFixed(2)}"/>`; }
   return `<defs><filter id="jb8" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="8"/></filter><filter id="jb3" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="3"/></filter></defs>
   <path d="${fp}" fill="none" stroke="#5a2a14" stroke-width="${f1(34 * strong)}" opacity="${(0.42 * strong).toFixed(2)}" filter="url(#jb8)"/>
   <path d="${fp}" fill="none" stroke="#2a1008" stroke-width="10" opacity="0.3" filter="url(#jb3)"/>
-  <path d="M388,330 Q420,392 ${m === 'A' || m === 'C' ? 470 : 456},${m === 'E' ? 418 : 404}" stroke="#ffe6cc" stroke-width="9" fill="none" opacity="${(0.28 * strong).toFixed(2)}" filter="url(#jb3)" transform="translate(0,-6)"/><path d="M636,330 Q604,392 ${m === 'A' || m === 'C' ? 554 : 568},${m === 'E' ? 418 : 404}" stroke="#ffe6cc" stroke-width="9" fill="none" opacity="${(0.28 * strong).toFixed(2)}" filter="url(#jb3)" transform="translate(0,-6)"/>
-  <ellipse cx="512" cy="${m === 'E' || m === 'A' ? 400 : 390}" rx="${m === 'D' ? 46 : 30}" ry="10" fill="#fff0e0" opacity="0.32" filter="url(#jb3)"/>
+  <path d="M388,330 Q420,392 ${m === 'V' || m === 'H' ? 472 : 458},${m === 'M' ? 418 : 404}" stroke="#ffe6cc" stroke-width="9" fill="none" opacity="${(0.28 * strong).toFixed(2)}" filter="url(#jb3)" transform="translate(0,-6)"/><path d="M636,330 Q604,392 ${m === 'V' || m === 'H' ? 552 : 566},${m === 'M' ? 418 : 404}" stroke="#ffe6cc" stroke-width="9" fill="none" opacity="${(0.28 * strong).toFixed(2)}" filter="url(#jb3)" transform="translate(0,-6)"/>
+  <ellipse cx="512" cy="${m === 'M' || m === 'V' ? 402 : 392}" rx="${m === 'D' ? 40 : 28}" ry="10" fill="#fff0e0" opacity="0.32" filter="url(#jb3)"/>
   <path d="M410,290 Q440,350 512,372 Q584,350 614,290" stroke="#6a3418" stroke-width="14" fill="none" opacity="${(0.16 * strong).toFixed(2)}" filter="url(#jb8)"/>${pores}`; }
 export function part_face(P, fillRef = 'url(#zFace)') { const fp = facePath(P); return `<g id="face"><path d="${fp}" fill="${fillRef}" stroke="${OUT}" stroke-width="8" stroke-linejoin="round"/><clipPath id="faceClip"><path d="${fp}"/></clipPath><g clip-path="url(#faceClip)"><ellipse cx="500" cy="230" rx="110" ry="130" fill="url(#zHi)"/><ellipse cx="512" cy="410" rx="120" ry="30" fill="#8f4f2b" opacity="0.22"/>${jawFx(P)}<path d="M400,300 Q420,380 512,404 Q604,380 624,300" stroke="#8f4f2b" stroke-opacity="0.2" stroke-width="16" fill="none"/></g></g>`; }
-export function part_ear(side, P) { const x = side === 'L' ? 384 : 640, s = side === 'L' ? -1 : 1; return `<g id="ear_${side}" transform="translate(${P.head.yaw * 8 * 0},0)"><path d="M${x},268 C${x + s * 22},262 ${x + s * 30},310 ${x + s * 12},340 C${x + s * 4},350 ${x},344 ${x},336Z" fill="${C.skin}" stroke="${OUT}" stroke-width="6"/><path d="M${x + s * 6},286 q${s * 10},18 ${s * 0},38" stroke="#8f4f2b" stroke-width="4" fill="none"/></g>`; }
+export function part_ear(side, P) { const x = 512 + ((side === 'L' ? 384 : 640) - 512) * (JAW.w || 1), s = side === 'L' ? -1 : 1; return `<g id="ear_${side}" transform="translate(${P.head.yaw * 8 * 0},0)"><path d="M${x},268 C${x + s * 22},262 ${x + s * 30},310 ${x + s * 12},340 C${x + s * 4},350 ${x},344 ${x},336Z" fill="${C.skin}" stroke="${OUT}" stroke-width="6"/><path d="M${x + s * 6},286 q${s * 10},18 ${s * 0},38" stroke="#8f4f2b" stroke-width="4" fill="none"/></g>`; }
 export function part_cheeks(P) { const sh = P.head.yaw * 14; return `<g id="cheeks"><radialGradient id="zBl" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#e05a4e" stop-opacity="0.85"/><stop offset="1" stop-color="#e05a4e" stop-opacity="0"/></radialGradient><circle cx="${f1(428 + sh)}" cy="338" r="52" fill="url(#zBl)"/><circle cx="${f1(598 + sh)}" cy="338" r="52" fill="url(#zBl)"/></g>`; }
 export function part_eye(side, P) { // devuelve {sclera,iris,pupil,lidUp,lidLow,lashes,all}
   const e = P.eyes, [cx0, cy] = EYE[side]; const sh = P.head.yaw * 22; const cx = cx0 + sh, b = clamp(side === 'L' ? e.blinkL : e.blinkR), wide = e.wide, sq = e.squint;
