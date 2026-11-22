@@ -127,7 +127,7 @@ export function hairFront(P) { const h = P.hair; return `<g id="hair_front"><g t
 // ================= CABEZA Y ROSTRO =================
 const EYE = { L: [454, 262], R: [570, 262] };
 const jawDrop = (P) => P.jaw * 1 + P.mouth.open * 30;
-export const JAW = { style: null, w: 1, cheek: 0, light: 0 };
+export const JAW = { style: null, w: 1, cheek: 0, light: 0, d: 0 };
 // Mandibulas suaves (solo curvas, sin picos). Cada una: segmentos cubicos del lado derecho desde la mejilla (128,268) hasta el menton.
 const JAWS = {
   O: [[[118, 336], [66, 414], [0, 420]]],
@@ -135,6 +135,7 @@ const JAWS = {
   H: [[[104, 322], [52, 410], [0, 426]]],
   D: [[[128, 322], [122, 356], [104, 384]], [[88, 404], [50, 418], [0, 418]]],
   M: [[[116, 330], [60, 420], [0, 430]]],
+  D1: [[[114, 332], [64, 412], [0, 424]]],
   R1: [[[122, 336], [84, 410], [0, 418]]],
   R2: [[[120, 330], [78, 408], [0, 420]]],
   R3: [[[124, 338], [90, 412], [0, 416]]],
@@ -153,6 +154,12 @@ function facePath(P) { const y = P.head.yaw, jd = jawDrop(P) * 0.85, sh = y * 10
 function jawFx(P) { if (!JAW.style) return ''; const fp = facePath(P);
   const ck = JAW.cheek || 0, lt = JAW.light || 0; let extra = '';
   if (ck > 0) extra += `<path d="M396,296 Q428,352 470,380" stroke="#4a2010" stroke-width="24" fill="none" stroke-linecap="round" opacity="${(0.34 * ck).toFixed(2)}" filter="url(#jb8)"/><path d="M628,296 Q596,352 554,380" stroke="#4a2010" stroke-width="24" fill="none" stroke-linecap="round" opacity="${(0.34 * ck).toFixed(2)}" filter="url(#jb8)"/><ellipse cx="428" cy="316" rx="50" ry="13" fill="#ffe8d0" opacity="${(0.5 * ck).toFixed(2)}" filter="url(#jb8)" transform="rotate(-24 428 316)"/><ellipse cx="596" cy="316" rx="50" ry="13" fill="#ffe8d0" opacity="${(0.5 * ck).toFixed(2)}" filter="url(#jb8)" transform="rotate(24 596 316)"/><ellipse cx="428" cy="314" rx="22" ry="5" fill="#fff" opacity="${(0.4 * ck).toFixed(2)}" filter="url(#jb3)" transform="rotate(-24 428 314)"/><ellipse cx="596" cy="314" rx="22" ry="5" fill="#fff" opacity="${(0.4 * ck).toFixed(2)}" filter="url(#jb3)" transform="rotate(24 596 314)"/>`;
+  const dd = JAW.d || 0;
+  if (dd > 0) extra += `<defs><radialGradient id="dk" cx="0.32" cy="0.28" r="0.5"><stop offset="0" stop-color="#fff6e6" stop-opacity="${(0.55 * dd).toFixed(2)}"/><stop offset="1" stop-color="#fff6e6" stop-opacity="0"/></radialGradient><radialGradient id="dsss" cx="0.5" cy="0.5" r="0.55"><stop offset="0.62" stop-color="#e0502a" stop-opacity="0"/><stop offset="1" stop-color="#d8402a" stop-opacity="${(0.34 * dd).toFixed(2)}"/></radialGradient><linearGradient id="drim" x1="0" y1="0" x2="1" y2="0"><stop offset="0.82" stop-color="#fff0d0" stop-opacity="0"/><stop offset="1" stop-color="#fff0d0" stop-opacity="${(0.5 * dd).toFixed(2)}"/></linearGradient></defs>
+    <rect x="372" y="116" width="280" height="330" fill="url(#dsss)"/><rect x="372" y="116" width="280" height="330" fill="url(#drim)"/><ellipse cx="452" cy="250" rx="86" ry="104" fill="url(#dk)"/>
+    <ellipse cx="418" cy="332" rx="26" ry="14" fill="#fff" opacity="${(0.45 * dd).toFixed(2)}" filter="url(#jb3)" transform="rotate(-20 418 332)"/><ellipse cx="606" cy="332" rx="20" ry="11" fill="#fff" opacity="${(0.3 * dd).toFixed(2)}" filter="url(#jb3)" transform="rotate(20 606 332)"/>
+    <ellipse cx="505" cy="308" rx="9" ry="6" fill="#fff" opacity="${(0.6 * dd).toFixed(2)}" filter="url(#jb3)"/><ellipse cx="512" cy="132" rx="70" ry="16" fill="#fff" opacity="${(0.35 * dd).toFixed(2)}" filter="url(#jb8)"/>
+    <ellipse cx="512" cy="372" rx="62" ry="22" fill="#6a2010" opacity="${(0.14 * dd).toFixed(2)}" filter="url(#jb8)"/><ellipse cx="512" cy="398" rx="44" ry="8" fill="#fff" opacity="${(0.4 * dd).toFixed(2)}" filter="url(#jb3)"/>`;
   if (lt > 0) extra += `<defs><linearGradient id="jl" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff1dc" stop-opacity="${(0.28 * lt).toFixed(2)}"/><stop offset="0.5" stop-color="#fff1dc" stop-opacity="0"/><stop offset="1" stop-color="#2a1006" stop-opacity="${(0.4 * lt).toFixed(2)}"/></linearGradient><radialGradient id="jr" cx="0.4" cy="0.35" r="0.7"><stop offset="0.5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#2a1006" stop-opacity="${(0.3 * lt).toFixed(2)}"/></radialGradient></defs><rect x="372" y="116" width="280" height="330" fill="url(#jl)"/><rect x="372" y="116" width="280" height="330" fill="url(#jr)"/><ellipse cx="512" cy="436" rx="86" ry="14" fill="#2a1006" opacity="${(0.35 * lt).toFixed(2)}" filter="url(#jb8)"/>`;
  const m = JAW.style; const strong = m === 'M' ? 1 : m === 'D' ? 0.85 : 0.65;
   let pores = ''; for (let i = 0; i < 110; i++) { const a = (i * 137.5) % 360 * Math.PI / 180, r = 60 + (i * 53 % 80); pores += `<circle cx="${f1(512 + Math.cos(a) * r * 1.2)}" cy="${f1(330 + Math.sin(a) * r * 0.9 + 40)}" r="${(0.9 + (i % 3) * 0.35).toFixed(2)}" fill="#6a3418" opacity="${(0.14 + (i % 4) * 0.04).toFixed(2)}"/>`; }
