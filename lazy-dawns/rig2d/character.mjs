@@ -327,6 +327,7 @@ export function oldHeadPose(P, withFace = true) { const e = P.eyes, b = P.brows,
     mouth: { open: clamp(m.open), wide: m.round > 0.5 ? -0.8 * m.round : clamp(m.wide, -1, 1), smile: m.smile, asym: 0, press: m.press || 0, teeth: { clean: 1, braces: 0, crooked: 0, extra: 0, shine: true }, lip: '#b0206a', tstyle: 'A' },
     skin: { acne: 0, mask: 0, dry: 0, foam: 0, patch: 0, glow: 1, red: 0 }, lidColor: lidColor(), hair: { hd: 'long', len: 0.82, shine: 1, cp: 1, grow: 1, ...(P.hairOv || {}), bounce: h.bounce, wind: 0, sway: clamp(hs / 18 + Math.sin(h.t * 1.3) * 0.12, -0.6, 0.6) },
     frontHair: true, noseStyle: P.noseStyle, noseK: P.noseK, makeup: LOOK, browStyle: { k: 1, kl: 1, kr: 1, red: 0, shortL: 0 }, fem: 1, skinTex: { tex: 'glass', shape: 'A' }, slim: 3.8, outfit: { kind: 'gown', prog: 1, jewel: 1 }, faceWrinkle: 0,
+    faceClip: withFace ? { d: facePath(P), tf: `scale(${f1(1000 / (HEAD_SCALE * 0.8)) / 1000},${f1(1000 / (HEAD_SCALE * 0.86)) / 1000}) translate(${-HEAD_POS[0]},${-HEAD_POS[1]})` } : undefined,
     faceSvg: withFace ? `<g transform="scale(${f1(1000 / (HEAD_SCALE * 0.8)) / 1000},${f1(1000 / (HEAD_SCALE * 0.86)) / 1000}) translate(${-HEAD_POS[0]},${-HEAD_POS[1]})">${part_ear('L', P)}${part_ear('R', P)}${part_face(P, lidColor())}</g>` : undefined }; }
 let LIDC = null;
 function lidColor() { if (LIDC) return LIDC; const P = defaultPose(); const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1536" viewBox="0 0 1024 1536">${oldDefs('e3d')}${DEFS}${part_face(P, 'url(#skin)')}</svg>`;
