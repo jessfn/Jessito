@@ -333,7 +333,8 @@ let LIDC = null;
 function lidColor() { if (LIDC) return LIDC; const P = defaultPose(); const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1536" viewBox="0 0 1024 1536">${oldDefs('e3d')}${DEFS}${part_face(P, 'url(#skin)')}</svg>`;
   const im = new Resvg(svg).render(), px = im.pixels; let R = 0, G = 0, B = 0, n = 0; for (const [x, y] of [[460, 219], [564, 219], [460, 298], [564, 298], [460, 258], [564, 258]]) { const i = (y * im.width + x) * 4; R += px[i]; G += px[i + 1]; B += px[i + 2]; n++; }
   LIDC = '#' + [R, G, B].map((v) => Math.round(v / n).toString(16).padStart(2, '0')).join(''); return LIDC; }
-const headWrap = (P, inner) => `<g transform="${rot(P.head.rot, SK.neck)} translate(${HEAD_POS[0]},${HEAD_POS[1]}) scale(${HEAD_SCALE})">${inner}</g>`;
+export const NECK = { dy: 0 };
+const headWrap = (P, inner) => `<g transform="${rot(P.head.rot, SK.neck)} translate(${HEAD_POS[0]},${HEAD_POS[1] + NECK.dy}) scale(${HEAD_SCALE})">${inner}</g>`;
 export const headBack = (P) => headWrap(P, drawLazyHeadBack(oldHeadPose(P)));
 export const headFront = (P) => headWrap(P, drawLazyHeadFront(oldHeadPose(P)));
 export const ALLDEFS = DEFS + oldDefs('e3d');
