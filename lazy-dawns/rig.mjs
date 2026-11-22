@@ -84,6 +84,7 @@ function eyeSvg(x, open, blink, squint, gx, gy, tear, tearT, side, mk) {
       const tx = rx + dx * len + dir * len * 0.22, ty = ry + dy * len * 0.85 - 3;
       const w = 3.6 + 1.6 * lsh;
       lashes += `<path d="M${f1(rx - dir * w * 0.6)},${f1(ry + 2)} Q${f1(mx - dir * w * 0.3)},${f1(my)} ${f1(tx)},${f1(ty)} Q${f1(mx + dir * w * 0.9)},${f1(my + 1)} ${f1(rx + dir * w * 0.6)},${f1(ry + 2)}Z" fill="#0b0506"/>`; } }
+  if (LASHX.style && c < 0.9) lashes = postizas(LASHX.style, dir, PX, edge, c, yl);
   return `<g transform="translate(${x},-6)">
     ${shadow}
     <ellipse rx="36" ry="40" fill="#fff"/>
@@ -627,3 +628,15 @@ export function drawLazy(p) {
 }
 export function drawHandOnly(style, curl = 0.1, spread = 0.5, sd = 1) { NST = style; AST = 'A'; const S = AS.A; return `<g>${handF(sd, 0, S, 'o', curl, spread)}${handF(sd, 0, S, 'f', curl, spread)}</g>`; }
 export const HAND_DEFS = () => SHADE_DEFS + OUTFIT_DEFS;
+
+export const LASHX = { style: null };
+function lashHairP(x, y, a0, len, curlK, w, toward, col) { const N = 7, pts = []; let px = x, py = y; const a1 = a0 + (toward - a0) * curlK; for (let i = 0; i <= N; i++) { const u = i / N; const a = a0 + (a1 - a0) * Math.pow(u, 1.6); if (i > 0) { px += Math.cos(a * Math.PI / 180) * len / N; py += Math.sin(a * Math.PI / 180) * len / N; } pts.push([px, py, w * (1 - 0.85 * u)]); }
+  let Lp = '', Rp = ''; pts.forEach(([X, Y, ww], i) => { const q = pts[Math.min(N, i + 1)], p = pts[Math.max(0, i - 1)]; const dx = q[0] - p[0], dy = q[1] - p[1], l = Math.hypot(dx, dy) || 1; const nx = -dy / l, ny = dx / l; Lp += `${(X + nx * ww).toFixed(1)},${(Y + ny * ww).toFixed(1)} `; Rp = `${(X - nx * ww).toFixed(1)},${(Y - ny * ww).toFixed(1)} ` + Rp; });
+  return `<polygon points="${Lp}${Rp}" fill="${col}"/>`; }
+function postizas(style, dir, PX, edge, c, yl) { let seed = 131 + (dir > 0 ? 7 : 0); const R = () => (seed = (seed * 16807) % 2147483647) / 2147483647; let up = '', lo = '';
+  const C = { P1: { n: 22, fan: 3, len: 34, outer: 1.0, curl: 0.55, lo: 9, lfan: 2, llen: 11 }, P2: { n: 26, fan: 3, len: 42, outer: 0.5, curl: 0.8, lo: 11, lfan: 2, llen: 13 }, P3: { n: 20, fan: 2, len: 30, outer: 1.9, curl: 0.6, lo: 8, lfan: 2, llen: 10 }, P4: { n: 18, fan: 4, len: 36, outer: 1.2, curl: 0.7, lo: 10, lfan: 2, llen: 12 } }[style];
+  for (let i = 0; i < C.n; i++) { const k = (i + 0.5) / C.n, u = -0.92 + k * 1.92, x = PX(u), y = edge(u) - 0.5; const outer = Math.max(0, u), inner = Math.max(0, -u);
+    const a0 = -90 + dir * u * 50 + (R() - 0.5) * 6; let len = C.len * (1 + C.outer * 0.5 * outer) * (1 - 0.35 * inner) * (0.9 + R() * 0.2); if (style === 'P4' && i % 3 === 0) len *= 1.3; len *= (1 - c);
+    for (let q = 0; q < C.fan; q++) { const sp = (q - (C.fan - 1) / 2) * 9 * dir; up += lashHairP(x + (q - (C.fan - 1) / 2) * 0.8, y + 1, a0 + sp, len * (0.82 + R() * 0.3), C.curl, 1.5, -90 - dir * 12, '#0a0406'); } }
+  if (c < 0.6) for (let i = 0; i < C.lo; i++) { const k = i / (C.lo - 1), u = -0.82 + k * 1.64, x = PX(u) , yb = Math.min(yl + 4, 40 * Math.sqrt(Math.max(0, 1 - Math.pow(u * 0.95, 2)))) - 1; const a0 = 90 + dir * u * 42; for (let q = 0; q < C.lfan; q++) lo += lashHairP(x, yb, a0 + (q - (C.lfan - 1) / 2) * 9 * dir, C.llen * (0.85 + R() * 0.3) * (1 + 0.5 * Math.max(0, u)), 0.55, 1.0, 90 + dir * u * 70, '#0a0406'); }
+  return `<g>${lo}</g>${up}`; }
