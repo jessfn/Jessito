@@ -338,7 +338,7 @@ function headSvg(p) {
         ${wrinkle > 0 ? `<g opacity="${clamp(wrinkle * 1.6) * 0.5}"><path d="M-110,-142 Q0,-158 110,-142"/><path d="M-96,-122 Q0,-136 96,-122"/></g>` : ''}
         ${furrow > 0.15 ? `<g opacity="${clamp(furrow) * 0.55}"><path d="M-14,-96 q-4,-16 0,-30 M14,-96 q4,-16 0,-30"/></g>` : ''}
         ${squint > 0.3 ? `<g opacity="${clamp(squint) * 0.5}"><path d="M-128,-12 l-18,-8 M-128,6 l-20,2 M128,-12 l18,-8 M128,6 l20,2"/></g>` : ''}
-        <g opacity="${clamp(Math.abs(sm) * 0.6 + jaw / 60) * 0.55}"><path d="M-38,66 Q-92,96 -${86 + up * 10},${128 - up * 6}"/><path d="M38,66 Q92,96 ${86 + up * 10},${128 - up * 6}"/></g>
+        ${NOSMILE.on ? '' : `<g opacity="${clamp(Math.abs(sm) * 0.6 + jaw / 60) * 0.55}"><path d="M-38,66 Q-92,96 -${86 + up * 10},${128 - up * 6}"/><path d="M38,66 Q92,96 ${86 + up * 10},${128 - up * 6}"/></g>`}
       </g>
       ${FEM > 0.02 ? `<clipPath id="femClip"><path d="${femPathStr(yaw)}"/></clipPath><g clip-path="url(#femClip)">` : ''}${makeupSvg(p.makeup, 1 - clamp(p.blink.l))}${pimplesSvg(sk.acne)}${patchesSvg(sk.acne, sk.patch)}${foamSvg(sk.foam, p.tearT || 0)}${maskSvg(sk.mask, sk.dry)}${FEM > 0.02 ? '</g>' : ''}
       ${eyeSvg(-78, p.lid.l, p.blink.l, squint, p.gaze.x, p.gaze.y, p.tears, p.tearT, 1, p.makeup)}${eyeSvg(78, p.lid.r, p.blink.r, squint, p.gaze.x, p.gaze.y, p.tears, p.tearT, -1, p.makeup)}
@@ -640,3 +640,5 @@ function postizas(style, dir, PX, edge, c, yl) { let seed = 131 + (dir > 0 ? 7 :
     for (let q = 0; q < C.fan; q++) { const sp = (q - (C.fan - 1) / 2) * 9 * dir; up += lashHairP(x + (q - (C.fan - 1) / 2) * 0.8, y + 1, a0 + sp, len * (0.82 + R() * 0.3), C.curl, 1.5, -90 - dir * 12, '#0a0406'); } }
   if (c < 0.6) for (let i = 0; i < C.lo; i++) { const k = i / (C.lo - 1), u = -0.82 + k * 1.64, x = PX(u) , yb = Math.min(yl + 4, 40 * Math.sqrt(Math.max(0, 1 - Math.pow(u * 0.95, 2)))) - 1; const a0 = 90 + dir * u * 42; for (let q = 0; q < C.lfan; q++) lo += lashHairP(x, yb, a0 + (q - (C.lfan - 1) / 2) * 9 * dir, C.llen * (0.85 + R() * 0.3) * (1 + 0.5 * Math.max(0, u)), 0.55, 1.0, 90 + dir * u * 70, '#0a0406'); }
   return `<g>${lo}</g>${up}`; }
+
+export const NOSMILE = { on: false };
