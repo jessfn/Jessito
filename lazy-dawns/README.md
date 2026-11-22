@@ -223,3 +223,9 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
 - Regla nueva: los títulos de cada día deben ser de suspenso ("Alguien del pasado regresó... pero").
 - Votación al final: zapatos o pestañas (día 15).
 - Archivos: render_dia14.mjs, director_d14.mjs, chars14.mjs, build_audio_dia14.py, resume_dia14.sh, script_dia14.json, plates3d/scenes14.html, objects14.html.
+
+## REGLAS NUEVAS (día 15 en adelante)
+- Revisar el video SEGUNDO A SEGUNDO antes de entregar (cuadros cada ~1 s): lógica de todo lo que aparece.
+- Celular/chat: cada pantalla muestra SOLO el chat de UNA persona (nombre, foto de perfil y mensajes de esa persona). Nunca mezclar mensajes de otro contacto en el mismo chat (error del día 14: el mensaje de Dustin aparecía dentro del chat "Número desconocido").
+- Reacciones del rostro coherentes con lo que pasa en cada instante; manos/brazos/objetos coherentes.
+- Pestañas (voto día 14→15): mostrar opciones largas, bien diseñadas, con textura y realistas; el usuario elige antes del video.
