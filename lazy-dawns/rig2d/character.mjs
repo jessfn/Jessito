@@ -32,7 +32,7 @@ export const DEFS = `<defs>
 <linearGradient id="zSk" x1="0" y1="0" x2="1" y2="0.3"><stop offset="0" stop-color="#6a000e"/><stop offset="0.35" stop-color="#b00a1e"/><stop offset="0.55" stop-color="#cc1a2e"/><stop offset="0.8" stop-color="#8a0314"/><stop offset="1" stop-color="#4c0008"/></linearGradient>
 <linearGradient id="zGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff0a0"/><stop offset="0.5" stop-color="#e0a820"/><stop offset="1" stop-color="#9a6a08"/></linearGradient>
 <radialGradient id="zIris" cx="0.5" cy="0.35" r="0.8"><stop offset="0" stop-color="#a0602e"/><stop offset="0.55" stop-color="#6a3418"/><stop offset="1" stop-color="#2a1208"/></radialGradient>
-<linearGradient id="zLip" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e86cb8"/><stop offset="1" stop-color="#b02a86"/></linearGradient>
+<linearGradient id="zLipN" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#cf8c78"/><stop offset="1" stop-color="#a85c4a"/></linearGradient><linearGradient id="zLip" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e86cb8"/><stop offset="1" stop-color="#b02a86"/></linearGradient>
 <radialGradient id="zHi" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#fff" stop-opacity="0.2"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
 <filter id="soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="9"/></filter>
 </defs>`;
@@ -127,7 +127,8 @@ export function hairFront(P) { const h = P.hair; return `<g id="hair_front"><g t
 // ================= CABEZA Y ROSTRO =================
 const EYE = { L: [454, 262], R: [570, 262] };
 const jawDrop = (P) => P.jaw * 1 + P.mouth.open * 30;
-export const JAW = { style: null, w: 1, cheek: 0, light: 0, d: 0, noLines: false, mouthK: 1, noChin: false, mouthUp: 0 };
+export const MK = { lips: 1, wet: 0 };
+export const JAW = { style: null, w: 1, cheek: 0, light: 0, d: 0, noLines: false, mouthK: 1, noChin: false, mouthUp: 0, fxK: 1 };
 // Mandibulas suaves (solo curvas, sin picos). Cada una: segmentos cubicos del lado derecho desde la mejilla (128,268) hasta el menton.
 const JAWS = {
   O: [[[118, 336], [66, 414], [0, 420]]],
@@ -175,7 +176,7 @@ function jawFx(P) { if (!JAW.style) return ''; const fp = facePath(P);
     <ellipse cx="505" cy="308" rx="9" ry="6" fill="#fff" opacity="${(0.6 * dd).toFixed(2)}" filter="url(#jb3)"/><ellipse cx="512" cy="132" rx="70" ry="16" fill="#fff" opacity="${(0.35 * dd).toFixed(2)}" filter="url(#jb8)"/>
     ${JAW.noChin ? '' : `<ellipse cx="512" cy="372" rx="62" ry="22" fill="#6a2010" opacity="${(0.14 * dd).toFixed(2)}" filter="url(#jb8)"/>`}${JAW.noChin ? '' : `<ellipse cx="512" cy="398" rx="44" ry="8" fill="#fff" opacity="${(0.4 * dd).toFixed(2)}" filter="url(#jb3)"/>`}`;
   if (lt > 0) extra += `<defs><linearGradient id="jl" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff1dc" stop-opacity="${(0.28 * lt).toFixed(2)}"/><stop offset="0.5" stop-color="#fff1dc" stop-opacity="0"/><stop offset="1" stop-color="#2a1006" stop-opacity="${(0.4 * lt).toFixed(2)}"/></linearGradient><radialGradient id="jr" cx="0.4" cy="0.35" r="0.7"><stop offset="0.5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#2a1006" stop-opacity="${(0.3 * lt).toFixed(2)}"/></radialGradient></defs><rect x="372" y="116" width="280" height="330" fill="url(#jl)"/><rect x="372" y="116" width="280" height="330" fill="url(#jr)"/><ellipse cx="512" cy="436" rx="86" ry="14" fill="#2a1006" opacity="${(0.35 * lt).toFixed(2)}" filter="url(#jb8)"/>`;
- const m = JAW.style; const strong = m === 'M' ? 1 : m === 'D' ? 0.85 : 0.65;
+ const m = JAW.style; const strong = (m === 'M' ? 1 : m === 'D' ? 0.85 : 0.65) * (JAW.fxK ?? 1);
   let pores = ''; for (let i = 0; i < 110; i++) { const a = (i * 137.5) % 360 * Math.PI / 180, r = 60 + (i * 53 % 80); pores += `<circle cx="${f1(512 + Math.cos(a) * r * 1.2)}" cy="${f1(330 + Math.sin(a) * r * 0.9 + 40)}" r="${(0.9 + (i % 3) * 0.35).toFixed(2)}" fill="#6a3418" opacity="${(0.14 + (i % 4) * 0.04).toFixed(2)}"/>`; }
   return `<defs><filter id="jb8" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="8"/></filter><filter id="jb3" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="3"/></filter></defs>
   <path d="${fp}" fill="none" stroke="#5a2a14" stroke-width="${f1(34 * strong)}" opacity="${(0.42 * strong).toFixed(2)}" filter="url(#jb8)"/>
@@ -224,9 +225,9 @@ export function part_mouth(P) { const g = mouthGeom(P), m = P.mouth, { cx, w, h 
   const teethL = m.lowerTeeth > 0.05 && h > 6 ? `<g clip-path="url(#${clipId})"><path d="M${f1(cx - tw * 0.85)},${f1(lowEdgeY + 6)} L${f1(cx + tw * 0.85)},${f1(lowEdgeY + 6)} L${f1(cx + tw * 0.85)},${f1(lowEdgeY - 8 * m.lowerTeeth)} Q${cx},${f1(lowEdgeY - 10 * m.lowerTeeth)} ${f1(cx - tw * 0.85)},${f1(lowEdgeY - 8 * m.lowerTeeth)}Z" fill="#f6f1e6" stroke="#cfc6b8" stroke-width="1.4"/></g>` : '';
   const tongue = h > 8 ? `<g clip-path="url(#${clipId})"><ellipse cx="${cx}" cy="${f1(lowEdgeY - 2 - m.tongue * 6)}" rx="${f1(w * 0.5)}" ry="${f1(Math.min(14, h * 0.5) + m.tongue * 4)}" fill="#e0607a"/><path d="M${cx},${f1(lowEdgeY - 12)} v8" stroke="#b0405a" stroke-width="2.4"/></g>` : '';
   const fv = m.fv > 0.3 ? `<path d="M${f1(cx - tw * 0.8)},${f1(lineY - 2)} L${f1(cx + tw * 0.8)},${f1(lineY - 2)} L${f1(cx + tw * 0.8)},${f1(lineY + 14)} Q${cx},${f1(lineY + 18)} ${f1(cx - tw * 0.8)},${f1(lineY + 14)}Z" fill="#fffdf6" stroke="#cfc6b8" stroke-width="1.6"/>` : '';
-  const lipS = `stroke="#6a0f4c" stroke-width="3.6" stroke-linejoin="round"`;
-  const lowerLipSvg = `<g id="lip_lower"><path d="${lowerLip}" fill="url(#zLip)" ${lipS}/><path d="M${f1(cx - w * 0.45)},${f1(lowEdgeY + tL * 0.55)} Q${cx},${f1(lowEdgeY + tL * 0.8)} ${f1(cx + w * 0.4)},${f1(lowEdgeY + tL * 0.55)}" stroke="#ffb0e0" stroke-opacity="0.65" stroke-width="3.4" fill="none" stroke-linecap="round"/></g>`;
-  const upperLipSvg = `<g id="lip_upper"><path d="${upperLip}" fill="#c43a96" ${lipS}/><path d="M${f1(cx - w * 0.5)},${f1(cy - tU + 1)} Q${f1(cx - 8)},${f1(cy - tU - 3)} ${f1(cx - 2)},${f1(cy - tU + 2)}" stroke="#ffb0e0" stroke-opacity="0.6" stroke-width="3" fill="none" stroke-linecap="round"/></g>`;
+  const lipS = `stroke="#6a0f4c" stroke-width="3.6" stroke-linejoin="round"`; const lipSN = `stroke="#6a3a2c" stroke-width="3" stroke-linejoin="round"`;
+  const lowerLipSvg = `<g id="lip_lower"><path d="${lowerLip}" fill="${MK.lips < 0.5 ? 'url(#zLipN)' : 'url(#zLip)'}" ${MK.lips < 0.5 ? lipSN : lipS}/><path d="M${f1(cx - w * 0.45)},${f1(lowEdgeY + tL * 0.55)} Q${cx},${f1(lowEdgeY + tL * 0.8)} ${f1(cx + w * 0.4)},${f1(lowEdgeY + tL * 0.55)}" stroke="#ffb0e0" stroke-opacity="0.65" stroke-width="3.4" fill="none" stroke-linecap="round"/></g>`;
+  const upperLipSvg = `<g id="lip_upper"><path d="${upperLip}" fill="${MK.lips < 0.5 ? '#b8705e' : '#c43a96'}" ${MK.lips < 0.5 ? lipSN : lipS}/><path d="M${f1(cx - w * 0.5)},${f1(cy - tU + 1)} Q${f1(cx - 8)},${f1(cy - tU - 3)} ${f1(cx - 2)},${f1(cy - tU + 2)}" stroke="#ffb0e0" stroke-opacity="0.6" stroke-width="3" fill="none" stroke-linecap="round"/></g>`;
   return { cavity: `<clipPath id="${clipId}"><path d="${cavity}"/></clipPath><path d="${cavity}" fill="#50081c" stroke="#2a0510" stroke-width="2"/>`, teethU, teethL, tongue, fv, lowerLipSvg, upperLipSvg,
     all: `<g id="mouth">${h > 1.5 ? `<clipPath id="${clipId}"><path d="${cavity}"/></clipPath><path d="${cavity}" fill="#50081c" stroke="#2a0510" stroke-width="2"/>${tongue}${teethU}${teethL}` : ''}${lowerLipSvg}${upperLipSvg}${fv}</g>` };
 }
@@ -318,13 +319,13 @@ export function part_waistband(P) { return `<g id="waistband"><path d="M440,704 
 
 // ================= ENSAMBLE =================
 // ---- Cabeza y pelo ORIGINALES de Lazy (rostro, ojos, cejas, nariz, boca, dientes, rizos HD) montados sobre el cuerpo nuevo ----
-const LOOK = { shade: 'match', mole: 0, found: 0, contour: 0.9, highlight: 0.8, blush: 0.7, shadow: 1, swL: 1, swR: 1, liner: 1, linerL: 1, linerR: 1, lsL: 1, lsR: 1, lash: 0.9, cols: { blush: '#e06a7a', contour: '#3a1608', shadow: ['#4b2a73', '#9d6be0', '#f0d8ff'], inner: '#f6ecff', hl: '#ffe6c2', liner: '#120818' }, wide: 1, lift: 1, thick: 5, wing: 1, sparkle: 0, glitter: 0 };
+export const LOOK = { shade: 'match', mole: 0, found: 0, contour: 0.9, highlight: 0.8, blush: 0.7, shadow: 1, swL: 1, swR: 1, liner: 1, linerL: 1, linerR: 1, lsL: 1, lsR: 1, lash: 0.9, cols: { blush: '#e06a7a', contour: '#3a1608', shadow: ['#4b2a73', '#9d6be0', '#f0d8ff'], inner: '#f6ecff', hl: '#ffe6c2', liner: '#120818' }, wide: 1, lift: 1, thick: 5, wing: 1, sparkle: 0, glitter: 0 };
 export const HEAD_SCALE = 0.84, HEAD_POS = [512, 262];
 export function oldHeadPose(P, withFace = true) { const e = P.eyes, b = P.brows, m = P.mouth, h = P.hair; const hs = (h.swayL + h.swayR) / 2;
   const br = (raise, fr) => ({ r: clamp(raise * 0.9, -1, 1), i: clamp(raise * 0.9 - fr * 0.9, -1, 1) });
   return { yaw: P.head.yaw, pitch: P.head.pitch * 0.3, roll: 0, bob: 0, sway: 0, breath: P.chest.breath, shoulders: 0, flare: 0, squint: e.squint, tears: 0, tearT: 0, gaze: { x: e.lookX, y: e.lookY },
     lid: { l: 1 + e.wide * 0.25, r: 1 + e.wide * 0.25 }, blink: { l: e.blinkL, r: e.blinkR }, brow: { l: br(b.Lraise, b.Lfrown), r: br(b.Rraise, b.Rfrown) },
-    mouth: { open: clamp(m.open), wide: m.round > 0.5 ? -0.8 * m.round : clamp(m.wide, -1, 1), smile: m.smile, asym: 0, press: m.press || 0, teeth: { clean: 1, braces: 0, crooked: 0, extra: 0, shine: true }, lip: '#b0206a', tstyle: 'A' },
+    mouth: { open: clamp(m.open), wide: m.round > 0.5 ? -0.8 * m.round : clamp(m.wide, -1, 1), smile: m.smile, asym: 0, press: m.press || 0, teeth: { clean: 1, braces: 0, crooked: 0, extra: 0, shine: true }, lip: MK.lips < 0.5 ? null : '#b0206a', tstyle: 'A' },
     skin: { acne: 0, mask: 0, dry: 0, foam: 0, patch: 0, glow: 1, red: 0 }, lidColor: lidColor(), hair: { hd: 'long', len: 0.82, shine: 1, cp: 1, grow: 1, ...(P.hairOv || {}), bounce: h.bounce, wind: 0, sway: clamp(hs / 18 + Math.sin(h.t * 1.3) * 0.12, -0.6, 0.6) },
     frontHair: true, noseStyle: P.noseStyle, noseK: P.noseK, makeup: LOOK, browStyle: { k: 1, kl: 1, kr: 1, red: 0, shortL: 0 }, fem: 1, skinTex: { tex: 'glass', shape: 'A' }, slim: 3.8, outfit: { kind: 'gown', prog: 1, jewel: 1 }, faceWrinkle: 0,
     faceClip: withFace ? { d: facePath(P), tf: `scale(${f1(1000 / (HEAD_SCALE * 0.8)) / 1000},${f1(1000 / (HEAD_SCALE * 0.86)) / 1000}) translate(${-HEAD_POS[0]},${-HEAD_POS[1]})` } : undefined,

@@ -337,7 +337,7 @@ function headSvg(p) {
     ${hr.lacio ? (p.frontHair ? '' : (isBob(hr) ? bobTop(hr, yaw) : lacioTop(hr, yaw))) : hr.hd ? `<g transform="translate(${yaw * 10},0)">${hdTop(hr, yaw)}</g>` : `<g transform="translate(${yaw * 10},0)">${hairCurly(hr)}${hairTop(hr)}</g>`}
     <g transform="translate(${fx},${(p.pitch || 0) * 12})">
       <!-- pomulos / mejillas -->
-      <defs><radialGradient id="rbG" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#e0624a" stop-opacity="${EYEX.corner ? 0.5 : 1}"/><stop offset="0.55" stop-color="#e0624a" stop-opacity="${EYEX.corner ? 0.26 : 1}"/><stop offset="1" stop-color="#e0624a" stop-opacity="0"/></radialGradient></defs>${EYEX.corner ? `<ellipse cx="-104" cy="${60 - up * 14}" rx="64" ry="48" fill="url(#rbG)"/><ellipse cx="104" cy="${60 - up * 14}" rx="64" ry="48" fill="url(#rbG)"/>` : `<ellipse cx="-124" cy="${58 - up * 14}" rx="${52 + up * 10}" ry="${34 + up * 6}" fill="#e0624a" opacity="${0.4 + up * 0.15}"/><ellipse cx="124" cy="${58 - up * 14}" rx="${52 + up * 10}" ry="${34 + up * 6}" fill="#e0624a" opacity="${0.4 + up * 0.15}"/>`}
+      <defs><radialGradient id="rbG" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#e0624a" stop-opacity="${EYEX.corner ? 0.5 : 1}"/><stop offset="0.55" stop-color="#e0624a" stop-opacity="${EYEX.corner ? 0.26 : 1}"/><stop offset="1" stop-color="#e0624a" stop-opacity="0"/></radialGradient></defs>${EYEX.corner ? (EYEX.nomk ? '' : `<ellipse cx="-104" cy="${60 - up * 14}" rx="64" ry="48" fill="url(#rbG)" opacity="${EYEX.nomk2 ?? 1}"/><ellipse cx="104" cy="${60 - up * 14}" rx="64" ry="48" fill="url(#rbG)" opacity="${EYEX.nomk2 ?? 1}"/>`) : `<ellipse cx="-124" cy="${58 - up * 14}" rx="${52 + up * 10}" ry="${34 + up * 6}" fill="#e0624a" opacity="${0.4 + up * 0.15}"/><ellipse cx="124" cy="${58 - up * 14}" rx="${52 + up * 10}" ry="${34 + up * 6}" fill="#e0624a" opacity="${0.4 + up * 0.15}"/>`}
       <ellipse cx="-138" cy="${22 - up * 10}" rx="46" ry="16" fill="#fff" opacity="${0.1 + up * 0.12}" filter="url(#blur8)"/><ellipse cx="138" cy="${22 - up * 10}" rx="46" ry="16" fill="#fff" opacity="${0.1 + up * 0.12}" filter="url(#blur8)"/>
       <!-- arrugas de expresion -->
       <g fill="none" stroke="#3a1d10" stroke-linecap="round" stroke-width="5">
@@ -649,7 +649,7 @@ function postizas(style, dir, PX, edge, c, yl) { let seed = 131 + (dir > 0 ? 7 :
 
 export const NOSMILE = { on: false };
 
-export const EYEX = { corner: 0, sx: 1, sy: 1, irK: 1, irX: 1, prK: 1, dx: 0, dy: 0, tilt: 0, tex: 0, pal: null, anime: 0, thick: null };
+export const EYEX = { nomk: 0, corner: 0, sx: 1, sy: 1, irK: 1, irX: 1, prK: 1, dx: 0, dy: 0, tilt: 0, tex: 0, pal: null, anime: 0, thick: null };
 const f1x = (n) => Math.round(n * 10) / 10;
 function irisTex(ix, iy, gx, side) { if (EYEX.anime) return irisAnime(ix, iy, gx, side); const P = EYEX.pal || ['#e0aa62', '#8a4a1e', '#2a1208'], k = EYEX.irK, sx = EYEX.sx, sy = EYEX.sy, pr = 11 * EYEX.prK; const id = 'ix' + (side > 0 ? 'L' : 'R');
   let fib = ''; for (let i = 0; i < 64; i++) { const a = i / 64 * 6.2832, r0 = pr + 2, r1 = 21 + (i % 3) * 0.6; fib += `<path d="M${f1x(Math.cos(a) * r0)},${f1x(Math.sin(a) * r0)} L${f1x(Math.cos(a + 0.04) * r1)},${f1x(Math.sin(a + 0.04) * r1)}" stroke="${i % 2 ? '#f7d28a' : '#3a1a08'}" stroke-opacity="${i % 2 ? 0.35 : 0.5}" stroke-width="${i % 4 === 0 ? 1.6 : 0.9}"/>`; }
