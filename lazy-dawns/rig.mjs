@@ -85,12 +85,12 @@ function eyeSvg(x, open, blink, squint, gx, gy, tear, tearT, side, mk) {
       const w = 3.6 + 1.6 * lsh;
       lashes += `<path d="M${f1(rx - dir * w * 0.6)},${f1(ry + 2)} Q${f1(mx - dir * w * 0.3)},${f1(my)} ${f1(tx)},${f1(ty)} Q${f1(mx + dir * w * 0.9)},${f1(my + 1)} ${f1(rx + dir * w * 0.6)},${f1(ry + 2)}Z" fill="#0b0506"/>`; } }
   if (LASHX.style && c < 0.9) lashes = postizas(LASHX.style, dir, PX, edge, c, yl);
-  return `<g transform="translate(${x},-6)">
+  return `<g transform="translate(${f1x(x + Math.sign(x) * EYEX.dx)},${-6 + EYEX.dy}) rotate(${EYEX.tilt * side}) scale(${EYEX.sx},${EYEX.sy})">
     ${shadow}
     <ellipse rx="36" ry="40" fill="#fff"/>
     <g clip-path="url(#eyeClip)">
       <ellipse rx="36" ry="40" fill="#000" opacity="0.08" cy="14"/>
-      <g transform="translate(${ix},${iy}) scale(${1 - Math.abs(gx) * 0.12},1)"><circle r="22" fill="url(#eye)"/><circle r="11" fill="#0a0503"/><circle cx="8" cy="-9" r="7" fill="#fff"/><circle cx="-6" cy="10" r="3.5" fill="#fff" opacity="0.8"/></g>
+      ${EYEX.tex ? irisTex(ix, iy, gx, side) : `<g transform="translate(${ix},${iy}) scale(${1 - Math.abs(gx) * 0.12},1)"><circle r="22" fill="url(#eye)"/><circle r="11" fill="#0a0503"/><circle cx="8" cy="-9" r="7" fill="#fff"/><circle cx="-6" cy="10" r="3.5" fill="#fff" opacity="0.8"/></g>`}
       ${tear > 0.2 ? `<ellipse cx="0" cy="${yl - 2}" rx="34" ry="${4 + tear * 5}" fill="#dff3ff" opacity="${0.35 + tear * 0.4}"/>` : ''}
       <path d="M-46,-62 L46,-62 L46,${yu} Q0,${yu + lerp(-16, 8, c)} -46,${yu}Z" fill="${LID}"/>
       ${sh > 0.02 ? `<path d="M-46,-62 L46,-62 L46,${yu} Q0,${yu + lerp(-16, 8, c)} -46,${yu}Z" fill="${(col.shadow || ['#8a4b1e', '#e0a84a'])[1]}" opacity="${0.8 * sh * Math.min(1, c * 2) * clamp(mk[side > 0 ? 'swL' : 'swR'] ?? 1)}"/>` : ''}
@@ -642,3 +642,12 @@ function postizas(style, dir, PX, edge, c, yl) { let seed = 131 + (dir > 0 ? 7 :
   return `<g>${lo}</g>${up}`; }
 
 export const NOSMILE = { on: false };
+
+export const EYEX = { sx: 1, sy: 1, irK: 1, prK: 1, dx: 0, dy: 0, tilt: 0, tex: 0, pal: null };
+const f1x = (n) => Math.round(n * 10) / 10;
+function irisTex(ix, iy, gx, side) { const P = EYEX.pal || ['#e0aa62', '#8a4a1e', '#2a1208'], k = EYEX.irK, sx = EYEX.sx, sy = EYEX.sy, pr = 11 * EYEX.prK; const id = 'ix' + (side > 0 ? 'L' : 'R');
+  let fib = ''; for (let i = 0; i < 64; i++) { const a = i / 64 * 6.2832, r0 = pr + 2, r1 = 21 + (i % 3) * 0.6; fib += `<path d="M${f1x(Math.cos(a) * r0)},${f1x(Math.sin(a) * r0)} L${f1x(Math.cos(a + 0.04) * r1)},${f1x(Math.sin(a + 0.04) * r1)}" stroke="${i % 2 ? '#f7d28a' : '#3a1a08'}" stroke-opacity="${i % 2 ? 0.35 : 0.5}" stroke-width="${i % 4 === 0 ? 1.6 : 0.9}"/>`; }
+  let fl = ''; for (let i = 0; i < 14; i++) { const a = i / 14 * 6.2832 + 0.2; fl += `<circle cx="${f1x(Math.cos(a) * (pr + 5))}" cy="${f1x(Math.sin(a) * (pr + 5))}" r="${(1.2 + (i % 3) * 0.5).toFixed(1)}" fill="#fff0b8" opacity="0.4"/>`; }
+  return `<g transform="translate(${ix},${iy}) scale(${f1x((1 - Math.abs(gx) * 0.12) * k / sx)},${f1x(k / sy)})"><defs><radialGradient id="${id}" cx="0.5" cy="0.5" r="0.5"><stop offset="0.3" stop-color="${P[0]}"/><stop offset="0.72" stop-color="${P[1]}"/><stop offset="1" stop-color="${P[2]}"/></radialGradient><radialGradient id="${id}h" cx="0.5" cy="0.5" r="0.5"><stop offset="0.8" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.7"/></radialGradient></defs>
+    <circle r="22.5" fill="url(#${id})"/>${fib}<circle r="22.5" fill="url(#${id}h)"/><circle r="22.5" fill="none" stroke="#1a0a05" stroke-width="2.6"/><circle r="${f1x(pr + 3)}" fill="none" stroke="#f3c77a" stroke-opacity="0.55" stroke-width="2.4"/>${fl}
+    <circle r="${f1x(pr)}" fill="#0a0503"/><circle r="${f1x(pr)}" fill="none" stroke="#000" stroke-width="1.2"/><path d="M-14,12 Q0,22 14,12" stroke="#fff3c8" stroke-opacity="0.45" stroke-width="2.6" fill="none" stroke-linecap="round"/><circle cx="8" cy="-9" r="7" fill="#fff"/><circle cx="-7" cy="10" r="3.4" fill="#fff" opacity="0.85"/><circle cx="12" cy="6" r="1.6" fill="#fff" opacity="0.8"/></g>`; }
