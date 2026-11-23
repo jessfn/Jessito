@@ -1,0 +1,105 @@
+[
+ {
+  "id": "l1",
+  "who": "N",
+  "text": "Día dieciséis. Eligieron la mandíbula. Desde que llegué a la clínica, tenía un mal presentimiento.",
+  "pad": 0.17
+ },
+ {
+  "id": "l2",
+  "who": "N",
+  "text": "Mi celular vibró en la puerta: número desconocido. Otra vez.",
+  "pad": 0.17
+ },
+ {
+  "id": "l3",
+  "who": "Q",
+  "text": "Qué gusto verte, Lazy. Hoy te dejaremos una mandíbula de revista, sin dolor y con total seguridad.",
+  "pad": 0.12
+ },
+ {
+  "id": "l4",
+  "who": "U",
+  "text": "Doctor, el ultrasonido y el ácido ya están listos. Todo en orden.",
+  "pad": 0.12
+ },
+ {
+  "id": "l5",
+  "who": "N",
+  "text": "Primero, un mapa con marcador: ahí se decide cuánto se afina y se levanta.",
+  "pad": 0.17
+ },
+ {
+  "id": "l6",
+  "who": "N",
+  "text": "Luego, ultrasonido para tensar la piel desde adentro. Solo se siente un leve calor.",
+  "pad": 0.17
+ },
+ {
+  "id": "l7",
+  "who": "N",
+  "text": "Y al final, ácido hialurónico en la línea de la mandíbula, gota por gota.",
+  "pad": 0.17
+ },
+ {
+  "id": "l8",
+  "who": "H",
+  "text": "¡Disculpe! ¡Usted no puede estar aquí! ¿Qué lleva en esa lata?",
+  "pad": 0.12
+ },
+ {
+  "id": "l9",
+  "who": "N",
+  "text": "Alguien se coló por el pasillo: una sombra, un bidón, y olor a gasolina.",
+  "pad": 0.17
+ },
+ {
+  "id": "l10",
+  "who": "D",
+  "text": "Qué bonita se ve su clínica. Ahora mismo la voy a convertir en cenizas.",
+  "pad": 0.17,
+  "fx": "asetrate=44100*0.8,aresample=44100,atempo=1.25,aecho=0.8:0.7:70|140:0.4|0.25,highpass=f=80"
+ },
+ {
+  "id": "l11",
+  "who": "N",
+  "text": "Era M. Encendió el encendedor, y el pasillo explotó en llamas.",
+  "pad": 0.17
+ },
+ {
+  "id": "l12",
+  "who": "U",
+  "text": "¡Fuego! ¡Doctor, saque a Lazy de aquí, rápido!",
+  "pad": 0.12
+ },
+ {
+  "id": "l13",
+  "who": "Q",
+  "text": "Tranquila, Lazy, tranquila. Yo termino, pero primero debo controlar este incendio.",
+  "pad": 0.12
+ },
+ {
+  "id": "l14",
+  "who": "N",
+  "text": "Sonó la alarma, cayeron los aspersores, y M se fue por la ventana, riéndose.",
+  "pad": 0.17
+ },
+ {
+  "id": "l15",
+  "who": "N",
+  "text": "Cuando todo se calmó, el doctor terminó. Me vi al espejo y quedó perfecta.",
+  "pad": 0.17
+ },
+ {
+  "id": "l16",
+  "who": "N",
+  "text": "Pero en el vidrio, escrito con hollín: ya casi te toca a ti, Lazy.",
+  "pad": 0.17
+ },
+ {
+  "id": "l17",
+  "who": "N",
+  "text": "¿Qué arreglamos mañana: el maquillaje o los ojos? Comenta tu elección, y sígueme para el día diecisiete.",
+  "pad": 0.17
+ }
+]

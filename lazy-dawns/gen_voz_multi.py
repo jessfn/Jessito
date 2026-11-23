@@ -18,6 +18,7 @@ VOICES = {'N': 'cgSgspJ2msm6clMCkdW9',   # Narrador: Jessica (FIJA, no cambiar)
           'Z': '9BWtsMINqrJLrRacOk9x',   # Zoe (estilista de neon): Aria
           'Y': 'bIHbv24MWmeRgasZH58o',
           'Q': 'JBFqnCBsd6RMkjVDRZzb',   # Dr. Montes: George
+          'H': 'SOYHLrjzK2X1ezoPC6cr',   # Don Chuy (conserje): Harry
           'F': 'jsCqWAovK2LkecY7zXl4',   # Bruna (lash artist): Freya
           'X': 'iP95p4xoKVk53GoZ742B',   # Dustin: Chris (joven moderno)
           'J': 'AZnzlk1XvdvUeBnXmlld',   # Yaz (manicurista): Domi
@@ -39,6 +40,7 @@ VS = {'N': dict(stability=0.5, similarity_boost=0.75, style=0.0, use_speaker_boo
       'Y': dict(stability=0.38, similarity_boost=0.8, style=0.35, use_speaker_boost=True),
       'Q': dict(stability=0.5, similarity_boost=0.8, style=0.25, use_speaker_boost=True),
       'U': dict(stability=0.42, similarity_boost=0.8, style=0.35, use_speaker_boost=True),
+      'H': dict(stability=0.4, similarity_boost=0.8, style=0.4, use_speaker_boost=True),
       'F': dict(stability=0.4, similarity_boost=0.8, style=0.4, use_speaker_boost=True),
       'X': dict(stability=0.35, similarity_boost=0.8, style=0.4, use_speaker_boost=True),
       'J': dict(stability=0.4, similarity_boost=0.8, style=0.4, use_speaker_boost=True),
@@ -81,7 +83,7 @@ json.dump({'lines': lines, 'total': total}, open(out + '/lines.json', 'w'), ensu
 inp = []; fc = []; labs = []
 for i, L in enumerate(lines):
     inp += ['-i', f"{out}/lines/{L['id']}.mp3"]; ms = int(L['start'] * 1000)
-    gain = {'N': 1.0, 'M': 1.0, 'D': 1.1, 'V': 1.05, 'E': 1.0, 'S': 1.05, 'K': 1.05, 'B': 1.05, 'T': 1.05, 'C': 1.05, 'W': 1.05, 'R': 1.05, 'I': 1.05, 'G': 1.05, 'Z': 1.05, 'Y': 1.05, 'Q': 1.05, 'U': 1.05, 'X': 1.05, 'J': 1.05, 'F': 1.05}[L['who']]
+    gain = {'N': 1.0, 'M': 1.0, 'D': 1.1, 'V': 1.05, 'E': 1.0, 'S': 1.05, 'K': 1.05, 'B': 1.05, 'T': 1.05, 'C': 1.05, 'W': 1.05, 'R': 1.05, 'I': 1.05, 'G': 1.05, 'Z': 1.05, 'Y': 1.05, 'Q': 1.05, 'U': 1.05, 'X': 1.05, 'J': 1.05, 'F': 1.05, 'H': 1.05}[L['who']]
     fx = (',' + L['fx']) if L.get('fx') else ''
     fc.append(f"[{i}:a]loudnorm=I=-17:TP=-1.5:LRA=7,aresample=44100{fx},pan=stereo|c0=c0|c1=c0,volume={gain},adelay={ms}|{ms}[v{i}]"); labs.append(f"[v{i}]")
 fc.append(''.join(labs) + f"amix=inputs={len(labs)}:normalize=0:duration=longest,apad=whole_dur={total}[a]")

@@ -240,3 +240,11 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
 
 ## ROSTRO FINAL DE LAZY (aprobado; usar desde el Día 16)
 - `face_final.mjs` → `applyFinalFace()`: mandíbula R1 (redondeada, ancho 0.95), sin pómulos marcados, sin líneas de sonrisa ni "filtrum", sin marcas en el mentón, boca/sonrisa +14 %, pestañas P3 (gatita postiza). Mentón: se descartó acortarlo/redondearlo más; se queda como en Sonrisa_v2.png.
+
+## REGLAS PERMANENTES NUEVAS (desde Día 16) — sustituyen cualquier regla anterior contraria
+- LENGUAJE: español neutro y natural, que suene a personas reales, pero SIN lenguaje coloquial ni jerga ("la neta", "mija", "chido", etc.) y JAMÁS groserías ni insultos. (Se anula la regla anterior que permitía groserías.) Mantener las mismas voces de cada personaje.
+- FPS: todos los videos a 60 cuadros por segundo (permitido hasta 120) para que todo se vea fluido; el director calcula las poses a 60 Hz.
+- FONDOS Y OBJETOS: otra vez 2D (sin Three.js): capas con texturas procedurales, degradados, sombras, articulaciones y movimiento; claqueta/portada animada con fondo en movimiento.
+- DEGRADADOS: todo efecto (fuego, humo, luces, brillos) debe desvanecerse con degradado/máscara; nunca bordes rectos ni líneas visibles en la base. Textos nunca encimados (usar fitFs y filas separadas).
+- Descargar de internet lo necesario cuando la red lo permita (hoy el proxy bloquea ambientcg/polyhaven: usar texturas procedurales).
+- Opciones del voto del día 16: maquillaje o ojos (día 17).
