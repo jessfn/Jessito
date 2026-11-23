@@ -4,7 +4,7 @@ import { JAW, NECK } from './rig2d/character.mjs';
 import { NOSMILE, LASHX, EYEX, MOUTHX } from './rig.mjs';
 export function applyFinalFace(lashes = true) {
   JAW.style = 'T4'; NECK.dy = 12; JAW.w = 0.95; JAW.cheek = 0; JAW.light = 0.5; JAW.d = 0.9; JAW.noLines = true; JAW.noChin = true; JAW.mouthK = 1.14; JAW.mouthUp = 0;
-  Object.assign(EYEX, { corner: 1, sx: 1.1, sy: 0.86, irK: 1.4, irX: 1.04, prK: 0.68, dx: 5, dy: 0, tilt: -2, tex: 1, anime: 1, thick: 8, pal: null });
+  Object.assign(EYEX, { corner: 1, sx: 1.0, sy: 0.8, irK: 1.28, irX: 1.04, prK: 0.68, dx: 3, dy: 0, tilt: -2, tex: 1, anime: 1, thick: 6, pal: null });
   MOUTHX.k = 1.08; MOUTHX.dy = -5;
   NOSMILE.on = true; if (lashes) LASHX.style = 'P3'; }
 

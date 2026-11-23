@@ -86,7 +86,7 @@ function eyeSvg(x, open, blink, squint, gx, gy, tear, tearT, side, mk) {
       const w = 3.6 + 1.6 * lsh;
       lashes += `<path d="M${f1(rx - dir * w * 0.6)},${f1(ry + 2)} Q${f1(mx - dir * w * 0.3)},${f1(my)} ${f1(tx)},${f1(ty)} Q${f1(mx + dir * w * 0.9)},${f1(my + 1)} ${f1(rx + dir * w * 0.6)},${f1(ry + 2)}Z" fill="#0b0506"/>`; } }
   if (LASHX.style && c < 0.9) lashes = postizas(LASHX.style, dir, PX, edge, c, yl);
-  if (EYEX.corner && c < 0.9) { const pts = []; for (let i = 0; i <= 14; i++) { const q = almondPt(dir, i / 14, true); pts.push(`${f1x(q.x)},${f1x(q.y)}`); } const O = almondPt(dir, 1, true); const wing = (mk.wing ?? 0.8); liner = `<path d="M${pts.join(' L')} L${f1x(O.x + dir * (14 + 12 * wing))},${f1x(O.y - 7 - 7 * wing)}" fill="none" stroke="${lc}" stroke-width="${f1x(5 + th * 0.5)}" stroke-linecap="round" stroke-linejoin="round"/>`; }
+  if (EYEX.corner && c < 0.9) { const pts = []; for (let i = 0; i <= 14; i++) { const q = almondPt(dir, i / 14, true); pts.push(`${f1x(q.x)},${f1x(q.y)}`); } const O = almondPt(dir, 1, true); const wing = (mk.wing ?? 0.8); liner = `<path d="M${pts.join(' L')} L${f1x(O.x + dir * (14 + 12 * wing))},${f1x(O.y - 7 - 7 * wing)}" fill="none" stroke="${lc}" stroke-width="${f1x(2.4 + th * 0.16)}" stroke-linecap="round" stroke-linejoin="round"/>`; }
   return `<g transform="translate(${f1x(x + Math.sign(x) * EYEX.dx)},${-6 + EYEX.dy}) rotate(${EYEX.tilt * side}) scale(${EYEX.sx},${EYEX.sy})">
     ${shadow}
     ${EYEX.corner ? `<clipPath id="eyeClip${side}"><path d="${almond(dir)}"/></clipPath><path d="${almond(dir)}" fill="#fff"/>` : '<ellipse rx="36" ry="40" fill="#fff"/>'}
@@ -99,7 +99,7 @@ function eyeSvg(x, open, blink, squint, gx, gy, tear, tearT, side, mk) {
       ${sh > 0.02 ? `<path d="M-46,-62 L46,-62 L46,${yu} Q0,${yu + lerp(-16, 8, c)} -46,${yu}Z" fill="${(col.shadow || ['#8a4b1e', '#e0a84a'])[1]}" opacity="${0.8 * sh * Math.min(1, c * 2) * clamp(mk[side > 0 ? 'swL' : 'swR'] ?? 1)}"/>` : ''}
       <path d="M-46,70 L-46,${yl} Q0,${yl + 10} 46,${yl} L46,70Z" fill="${LID}"/>
     </g>
-    ${EYEX.corner ? `<path d="${almond(dir)}" fill="none" stroke="${OUT}" stroke-width="${c < 0.5 ? 4.5 : 7}" stroke-linejoin="round"/><path d="${creaseP(dir)}" fill="none" stroke="#3a1a10" stroke-opacity="0.55" stroke-width="2.6" stroke-linecap="round"/>` : `<ellipse rx="36" ry="40" fill="none" stroke="${OUT}" stroke-width="${c < 0.5 ? 4.5 : 7}"/>`}
+    ${EYEX.corner ? `<path d="${almond(dir)}" fill="none" stroke="${OUT}" stroke-width="${c < 0.5 ? 3 : 4.5}" stroke-linejoin="round"/>` : `<ellipse rx="36" ry="40" fill="none" stroke="${OUT}" stroke-width="${c < 0.5 ? 4.5 : 7}"/>`}
     ${liner}${lashes}${tearDrop}
   </g>`;
 }
