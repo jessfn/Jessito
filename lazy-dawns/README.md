@@ -248,3 +248,4 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
 - DEGRADADOS: todo efecto (fuego, humo, luces, brillos) debe desvanecerse con degradado/máscara; nunca bordes rectos ni líneas visibles en la base. Textos nunca encimados (usar fitFs y filas separadas).
 - Descargar de internet lo necesario cuando la red lo permita (hoy el proxy bloquea ambientcg/polyhaven: usar texturas procedurales).
 - Opciones del voto del día 16: maquillaje o ojos (día 17).
+- OJOS FINALES (opción D "Almendra mediana", aprobada): forma almendrada con esquinas (interna redondeada, externa en punta), iris anime texturizado, pupila pequeña, pestañas P3 adaptadas al contorno del párpado. Ya incluidos en `applyFinalFace()`.
