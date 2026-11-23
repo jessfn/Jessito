@@ -87,16 +87,17 @@ function eyeSvg(x, open, blink, squint, gx, gy, tear, tearT, side, mk) {
   if (LASHX.style && c < 0.9) lashes = postizas(LASHX.style, dir, PX, edge, c, yl);
   return `<g transform="translate(${f1x(x + Math.sign(x) * EYEX.dx)},${-6 + EYEX.dy}) rotate(${EYEX.tilt * side}) scale(${EYEX.sx},${EYEX.sy})">
     ${shadow}
-    <ellipse rx="36" ry="40" fill="#fff"/>
-    <g clip-path="url(#eyeClip)">
+    ${EYEX.corner ? `<clipPath id="eyeClip${side}"><path d="${almond(dir)}"/></clipPath><path d="${almond(dir)}" fill="#fff"/>` : '<ellipse rx="36" ry="40" fill="#fff"/>'}
+    <g clip-path="url(#${EYEX.corner ? 'eyeClip' + side : 'eyeClip'})">
       <ellipse rx="36" ry="40" fill="#000" opacity="0.08" cy="14"/>
       ${EYEX.tex ? irisTex(ix, iy, gx, side) : `<g transform="translate(${ix},${iy}) scale(${1 - Math.abs(gx) * 0.12},1)"><circle r="22" fill="url(#eye)"/><circle r="11" fill="#0a0503"/><circle cx="8" cy="-9" r="7" fill="#fff"/><circle cx="-6" cy="10" r="3.5" fill="#fff" opacity="0.8"/></g>`}
+      ${EYEX.corner ? `<ellipse cx="${-dir * 34}" cy="8" rx="6" ry="4.5" fill="#e99a92" opacity="0.8"/>` : ''}
       ${tear > 0.2 ? `<ellipse cx="0" cy="${yl - 2}" rx="34" ry="${4 + tear * 5}" fill="#dff3ff" opacity="${0.35 + tear * 0.4}"/>` : ''}
       <path d="M-46,-62 L46,-62 L46,${yu} Q0,${yu + lerp(-16, 8, c)} -46,${yu}Z" fill="${LID}"/>
       ${sh > 0.02 ? `<path d="M-46,-62 L46,-62 L46,${yu} Q0,${yu + lerp(-16, 8, c)} -46,${yu}Z" fill="${(col.shadow || ['#8a4b1e', '#e0a84a'])[1]}" opacity="${0.8 * sh * Math.min(1, c * 2) * clamp(mk[side > 0 ? 'swL' : 'swR'] ?? 1)}"/>` : ''}
       <path d="M-46,70 L-46,${yl} Q0,${yl + 10} 46,${yl} L46,70Z" fill="${LID}"/>
     </g>
-    <ellipse rx="36" ry="40" fill="none" stroke="${OUT}" stroke-width="${c < 0.5 ? 4.5 : 7}"/>
+    ${EYEX.corner ? `<path d="${almond(dir)}" fill="none" stroke="${OUT}" stroke-width="${c < 0.5 ? 4.5 : 7}" stroke-linejoin="round"/><path d="${creaseP(dir)}" fill="none" stroke="#3a1a10" stroke-opacity="0.55" stroke-width="2.6" stroke-linecap="round"/>` : `<ellipse rx="36" ry="40" fill="none" stroke="${OUT}" stroke-width="${c < 0.5 ? 4.5 : 7}"/>`}
     ${liner}${lashes}${tearDrop}
   </g>`;
 }
@@ -643,7 +644,7 @@ function postizas(style, dir, PX, edge, c, yl) { let seed = 131 + (dir > 0 ? 7 :
 
 export const NOSMILE = { on: false };
 
-export const EYEX = { sx: 1, sy: 1, irK: 1, irX: 1, prK: 1, dx: 0, dy: 0, tilt: 0, tex: 0, pal: null, anime: 0, thick: null };
+export const EYEX = { corner: 0, sx: 1, sy: 1, irK: 1, irX: 1, prK: 1, dx: 0, dy: 0, tilt: 0, tex: 0, pal: null, anime: 0, thick: null };
 const f1x = (n) => Math.round(n * 10) / 10;
 function irisTex(ix, iy, gx, side) { if (EYEX.anime) return irisAnime(ix, iy, gx, side); const P = EYEX.pal || ['#e0aa62', '#8a4a1e', '#2a1208'], k = EYEX.irK, sx = EYEX.sx, sy = EYEX.sy, pr = 11 * EYEX.prK; const id = 'ix' + (side > 0 ? 'L' : 'R');
   let fib = ''; for (let i = 0; i < 64; i++) { const a = i / 64 * 6.2832, r0 = pr + 2, r1 = 21 + (i % 3) * 0.6; fib += `<path d="M${f1x(Math.cos(a) * r0)},${f1x(Math.sin(a) * r0)} L${f1x(Math.cos(a + 0.04) * r1)},${f1x(Math.sin(a + 0.04) * r1)}" stroke="${i % 2 ? '#f7d28a' : '#3a1a08'}" stroke-opacity="${i % 2 ? 0.35 : 0.5}" stroke-width="${i % 4 === 0 ? 1.6 : 0.9}"/>`; }
@@ -653,8 +654,13 @@ function irisTex(ix, iy, gx, side) { if (EYEX.anime) return irisAnime(ix, iy, gx
     <circle r="${f1x(pr)}" fill="#0a0503"/><circle r="${f1x(pr)}" fill="none" stroke="#000" stroke-width="1.2"/><path d="M-14,12 Q0,22 14,12" stroke="#fff3c8" stroke-opacity="0.45" stroke-width="2.6" fill="none" stroke-linecap="round"/><circle cx="8" cy="-9" r="7" fill="#fff"/><circle cx="-7" cy="10" r="3.4" fill="#fff" opacity="0.85"/><circle cx="12" cy="6" r="1.6" fill="#fff" opacity="0.8"/></g>`; }
 
 function irisAnime(ix, iy, gx, side) { const P = EYEX.pal || ['#1c0f08', '#4a2e1a', '#9a6e40', '#d8aa70'], k = EYEX.irK, sx = EYEX.sx, sy = EYEX.sy, pr = 11 * EYEX.prK; const id = 'ia' + (side > 0 ? 'L' : 'R');
-  let fib = ''; for (let i = 0; i < 90; i++) { const a = i / 90 * 6.2832, r0 = pr + 1.5, r1 = 21.5 + (i % 3) * 0.5; fib += `<path d="M${f1x(Math.cos(a) * r0)},${f1x(Math.sin(a) * r0)} L${f1x(Math.cos(a + 0.03) * r1)},${f1x(Math.sin(a + 0.03) * r1)}" stroke="${i % 2 ? '#f3d49a' : '#1a0c06'}" stroke-opacity="${i % 2 ? 0.28 : 0.4}" stroke-width="${i % 5 === 0 ? 1.5 : 0.8}"/>`; }
+  let fib = ''; for (let i = 0; i < 90; i++) { const a = i / 90 * 6.2832, r0 = pr + 1.5, r1 = 21.5 + (i % 3) * 0.5; fib += `<path d="M${f1x(Math.cos(a) * r0)},${f1x(Math.sin(a) * r0)} L${f1x(Math.cos(a + 0.03) * r1)},${f1x(Math.sin(a + 0.03) * r1)}" stroke="${i % 2 ? '#f3d49a' : '#1a0c06'}" stroke-opacity="${i % 2 ? 0.16 : 0.24}" stroke-width="${i % 5 === 0 ? 1.2 : 0.7}"/>`; }
   let sp = ''; for (let i = 0; i < 26; i++) { const a = 0.4 + i / 26 * 2.3, r = 14 + (i % 4) * 2; sp += `<circle cx="${f1x(Math.cos(a) * r)}" cy="${f1x(Math.sin(a) * r)}" r="${(0.8 + (i % 3) * 0.5).toFixed(1)}" fill="#fff2cc" opacity="${(0.3 + (i % 3) * 0.12).toFixed(2)}"/>`; }
   return `<g transform="translate(${ix},${iy}) scale(${f1x((1 - Math.abs(gx) * 0.1) * k * EYEX.irX / sx)},${f1x(k / sy)})"><defs><linearGradient id="${id}" x1="0" y1="-1" x2="0" y2="1"><stop offset="0" stop-color="${P[0]}"/><stop offset="0.45" stop-color="${P[1]}"/><stop offset="1" stop-color="${P[2]}"/></linearGradient><radialGradient id="${id}b" cx="0.5" cy="1" r="0.75"><stop offset="0" stop-color="${P[3]}" stop-opacity="0.85"/><stop offset="1" stop-color="${P[3]}" stop-opacity="0"/></radialGradient><radialGradient id="${id}h" cx="0.5" cy="0.5" r="0.5"><stop offset="0.82" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.75"/></radialGradient></defs>
     <circle r="22.5" fill="url(#${id})"/><circle r="22.5" fill="url(#${id}b)"/>${fib}${sp}<circle r="22.5" fill="url(#${id}h)"/><circle r="22.5" fill="none" stroke="#150a05" stroke-width="2.2"/><circle r="${f1x(pr + 2.5)}" fill="none" stroke="#e4b878" stroke-opacity="0.45" stroke-width="2"/>
     <circle r="${f1x(pr)}" fill="#070302"/><circle cx="-8" cy="-9" r="7.2" fill="#fff"/><circle cx="-8" cy="-9" r="7.2" fill="none" stroke="#ffe9c0" stroke-opacity="0.5" stroke-width="1.2"/><circle cx="9" cy="9" r="3.6" fill="#fff" opacity="0.9"/><circle cx="1" cy="13" r="1.8" fill="#fff" opacity="0.7"/></g>`; }
+
+// Ojo almendrado con esquinas: interna redondeada (lagrimal) y externa en punta ligeramente alzada.
+function almond(d) { const f = (n) => Math.round(n * 10) / 10; const O = [d * 46, -5], I = [-d * 41, 9];
+  return `M${I[0]},${I[1]} C${f(-d * 40)},${-8} ${f(-d * 30)},-36 ${f(-d * 8)},-43 C${f(d * 14)},-48 ${f(d * 36)},-28 ${O[0]},${O[1]} C${f(d * 36)},18 ${f(d * 16)},40 ${f(-d * 6)},41 C${f(-d * 26)},41 ${f(-d * 40)},26 ${I[0]},${I[1]}Z`; }
+function creaseP(d) { const f = (n) => Math.round(n * 10) / 10; return `M${f(-d * 30)},-44 C${f(-d * 16)},-58 ${f(d * 12)},-60 ${f(d * 34)},-38`; }
