@@ -117,7 +117,7 @@ function browSvg(side, r, i, k = 0, shortF = 0) {
 function realTeethSvg(pts, w, open, smile, N, sty = 'A') {
   const ST = { A: { W0: 16, hu: 17, hl: 11, can: 0, wl: 0.86 }, B: { W0: 22, hu: 17, hl: 12, can: 0.4, wl: 0.85 }, C: { W0: 20, hu: 19, hl: 13, can: 0.25, wl: 0.9 } }[sty] || { W0: 16, hu: 17, hl: 11, can: 0, wl: 0.86 };
   const at = (x) => { const t = clamp((x / w + 1) / 2, 0, 1), f = t * N, i = Math.min(N - 1, Math.floor(f)), k = f - i; const a = pts[i], b = pts[i + 1]; return { yu: a.yu + (b.yu - a.yu) * k, yl: a.yl + (b.yl - a.yl) * k }; };
-  const W0 = ST.W0, SP = [[1.0, 1.0], [0.66, 0.84], [0.84, 0.86], [0.7, 0.72], [0.66, 0.66]];   // [ancho rel., alto rel.]
+  const W0 = ST.W0, SP = [[1.0, 1.0], [0.92, 1.0], [0.88, 1.0], [0.8, 1.0], [0.72, 1.0]];   // [ancho rel., alto rel.]
   const tooth = (cx, wd, ht, up, k, isCanine) => { const s = up ? 1 : -1, hw = wd / 2; const y0 = 0, y1 = s * ht; const cor = Math.min(hw * 0.9, 6);
     const edge = isCanine ? `L${hw - 1},${y1 - s * 6} L0,${y1 + s * 3} L${-hw + 1},${y1 - s * 6}` : `Q${hw * 0.9},${y1 + s * 1} ${hw - cor},${y1} L${-hw + cor},${y1} Q${-hw * 0.9},${y1 + s * 1} ${-hw},${y1 - s * cor}`;
     return `<g transform="translate(${cx.toFixed(1)},0)"><path d="M${-hw},${y0} L${hw},${y0} L${hw},${y1 - s * cor} ${isCanine ? '' : `Q${hw * 0.98},${y1} ${hw - cor},${y1}`} ${isCanine ? edge.replace(/^L[^L]*/, '') : ''}${isCanine ? '' : ''}Z" fill="none"/></g>`; };
@@ -130,17 +130,20 @@ function realTeethSvg(pts, w, open, smile, N, sty = 'A') {
     <linearGradient id="gum" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b94a5a"/><stop offset="1" stop-color="#e58b96"/></linearGradient>
     <radialGradient id="tng" cx="0.5" cy="0.25" r="0.85"><stop offset="0" stop-color="#f19aa4"/><stop offset="0.55" stop-color="#d9687b"/><stop offset="1" stop-color="#9c3345"/></radialGradient>
     <linearGradient id="cav" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1a0407"/><stop offset="1" stop-color="#4a1018"/></linearGradient>`;
+  const g0 = at(0).yl - at(0).yu, bothRows = (open > 0.2 || smile > 0.55) && g0 >= 17;
+  const huS = bothRows ? Math.min(ST.hu, g0 * 0.5 - 1) : Math.min(ST.hu, Math.max(3, g0 * 0.85)), hlS = Math.min(ST.hl, g0 * 0.4 - 1);
   const row = (up) => { let out = '', shadow = '', gums = ''; const items = [];
     for (const sg of [-1, 1]) { let x = 0; for (let i = 0; i < 5; i++) { const [rw, rh] = SP[i]; const wd = W0 * rw * (up ? 1 : ST.wl * 0.92), ht = (up ? ST.hu : ST.hl) * rh; const cx = (i === 0 ? sg * wd / 2 : x + sg * wd / 2); items.push({ cx: sg === 1 ? cx : cx, wd, ht, i, sg }); x = (i === 0 ? sg * wd : x + sg * wd); if (Math.abs(x) > w * 0.86) break; } }
     items.sort((a, b) => Math.abs(b.cx) - Math.abs(a.cx));
-    for (const it of items) { const e = at(it.cx), y = up ? e.yu + 1 : e.yl - 1, canine = false; const depth = 1 - Math.abs(it.cx) / w; const tilt = 0;
+    const exs = items.map((q) => at(q.cx)); const anchor = up ? Math.min(...exs.map((q) => q.yu)) - 1 : Math.max(...exs.map((q) => q.yl)) + 1; const straightEnd = up ? at(0).yu + 1 + huS : at(0).yl - 1 - hlS; const HH = Math.max(3, Math.abs(straightEnd - anchor));
+    for (const it of items) { it.ht = HH; const e = at(it.cx), y = anchor, canine = false; const depth = 1 - Math.abs(it.cx) / w; const tilt = 0;
       const path = toothPath(it.wd - 1.2, it.ht, up, canine); const dark = clamp(Math.abs(it.cx) / w * 0.75);
       out += `<g transform="translate(${it.cx.toFixed(1)},${y.toFixed(1)}) rotate(${(up ? -1 : 1) * -tilt * 0.5})"><path d="${path}" fill="url(#${up ? 'enU' : 'enL'})" stroke="#bda98a" stroke-width="1.6" stroke-linejoin="round"/><path d="${path}" fill="#7a5a48" opacity="${(dark * 0.38).toFixed(2)}"/>
         <path d="M${(-it.wd * 0.22).toFixed(1)},${up ? 7 : -7} Q${(-it.wd * 0.28).toFixed(1)},${(up ? it.ht * 0.55 : -it.ht * 0.55).toFixed(1)} ${(-it.wd * 0.12).toFixed(1)},${(up ? it.ht * 0.82 : -it.ht * 0.82).toFixed(1)}" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.8"/>
         <path d="M${(it.wd * 0.5 - 1).toFixed(1)},${up ? 4 : -4} L${(it.wd * 0.5 - 1).toFixed(1)},${(up ? it.ht - 4 : -(it.ht - 4)).toFixed(1)}" stroke="#a8927a" stroke-width="1.4" opacity="0.55"/></g>`;
       gums += `<ellipse cx="${it.cx.toFixed(1)}" cy="${(up ? e.yu - 2 : e.yl + 2).toFixed(1)}" rx="${(it.wd * 0.62).toFixed(1)}" ry="${up ? 9 : 7}" fill="url(#gum)"/>`; }
     return { out, gums }; };
-  const U = row(true), Lw = open > 0.2 || smile > 0.55 ? row(false) : { out: '', gums: '' };
+  const U = row(true), Lw = bothRows ? row(false) : { out: '', gums: '' };
   const cavity = `<rect x="${-w - 10}" y="-60" width="${2 * w + 20}" height="260" fill="url(#cav)"/>`;
   const shade = `<path d="M${-w},${at(-w).yu} L${w},${at(w).yu} L${w},${at(w).yu + 14} L${-w},${at(-w).yu + 14}Z" fill="#000" opacity="0.18"/>`;
   return { defs: defsT, cav: cavity, upper: U.gums + U.out, lower: Lw.gums + Lw.out, shade };
