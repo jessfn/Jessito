@@ -1,0 +1,101 @@
+[
+ {
+  "id": "i1",
+  "who": "D",
+  "text": "Cada cambio que le hacen, yo lo veo.",
+  "pad": 0.6,
+  "fx": "asetrate=44100*0.8,aresample=44100,atempo=1.25,aecho=0.8:0.7:70|140:0.4|0.25,highpass=f=80"
+ },
+ {
+  "id": "i2",
+  "who": "D",
+  "text": "Hoy estrenará una mirada nueva. Yo le tengo un regalo para el camino a casa.",
+  "pad": 0.25,
+  "fx": "asetrate=44100*0.8,aresample=44100,atempo=1.25,aecho=0.8:0.7:70|140:0.4|0.25,highpass=f=80"
+ },
+ {
+  "id": "l1",
+  "who": "N",
+  "text": "Día diecisiete. Eligieron los ojos. Y yo caminaba sin imaginar quién me observaba.",
+  "pad": 3.9
+ },
+ {
+  "id": "l3",
+  "who": "K",
+  "text": "Bienvenida, Lazy. Soy la doctora Ivana. Hoy tendrás unos ojos oscuros, grandes y profundos.",
+  "pad": 0.12
+ },
+ {
+  "id": "l4",
+  "who": "N",
+  "text": "Primero, un mapa de la mirada con luz azul, para medir cada milímetro.",
+  "pad": 0.17
+ },
+ {
+  "id": "l5",
+  "who": "N",
+  "text": "Luego, lentes de contacto negro café, hechos a medida, con el iris pintado a mano.",
+  "pad": 0.17
+ },
+ {
+  "id": "l6",
+  "who": "N",
+  "text": "Y por último, gotas de brillo, para que cada mirada se vea luminosa.",
+  "pad": 0.17
+ },
+ {
+  "id": "l7",
+  "who": "K",
+  "text": "Cierra los ojos un momento. Ahora, ábrelos despacio.",
+  "pad": 0.12
+ },
+ {
+  "id": "l8",
+  "who": "N",
+  "text": "Cuando los abrí, mi mirada era profunda, brillante y enorme. Casi no me reconocí.",
+  "pad": 0.17
+ },
+ {
+  "id": "l9",
+  "who": "N",
+  "text": "Salí de la clínica de noche, feliz, caminando hacia mi casa.",
+  "pad": 0.17
+ },
+ {
+  "id": "l10",
+  "who": "N",
+  "text": "Entonces, desde un balcón oscuro, alguien volcó un cubo de agua helada sobre mí.",
+  "pad": 0.17
+ },
+ {
+  "id": "l11",
+  "who": "N",
+  "text": "Mi maquillaje se corrió por completo: las pestañas, el labial, todo escurría.",
+  "pad": 0.17
+ },
+ {
+  "id": "l12",
+  "who": "D",
+  "text": "¿Te gustó mi regalo, Lazy? Esto apenas empieza.",
+  "pad": 0.17,
+  "fx": "asetrate=44100*0.8,aresample=44100,atempo=1.25,aecho=0.8:0.7:70|140:0.4|0.25,highpass=f=80"
+ },
+ {
+  "id": "l13",
+  "who": "Y",
+  "text": "¡Oye! ¿Estás bien? Lo vi desde la esquina. Ven, toma mi abrigo.",
+  "pad": 0.12
+ },
+ {
+  "id": "l14",
+  "who": "N",
+  "text": "Era Will, un chico que pasaba por ahí. Era amable, pero yo no dejaba de temblar.",
+  "pad": 0.17
+ },
+ {
+  "id": "l16",
+  "who": "N",
+  "text": "¿Qué arreglamos mañana: el maquillaje o el peinado? Comenta tu elección, y sígueme para el día dieciocho.",
+  "pad": 0.17
+ }
+]
