@@ -8,7 +8,7 @@ import path from 'node:path';
 import { defs, hand } from './lazy_lib.mjs';
 import { drawLazy, LASHX } from './rig.mjs';
 import { handsToTargets, salonTool, armIK } from './chars.mjs';
-import { drawIvana, drawWill } from './chars17.mjs'; import { dripsFx } from './drips17.mjs'; import { LOOK, MK, JAW } from './rig2d/character.mjs'; import { EYEX } from './rig.mjs'; import { drawMontes, drawNuria } from './chars13.mjs'; import './chars15.mjs'; import { applyFinalFace, resetFace } from './face_final.mjs'; import { renderM } from './rig2d/m_character.mjs'; import { poseClip } from './rig2d/m_clips.mjs';
+import { drawIvana, drawWill } from './chars17.mjs'; import { dripsFx } from './drips17.mjs'; import { LOOK, MK, JAW } from './rig2d/character.mjs'; import { EYEX } from './rig.mjs'; import { drawMontes, drawNuria } from './chars13.mjs'; import './chars15.mjs'; import { applyFinalFace, resetFace, applyDay16Face } from './face_final.mjs'; import { renderM } from './rig2d/m_character.mjs'; import { poseClip } from './rig2d/m_clips.mjs';
 
 
 import { renderCharacter, defaultPose as defPose2, ik2, SK as SK2, ALLDEFS, NAILS } from './rig2d/character.mjs';
@@ -61,7 +61,7 @@ const charDefs = defs('e3d');
 const PL = (n) => b64(readFileSync(path.join(here, 'plates2d', n + '.png')));
 const platePng = { lair: PL('lair17'), clinic: PL('eyeclinic17'), street: PL('street17') };
 
-const lazyThumb = (() => { resetFace(); const P = defPose2(); P.noseStyle = 'D'; P.noseK = 1.35; P.hairOv = { lacio: 'C2', len: 0.4, shine: 1, cp: 1, grow: 1 }; P.hair.t = 1; P.skirt.t = 1; P.eyes.lookX = 0.2; P.mouth.smile = 0.5;
+const lazyThumb = (() => { applyDay16Face(); const P = defPose2(); P.noseStyle = 'D'; P.noseK = 1.35; P.hairOv = { lacio: 'C2', len: 0.4, shine: 1, cp: 1, grow: 1 }; P.hair.t = 1; P.skirt.t = 1; P.eyes.lookX = 0.2; P.mouth.smile = 0.5;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1500" viewBox="0 0 1024 1500">${charDefs}${ALLDEFS}<rect width="1024" height="1500" fill="#2a1830"/>${renderCharacter(P)}</svg>`; return b64(new Resvg(svg, { fitTo: { mode: 'width', value: 700 } }).render().asPng()); })();
 
 // ---------------- escenas, personajes y camara (todo 2D) ----------------
@@ -211,7 +211,7 @@ function transitionAt(t) { for (const [t0, kind, d] of TRANS) { const a = t0 - (
 // espejo dorado con comparacion antes / despues (cortina que barre)
 function mirrorCard(t) { const a = T.mirrorA, b = T.mirrorB; const k = win(t, a, b, 0.4, 0.4); if (k <= 0) return ''; const u = clamp((t - T.revealA + 0.3) / 1.4); const cx = lerp(300, 780, ease(u));
   resetFace(); const before = ''; const mk = () => { const P2 = defPose2(); P2.noseStyle = 'D'; P2.noseK = 1.35; P2.hairOv = { lacio: 'C2', len: 0.4, shine: 1, cp: 1, grow: 1 }; P2.hair.t = t; P2.skirt.t = t; P2.eyes.lookX = 0.1; P2.mouth.smile = 0.8; P2.mouth.open = 0.1; return renderCharacter(P2); };
-  resetFace(); const A = mk(); applyFinalFace(); const Bf = mk(); if (t < T.revealA) resetFace();
+  applyDay16Face(); const A = mk(); applyFinalFace(); const Bf = mk(); if (t < T.openA) applyDay16Face();
   const S = 1.95; const ctr = `translate(${540 - 512 * S},${720 - 262 * S}) scale(${S})`;
   return `<g opacity="${k.toFixed(2)}"><rect width="${W}" height="${H}" fill="#05030a" opacity="0.6"/><g transform="translate(0,${f(40 * (1 - k))})"><defs><clipPath id="mrC"><ellipse cx="540" cy="760" rx="400" ry="560"/></clipPath><linearGradient id="mrG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f6d98a"/><stop offset="0.5" stop-color="#b8860b"/><stop offset="1" stop-color="#fff0b0"/></linearGradient><clipPath id="mrL"><rect x="0" y="0" width="${f(cx + 0)}" height="${H}"/></clipPath><clipPath id="mrR"><rect x="${f(cx)}" y="0" width="${f(W - cx)}" height="${H}"/></clipPath></defs>
     <ellipse cx="540" cy="760" rx="420" ry="580" fill="url(#mrG)" stroke="${OUT}" stroke-width="10"/><ellipse cx="540" cy="760" rx="400" ry="560" fill="#20283a"/><g clip-path="url(#mrC)"><g clip-path="url(#mrL)"><g transform="${ctr}">${A}</g></g><g clip-path="url(#mrR)"><g transform="${ctr}">${Bf}</g></g><path d="M${f(cx)},200 V1320" stroke="#fff" stroke-width="5" opacity="0.8"/><circle cx="${f(cx)}" cy="760" r="26" fill="#fff" stroke="${OUT}" stroke-width="5"/><text x="300" y="260" font-family="Anton" font-size="44" fill="#fff" stroke="${OUT}" stroke-width="8" paint-order="stroke" text-anchor="middle" opacity="${(1 - ease(u)).toFixed(2)}">ANTES</text><text x="780" y="260" font-family="Anton" font-size="44" fill="#ffe14d" stroke="${OUT}" stroke-width="8" paint-order="stroke" text-anchor="middle" opacity="${ease(u).toFixed(2)}">DESPUÉS</text></g>${SPK(clamp((t - a) / 6), 12, 160, 220, 760, 1000, 0.85)}</g></g>`; }
@@ -237,7 +237,7 @@ const lairFg = (t) => { const pT = t - L.i2.start; const clip = t >= L.i2.end - 
 function frame(t) {
   const P = pose(t), cam = camAt(t), sc = sceneAt(t); CURPLATE = platePng[sc === 'lair' ? 'clinic' : sc]; NAILS.on = true;
   const wet = clamp((t - T.hitA) / 3.5);
-  const mkLazy = () => { Object.assign(LOOK, FULL); MK.lips = 1; EYEX.nomk = 0; EYEX.nomk2 = 1; JAW.fxK = 1; if (t >= T.openA) applyFinalFace(); else resetFace(); EYEX.nomk = 0; LASHX.style = 'P3';
+  const mkLazy = () => { Object.assign(LOOK, FULL); MK.lips = 1; EYEX.nomk = 0; EYEX.nomk2 = 1; JAW.fxK = 1; if (t >= T.openA) applyFinalFace(); else applyDay16Face(); EYEX.nomk = 0; LASHX.style = 'P3';
     if (wet > 0) { for (const q of ['blush', 'shadow', 'liner', 'contour', 'highlight']) LOOK[q] = FULL[q] * (1 - wet); if (wet > 0.55) MK.lips = 0; if (wet > 0.85) EYEX.nomk = 1; JAW.fxK = 1 - 0.75 * wet; EYEX.nomk2 = 1 - 0.7 * wet; }
     const P2 = defPose2(); const e = P2.eyes; e.blinkL = P.blink.l; e.blinkR = P.blink.r; e.lookX = P.gaze.x; e.lookY = P.gaze.y; e.wide = Math.max(0, (P.lid.l - 1) * 2); e.squint = P.squint || 0;
     P2.brows.Lraise = P.brow.l.r; P2.brows.Rraise = P.brow.r.r; P2.brows.Lfrown = -P.brow.l.i; P2.brows.Rfrown = -P.brow.r.i; P2.mouth.open = Math.min(0.35, P.mouth.open); P2.mouth.wide = P.mouth.wide; P2.mouth.smile = P.mouth.smile; P2.mouth.upperTeeth = P.mouth.open > 0.2 ? 1 : 0.2;
