@@ -46,7 +46,7 @@
 
   /* Joystick táctil: aparece donde pones el dedo */
   .stick-zone { position:relative; width:100%; height:100%; }
-  .stick { position:absolute; width:min(calc(var(--side) - 30px),150px); aspect-ratio:1; border-radius:50%; transform:translate(-50%,-50%); left:50%; top:50%;
+  .stick { position:absolute; width:min(calc(var(--side) - 30px),150px,calc(100dvh - 200px)); aspect-ratio:1; border-radius:50%; transform:translate(-50%,-50%); left:50%; top:50%;
     background:radial-gradient(circle,#ffffff08 0 55%,#ffffff14 56% 100%); border:2px solid #ffffff26; box-shadow:inset 0 0 30px #7c5cff33; transition:left .15s, top .15s; opacity:.85; }
   .stick.active { transition:none; opacity:1; border-color:#7c5cff99; }
   .knob { position:absolute; left:50%; top:50%; width:44%; aspect-ratio:1; border-radius:50%; transform:translate(-50%,-50%);
@@ -55,15 +55,20 @@
   .stick .ring { position:absolute; inset:14%; border-radius:50%; border:1px dashed #ffffff1f; }
 
   /* Botones A / B */
-  .ab { position:relative; width:min(calc(var(--side) - 20px),170px); aspect-ratio:1; }
+  .ab { position:relative; width:min(calc(var(--side) - 16px),180px,calc(100dvh - 190px)); aspect-ratio:1; }
   .btn { position:absolute; width:47%; aspect-ratio:1; border-radius:50%; border:none; font-size:22px; font-weight:800; color:#fff; box-shadow:0 6px 0 #0007, inset 0 -6px 12px #0003; transition:transform .05s; }
   .btn.a { right:0; top:8%; background:radial-gradient(circle at 35% 30%,#ff8fb0,var(--a)); }
   .btn.b { left:0; bottom:8%; background:radial-gradient(circle at 35% 30%,#ffd27a,var(--b)); }
   .btn.on { transform:translateY(4px) scale(.96); box-shadow:0 2px 0 #0007; filter:brightness(1.2); }
-  .ab.four .btn { width:40%; font-size:18px; }
-  .ab.four .a { right:0; top:30%; } .ab.four .b { left:30%; bottom:0; } .ab.four .x { left:30%; top:0; } .ab.four .y { left:0; top:30%; }
+  .ab.four .btn { width:38%; font-size:18px; }
+  .ab.four .a { right:0; top:31%; } .ab.four .b { left:31%; bottom:0; } .ab.four .x { left:31%; top:0; } .ab.four .y { left:0; top:31%; }
+  .ab.ps .btn { background:radial-gradient(circle at 35% 30%,#3a3f63,#1d2040); font-size:24px; }
+  .ab.ps .b { color:#7cb8ff; } .ab.ps .a { color:#ff6b7d; } .ab.ps .x { color:#5be3a8; } .ab.ps .y { color:#ff8fd6; }
+  .shoulders { display:flex; gap:6px; width:100%; margin-top:8px; min-height:0; }
+  .shoulders:not(:has(.sh:not(.hidden))) { display:none; }
+  .sh { flex:1; height:34px; border-radius:12px 12px 6px 6px; background:#ffffff12; border:1px solid #ffffff26; font-size:12px; font-weight:800; letter-spacing:1px; }
+  .sh.on { background:var(--acc); transform:translateY(2px); }
   .btn.x { background:radial-gradient(circle at 35% 30%,#8fd9ff,#2f9bff); } .btn.y { background:radial-gradient(circle at 35% 30%,#a6f5b5,#22c55e); }
-  .pill.sh { margin-bottom:6px; padding:6px 26px; }
   iframe.ejs { position:absolute; inset:0; width:100%; height:100%; border:0; background:#000; }
   .keypad { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; width:100%; }
   .key { height:40px; font-size:16px; font-weight:700; border-radius:12px; border:1px solid var(--line); background:linear-gradient(160deg,#2b2f5e,#191b34); box-shadow:0 3px 0 #05060f; }
@@ -125,8 +130,8 @@
       <button class="ib" id="pause" aria-label="Pausa"><svg class="i"><use href="#i-pause"/></svg></button>
       <button class="ib" id="reset" aria-label="Reiniciar"><svg class="i"><use href="#i-reset"/></svg></button>
     </div>
+    <div class="shoulders"><button class="sh hidden" data-b="l2" data-extra>L2</button><button class="sh hidden" data-b="l" data-extra>L</button></div>
     <div class="mid"><div class="stick-zone" id="zone"><div class="stick" id="stick"><div class="ring"></div><div class="knob" id="knob"></div></div></div></div>
-    <button class="pill sh hidden" data-b="l" data-extra>L</button>
     <button class="pill" data-b="select">SELECT</button>
   </div>
 
@@ -143,6 +148,7 @@
       <button class="ib" id="full" aria-label="Pantalla completa"><svg class="i"><use href="#i-max"/></svg></button>
       <button class="ib" id="cfg" aria-label="Ajustes"><svg class="i"><use href="#i-gear"/></svg></button>
     </div>
+    <div class="shoulders"><button class="sh hidden" data-b="r" data-extra>R</button><button class="sh hidden" data-b="r2" data-extra>R2</button></div>
     <div class="mid">
       <div class="ab" id="ab">
         <button class="btn a" data-b="a">A</button>
@@ -152,7 +158,6 @@
       </div>
       <div class="keypad hidden" id="keypad"></div>
     </div>
-    <button class="pill sh hidden" data-b="r" data-extra>R</button>
     <button class="pill" data-b="start">START</button>
   </div>
 </div>
@@ -181,6 +186,8 @@
   <div class="opt">Velocidad CHIP-8<input id="speed" type="range" min="2" max="40" value="12"></div>
   <div class="opt">Color CHIP-8<div class="swatches" id="sw"></div></div>
   <div class="opt"><label><input type="checkbox" id="vib" checked> Vibrar al tocar</label></div>
+  <label class="chip" style="justify-content:center"><svg class="i"><use href="#i-folder"/></svg><span id="biosLbl">Cargar BIOS de PlayStation</span><input id="biosFile" type="file" hidden></label>
+  <div class="note">Algunos juegos de PlayStation (como Resident Evil 3) necesitan el BIOS real de la consola (por ejemplo SCPH5502.bin para juegos europeos, SCPH1001.bin para americanos). Se guarda solo en este dispositivo.</div>
   <button class="chip" id="kpToggle" style="justify-content:center"><svg class="i"><use href="#i-keys"/></svg>Mostrar teclado CHIP-8</button>
   <div class="note">Teclado en PC: flechas = joystick, Z = B, X = A, Enter = Start, Shift = Select.<br>Las ROMs se quedan solo en tu dispositivo, no se suben a ningún lado.</div>
   <button class="chip" id="closeCfg" style="justify-content:center">Listo</button>
@@ -201,7 +208,7 @@ function sfx(freq,dur=.08,type='square',vol=.06,slide=0){ if(!actx||!store.sound
   g.gain.setValueAtTime(vol,actx.currentTime);g.gain.exponentialRampToValueAtTime(.0001,actx.currentTime+dur);o.connect(g).connect(master);o.start();o.stop(actx.currentTime+dur); }
 
 // ================= Entrada unificada =================
-const IN={up:0,down:0,left:0,right:0,a:0,b:0,x:0,y:0,l:0,r:0,start:0,select:0};
+const IN={up:0,down:0,left:0,right:0,a:0,b:0,x:0,y:0,l:0,r:0,l2:0,r2:0,start:0,select:0};
 let sys=null; // sistema activo
 function press(btn,on){ if(IN[btn]===+on)return; IN[btn]=+on; if(on&&store.vib)navigator.vibrate?.(8); initAudio(); sys?.input?.(btn,on); }
 
@@ -318,9 +325,9 @@ function chip8System(rom,name,keypad){
 const CORES={nes:'nes',fds:'nes',unf:'nes',unif:'nes',sfc:'snes',smc:'snes',fig:'snes',swc:'snes',gba:'gba',gb:'gb',gbc:'gb',
   md:'segaMD',gen:'segaMD',smd:'segaMD',bin:'segaMD',sms:'segaMS',gg:'segaGG',n64:'n64',z64:'n64',v64:'n64',pce:'pce',a26:'atari2600',nds:'nds',cue:'psx',pbp:'psx',chd:'psx',iso:'psx',m3u:'psx',ecm:'psx'};
 const CONSOLE_INFO={nes:['NES','4/3',[]],snes:['Super Nintendo','4/3',['x','y','l','r']],gba:['Game Boy Advance','3/2',['l','r']],gb:['Game Boy','10/9',[]],
-  segaMD:['Sega Genesis','4/3',['x','y','l']],segaMS:['Master System','4/3',[]],segaGG:['Game Gear','10/9',[]],n64:['Nintendo 64','4/3',['x','y','l','r']],
-  pce:['PC Engine','4/3',[]],atari2600:['Atari 2600','4/3',[]],nds:['Nintendo DS','4/3',['x','y','l','r']],psx:['PlayStation','4/3',['x','y','l','r']]};
-const RETROPAD={b:0,y:1,select:2,start:3,up:4,down:5,left:6,right:7,a:8,x:9,l:10,r:11};
+  segaMD:['Sega Genesis','4/3',['x','y','l']],segaMS:['Master System','4/3',[]],segaGG:['Game Gear','10/9',[]],n64:['Nintendo 64','4/3',['x','y','l','r','r2']],
+  pce:['PC Engine','4/3',[]],atari2600:['Atari 2600','4/3',[]],nds:['Nintendo DS','4/3',['x','y','l','r']],psx:['PlayStation','4/3',['x','y','l','r','l2','r2'],{a:'○',b:'✕',x:'△',y:'□',l:'L1',r:'R1'}]};
+const RETROPAD={b:0,y:1,select:2,start:3,up:4,down:5,left:6,right:7,a:8,x:9,l:10,r:11,l2:12,r2:13};
 function zipInnerName(b){ // nombre del primer archivo dentro de un .zip
   if(!(b[0]===0x50&&b[1]===0x4B))return null; const n=b[26]|(b[27]<<8); return new TextDecoder().decode(b.subarray(30,30+n)); }
 function coreFor(name,bytes){
@@ -330,15 +337,16 @@ function coreFor(name,bytes){
   return CORES[ext]||null;
 }
 function ejsSystem(bytes,name,core){
-  const [label,aspect,extra]=CONSOLE_INFO[core];
+  const [label,aspect,extra,labels]=CONSOLE_INFO[core];
   const url=URL.createObjectURL(new Blob([bytes]));
   let frame,emu=null,queue=[];
   const emuReady=()=>{try{emu=frame.contentWindow.EJS_emulator;return !!emu?.gameManager;}catch(e){return false;}};
   const send=(b,on)=>{const i=RETROPAD[b];if(i===undefined)return;
     if(emuReady())emu.gameManager.simulateInput(0,i,on?1:0); else if(on)queue.push(b);};
   const onMsg=e=>{if(e.data?.ejs==='start'){emuReady();emu?.setVolume?.(store.sound?.8:0);queue=[];showHint(label+' · ¡a jugar!');}};
-  return {name,size:[4,3],aspect,extra,
-    start(){window.__ejsGame={core,url,name,volume:store.sound?.8:0};addEventListener('message',onMsg);
+  return {name,size:[4,3],aspect,extra,labels,ps:core==='psx',
+    async start(){let bios=null;if(core==='psx'){const b=await tx('roms','readonly',s=>s.get('bios_psx')).catch(()=>null);if(b)bios=URL.createObjectURL(b.blob);}
+      window.__ejsGame={core,url,name,bios,volume:store.sound?.8:0};addEventListener('message',onMsg);
       frame=document.createElement('iframe');frame.src='ejs.html';frame.className='ejs';frame.allow='autoplay; gamepad; fullscreen';
       document.querySelector('.screen').appendChild(frame);},
     stop(){removeEventListener('message',onMsg);frame?.remove();URL.revokeObjectURL(url);},
@@ -453,7 +461,9 @@ function launch(s,hint){
   $('ov').classList.add('hidden');$('menu').classList.add('hidden');showHint(hint);
   $('keypad').classList.toggle('hidden',!s.keypad);$('ab').classList.toggle('hidden',!!s.keypad);
   const ex=s.extra||[];document.querySelectorAll('[data-extra]').forEach(b=>b.classList.toggle('hidden',!ex.includes(b.dataset.b)));
-  $('ab').classList.toggle('four',ex.includes('x'));
+  $('ab').classList.toggle('four',ex.includes('x'));$('ab').classList.toggle('ps',!!s.ps);
+  const LB=Object.assign({a:'A',b:'B',x:'X',y:'Y',l:'L',r:'R',l2:'L2',r2:'R2'},s.labels||{});
+  document.querySelectorAll('.btn[data-b],.sh[data-b]').forEach(b=>b.textContent=LB[b.dataset.b]);
   s.start();running=true;icon($('pause'),'i-pause');
 }
 function fit(){ if(!sys)return; if(sys.fluid){const side=parseFloat(getComputedStyle(document.getElementById('app')).gridTemplateColumns)||0,w=innerWidth-2*side,h=innerHeight;
@@ -503,6 +513,7 @@ async function detectCore(name,blob){
   if(head[0]===0x4E&&head[1]===0x45&&head[2]===0x53&&head[3]===0x1A)return 'nes';
   let ext=(name.split('.').pop()||'').toLowerCase();
   if(ext==='zip'){const inner=zipInnerName(head);if(inner)ext=(inner.split('.').pop()||'').toLowerCase();}
+  if(ext==='bin'||ext==='iso'||ext==='img'){const id=new TextDecoder().decode(new Uint8Array(await blob.slice(0x9318,0x9340).arrayBuffer()));if(id.includes('PLAYSTATION'))return 'psx';}
   if(CORES[ext])return CORES[ext];
   if(/\b(SLES|SLUS|SCUS|SCES|SLPS|SLPM|SCPS|SIPS)[-_ ]?\d/i.test(name))return 'psx'; // código de disco de PlayStation
   if(/\.(ch8|c8)$/i.test(name)||blob.size<=3584)return 'chip8';
@@ -521,8 +532,24 @@ async function runGame(name,blob,core){
     launch(ejsSystem(blob,clean,core),'Cargando '+CONSOLE_INFO[core][0]+'…'+(blob.size>5e7?' juego grande, puede tardar':''));
   }catch(err){showHint('No se pudo abrir: '+err.message);}
 }
+// .ecm -> .bin en segundo plano (Web Worker), mostrando el avance
+function unEcm(file){
+  return new Promise(ok=>{const wk=new Worker('ecm.js');showHint('Descomprimiendo disco… 0%');
+    wk.onmessage=e=>{const d=e.data;
+      if(d.progress!==undefined){$('toast').textContent='Descomprimiendo disco… '+Math.round(d.progress*100)+'%';$('toast').style.opacity=1;}
+      else if(d.blob){wk.terminate();ok(new File([d.blob],file.name.replace(/\.ecm$/i,'')));}
+      else {wk.terminate();showHint('No se pudo descomprimir: '+d.error);ok(null);}};
+    wk.postMessage({file});});
+}
+// BIOS de PlayStation (lo pone el usuario; se guarda solo en este dispositivo)
+async function showBios(){const b=await tx('roms','readonly',s=>s.get('bios_psx')).catch(()=>null);$('biosLbl').textContent=b?'BIOS PlayStation: '+b.name+' ✓':'Cargar BIOS de PlayStation';}
+$('biosFile').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
+  if(f.size<256e3||f.size>4e6){showHint('Ese archivo no parece un BIOS de PlayStation');return;}
+  await tx('roms','readwrite',s=>s.put({name:f.name,blob:f},'bios_psx'));showBios();showHint('BIOS guardado. Vuelve a abrir el juego.');};
+showBios();
 async function addGame(file){
   initAudio();
+  if(/\.ecm$/i.test(file.name)){file=await unEcm(file);if(!file)return;}
   const core=(await detectCore(file.name,file))||(await pickConsole(file.name)); if(!core)return;
   showHint('Guardando en tu biblioteca…');
   try{await libPut({name:file.name,blob:file,core,size:file.size,added:Date.now()});}
