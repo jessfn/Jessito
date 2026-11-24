@@ -1,0 +1,12 @@
+import { Resvg } from '@resvg/resvg-js'; import { writeFileSync, readFileSync } from 'node:fs'; import { execSync } from 'node:child_process';
+import { renderCharacter as rc, defaultPose as dp, ALLDEFS } from './rig2d/character.mjs'; import { applyFinalFace } from './face_final.mjs'; import { EYEX } from './rig.mjs'; import { defs } from './lazy_lib.mjs';
+const O = [['Actual', 1.28, 0.68], ['A · Un poco más chicos', 1.12, 0.58], ['B · Más chicos', 1.0, 0.52], ['C · Pequeños', 0.88, 0.46]];
+const tiles = [];
+O.forEach(([n, ir, pr], i) => { applyFinalFace(); EYEX.irK = ir; EYEX.prK = pr;
+  const P = dp(); P.eyes.lookX = 0.1; P.mouth.smile = 0.6; P.mouth.open = 0.05; P.noseStyle = 'D'; P.noseK = 1.35; P.hairOv = { lacio: 'C2', len: 0.4, shine: 1, cp: 1, grow: 1 }; P.hair.t = 1; P.skirt.t = 1;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1500" viewBox="0 0 1024 1500">${defs('e3d')}${ALLDEFS}<rect width="1024" height="1500" fill="#3a2540"/>${rc(P)}</svg>`;
+  writeFileSync(`/tmp/es_${i}.png`, new Resvg(svg, { fitTo: { mode: 'zoom', value: 2 }, font: { loadSystemFonts: true } }).render().asPng());
+  execSync(`ffmpeg -y -loglevel error -i /tmp/es_${i}.png -vf crop=900:700:562:160,scale=640:498 /tmp/esc_${i}.png`); tiles.push([n, readFileSync(`/tmp/esc_${i}.png`)]); });
+const b64 = (b) => 'data:image/png;base64,' + Buffer.from(b).toString('base64'); let body = '';
+tiles.forEach(([n, t], i) => { const x = (i % 2) * 650 + 5, y = Math.floor(i / 2) * 560 + 5; body += `<image href="${b64(t)}" x="${x}" y="${y}" width="640" height="498"/><text x="${x + 320}" y="${y + 535}" font-family="Anton" font-size="32" text-anchor="middle" fill="#fff">${n}</text>`; });
+writeFileSync('OjosMasChicosIris.png', new Resvg(`<svg xmlns="http://www.w3.org/2000/svg" width="1300" height="1130"><rect width="1300" height="1130" fill="#1d1426"/>${body}</svg>`, { font: { loadSystemFonts: true } }).render().asPng());
