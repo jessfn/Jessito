@@ -72,19 +72,23 @@
   .note { font-size:12px; opacity:.6; line-height:1.4; }
   .toast { text-align:center; font-size:12px; opacity:.65; min-height:15px; flex:none; }
   #install { display:none; }
+  #rotate { display:none; position:fixed; inset:0; z-index:9; background:var(--bg); flex-direction:column; align-items:center; justify-content:center; gap:16px; text-align:center; font-size:16px; padding:24px; }
+  #rotate svg { width:72px; height:72px; animation:rot 1.6s ease-in-out infinite; }
+  @keyframes rot { 0%,30%{transform:rotate(0)} 60%,100%{transform:rotate(-90deg)} }
+  @media (orientation:portrait) and (max-width:820px) { #rotate { display:flex; } }
   /* ===== Horizontal: estilo consola portátil ===== */
-  @media (orientation:landscape) and (max-height:560px) {
+  @media all { /* Siempre: | controles | pantalla | controles | */
     .app { max-width:none; display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); grid-template-rows:auto minmax(0,1fr) auto auto; gap:6px 12px; }
     header { grid-column:1/-1; grid-row:1; }
     h1 small { display:none; }
     .screen { grid-column:2; grid-row:2; align-self:center; justify-self:center; padding:4px; }
-    .screen canvas { height:calc(100dvh - 175px); width:auto; max-width:52vw; object-fit:contain; }
-    .games { grid-column:2; grid-row:3; justify-content:center; max-width:52vw; }
+    .screen canvas { height:calc(100dvh - 150px); width:auto; max-width:64vw; object-fit:fill; }
+    .games { grid-column:2; grid-row:3; justify-content:center; max-width:62vw; }
     .chip { padding:6px 11px; font-size:12px; }
     .toast { display:none; }
     .pad-area, .gamepad { display:contents; }
-    .dpad { grid-column:1; grid-row:2/5; align-self:center; justify-self:center; width:min(20vw,160px); }
-    .ab { grid-column:3; grid-row:2/5; align-self:center; justify-self:center; width:min(20vw,160px); }
+    .dpad { grid-column:1; grid-row:2/5; align-self:center; justify-self:center; width:min(17vw,170px); }
+    .ab { grid-column:3; grid-row:2/5; align-self:center; justify-self:center; width:min(17vw,170px); }
     .meta { grid-column:2; grid-row:4; gap:14px; }
     .pill { padding:5px 14px; }
     .keypad { grid-column:3; grid-row:2/5; align-self:center; }
@@ -112,6 +116,7 @@
   <symbol id="i-up" viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></symbol>
 </svg>
 
+<div id="rotate"><svg class="i" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2"/></svg><b>Gira tu celular</b><span style="opacity:.6;font-size:13px">Jessito Emu se juega en horizontal</span></div>
 <div class="app">
   <header>
     <div class="logo"><svg class="i"><use href="#i-pad"/></svg></div>
@@ -281,7 +286,7 @@ const ROM_TECLAS=hex('6A1C 6B0D 00E0 F00A F029 00E0 DAB5 1206');
 const C8MAP={up:2,down:8,left:4,right:6,a:5,b:0xA,start:0xF,select:0};
 function chip8System(rom,name,keypad){
   const c=new Chip8();c.reset(rom);let beeping=false,osc,g;
-  return {name,size:[64,32],keypad,
+  return {name,size:[64,32],aspect:'2/1',keypad,
     start(){initAudio();osc=actx.createOscillator();g=actx.createGain();osc.type='square';osc.frequency.value=520;g.gain.value=0;osc.connect(g).connect(master);osc.start();},
     stop(){try{osc.stop();}catch(e){}},
     reset(){c.reset(rom);},
@@ -309,7 +314,7 @@ function nesSystem(bytes,name){
   proc.onaudioprocess=e=>{const l=e.outputBuffer.getChannelData(0),r=e.outputBuffer.getChannelData(1);
     for(let i=0;i<l.length;i++){if(rd!==wr){l[i]=L[rd];r[i]=R[rd];rd=(rd+1)&8191;}else{l[i]=r[i]=0;}}};
   const C=jsnes.Controller,MAP={up:C.BUTTON_UP,down:C.BUTTON_DOWN,left:C.BUTTON_LEFT,right:C.BUTTON_RIGHT,a:C.BUTTON_A,b:C.BUTTON_B,start:C.BUTTON_START,select:C.BUTTON_SELECT};
-  return {name,size:[256,240],
+  return {name,size:[256,240],aspect:'4/3',
     start(){proc.connect(master);}, stop(){proc.disconnect();},
     reset(){nes.reloadROM();},
     input(b,on){on?nes.buttonDown(1,MAP[b]):nes.buttonUp(1,MAP[b]);},
@@ -320,7 +325,7 @@ function nesSystem(bytes,name){
 
 // ================= Jessito Run (juego original de plataformas) =================
 function runSystem(){
-  const T=16,W=200,H=15; let map,coins,enemies,p,cam,score,lives,time,state,level,flagX,particles;
+  const T=16,W=200,H=15,VW=427; let map,coins,enemies,p,cam,score,lives,time,state,level,flagX,particles;
   function rng(seed){return()=>(seed=(seed*16807)%2147483647)/2147483647;}
   function build(){
     const r=rng(7+level*31);map=[];for(let y=0;y<H;y++)map.push(new Uint8Array(W));coins=[];enemies=[];particles=[];
@@ -353,7 +358,7 @@ function runSystem(){
     if(lives<=0){state='over';}else{const lx=p.x;build();p.x=Math.max(2*T,Math.floor(lx/T/20)*20*T);for(;p.x>2*T&&!solid(Math.floor(p.x/T),13);p.x-=T);p.y=4*T;p.inv=90;}}
   function newGame(){score=0;lives=3;level=1;build();}
   newGame();
-  return {name:'Jessito Run',size:[256,240],
+  return {name:'Jessito Run',size:[427,240],aspect:'16/9',
     start(){}, stop(){}, reset(){newGame();}, mute(){},
     input(b,on){ if(b==='a'&&on)p.jbuf=8; if(b==='start'&&on){ if(state==='over')newGame(); else if(state==='win'){level++;build();} } },
     frame(){
@@ -372,7 +377,7 @@ function runSystem(){
       if(p.inv>0)p.inv--;
       if(p.y>H*T){die();return;}
       for(const c of coins)if(!c.got&&Math.abs(p.x+6-c.x-4)<10&&Math.abs(p.y+7-c.y-4)<11){c.got=1;score+=10;sfx(990,.08,'square',.04,1500);burst(c.x+4,c.y+4,'#ffd43b',5);}
-      for(const e of enemies){ if(!e.alive){e.squash--;continue;} if(e.x<cam-T*2||e.x>cam+300)continue;
+      for(const e of enemies){ if(!e.alive){e.squash--;continue;} if(e.x<cam-T*2||e.x>cam+VW+40)continue;
         e.w=14;e.h=14;e.hitX=false;e.ground=false;e.vy=Math.min((e.vy||0)+.3,6);
         collide(e,e.vx,0); if(e.hitX)e.vx=-e.vx; collide(e,0,e.vy);
         if(e.ground){const ahead=Math.floor((e.vx>0?e.x+e.w+1:e.x-1)/T);if(!solid(ahead,Math.floor((e.y+e.h+2)/T)))e.vx=-e.vx;}
@@ -381,14 +386,14 @@ function runSystem(){
           if(p.vy>0&&p.y+p.h-e.y<9){e.alive=false;e.squash=20;p.vy=IN.a?-6.5:-4;score+=50;sfx(200,.15,'triangle',.08,80);burst(e.x+7,e.y+10,'#ff5c8a');}
           else if(!p.inv){die();return;} } }
       if(p.x>=flagX){state='win';score+=Math.ceil(time)*2;sfx(523,.15);setTimeout(()=>sfx(659,.15),150);setTimeout(()=>sfx(784,.3),300);}
-      cam+=((p.x-110)-cam)*.15; cam=Math.max(0,Math.min(cam,W*T-256));
+      cam+=((p.x-VW*.4)-cam)*.15; cam=Math.max(0,Math.min(cam,W*T-VW));
     },
     draw(){
-      const g=ctx.createLinearGradient(0,0,0,240);g.addColorStop(0,'#3b2a8f');g.addColorStop(1,'#22d3ee');ctx.fillStyle=g;ctx.fillRect(0,0,256,240);
-      ctx.fillStyle='#ffffff22';for(let i=0;i<8;i++){const x=((i*97-cam*.2)%330+330)%330-40;ctx.beginPath();ctx.ellipse(x,30+i%3*18,22,8,0,0,7);ctx.fill();}
-      ctx.fillStyle='#2d1f73';for(let i=0;i<10;i++){const x=((i*140-cam*.4)%420+420)%420-80;ctx.beginPath();ctx.moveTo(x,200);ctx.lineTo(x+60,120+i%3*15);ctx.lineTo(x+120,200);ctx.fill();}
+      const g=ctx.createLinearGradient(0,0,0,240);g.addColorStop(0,'#3b2a8f');g.addColorStop(1,'#22d3ee');ctx.fillStyle=g;ctx.fillRect(0,0,VW,240);
+      ctx.fillStyle='#ffffff22';for(let i=0;i<8;i++){const x=((i*97-cam*.2)%500+500)%500-40;ctx.beginPath();ctx.ellipse(x,30+i%3*18,22,8,0,0,7);ctx.fill();}
+      ctx.fillStyle='#2d1f73';for(let i=0;i<10;i++){const x=((i*140-cam*.4)%560+560)%560-80;ctx.beginPath();ctx.moveTo(x,200);ctx.lineTo(x+60,120+i%3*15);ctx.lineTo(x+120,200);ctx.fill();}
       ctx.save();ctx.translate(-Math.round(cam),0);
-      const t0=Math.floor(cam/T),t1=t0+18;
+      const t0=Math.floor(cam/T),t1=t0+29;
       for(let y=0;y<H;y++)for(let x=t0;x<t1&&x<W;x++){const v=map[y][x];if(!v)continue;const X=x*T,Y=y*T;
         if(v===1){ctx.fillStyle='#7a4a2b';ctx.fillRect(X,Y,T,T);ctx.fillStyle='#4ade80';ctx.fillRect(X,Y,T,5);ctx.fillStyle='#22c55e';ctx.fillRect(X,Y+4,T,2);}
         else if(v===2){ctx.fillStyle='#6b3f24';ctx.fillRect(X,Y,T,T);ctx.fillStyle='#5a341d';ctx.fillRect(X+3,Y+5,3,3);ctx.fillRect(X+10,Y+11,3,3);}
@@ -407,10 +412,10 @@ function runSystem(){
         ctx.fillStyle='#22d3ee';ctx.fillRect(p.x+1,p.y+p.h-3,4,3);ctx.fillRect(p.x+p.w-5,p.y+p.h-3,4,3);}
       for(const q of particles){ctx.fillStyle=q.c;ctx.fillRect(q.x,q.y,2,2);}
       ctx.restore();
-      ctx.fillStyle='#0007';ctx.fillRect(0,0,256,18);ctx.fillStyle='#fff';ctx.font='bold 10px system-ui';ctx.textBaseline='middle';
-      ctx.fillText('★ '+score,6,9);ctx.fillText('♥ '+lives,80,9);ctx.fillText('NIVEL '+level,128,9);ctx.fillText('⏱ '+Math.ceil(time),208,9);
-      if(state!=='play'){ctx.fillStyle='#000a';ctx.fillRect(0,80,256,70);ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='bold 18px system-ui';
-        ctx.fillText(state==='win'?'¡Nivel completado!':'Fin del juego',128,105);ctx.font='11px system-ui';ctx.fillText('Toca START para '+(state==='win'?'el siguiente nivel':'jugar otra vez'),128,130);ctx.textAlign='left';}
+      ctx.fillStyle='#0007';ctx.fillRect(0,0,VW,18);ctx.fillStyle='#fff';ctx.font='bold 10px system-ui';ctx.textBaseline='middle';
+      ctx.fillText('★ '+score,6,9);ctx.fillText('♥ '+lives,120,9);ctx.fillText('NIVEL '+level,200,9);ctx.fillText('⏱ '+Math.ceil(time),VW-44,9);
+      if(state!=='play'){ctx.fillStyle='#000a';ctx.fillRect(0,80,VW,70);ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='bold 18px system-ui';
+        ctx.fillText(state==='win'?'¡Nivel completado!':'Fin del juego',VW/2,105);ctx.font='11px system-ui';ctx.fillText('Toca START para '+(state==='win'?'el siguiente nivel':'jugar otra vez'),VW/2,130);ctx.textAlign='left';}
     }};
 }
 
@@ -418,7 +423,7 @@ function runSystem(){
 let running=false;
 const icon=(el,id)=>el.querySelector('use').setAttribute('href','#'+id);
 function launch(s,hint){
-  sys?.stop();sys=s;cv.width=s.size[0];cv.height=s.size[1];ctx.imageSmoothingEnabled=false;
+  sys?.stop();sys=s;cv.width=s.size[0];cv.height=s.size[1];cv.style.aspectRatio=s.aspect;ctx.imageSmoothingEnabled=false;
   $('sys').textContent=s.name;$('ov').classList.add('hidden');$('toast').textContent=hint||'';
   $('keypad').classList.toggle('hidden',!s.keypad);$('gamepad').classList.toggle('hidden',!!s.keypad);
   s.start();running=true;icon($('pause'),'i-pause');
