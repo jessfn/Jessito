@@ -1,9 +1,27 @@
 {
+  "id": "./",
   "name": "Jessito Emu",
   "short_name": "Jessito Emu",
+  "description": "Emulador táctil de NES y CHIP-8 con juegos originales",
+  "lang": "es",
   "start_url": "./",
-  "display": "standalone",
+  "scope": "./",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "any",
   "background_color": "#0b0c1a",
   "theme_color": "#0b0c1a",
-  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+  "categories": ["games", "entertainment"],
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ],
+  "shortcuts": [
+    { "name": "Jessito Run", "url": "./?juego=run", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] }
+  ],
+  "file_handlers": [
+    { "action": "./", "accept": { "application/octet-stream": [".nes", ".ch8"] } }
+  ]
 }

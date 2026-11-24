@@ -3,64 +3,93 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#0f1020">
+<meta name="theme-color" content="#0b0c1a">
+<meta name="description" content="Emulador táctil de NES y CHIP-8 con juegos originales">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Jessito Emu">
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="icon.svg">
+<link rel="apple-touch-icon" href="icon-192.png">
 <title>Jessito Emu</title>
 <style>
-  :root { --bg:#0b0c1a; --card:#1a1c35; --line:#2f3366; --acc:#7c5cff; --acc2:#22d3ee; --txt:#eef0ff; }
-  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none; -webkit-user-select:none; }
+  :root { --bg:#0b0c1a; --card:#1a1c35; --line:#2f3366; --acc:#7c5cff; --acc2:#22d3ee; --txt:#eef0ff; --a:#ff5c8a; --b:#ffb020; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; }
   html,body { margin:0; height:100%; overflow:hidden; background:radial-gradient(120% 80% at 50% 0%,#2a2366,var(--bg) 60%); color:var(--txt); font-family:system-ui,-apple-system,"Segoe UI",sans-serif; touch-action:none; overscroll-behavior:none; }
   svg.i { width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  button { font:inherit; color:inherit; }
   .app { height:100dvh; max-width:560px; margin:0 auto; display:flex; flex-direction:column; gap:10px;
-    padding:max(10px,env(safe-area-inset-top)) 12px max(12px,env(safe-area-inset-bottom)); }
-  header { display:flex; align-items:center; gap:10px; }
-  .logo { width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,var(--acc),var(--acc2)); display:grid; place-items:center; box-shadow:0 4px 16px #7c5cff66; }
-  h1 { font-size:18px; margin:0; font-weight:800; letter-spacing:.3px; }
+    padding:max(10px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left)); }
+  header { display:flex; align-items:center; gap:8px; }
+  .logo { width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,var(--acc),var(--acc2)); display:grid; place-items:center; box-shadow:0 4px 16px #7c5cff66; flex:none; }
+  h1 { font-size:17px; margin:0; font-weight:800; white-space:nowrap; }
   h1 small { display:block; font-size:11px; font-weight:500; opacity:.55; }
   .spacer { flex:1; }
-  .ib { width:42px; height:42px; display:grid; place-items:center; background:var(--card); color:var(--txt); border:1px solid var(--line); border-radius:13px; padding:0; cursor:pointer; transition:transform .08s, background .2s; }
-  .ib:active { transform:scale(.9); background:#262a50; }
-  .screen { position:relative; background:#04050b; border-radius:20px; padding:8px; box-shadow:0 0 0 1px var(--line), 0 10px 40px #7c5cff44; }
-  canvas { width:100%; aspect-ratio:2/1; image-rendering:pixelated; display:block; border-radius:12px; }
-  .hud { position:absolute; left:16px; bottom:14px; font-size:11px; padding:3px 8px; border-radius:99px; background:#ffffff14; backdrop-filter:blur(6px); }
-  .games { display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; }
-  .chip { flex:none; display:flex; align-items:center; gap:6px; padding:9px 14px; border-radius:99px; background:var(--card); border:1px solid var(--line); color:var(--txt); font-size:14px; cursor:pointer; }
+  .ib { width:40px; height:40px; flex:none; display:grid; place-items:center; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:0; cursor:pointer; transition:transform .08s; }
+  .ib:active { transform:scale(.9); }
+  .screen { position:relative; background:#000; border-radius:18px; padding:6px; box-shadow:0 0 0 1px var(--line), 0 10px 40px #7c5cff44; }
+  canvas { width:100%; display:block; border-radius:12px; image-rendering:pixelated; background:#000; }
+  .hud { position:absolute; left:14px; top:12px; font-size:11px; padding:3px 9px; border-radius:99px; background:#0008; backdrop-filter:blur(6px); pointer-events:none; }
+  .overlay { position:absolute; inset:6px; border-radius:12px; display:grid; place-items:center; text-align:center; background:#04050bcc; font-size:14px; padding:16px; }
+  .games { display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; flex:none; }
+  .games::-webkit-scrollbar { display:none; }
+  .chip { flex:none; display:flex; align-items:center; gap:6px; padding:9px 14px; border-radius:99px; background:var(--card); border:1px solid var(--line); font-size:14px; cursor:pointer; }
   .chip.sel { background:linear-gradient(135deg,var(--acc),#5b43e0); border-color:transparent; }
   .chip svg.i { width:18px; height:18px; }
-  .controls { flex:1; display:flex; flex-direction:column; justify-content:flex-end; min-height:0; }
-  .dpad { display:grid; grid-template-columns:1fr 1fr; gap:14px; height:min(34vh,220px); }
-  .big { border-radius:28px; border:1px solid var(--line); background:linear-gradient(160deg,#2b2f5e,#191b34); color:var(--txt); display:grid; place-items:center; box-shadow:0 6px 0 #07081280; transition:transform .05s; }
-  .big svg.i { width:56px; height:56px; stroke-width:2.5; }
-  .pad { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
-  .key { height:min(9.5vh,64px); font-size:22px; font-weight:700; border-radius:16px; border:1px solid var(--line); background:linear-gradient(160deg,#2b2f5e,#191b34); color:var(--txt); box-shadow:0 4px 0 #07081280; transition:transform .05s; }
-  .on { transform:translateY(3px); box-shadow:0 1px 0 #07081280 !important; background:linear-gradient(160deg,var(--acc),#4f3bd1) !important; }
+  /* ===== Gamepad ===== */
+  .pad-area { flex:1; min-height:0; display:flex; flex-direction:column; justify-content:flex-end; }
+  .gamepad { display:grid; grid-template-columns:1fr auto 1fr; grid-template-rows:1fr auto; align-items:center; gap:6px; padding-bottom:6px; }
+  .dpad { position:relative; width:min(42vw,170px); aspect-ratio:1; justify-self:start; touch-action:none; }
+  .dpad .arm { position:absolute; background:linear-gradient(160deg,#30345f,#1a1c35); border:1px solid var(--line); box-shadow:0 5px 0 #05060f; display:grid; place-items:center; color:#ffffffaa; }
+  .dpad .u { left:33%; top:0; width:34%; height:38%; border-radius:12px 12px 4px 4px; }
+  .dpad .d { left:33%; bottom:0; width:34%; height:38%; border-radius:4px 4px 12px 12px; }
+  .dpad .l { top:33%; left:0; height:34%; width:38%; border-radius:12px 4px 4px 12px; }
+  .dpad .r { top:33%; right:0; height:34%; width:38%; border-radius:4px 12px 12px 4px; }
+  .dpad .c { position:absolute; left:33%; top:33%; width:34%; height:34%; background:#1f2242; }
+  .dpad .arm.on { background:linear-gradient(160deg,var(--acc),#4f3bd1); box-shadow:0 1px 0 #05060f; color:#fff; }
+  .ab { position:relative; width:min(42vw,170px); aspect-ratio:1; justify-self:end; }
+  .btn { position:absolute; width:46%; aspect-ratio:1; border-radius:50%; border:none; font-size:22px; font-weight:800; color:#fff; box-shadow:0 6px 0 #0007, inset 0 -6px 12px #0003; transition:transform .05s; }
+  .btn.a { right:0; top:12%; background:radial-gradient(circle at 35% 30%,#ff8fb0,var(--a)); }
+  .btn.b { left:0; bottom:12%; background:radial-gradient(circle at 35% 30%,#ffd27a,var(--b)); }
+  .btn.on { transform:translateY(4px); box-shadow:0 2px 0 #0007; filter:brightness(1.2); }
+  .meta { grid-column:1/-1; display:flex; justify-content:center; gap:18px; }
+  .pill { padding:7px 16px; border-radius:99px; background:#262a4f; border:1px solid var(--line); font-size:11px; font-weight:700; letter-spacing:1px; box-shadow:0 3px 0 #05060f; }
+  .pill.on { transform:translateY(2px); box-shadow:none; background:var(--acc); }
+  .keypad { display:grid; grid-template-columns:repeat(4,1fr); gap:7px; }
+  .key { height:min(8vh,56px); font-size:20px; font-weight:700; border-radius:14px; border:1px solid var(--line); background:linear-gradient(160deg,#2b2f5e,#191b34); box-shadow:0 4px 0 #05060f; }
+  .key.on { transform:translateY(3px); box-shadow:0 1px 0 #05060f; background:var(--acc); }
   .hidden { display:none !important; }
-  .sheet { position:fixed; inset:0; background:#0008; display:flex; align-items:flex-end; z-index:5; }
+  .sheet { position:fixed; inset:0; background:#0009; display:flex; align-items:flex-end; z-index:5; }
   .sheet > div { width:100%; max-width:560px; margin:0 auto; background:#151730; border-radius:24px 24px 0 0; padding:18px 18px max(18px,env(safe-area-inset-bottom)); display:flex; flex-direction:column; gap:14px; }
   .sheet h2 { margin:0; font-size:16px; }
   .opt { display:flex; align-items:center; gap:10px; font-size:14px; }
   .opt input[type=range] { flex:1; accent-color:var(--acc); }
   .swatches { display:flex; gap:10px; }
-  .sw { width:34px; height:34px; border-radius:50%; border:3px solid transparent; cursor:pointer; }
+  .sw { width:32px; height:32px; border-radius:50%; border:3px solid transparent; cursor:pointer; }
   .sw.sel { border-color:#fff; }
-  .toast { text-align:center; font-size:12px; opacity:.65; min-height:16px; }
-  @media (orientation:landscape) and (max-height:520px) {
-    .app { max-width:none; display:grid; grid-template-columns:1fr minmax(0,1.4fr) 1fr; grid-template-rows:auto 1fr auto; gap:8px 14px; }
-    header { grid-column:1/-1; } .screen { grid-column:2; grid-row:2; align-self:center; }
-    .games { grid-column:2; grid-row:3; justify-content:center; } .toast { display:none; }
-    .controls { display:contents; }
-    .dpad { display:contents; } .dpad .big { grid-row:2/4; height:100%; }
-    .dpad .big:first-child { grid-column:1; } .dpad .big:last-child { grid-column:3; }
-    .pad { grid-column:3; grid-row:2/4; align-self:center; } .key { height:42px; font-size:17px; }
+  .note { font-size:12px; opacity:.6; line-height:1.4; }
+  .toast { text-align:center; font-size:12px; opacity:.65; min-height:15px; flex:none; }
+  #install { display:none; }
+  /* ===== Horizontal: estilo consola portátil ===== */
+  @media (orientation:landscape) and (max-height:560px) {
+    .app { max-width:none; display:grid; grid-template-columns:1fr auto 1fr; grid-template-rows:auto 1fr auto; gap:6px 12px; }
+    header { grid-column:1/-1; }
+    .screen { grid-column:2; grid-row:2; align-self:center; height:calc(100dvh - 130px); }
+    .screen canvas { height:100%; width:auto; }
+    .games { grid-column:2; grid-row:3; justify-content:center; max-width:60vw; }
+    .toast { display:none; }
+    .pad-area, .gamepad { display:contents; }
+    .dpad { grid-column:1; grid-row:2/4; align-self:center; justify-self:center; width:min(22vw,170px); }
+    .ab { grid-column:3; grid-row:2/4; align-self:center; justify-self:center; width:min(22vw,170px); }
+    .meta { grid-column:1/-1; grid-row:1; justify-content:center; align-self:center; z-index:1; pointer-events:none; }
+    .meta .pill { pointer-events:auto; }
+    .keypad { grid-column:3; grid-row:2/4; align-self:center; }
+    .key { height:38px; font-size:15px; }
   }
 </style>
 </head>
 <body>
-<!-- Iconos SVG modernos (trazos estilo Lucide) -->
 <svg width="0" height="0" style="position:absolute">
   <symbol id="i-pad" viewBox="0 0 24 24"><path d="M6 11h4M8 9v4M15 12h.01M18 10h.01"/><rect x="2" y="6" width="20" height="12" rx="6"/></symbol>
   <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></symbol>
@@ -68,59 +97,128 @@
   <symbol id="i-reset" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></symbol>
   <symbol id="i-vol" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></symbol>
   <symbol id="i-mute" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4z"/><path d="M22 9l-6 6M16 9l6 6"/></symbol>
-  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
-  <symbol id="i-left" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></symbol>
-  <symbol id="i-right" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1L7 17M17 7l2.1-2.1"/></symbol>
+  <symbol id="i-max" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></symbol>
+  <symbol id="i-dl" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></symbol>
   <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M12 11v5M9.5 13.5L12 11l2.5 2.5"/></symbol>
+  <symbol id="i-run" viewBox="0 0 24 24"><circle cx="14" cy="4" r="2"/><path d="M6 21l3-6 3 2v4M13 8l-4 3 3 3 2-3 3 2M9 11L6 12"/></symbol>
   <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></symbol>
   <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
+  <symbol id="i-cart" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 7h6M9 17h.01M15 17h.01"/></symbol>
   <symbol id="i-keys" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M6 9h.01M10 9h.01M14 9h.01M18 9h.01M7 15h10"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></symbol>
 </svg>
 
 <div class="app">
   <header>
     <div class="logo"><svg class="i"><use href="#i-pad"/></svg></div>
-    <h1>Jessito Emu<small>CHIP-8 · táctil</small></h1>
+    <h1>Jessito Emu<small id="sys">Elige un juego</small></h1>
     <div class="spacer"></div>
+    <button class="ib" id="install" aria-label="Instalar"><svg class="i"><use href="#i-dl"/></svg></button>
     <button class="ib" id="pause" aria-label="Pausa"><svg class="i"><use href="#i-pause"/></svg></button>
     <button class="ib" id="reset" aria-label="Reiniciar"><svg class="i"><use href="#i-reset"/></svg></button>
     <button class="ib" id="sound" aria-label="Sonido"><svg class="i"><use href="#i-vol"/></svg></button>
+    <button class="ib" id="full" aria-label="Pantalla completa"><svg class="i"><use href="#i-max"/></svg></button>
     <button class="ib" id="cfg" aria-label="Ajustes"><svg class="i"><use href="#i-gear"/></svg></button>
   </header>
 
-  <div class="screen"><canvas id="cv" width="64" height="32"></canvas><div class="hud" id="hud">Elige un juego</div></div>
+  <div class="screen">
+    <canvas id="cv" width="256" height="240"></canvas>
+    <div class="hud hidden" id="hud"></div>
+    <div class="overlay" id="ov">Toca un juego para empezar ▼</div>
+  </div>
 
   <div class="games">
+    <button class="chip" data-game="run"><svg class="i"><use href="#i-run"/></svg>Jessito Run</button>
     <button class="chip" data-game="atrapa"><svg class="i"><use href="#i-star"/></svg>Atrapa</button>
     <button class="chip" data-game="teclas"><svg class="i"><use href="#i-grid"/></svg>Teclas</button>
-    <label class="chip"><svg class="i"><use href="#i-folder"/></svg>Cargar ROM<input id="file" type="file" hidden></label>
-    <button class="chip" id="toggleKeys"><svg class="i"><use href="#i-keys"/></svg>Teclado</button>
+    <button class="chip hidden" id="last"><svg class="i"><use href="#i-cart"/></svg><span></span></button>
+    <label class="chip"><svg class="i"><use href="#i-folder"/></svg>Cargar ROM<input id="file" type="file" accept=".nes,.ch8,.c8,.rom" hidden></label>
   </div>
-  <div class="toast" id="toast">Mueve la barra y atrapa las pelotas</div>
+  <div class="toast" id="toast">NES (.nes) y CHIP-8 (.ch8) · tus propias ROMs</div>
 
-  <div class="controls">
-    <div class="dpad" id="dpad">
-      <button class="big" data-k="4" aria-label="Izquierda"><svg class="i"><use href="#i-left"/></svg></button>
-      <button class="big" data-k="6" aria-label="Derecha"><svg class="i"><use href="#i-right"/></svg></button>
+  <div class="pad-area">
+    <div class="gamepad" id="gamepad">
+      <div class="dpad" id="dpad">
+        <div class="arm u" data-d="up"><svg class="i"><use href="#i-up"/></svg></div>
+        <div class="arm d" data-d="down"><svg class="i" style="transform:rotate(180deg)"><use href="#i-up"/></svg></div>
+        <div class="arm l" data-d="left"><svg class="i" style="transform:rotate(-90deg)"><use href="#i-up"/></svg></div>
+        <div class="arm r" data-d="right"><svg class="i" style="transform:rotate(90deg)"><use href="#i-up"/></svg></div>
+        <div class="c"></div>
+      </div>
+      <div></div>
+      <div class="ab">
+        <button class="btn a" data-b="a">A</button>
+        <button class="btn b" data-b="b">B</button>
+      </div>
+      <div class="meta">
+        <button class="pill" data-b="select">SELECT</button>
+        <button class="pill" data-b="start">START</button>
+      </div>
     </div>
-    <div class="pad hidden" id="pad"></div>
+    <div class="keypad hidden" id="keypad"></div>
   </div>
 </div>
 
 <div class="sheet hidden" id="sheet"><div>
   <h2>Ajustes</h2>
-  <div class="opt">Velocidad<input id="speed" type="range" min="2" max="40" value="12"></div>
-  <div class="opt">Color<div class="swatches" id="sw"></div></div>
+  <div class="opt">Velocidad CHIP-8<input id="speed" type="range" min="2" max="40" value="12"></div>
+  <div class="opt">Color CHIP-8<div class="swatches" id="sw"></div></div>
+  <div class="opt"><label><input type="checkbox" id="vib" checked> Vibrar al tocar</label></div>
+  <button class="chip" id="kpToggle" style="justify-content:center"><svg class="i"><use href="#i-keys"/></svg>Mostrar teclado CHIP-8</button>
+  <div class="note">Teclado en PC: flechas = cruceta, Z = B, X = A, Enter = Start, Shift = Select.<br>Las ROMs se quedan solo en tu dispositivo, no se suben a ningún lado.</div>
   <button class="chip" id="closeCfg" style="justify-content:center">Listo</button>
 </div></div>
 
+<script src="jsnes.min.js"></script>
 <script>
-// ===== Núcleo CHIP-8 =====
+const $=id=>document.getElementById(id), cv=$('cv'), ctx=cv.getContext('2d');
+let store={};try{store=JSON.parse(localStorage.getItem('jemu')||'{}');}catch(e){}
+const save=()=>{try{localStorage.setItem('jemu',JSON.stringify(store));}catch(e){}};
+store.sound??=true; store.color??='#a5f3fc'; store.vib??=true;
+
+// ================= Audio =================
+let actx, master;
+function initAudio(){ if(!actx){actx=new (window.AudioContext||window.webkitAudioContext)();master=actx.createGain();master.connect(actx.destination);}
+  master.gain.value=store.sound?1:0; if(actx.state==='suspended')actx.resume(); }
+function sfx(freq,dur=.08,type='square',vol=.06,slide=0){ if(!actx||!store.sound)return; const o=actx.createOscillator(),g=actx.createGain();
+  o.type=type;o.frequency.setValueAtTime(freq,actx.currentTime); if(slide)o.frequency.exponentialRampToValueAtTime(slide,actx.currentTime+dur);
+  g.gain.setValueAtTime(vol,actx.currentTime);g.gain.exponentialRampToValueAtTime(.0001,actx.currentTime+dur);o.connect(g).connect(master);o.start();o.stop(actx.currentTime+dur); }
+
+// ================= Entrada unificada =================
+const IN={up:0,down:0,left:0,right:0,a:0,b:0,start:0,select:0};
+let sys=null; // sistema activo
+function press(btn,on){ if(IN[btn]===+on)return; IN[btn]=+on; if(on&&store.vib)navigator.vibrate?.(8); initAudio(); sys?.input?.(btn,on); }
+
+// Cruceta: un solo dedo que se puede deslizar (incluye diagonales)
+const dpad=$('dpad'), arms={}; dpad.querySelectorAll('[data-d]').forEach(a=>arms[a.dataset.d]=a);
+let dpadId=null;
+function dpadAt(e){ const r=dpad.getBoundingClientRect(), x=(e.clientX-r.left)/r.width-.5, y=(e.clientY-r.top)/r.height-.5, dz=.12;
+  const s={up:y<-dz&&Math.abs(x)<Math.abs(y)*2.2, down:y>dz&&Math.abs(x)<Math.abs(y)*2.2, left:x<-dz&&Math.abs(y)<Math.abs(x)*2.2, right:x>dz&&Math.abs(y)<Math.abs(x)*2.2};
+  for(const d in s){press(d,s[d]);arms[d].classList.toggle('on',s[d]);} }
+function dpadOff(){ dpadId=null; for(const d in arms){press(d,false);arms[d].classList.remove('on');} }
+dpad.addEventListener('pointerdown',e=>{e.preventDefault();dpadId=e.pointerId;dpad.setPointerCapture(e.pointerId);dpadAt(e);});
+dpad.addEventListener('pointermove',e=>{if(e.pointerId===dpadId)dpadAt(e);});
+['pointerup','pointercancel','lostpointercapture'].forEach(ev=>dpad.addEventListener(ev,e=>{if(e.pointerId===dpadId)dpadOff();}));
+// Botones A, B, Start, Select (multi-touch)
+document.querySelectorAll('[data-b]').forEach(el=>{const b=el.dataset.b;
+  el.addEventListener('pointerdown',e=>{e.preventDefault();el.setPointerCapture(e.pointerId);el.classList.add('on');press(b,true);});
+  ['pointerup','pointercancel','lostpointercapture'].forEach(ev=>el.addEventListener(ev,()=>{el.classList.remove('on');press(b,false);}));});
+document.addEventListener('contextmenu',e=>e.preventDefault());
+// Teclado físico
+const KB={arrowup:'up',arrowdown:'down',arrowleft:'left',arrowright:'right',x:'a',z:'b',enter:'start',shift:'select'};
+addEventListener('keydown',e=>{const b=KB[e.key.toLowerCase()];if(b){e.preventDefault();press(b,true);} else if(sys?.key)sys.key(e.key.toLowerCase(),true);});
+addEventListener('keyup',e=>{const b=KB[e.key.toLowerCase()];if(b)press(b,false); else if(sys?.key)sys.key(e.key.toLowerCase(),false);});
+// Mandos Bluetooth/USB (Gamepad API)
+const GPMAP={12:'up',13:'down',14:'left',15:'right',0:'a',1:'b',2:'b',3:'a',9:'start',8:'select'};
+function pollGamepad(){ for(const gp of navigator.getGamepads?.()||[]){ if(!gp)continue; for(const i in GPMAP)if(gp.buttons[i])press(GPMAP[i],gp.buttons[i].pressed);
+  if(gp.axes.length>=2){press('left',gp.axes[0]<-.5);press('right',gp.axes[0]>.5);press('up',gp.axes[1]<-.5);press('down',gp.axes[1]>.5);} } }
+
+// ================= CHIP-8 =================
 const FONT=[0xF0,0x90,0x90,0x90,0xF0,0x20,0x60,0x20,0x20,0x70,0xF0,0x10,0xF0,0x80,0xF0,0xF0,0x10,0xF0,0x10,0xF0,0x90,0x90,0xF0,0x10,0x10,0xF0,0x80,0xF0,0x10,0xF0,0xF0,0x80,0xF0,0x90,0xF0,0xF0,0x10,0x20,0x40,0x40,0xF0,0x90,0xF0,0x90,0xF0,0xF0,0x90,0xF0,0x10,0xF0,0xF0,0x90,0xF0,0x90,0x90,0xE0,0x90,0xE0,0x90,0xE0,0xF0,0x80,0x80,0x80,0xF0,0xE0,0x90,0x90,0x90,0xE0,0xF0,0x80,0xF0,0x80,0xF0,0xF0,0x80,0xF0,0x80,0x80];
 class Chip8{
   reset(rom){this.mem=new Uint8Array(4096);this.mem.set(FONT,0);this.V=new Uint8Array(16);this.I=0;this.pc=0x200;this.stack=[];this.dt=0;this.st=0;
-    this.disp=new Uint8Array(2048);this.keys=new Array(16).fill(false);this.waitReg=-1;this.dirty=true;
-    if(rom){this.mem.set(rom.slice(0,3584),0x200);this.rom=rom;}}
+    this.disp=new Uint8Array(2048);this.keys=new Array(16).fill(false);this.waitReg=-1;this.dirty=true;this.mem.set(rom.slice(0,3584),0x200);}
   keyDown(k){this.keys[k]=true;if(this.waitReg>=0){this.V[this.waitReg]=k;this.waitReg=-1;}}
   keyUp(k){this.keys[k]=false;}
   tick(){if(this.dt)this.dt--;if(this.st)this.st--;}
@@ -162,76 +260,222 @@ class Chip8{
     }
   }
 }
-
-// ===== Juegos originales =====
 const hex=s=>new Uint8Array(s.replace(/\s+/g,'').match(/../g).map(h=>parseInt(h,16)));
+const ROM_ATRAPA=hex(`00E0 601C 611E 6400 226A A292 D011 6E00 6E00 2274
+  6503 F515 6504 E5A1 2252 6506 E5A1 225E A293 D232 7301 D232 3F01 123C D232 2274 7401 2274 226A 124A
+  331F 124A D232 2274 6400 2274 226A F507 3500 124A 1214
+  A292 D011 3000 70FE D011 00EE  A292 D011 3038 7002 D011 00EE  C23E 6306 A293 D232 00EE
+  A298 F255 A295 F433 F265 6C1A 6D01 F129 DCD5 7C05 F229 DCD5 A298 F265 00EE  FFC0C0 000000 000000`);
+const ROM_TECLAS=hex('6A1C 6B0D 00E0 F00A F029 00E0 DAB5 1206');
+// Cruceta -> teclas CHIP-8 (convención habitual: 2/8/4/6, A=5)
+const C8MAP={up:2,down:8,left:4,right:6,a:5,b:0xA,start:0xF,select:0};
+function chip8System(rom,name,keypad){
+  const c=new Chip8();c.reset(rom);let beeping=false,osc,g;
+  return {name,size:[64,32],keypad,
+    start(){initAudio();osc=actx.createOscillator();g=actx.createGain();osc.type='square';osc.frequency.value=520;g.gain.value=0;osc.connect(g).connect(master);osc.start();},
+    stop(){try{osc.stop();}catch(e){}},
+    reset(){c.reset(rom);},
+    input(b,on){const k=C8MAP[b];if(k!==undefined)on?c.keyDown(k):c.keyUp(k);},
+    key(k,on){const i=parseInt(k,16);if(k.length===1&&!isNaN(i))on?c.keyDown(i):c.keyUp(i);},
+    pad:c,
+    frame(){const s=+$('speed').value;for(let i=0;i<s;i++)c.step();c.tick();
+      const b=c.st>0;if(b!==beeping){beeping=b;g.gain.setTargetAtTime(b?.05:0,actx.currentTime,.01);}},
+    draw(){if(!c.dirty)return;c.dirty=false;ctx.fillStyle='#04050b';ctx.fillRect(0,0,64,32);ctx.fillStyle=store.color;
+      for(let i=0;i<2048;i++)if(c.disp[i])ctx.fillRect(i%64,i/64|0,1,1);},
+    mute(){g&&g.gain.setTargetAtTime(0,actx.currentTime,.01);beeping=false;}};
+}
+
+// ================= NES (jsnes) =================
+function nesSystem(bytes,name){
+  initAudio();
+  const L=new Float32Array(8192),R=new Float32Array(8192);let wr=0,rd=0;
+  const img=ctx.createImageData(256,240),buf32=new Uint32Array(img.data.buffer);let frameReady=false;
+  const nes=new jsnes.NES({sampleRate:actx.sampleRate,
+    onFrame(fb){for(let i=0;i<61440;i++)buf32[i]=0xFF000000|fb[i];frameReady=true;},
+    onAudioSample(l,r){L[wr]=l;R[wr]=r;wr=(wr+1)&8191;}});
+  let s='';for(let i=0;i<bytes.length;i+=8192)s+=String.fromCharCode.apply(null,bytes.subarray(i,i+8192));
+  nes.loadROM(s);
+  const proc=actx.createScriptProcessor(1024,0,2);
+  proc.onaudioprocess=e=>{const l=e.outputBuffer.getChannelData(0),r=e.outputBuffer.getChannelData(1);
+    for(let i=0;i<l.length;i++){if(rd!==wr){l[i]=L[rd];r[i]=R[rd];rd=(rd+1)&8191;}else{l[i]=r[i]=0;}}};
+  const C=jsnes.Controller,MAP={up:C.BUTTON_UP,down:C.BUTTON_DOWN,left:C.BUTTON_LEFT,right:C.BUTTON_RIGHT,a:C.BUTTON_A,b:C.BUTTON_B,start:C.BUTTON_START,select:C.BUTTON_SELECT};
+  return {name,size:[256,240],
+    start(){proc.connect(master);}, stop(){proc.disconnect();},
+    reset(){nes.reloadROM();},
+    input(b,on){on?nes.buttonDown(1,MAP[b]):nes.buttonUp(1,MAP[b]);},
+    frame(){nes.frame();if(((wr-rd)&8191)>4096)rd=(wr-2048)&8191;},
+    draw(){if(frameReady){ctx.putImageData(img,0,0);frameReady=false;}},
+    mute(){rd=wr;}};
+}
+
+// ================= Jessito Run (juego original de plataformas) =================
+function runSystem(){
+  const T=16,W=200,H=15; let map,coins,enemies,p,cam,score,lives,time,state,level,flagX,particles;
+  function rng(seed){return()=>(seed=(seed*16807)%2147483647)/2147483647;}
+  function build(){
+    const r=rng(7+level*31);map=[];for(let y=0;y<H;y++)map.push(new Uint8Array(W));coins=[];enemies=[];particles=[];
+    let x=0,gh=12;
+    while(x<W){
+      const len=4+(r()*8|0);
+      for(let i=0;i<len&&x<W;i++,x++){for(let y=gh;y<H;y++)map[y][x]=y===gh?1:2;
+        if(x>8&&x<W-12&&r()<.12)coins.push({x:x*T+4,y:(gh-2)*T+4,t:r()*6});}
+      if(x>10&&x<W-14){
+        const k=r();
+        if(k<.35){x+=2+(r()*2|0);} // hueco
+        else if(k<.7){const py=gh-4-(r()*2|0),pw=3+(r()*3|0);for(let i=0;i<pw;i++){map[py][x-pw+i]=3;coins.push({x:(x-pw+i)*T+4,y:(py-1)*T+4,t:i});}}
+        if(r()<.55)enemies.push({x:(x-2)*T,y:(gh-1)*T,vx:-.5-level*.15,alive:true,squash:0});
+        gh=Math.max(8,Math.min(12,gh+((r()*3|0)-1)));
+      }
+    }
+    for(let y=0;y<H;y++)for(let i=W-10;i<W;i++)map[y][i]=y>=12?(y===12?1:2):0;
+    flagX=(W-5)*T;
+    p={x:2*T,y:5*T,vx:0,vy:0,w:12,h:14,ground:false,face:1,inv:0,coyote:0,jbuf:0};cam=0;time=300;state='play';
+  }
+  const solid=(tx,ty)=>tx<0||(ty>=0&&ty<H&&tx<W&&map[ty][tx]>0);
+  function collide(o,dx,dy){
+    o.x+=dx; let x0=Math.floor(o.x/T),x1=Math.floor((o.x+o.w-1)/T),y0=Math.floor(o.y/T),y1=Math.floor((o.y+o.h-1)/T);
+    for(let ty=y0;ty<=y1;ty++)for(let tx=x0;tx<=x1;tx++)if(solid(tx,ty)){o.x=dx>0?tx*T-o.w:(tx+1)*T;o.hitX=true;return;}
+    o.y+=dy; x0=Math.floor(o.x/T);x1=Math.floor((o.x+o.w-1)/T);y0=Math.floor(o.y/T);y1=Math.floor((o.y+o.h-1)/T);
+    for(let ty=y0;ty<=y1;ty++)for(let tx=x0;tx<=x1;tx++)if(solid(tx,ty)){if(dy>0){o.y=ty*T-o.h;o.ground=true;}else{o.y=(ty+1)*T;}o.vy=0;return;}
+  }
+  function burst(x,y,c,n=8){for(let i=0;i<n;i++)particles.push({x,y,vx:(Math.random()-.5)*3,vy:-Math.random()*3,l:25,c});}
+  function die(){lives--;sfx(300,.4,'sawtooth',.06,60);burst(p.x+6,p.y+6,'#c4b5fd',14);
+    if(lives<=0){state='over';}else{const lx=p.x;build();p.x=Math.max(2*T,Math.floor(lx/T/20)*20*T);for(;p.x>2*T&&!solid(Math.floor(p.x/T),13);p.x-=T);p.y=4*T;p.inv=90;}}
+  function newGame(){score=0;lives=3;level=1;build();}
+  newGame();
+  return {name:'Jessito Run',size:[256,240],
+    start(){}, stop(){}, reset(){newGame();}, mute(){},
+    input(b,on){ if(b==='a'&&on)p.jbuf=8; if(b==='start'&&on){ if(state==='over')newGame(); else if(state==='win'){level++;build();} } },
+    frame(){
+      for(const q of particles){q.x+=q.vx;q.y+=q.vy;q.vy+=.2;q.l--;} particles=particles.filter(q=>q.l>0);
+      for(const c of coins)c.t+=.1;
+      if(state!=='play')return;
+      if((time-=1/60)<=0){time=300;die();return;}
+      const run=IN.b?1:0, max=run?3.2:2, acc=p.ground?.25:.15;
+      if(IN.left){p.vx=Math.max(p.vx-acc,-max);p.face=-1;} else if(IN.right){p.vx=Math.min(p.vx+acc,max);p.face=1;} else p.vx*=p.ground?.8:.95;
+      if(Math.abs(p.vx)<.05)p.vx=0;
+      p.coyote=p.ground?6:p.coyote-1; if(p.jbuf>0)p.jbuf--;
+      if(p.jbuf>0&&p.coyote>0){p.vy=-6.4-Math.abs(p.vx)*.25;p.jbuf=0;p.coyote=0;sfx(380,.12,'square',.05,760);}
+      if(!IN.a&&p.vy<-2)p.vy+=.5; // salto variable
+      p.vy=Math.min(p.vy+.32,7); p.ground=false;p.hitX=false;
+      collide(p,p.vx,0); if(p.hitX)p.vx=0; collide(p,0,p.vy);
+      if(p.inv>0)p.inv--;
+      if(p.y>H*T){die();return;}
+      for(const c of coins)if(!c.got&&Math.abs(p.x+6-c.x-4)<10&&Math.abs(p.y+7-c.y-4)<11){c.got=1;score+=10;sfx(990,.08,'square',.04,1500);burst(c.x+4,c.y+4,'#ffd43b',5);}
+      for(const e of enemies){ if(!e.alive){e.squash--;continue;} if(e.x<cam-T*2||e.x>cam+300)continue;
+        e.w=14;e.h=14;e.hitX=false;e.ground=false;e.vy=Math.min((e.vy||0)+.3,6);
+        collide(e,e.vx,0); if(e.hitX)e.vx=-e.vx; collide(e,0,e.vy);
+        if(e.ground){const ahead=Math.floor((e.vx>0?e.x+e.w+1:e.x-1)/T);if(!solid(ahead,Math.floor((e.y+e.h+2)/T)))e.vx=-e.vx;}
+        if(e.y>H*T)e.alive=false;
+        if(p.x<e.x+e.w&&p.x+p.w>e.x&&p.y<e.y+e.h&&p.y+p.h>e.y){
+          if(p.vy>0&&p.y+p.h-e.y<9){e.alive=false;e.squash=20;p.vy=IN.a?-6.5:-4;score+=50;sfx(200,.15,'triangle',.08,80);burst(e.x+7,e.y+10,'#ff5c8a');}
+          else if(!p.inv){die();return;} } }
+      if(p.x>=flagX){state='win';score+=Math.ceil(time)*2;sfx(523,.15);setTimeout(()=>sfx(659,.15),150);setTimeout(()=>sfx(784,.3),300);}
+      cam+=((p.x-110)-cam)*.15; cam=Math.max(0,Math.min(cam,W*T-256));
+    },
+    draw(){
+      const g=ctx.createLinearGradient(0,0,0,240);g.addColorStop(0,'#3b2a8f');g.addColorStop(1,'#22d3ee');ctx.fillStyle=g;ctx.fillRect(0,0,256,240);
+      ctx.fillStyle='#ffffff22';for(let i=0;i<8;i++){const x=((i*97-cam*.2)%330+330)%330-40;ctx.beginPath();ctx.ellipse(x,30+i%3*18,22,8,0,0,7);ctx.fill();}
+      ctx.fillStyle='#2d1f73';for(let i=0;i<10;i++){const x=((i*140-cam*.4)%420+420)%420-80;ctx.beginPath();ctx.moveTo(x,200);ctx.lineTo(x+60,120+i%3*15);ctx.lineTo(x+120,200);ctx.fill();}
+      ctx.save();ctx.translate(-Math.round(cam),0);
+      const t0=Math.floor(cam/T),t1=t0+18;
+      for(let y=0;y<H;y++)for(let x=t0;x<t1&&x<W;x++){const v=map[y][x];if(!v)continue;const X=x*T,Y=y*T;
+        if(v===1){ctx.fillStyle='#7a4a2b';ctx.fillRect(X,Y,T,T);ctx.fillStyle='#4ade80';ctx.fillRect(X,Y,T,5);ctx.fillStyle='#22c55e';ctx.fillRect(X,Y+4,T,2);}
+        else if(v===2){ctx.fillStyle='#6b3f24';ctx.fillRect(X,Y,T,T);ctx.fillStyle='#5a341d';ctx.fillRect(X+3,Y+5,3,3);ctx.fillRect(X+10,Y+11,3,3);}
+        else {ctx.fillStyle='#f59e0b';ctx.fillRect(X,Y,T,T);ctx.fillStyle='#fcd34d';ctx.fillRect(X+1,Y+1,T-2,3);ctx.strokeStyle='#b45309';ctx.strokeRect(X+.5,Y+.5,T-1,T-1);}}
+      ctx.fillStyle='#e2e8f0';ctx.fillRect(flagX+6,12*T-120,3,120);ctx.fillStyle='#ff5c8a';ctx.beginPath();ctx.moveTo(flagX+9,12*T-118);ctx.lineTo(flagX+34,12*T-108);ctx.lineTo(flagX+9,12*T-98);ctx.fill();
+      for(const c of coins){if(c.got)continue;const w=Math.abs(Math.cos(c.t))*4+1;ctx.fillStyle='#ffd43b';ctx.beginPath();ctx.ellipse(c.x+4,c.y+4,w,5,0,0,7);ctx.fill();}
+      for(const e of enemies){if(!e.alive&&e.squash<=0)continue;ctx.fillStyle='#ff5c8a';
+        if(!e.alive){ctx.fillRect(e.x,e.y+10,14,4);continue;}
+        const b=Math.sin(e.x*.3)*1.5;ctx.beginPath();ctx.ellipse(e.x+7,e.y+8-b*.3,7,6+b*.3,0,0,7);ctx.fill();
+        ctx.fillStyle='#fff';ctx.fillRect(e.x+3,e.y+5,3,3);ctx.fillRect(e.x+8,e.y+5,3,3);ctx.fillStyle='#000';ctx.fillRect(e.x+(e.vx<0?3:5),e.y+6,2,2);ctx.fillRect(e.x+(e.vx<0?8:10),e.y+6,2,2);}
+      if(state!=='over'&&!(p.inv&&p.inv%6<3)){const sq=p.ground?0:2;
+        ctx.fillStyle='#7c5cff';ctx.beginPath();ctx.roundRect(p.x-sq/2,p.y-1+sq,p.w+sq,p.h+1-sq,5);ctx.fill();
+        ctx.fillStyle='#a78bfa';ctx.fillRect(p.x+2,p.y+1,p.w-4,3);
+        ctx.fillStyle='#fff';const ex=p.face>0?6:1;ctx.fillRect(p.x+ex,p.y+4,3,4);ctx.fillRect(p.x+ex+4,p.y+4,3,4);
+        ctx.fillStyle='#111';ctx.fillRect(p.x+ex+(p.face>0?1:0),p.y+5,2,2);ctx.fillRect(p.x+ex+4+(p.face>0?1:0),p.y+5,2,2);
+        ctx.fillStyle='#22d3ee';ctx.fillRect(p.x+1,p.y+p.h-3,4,3);ctx.fillRect(p.x+p.w-5,p.y+p.h-3,4,3);}
+      for(const q of particles){ctx.fillStyle=q.c;ctx.fillRect(q.x,q.y,2,2);}
+      ctx.restore();
+      ctx.fillStyle='#0007';ctx.fillRect(0,0,256,18);ctx.fillStyle='#fff';ctx.font='bold 10px system-ui';ctx.textBaseline='middle';
+      ctx.fillText('★ '+score,6,9);ctx.fillText('♥ '+lives,80,9);ctx.fillText('NIVEL '+level,128,9);ctx.fillText('⏱ '+Math.ceil(time),208,9);
+      if(state!=='play'){ctx.fillStyle='#000a';ctx.fillRect(0,80,256,70);ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='bold 18px system-ui';
+        ctx.fillText(state==='win'?'¡Nivel completado!':'Fin del juego',128,105);ctx.font='11px system-ui';ctx.fillText('Toca START para '+(state==='win'?'el siguiente nivel':'jugar otra vez'),128,130);ctx.textAlign='left';}
+    }};
+}
+
+// ================= Gestor de sistemas =================
+let running=false;
+const icon=(el,id)=>el.querySelector('use').setAttribute('href','#'+id);
+function launch(s,hint){
+  sys?.stop();sys=s;cv.width=s.size[0];cv.height=s.size[1];ctx.imageSmoothingEnabled=false;
+  $('sys').textContent=s.name;$('ov').classList.add('hidden');$('toast').textContent=hint||'';
+  $('keypad').classList.toggle('hidden',!s.keypad);$('gamepad').classList.toggle('hidden',!!s.keypad);
+  s.start();running=true;icon($('pause'),'i-pause');
+}
 const GAMES={
-  // "Atrapa": mueve la barra con 4/6 y atrapa las pelotas que caen. Puntos arriba a la derecha.
-  atrapa:{name:'Atrapa',pad:true,hint:'Mueve la barra y atrapa las pelotas',rom:hex(`
-    00E0 601C 611E 6400 226A A292 D011 6E00 6E00 2274
-    6503 F515 6504 E5A1 2252 6506 E5A1 225E A293 D232 7301 D232 3F01 123C D232 2274 7401 2274 226A 124A
-    331F 124A D232 2274 6400 2274 226A
-    F507 3500 124A 1214
-    A292 D011 3000 70FE D011 00EE
-    A292 D011 3038 7002 D011 00EE
-    C23E 6306 A293 D232 00EE
-    A298 F255 A295 F433 F265 6C1A 6D01 F129 DCD5 7C05 F229 DCD5 A298 F265 00EE
-    FFC0C0 000000 000000`)},
-  // "Teclas": muestra la tecla que toques
-  teclas:{name:'Teclas',pad:false,hint:'Toca una tecla para verla en pantalla',rom:hex('6A1C 6B0D 00E0 F00A F029 00E0 DAB5 1206')},
+  run:()=>launch(runSystem(),'Cruceta: moverte · A: saltar · B: correr'),
+  atrapa:()=>launch(chip8System(ROM_ATRAPA,'Atrapa'),'Mueve la barra con ◀ ▶ y atrapa las pelotas'),
+  teclas:()=>launch(chip8System(ROM_TECLAS,'Teclas',true),'Toca una tecla para verla en pantalla'),
 };
+const selChip=el=>{document.querySelectorAll('.games .chip').forEach(c=>c.classList.remove('sel'));el?.classList.add('sel');};
+document.querySelectorAll('[data-game]').forEach(b=>b.onclick=()=>{initAudio();selChip(b);GAMES[b.dataset.game]();});
 
-// ===== Interfaz =====
-const cpu=new Chip8(),cv=document.getElementById('cv'),ctx=cv.getContext('2d'),$=id=>document.getElementById(id);
-let store={};try{store=JSON.parse(localStorage.getItem('jemu')||'{}');}catch(e){}
-let running=false,soundOn=store.sound??true,color=store.color||'#a5f3fc',audio,gain,lastBeep=false;
-const save=()=>{try{localStorage.setItem('jemu',JSON.stringify({sound:soundOn,color,speed:+$('speed').value}));}catch(e){}};
-if(store.speed)$('speed').value=store.speed;
+function loadRom(name,bytes){
+  const clean=name.replace(/\.\w+$/,'');
+  try{
+    if(/\.nes$/i.test(name)||(bytes[0]===0x4E&&bytes[1]===0x45&&bytes[2]===0x53))launch(nesSystem(bytes,clean),'NES · Cruceta, A, B, START, SELECT');
+    else launch(chip8System(bytes,clean),'CHIP-8 · cruceta = 2/4/6/8, A = 5');
+  }catch(err){$('toast').textContent='No se pudo abrir la ROM: '+err.message;}
+}
+$('file').onchange=async e=>{const f=e.target.files[0];if(!f)return;initAudio();const bytes=new Uint8Array(await f.arrayBuffer());
+  loadRom(f.name,bytes);dbPut(f.name,bytes);showLast(f.name);selChip($('last'));e.target.value='';};
 
-function draw(){if(!cpu.dirty)return;cpu.dirty=false;ctx.fillStyle='#04050b';ctx.fillRect(0,0,64,32);ctx.fillStyle=color;
-  for(let i=0;i<2048;i++)if(cpu.disp[i])ctx.fillRect(i%64,i/64|0,1,1);}
-function initAudio(){if(audio){audio.resume();return;}audio=new (window.AudioContext||window.webkitAudioContext)();const o=audio.createOscillator();gain=audio.createGain();
-  o.type='square';o.frequency.value=520;gain.gain.value=0;o.connect(gain).connect(audio.destination);o.start();}
-function beep(on){on=on&&soundOn;if(!audio||on===lastBeep)return;lastBeep=on;gain.gain.setTargetAtTime(on?0.06:0,audio.currentTime,0.01);}
-cpu.reset();cpu.dirty=true;
-let last=0,acc=0;
-function loop(t){if(running){acc+=Math.min(t-last,100);while(acc>=1000/60){acc-=1000/60;const s=+$('speed').value;for(let i=0;i<s;i++)cpu.step();cpu.tick();}beep(cpu.st>0);}else beep(false);
-  last=t;draw();requestAnimationFrame(loop);}
+// Recordar la última ROM (IndexedDB, solo en este dispositivo)
+function db(){return new Promise((ok,ko)=>{const r=indexedDB.open('jemu',1);r.onupgradeneeded=()=>r.result.createObjectStore('roms');r.onsuccess=()=>ok(r.result);r.onerror=ko;});}
+async function dbPut(name,bytes){try{const d=await db();d.transaction('roms','readwrite').objectStore('roms').put({name,bytes},'last');}catch(e){}}
+async function dbGet(){try{const d=await db();return await new Promise(ok=>{const q=d.transaction('roms').objectStore('roms').get('last');q.onsuccess=()=>ok(q.result);q.onerror=()=>ok(null);});}catch(e){return null;}}
+function showLast(name){$('last').classList.remove('hidden');$('last').querySelector('span').textContent=name.replace(/\.\w+$/,'').slice(0,18);}
+dbGet().then(r=>{if(!r)return;showLast(r.name);$('last').onclick=async()=>{initAudio();const x=await dbGet();if(x){selChip($('last'));loadRom(x.name,x.bytes);}};});
+$('last').onclick=async()=>{initAudio();const x=await dbGet();if(x){selChip($('last'));loadRom(x.name,x.bytes);}};
+
+// Bucle principal a 60 fps fijos
+let last=performance.now(),acc=0;
+function loop(t){ pollGamepad();
+  if(sys&&running){acc+=Math.min(t-last,100);let n=0;while(acc>=1000/60&&n<4){acc-=1000/60;sys.frame();n++;}}
+  last=t; sys?.draw(); requestAnimationFrame(loop); }
 requestAnimationFrame(loop);
 
-const icon=(el,id)=>el.querySelector('use').setAttribute('href','#'+id);
-function setPad(game){$('dpad').classList.toggle('hidden',!game);$('pad').classList.toggle('hidden',!!game);}
-function start(rom,name,hint,usePad){initAudio();cpu.reset(rom);running=true;icon($('pause'),'i-pause');$('hud').textContent=name;$('toast').textContent=hint||'';setPad(usePad);}
-document.querySelectorAll('[data-game]').forEach(b=>b.onclick=()=>{const g=GAMES[b.dataset.game];
-  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('sel'));b.classList.add('sel');start(g.rom,g.name,g.hint,g.pad);});
-
-// Controles táctiles: multi-touch con pointer events
-function bindKey(el,k){
-  const down=e=>{e.preventDefault();initAudio();el.setPointerCapture?.(e.pointerId);el.classList.add('on');cpu.keyDown(k);navigator.vibrate?.(10);};
-  const up=e=>{e.preventDefault();el.classList.remove('on');cpu.keyUp(k);};
-  el.addEventListener('pointerdown',down);['pointerup','pointercancel','lostpointercapture'].forEach(ev=>el.addEventListener(ev,up));
-  el.addEventListener('contextmenu',e=>e.preventDefault());}
-const LAYOUT=[1,2,3,0xC,4,5,6,0xD,7,8,9,0xE,0xA,0,0xB,0xF];
-LAYOUT.forEach(k=>{const b=document.createElement('button');b.className='key';b.textContent=k.toString(16).toUpperCase();bindKey(b,k);$('pad').appendChild(b);});
-document.querySelectorAll('[data-k]').forEach(b=>bindKey(b,+b.dataset.k));
-
-const KEYMAP={'1':1,'2':2,'3':3,'4':0xC,'q':4,'w':5,'e':6,'r':0xD,'a':7,'s':8,'d':9,'f':0xE,'z':0xA,'x':0,'c':0xB,'v':0xF,'arrowleft':4,'arrowright':6};
-addEventListener('keydown',e=>{const k=KEYMAP[e.key.toLowerCase()];if(k!==undefined&&!e.repeat)cpu.keyDown(k);});
-addEventListener('keyup',e=>{const k=KEYMAP[e.key.toLowerCase()];if(k!==undefined)cpu.keyUp(k);});
-
-$('file').onchange=async e=>{const f=e.target.files[0];if(!f)return;document.querySelectorAll('.chip').forEach(c=>c.classList.remove('sel'));
-  start(new Uint8Array(await f.arrayBuffer()),f.name.replace(/\.\w+$/,''),'ROM cargada · usa el teclado',false);};
-$('toggleKeys').onclick=()=>setPad($('pad').classList.contains('hidden')?false:true);
-$('pause').onclick=()=>{if(!cpu.rom)return;running=!running;icon($('pause'),running?'i-pause':'i-play');};
-$('reset').onclick=()=>{if(cpu.rom){cpu.reset(cpu.rom);running=true;icon($('pause'),'i-pause');}};
-$('sound').onclick=()=>{soundOn=!soundOn;icon($('sound'),soundOn?'i-vol':'i-mute');save();};
-icon($('sound'),soundOn?'i-vol':'i-mute');
+// Barra superior
+function setPaused(p){if(!sys)return;running=!p;icon($('pause'),p?'i-play':'i-pause');if(p)sys.mute();}
+$('pause').onclick=()=>setPaused(running);
+$('reset').onclick=()=>{if(sys){sys.reset();setPaused(false);}};
+$('sound').onclick=()=>{store.sound=!store.sound;save();icon($('sound'),store.sound?'i-vol':'i-mute');if(master)master.gain.value=store.sound?1:0;};
+icon($('sound'),store.sound?'i-vol':'i-mute');
+$('full').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else{await document.documentElement.requestFullscreen({navigationUI:'hide'});await screen.orientation?.lock?.('landscape').catch(()=>{});}}catch(e){}};
 $('cfg').onclick=()=>$('sheet').classList.remove('hidden');
-$('closeCfg').onclick=$('sheet').onclick=e=>{if(e.target===$('sheet')||e.target===$('closeCfg')){$('sheet').classList.add('hidden');save();}};
-['#a5f3fc','#86efac','#fcd34d','#f9a8d4','#c4b5fd','#ffffff'].forEach(c=>{const s=document.createElement('div');s.className='sw'+(c===color?' sel':'');s.style.background=c;
-  s.onclick=()=>{color=c;cpu.dirty=true;document.querySelectorAll('.sw').forEach(x=>x.classList.remove('sel'));s.classList.add('sel');save();};$('sw').appendChild(s);});
-document.addEventListener('visibilitychange',()=>{if(document.hidden&&running){running=false;icon($('pause'),'i-play');}});
+$('sheet').onclick=e=>{if(e.target===$('sheet')||e.target.closest('#closeCfg')){$('sheet').classList.add('hidden');store.speed=+$('speed').value;save();}};
+$('kpToggle').onclick=()=>{const kp=$('keypad').classList.toggle('hidden');$('gamepad').classList.toggle('hidden',!kp);};
+$('vib').checked=store.vib;$('vib').onchange=e=>{store.vib=e.target.checked;save();};
+if(store.speed)$('speed').value=store.speed;
+['#a5f3fc','#86efac','#fcd34d','#f9a8d4','#c4b5fd','#ffffff'].forEach(c=>{const s=document.createElement('div');s.className='sw'+(c===store.color?' sel':'');s.style.background=c;
+  s.onclick=()=>{store.color=c;save();if(sys?.pad)sys.pad.dirty=true;document.querySelectorAll('.sw').forEach(x=>x.classList.remove('sel'));s.classList.add('sel');};$('sw').appendChild(s);});
+// Teclado CHIP-8 4x4
+[1,2,3,0xC,4,5,6,0xD,7,8,9,0xE,0xA,0,0xB,0xF].forEach(k=>{const b=document.createElement('button');b.className='key';b.textContent=k.toString(16).toUpperCase();
+  b.addEventListener('pointerdown',e=>{e.preventDefault();b.setPointerCapture(e.pointerId);b.classList.add('on');initAudio();if(store.vib)navigator.vibrate?.(8);sys?.pad?.keyDown(k);});
+  ['pointerup','pointercancel','lostpointercapture'].forEach(ev=>b.addEventListener(ev,()=>{b.classList.remove('on');sys?.pad?.keyUp(k);}));$('keypad').appendChild(b);});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&running)setPaused(true);});
+
+// ================= PWA =================
+let deferred;
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;$('install').style.display='grid';});
+$('install').onclick=async()=>{if(!deferred)return;deferred.prompt();await deferred.userChoice;deferred=null;$('install').style.display='none';};
+addEventListener('appinstalled',()=>$('install').style.display='none');
 if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js');
+// Atajo: ?juego=run abre directo un juego
+{const j=new URLSearchParams(location.search).get('juego');if(GAMES[j]){selChip(document.querySelector(`[data-game="${j}"]`));GAMES[j]();}}
+// Abrir ROMs desde el sistema (Android: "Abrir con")
+if('launchQueue' in window)launchQueue.setConsumer(async p=>{for(const h of p.files||[]){const f=await h.getFile();const b=new Uint8Array(await f.arrayBuffer());loadRom(f.name,b);dbPut(f.name,b);showLast(f.name);}});
 </script>
 </body>
 </html>
