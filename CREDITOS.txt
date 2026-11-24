@@ -1,1 +1,2 @@
-Emulador web adaptado del proyecto jsnes (Apache 2.0): https://github.com/bfirsh/jsnes
+Motor multi-consola: EmulatorJS (GPL-3.0) https://github.com/EmulatorJS/EmulatorJS
+Núcleos libretro: fceumm, snes9x, mGBA, Gambatte, Genesis Plus GX y otros.
