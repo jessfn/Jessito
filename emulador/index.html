@@ -60,6 +60,11 @@
   .btn.a { right:0; top:8%; background:radial-gradient(circle at 35% 30%,#ff8fb0,var(--a)); }
   .btn.b { left:0; bottom:8%; background:radial-gradient(circle at 35% 30%,#ffd27a,var(--b)); }
   .btn.on { transform:translateY(4px) scale(.96); box-shadow:0 2px 0 #0007; filter:brightness(1.2); }
+  .ab.four .btn { width:40%; font-size:18px; }
+  .ab.four .a { right:0; top:30%; } .ab.four .b { left:30%; bottom:0; } .ab.four .x { left:30%; top:0; } .ab.four .y { left:0; top:30%; }
+  .btn.x { background:radial-gradient(circle at 35% 30%,#8fd9ff,#2f9bff); } .btn.y { background:radial-gradient(circle at 35% 30%,#a6f5b5,#22c55e); }
+  .pill.sh { margin-bottom:6px; padding:6px 26px; }
+  iframe.ejs { position:absolute; inset:0; width:100%; height:100%; border:0; background:#000; }
   .keypad { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; width:100%; }
   .key { height:40px; font-size:16px; font-weight:700; border-radius:12px; border:1px solid var(--line); background:linear-gradient(160deg,#2b2f5e,#191b34); box-shadow:0 3px 0 #05060f; }
   .key.on { transform:translateY(2px); box-shadow:none; background:var(--acc); }
@@ -113,6 +118,7 @@
       <button class="ib" id="reset" aria-label="Reiniciar"><svg class="i"><use href="#i-reset"/></svg></button>
     </div>
     <div class="mid"><div class="stick-zone" id="zone"><div class="stick" id="stick"><div class="ring"></div><div class="knob" id="knob"></div></div></div></div>
+    <button class="pill sh hidden" data-b="l" data-extra>L</button>
     <button class="pill" data-b="select">SELECT</button>
   </div>
 
@@ -133,9 +139,12 @@
       <div class="ab" id="ab">
         <button class="btn a" data-b="a">A</button>
         <button class="btn b" data-b="b">B</button>
+        <button class="btn x hidden" data-b="x" data-extra>X</button>
+        <button class="btn y hidden" data-b="y" data-extra>Y</button>
       </div>
       <div class="keypad hidden" id="keypad"></div>
     </div>
+    <button class="pill sh hidden" data-b="r" data-extra>R</button>
     <button class="pill" data-b="start">START</button>
   </div>
 </div>
@@ -147,7 +156,7 @@
     <button class="chip" data-game="atrapa"><svg class="i"><use href="#i-star"/></svg>Atrapa</button>
     <button class="chip" data-game="teclas"><svg class="i"><use href="#i-grid"/></svg>Teclas</button>
     <button class="chip hidden" id="last"><svg class="i"><use href="#i-cart"/></svg><span></span></button>
-    <label class="chip"><svg class="i"><use href="#i-folder"/></svg>Cargar ROM<input id="file" type="file" accept=".nes,.ch8,.c8,.rom" hidden></label>
+    <label class="chip"><svg class="i"><use href="#i-folder"/></svg>Cargar ROM<input id="file" type="file" accept=".zip,.nes,.fds,.sfc,.smc,.gba,.gb,.gbc,.md,.gen,.smd,.bin,.sms,.gg,.n64,.z64,.v64,.pce,.a26,.nds,.ch8,.c8,.rom" hidden></label>
   </div>
   <div class="note">Carga tus propias ROMs de NES (.nes) o CHIP-8 (.ch8). Se quedan solo en tu dispositivo.</div>
 </div></div>
@@ -162,7 +171,6 @@
   <button class="chip" id="closeCfg" style="justify-content:center">Listo</button>
 </div></div>
 
-<script src="jsnes.min.js"></script>
 <script>
 const $=id=>document.getElementById(id), cv=$('cv'), ctx=cv.getContext('2d');
 let store={};try{store=JSON.parse(localStorage.getItem('jemu')||'{}');}catch(e){}
@@ -178,7 +186,7 @@ function sfx(freq,dur=.08,type='square',vol=.06,slide=0){ if(!actx||!store.sound
   g.gain.setValueAtTime(vol,actx.currentTime);g.gain.exponentialRampToValueAtTime(.0001,actx.currentTime+dur);o.connect(g).connect(master);o.start();o.stop(actx.currentTime+dur); }
 
 // ================= Entrada unificada =================
-const IN={up:0,down:0,left:0,right:0,a:0,b:0,start:0,select:0};
+const IN={up:0,down:0,left:0,right:0,a:0,b:0,x:0,y:0,l:0,r:0,start:0,select:0};
 let sys=null; // sistema activo
 function press(btn,on){ if(IN[btn]===+on)return; IN[btn]=+on; if(on&&store.vib)navigator.vibrate?.(8); initAudio(); sys?.input?.(btn,on); }
 
@@ -211,11 +219,11 @@ document.addEventListener('dblclick',e=>e.preventDefault(),{passive:false});
 addEventListener('wheel',e=>{if(e.ctrlKey)e.preventDefault();},{passive:false});
 addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&['+','-','=','0'].includes(e.key))e.preventDefault();});
 // Teclado físico
-const KB={arrowup:'up',arrowdown:'down',arrowleft:'left',arrowright:'right',x:'a',z:'b',enter:'start',shift:'select'};
+const KB={arrowup:'up',arrowdown:'down',arrowleft:'left',arrowright:'right',x:'a',z:'b',s:'x',a:'y',q:'l',w:'r',enter:'start',shift:'select'};
 addEventListener('keydown',e=>{const b=KB[e.key.toLowerCase()];if(b){e.preventDefault();press(b,true);} else if(sys?.key)sys.key(e.key.toLowerCase(),true);});
 addEventListener('keyup',e=>{const b=KB[e.key.toLowerCase()];if(b)press(b,false); else if(sys?.key)sys.key(e.key.toLowerCase(),false);});
 // Mandos Bluetooth/USB (Gamepad API)
-const GPMAP={12:'up',13:'down',14:'left',15:'right',0:'a',1:'b',2:'b',3:'a',9:'start',8:'select'};
+const GPMAP={12:'up',13:'down',14:'left',15:'right',0:'b',1:'a',2:'y',3:'x',4:'l',5:'r',9:'start',8:'select'};
 function pollGamepad(){ for(const gp of navigator.getGamepads?.()||[]){ if(!gp)continue; for(const i in GPMAP)if(gp.buttons[i])press(GPMAP[i],gp.buttons[i].pressed);
   if(gp.axes.length>=2){press('left',gp.axes[0]<-.5);press('right',gp.axes[0]>.5);press('up',gp.axes[1]<-.5);press('down',gp.axes[1]>.5);} } }
 
@@ -290,27 +298,40 @@ function chip8System(rom,name,keypad){
     mute(){g&&g.gain.setTargetAtTime(0,actx.currentTime,.01);beeping=false;}};
 }
 
-// ================= NES (jsnes) =================
-function nesSystem(bytes,name){
-  initAudio();
-  const L=new Float32Array(8192),R=new Float32Array(8192);let wr=0,rd=0;
-  const img=ctx.createImageData(256,240),buf32=new Uint32Array(img.data.buffer);let frameReady=false;
-  const nes=new jsnes.NES({sampleRate:actx.sampleRate,
-    onFrame(fb){for(let i=0;i<61440;i++)buf32[i]=0xFF000000|fb[i];frameReady=true;},
-    onAudioSample(l,r){L[wr]=l;R[wr]=r;wr=(wr+1)&8191;}});
-  let s='';for(let i=0;i<bytes.length;i+=8192)s+=String.fromCharCode.apply(null,bytes.subarray(i,i+8192));
-  nes.loadROM(s);
-  const proc=actx.createScriptProcessor(1024,0,2);
-  proc.onaudioprocess=e=>{const l=e.outputBuffer.getChannelData(0),r=e.outputBuffer.getChannelData(1);
-    for(let i=0;i<l.length;i++){if(rd!==wr){l[i]=L[rd];r[i]=R[rd];rd=(rd+1)&8191;}else{l[i]=r[i]=0;}}};
-  const C=jsnes.Controller,MAP={up:C.BUTTON_UP,down:C.BUTTON_DOWN,left:C.BUTTON_LEFT,right:C.BUTTON_RIGHT,a:C.BUTTON_A,b:C.BUTTON_B,start:C.BUTTON_START,select:C.BUTTON_SELECT};
-  return {name,size:[256,240],aspect:'4/3',
-    start(){proc.connect(master);}, stop(){proc.disconnect();},
-    reset(){nes.reloadROM();},
-    input(b,on){on?nes.buttonDown(1,MAP[b]):nes.buttonUp(1,MAP[b]);},
-    frame(){nes.frame();if(((wr-rd)&8191)>4096)rd=(wr-2048)&8191;},
-    draw(){if(frameReady){ctx.putImageData(img,0,0);frameReady=false;}},
-    mute(){rd=wr;}};
+// ================= Multi-consola (EmulatorJS en un iframe) =================
+// Consolas por extensión del archivo
+const CORES={nes:'nes',fds:'nes',unf:'nes',unif:'nes',sfc:'snes',smc:'snes',fig:'snes',swc:'snes',gba:'gba',gb:'gb',gbc:'gb',
+  md:'segaMD',gen:'segaMD',smd:'segaMD',bin:'segaMD',sms:'segaMS',gg:'segaGG',n64:'n64',z64:'n64',v64:'n64',pce:'pce',a26:'atari2600',nds:'nds'};
+const CONSOLE_INFO={nes:['NES','4/3',[]],snes:['Super Nintendo','4/3',['x','y','l','r']],gba:['Game Boy Advance','3/2',['l','r']],gb:['Game Boy','10/9',[]],
+  segaMD:['Sega Genesis','4/3',['x','y','l']],segaMS:['Master System','4/3',[]],segaGG:['Game Gear','10/9',[]],n64:['Nintendo 64','4/3',['x','y','l','r']],
+  pce:['PC Engine','4/3',[]],atari2600:['Atari 2600','4/3',[]],nds:['Nintendo DS','4/3',['x','y','l','r']]};
+const RETROPAD={b:0,y:1,select:2,start:3,up:4,down:5,left:6,right:7,a:8,x:9,l:10,r:11};
+function zipInnerName(b){ // nombre del primer archivo dentro de un .zip
+  if(!(b[0]===0x50&&b[1]===0x4B))return null; const n=b[26]|(b[27]<<8); return new TextDecoder().decode(b.subarray(30,30+n)); }
+function coreFor(name,bytes){
+  let ext=(name.split('.').pop()||'').toLowerCase();
+  if(ext==='zip'){const inner=zipInnerName(bytes);if(inner)ext=(inner.split('.').pop()||'').toLowerCase();}
+  if(bytes[0]===0x4E&&bytes[1]===0x45&&bytes[2]===0x53)return 'nes';
+  return CORES[ext]||null;
+}
+function ejsSystem(bytes,name,core){
+  const [label,aspect,extra]=CONSOLE_INFO[core];
+  const url=URL.createObjectURL(new Blob([bytes]));
+  let frame,emu=null,queue=[];
+  const emuReady=()=>{try{emu=frame.contentWindow.EJS_emulator;return !!emu?.gameManager;}catch(e){return false;}};
+  const send=(b,on)=>{const i=RETROPAD[b];if(i===undefined)return;
+    if(emuReady())emu.gameManager.simulateInput(0,i,on?1:0); else if(on)queue.push(b);};
+  const onMsg=e=>{if(e.data?.ejs==='start'){emuReady();emu?.setVolume?.(store.sound?.8:0);queue=[];showHint(label+' · ¡a jugar!');}};
+  return {name,size:[4,3],aspect,extra,
+    start(){window.__ejsGame={core,url,name,volume:store.sound?.8:0};addEventListener('message',onMsg);
+      frame=document.createElement('iframe');frame.src='ejs.html';frame.className='ejs';frame.allow='autoplay; gamepad; fullscreen';
+      document.querySelector('.screen').appendChild(frame);},
+    stop(){removeEventListener('message',onMsg);frame?.remove();URL.revokeObjectURL(url);},
+    reset(){if(emuReady())emu.gameManager.restart();},
+    input:send,
+    setRunning(on){if(emuReady())on?emu.play():emu.pause();},
+    setSound(on){if(emuReady())emu.setVolume(on?.8:0);},
+    frame(){}, draw(){}, mute(){}};
 }
 
 // ================= Jessito Run (juego original de plataformas) =================
@@ -416,6 +437,8 @@ function launch(s,hint){
   sys?.stop();sys=s;cv.width=s.size[0];cv.height=s.size[1];fit();
   $('ov').classList.add('hidden');$('menu').classList.add('hidden');showHint(hint);
   $('keypad').classList.toggle('hidden',!s.keypad);$('ab').classList.toggle('hidden',!!s.keypad);
+  const ex=s.extra||[];document.querySelectorAll('[data-extra]').forEach(b=>b.classList.toggle('hidden',!ex.includes(b.dataset.b)));
+  $('ab').classList.toggle('four',ex.includes('x'));
   s.start();running=true;icon($('pause'),'i-pause');
 }
 function fit(){ if(!sys)return; if(sys.fluid){const side=parseFloat(getComputedStyle(document.getElementById('app')).gridTemplateColumns)||0,w=innerWidth-2*side,h=innerHeight;
@@ -436,8 +459,11 @@ document.querySelectorAll('[data-game]').forEach(b=>b.onclick=()=>{initAudio();s
 function loadRom(name,bytes){
   const clean=name.replace(/\.\w+$/,'');
   try{
-    if(/\.nes$/i.test(name)||(bytes[0]===0x4E&&bytes[1]===0x45&&bytes[2]===0x53))launch(nesSystem(bytes,clean),'NES · joystick, A, B, START, SELECT');
-    else launch(chip8System(bytes,clean),'CHIP-8 · joystick = 2/4/6/8, A = 5');
+    const core=coreFor(name,bytes);
+    if(core){if(!navigator.onLine){showHint('Conéctate a internet para cargar el emulador de '+CONSOLE_INFO[core][0]);return;}
+      launch(ejsSystem(bytes,clean,core),'Cargando '+CONSOLE_INFO[core][0]+'…');}
+    else if(/\.(ch8|c8)$/i.test(name)||bytes.length<=3584)launch(chip8System(bytes,clean),'CHIP-8 · joystick = 2/4/6/8, A = 5');
+    else showHint('Formato no reconocido: '+name);
   }catch(err){showHint('No se pudo abrir la ROM: '+err.message);}
 }
 $('file').onchange=async e=>{const f=e.target.files[0];if(!f)return;initAudio();const bytes=new Uint8Array(await f.arrayBuffer());
@@ -459,10 +485,10 @@ function loop(t){ pollGamepad();
 requestAnimationFrame(loop);
 
 // Barra superior
-function setPaused(p){if(!sys)return;running=!p;icon($('pause'),p?'i-play':'i-pause');if(p)sys.mute();}
+function setPaused(p){if(!sys)return;running=!p;icon($('pause'),p?'i-play':'i-pause');if(p)sys.mute();sys.setRunning?.(!p);}
 $('pause').onclick=()=>setPaused(running);
 $('reset').onclick=()=>{if(sys){sys.reset();setPaused(false);}};
-$('sound').onclick=()=>{store.sound=!store.sound;save();icon($('sound'),store.sound?'i-vol':'i-mute');if(master)master.gain.value=store.sound?1:0;};
+$('sound').onclick=()=>{store.sound=!store.sound;save();icon($('sound'),store.sound?'i-vol':'i-mute');if(master)master.gain.value=store.sound?1:0;sys?.setSound?.(store.sound);};
 icon($('sound'),store.sound?'i-vol':'i-mute');
 $('full').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else{await document.documentElement.requestFullscreen({navigationUI:'hide'});await screen.orientation?.lock?.('landscape').catch(()=>{});}}catch(e){}};
 $('cfg').onclick=()=>$('sheet').classList.remove('hidden');

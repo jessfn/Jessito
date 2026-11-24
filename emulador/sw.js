@@ -1,7 +1,7 @@
 // Service worker: SIEMPRE intenta la red primero (así cada actualización llega al instante)
 // y usa la caché solo si no hay internet.
 const C = 'jemu-cache';
-const FILES = ['./', 'index.html', 'jsnes.min.js', 'icon.svg', 'icon-192.png', 'icon-512.png', 'manifest.webmanifest'];
+const FILES = ['./', 'index.html', 'icon.svg', 'icon-192.png', 'icon-512.png', 'manifest.webmanifest'];
 
 self.addEventListener('install', e => { self.skipWaiting(); e.waitUntil(caches.open(C).then(c => c.addAll(FILES)).catch(() => {})); });
 self.addEventListener('activate', e => e.waitUntil(
