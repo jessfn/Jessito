@@ -16,7 +16,8 @@
 <style>
   :root { --bg:#0b0c1a; --card:#1a1c35; --line:#2f3366; --acc:#7c5cff; --acc2:#22d3ee; --txt:#eef0ff; --a:#ff5c8a; --b:#ffb020; }
   * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; }
-  html,body { margin:0; height:100%; overflow:hidden; background:radial-gradient(120% 80% at 50% 0%,#2a2366,var(--bg) 60%); color:var(--txt); font-family:system-ui,-apple-system,"Segoe UI",sans-serif; touch-action:none; overscroll-behavior:none; }
+  html,body { margin:0; height:100%; overflow:hidden; background:radial-gradient(120% 80% at 50% 0%,#2a2366,var(--bg) 60%); color:var(--txt); font-family:system-ui,-apple-system,"Segoe UI",sans-serif; touch-action:none; overscroll-behavior:none; -webkit-text-size-adjust:100%; text-size-adjust:100%; }
+  button, .chip, .ib, .arm, .btn, .pill, .key { touch-action:none; }
   svg.i { width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
   button { font:inherit; color:inherit; }
   .app { height:100dvh; max-width:560px; margin:0 auto; display:flex; flex-direction:column; gap:10px;
@@ -207,6 +208,13 @@ document.querySelectorAll('[data-b]').forEach(el=>{const b=el.dataset.b;
   el.addEventListener('pointerdown',e=>{e.preventDefault();el.setPointerCapture(e.pointerId);el.classList.add('on');press(b,true);});
   ['pointerup','pointercancel','lostpointercapture'].forEach(ev=>el.addEventListener(ev,()=>{el.classList.remove('on');press(b,false);}));});
 document.addEventListener('contextmenu',e=>e.preventDefault());
+// Sin zoom: pellizco (iOS/Android), doble toque y Ctrl+rueda/teclas
+['gesturestart','gesturechange','gestureend'].forEach(ev=>document.addEventListener(ev,e=>e.preventDefault(),{passive:false}));
+document.addEventListener('touchmove',e=>{if(e.touches.length>1||(e.scale&&e.scale!==1))e.preventDefault();},{passive:false});
+let lastTouch=0;document.addEventListener('touchend',e=>{const n=Date.now();if(n-lastTouch<350&&!e.target.closest('input,label'))e.preventDefault();lastTouch=n;},{passive:false});
+document.addEventListener('dblclick',e=>e.preventDefault(),{passive:false});
+addEventListener('wheel',e=>{if(e.ctrlKey)e.preventDefault();},{passive:false});
+addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&['+','-','=','0'].includes(e.key))e.preventDefault();});
 // Teclado físico
 const KB={arrowup:'up',arrowdown:'down',arrowleft:'left',arrowright:'right',x:'a',z:'b',enter:'start',shift:'select'};
 addEventListener('keydown',e=>{const b=KB[e.key.toLowerCase()];if(b){e.preventDefault();press(b,true);} else if(sys?.key)sys.key(e.key.toLowerCase(),true);});

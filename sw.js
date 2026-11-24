@@ -1,5 +1,5 @@
 // Caché offline: sirve rápido desde caché y actualiza en segundo plano
-const C = 'jemu-v2';
+const C = 'jemu-v3';
 const FILES = ['./', 'index.html', 'jsnes.min.js', 'icon.svg', 'icon-192.png', 'icon-512.png', 'manifest.webmanifest'];
 self.addEventListener('install', e => { self.skipWaiting(); e.waitUntil(caches.open(C).then(c => c.addAll(FILES))); });
 self.addEventListener('activate', e => e.waitUntil(
