@@ -1,0 +1,1 @@
+Emulador web adaptado del proyecto jsnes (Apache 2.0): https://github.com/bfirsh/jsnes
