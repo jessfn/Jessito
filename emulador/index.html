@@ -73,18 +73,20 @@
   #install { display:none; }
   /* ===== Horizontal: estilo consola portátil ===== */
   @media (orientation:landscape) and (max-height:560px) {
-    .app { max-width:none; display:grid; grid-template-columns:1fr auto 1fr; grid-template-rows:auto 1fr auto; gap:6px 12px; }
-    header { grid-column:1/-1; }
-    .screen { grid-column:2; grid-row:2; align-self:center; height:calc(100dvh - 130px); }
-    .screen canvas { height:100%; width:auto; }
-    .games { grid-column:2; grid-row:3; justify-content:center; max-width:60vw; }
+    .app { max-width:none; display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); grid-template-rows:auto minmax(0,1fr) auto auto; gap:6px 12px; }
+    header { grid-column:1/-1; grid-row:1; }
+    h1 small { display:none; }
+    .screen { grid-column:2; grid-row:2; align-self:center; justify-self:center; padding:4px; }
+    .screen canvas { height:calc(100dvh - 175px); width:auto; max-width:52vw; object-fit:contain; }
+    .games { grid-column:2; grid-row:3; justify-content:center; max-width:52vw; }
+    .chip { padding:6px 11px; font-size:12px; }
     .toast { display:none; }
     .pad-area, .gamepad { display:contents; }
-    .dpad { grid-column:1; grid-row:2/4; align-self:center; justify-self:center; width:min(22vw,170px); }
-    .ab { grid-column:3; grid-row:2/4; align-self:center; justify-self:center; width:min(22vw,170px); }
-    .meta { grid-column:1/-1; grid-row:1; justify-content:center; align-self:center; z-index:1; pointer-events:none; }
-    .meta .pill { pointer-events:auto; }
-    .keypad { grid-column:3; grid-row:2/4; align-self:center; }
+    .dpad { grid-column:1; grid-row:2/5; align-self:center; justify-self:center; width:min(20vw,160px); }
+    .ab { grid-column:3; grid-row:2/5; align-self:center; justify-self:center; width:min(20vw,160px); }
+    .meta { grid-column:2; grid-row:4; gap:14px; }
+    .pill { padding:5px 14px; }
+    .keypad { grid-column:3; grid-row:2/5; align-self:center; }
     .key { height:38px; font-size:15px; }
   }
 </style>
