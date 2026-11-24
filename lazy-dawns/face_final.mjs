@@ -9,3 +9,6 @@ export function applyFinalFace(lashes = true) {
   NOSMILE.on = true; if (lashes) LASHX.style = 'P3'; }
 
 export function resetFace() { MOUTHX.k = 1; MOUTHX.dy = 0; Object.assign(EYEX, { corner: 0, sx: 1, sy: 1, irK: 1, irX: 1, prK: 1, dx: 0, dy: 0, tilt: 0, tex: 0, anime: 0, thick: null, pal: null }); JAW.style = null; JAW.noLines = false; JAW.noChin = false; JAW.mouthK = 1; JAW.mouthUp = 0; JAW.w = 1; JAW.cheek = 0; JAW.light = 0; JAW.d = 0; NECK.dy = 0; NOSMILE.on = false; }
+
+// Rostro con el que TERMINO el dia 16 (mandibula T4 sin lineas, ojos y boca anteriores). Es el rostro de Lazy al inicio del dia 17 hasta que le cambian los ojos.
+export function applyDay16Face() { resetFace(); JAW.style = 'T4'; NECK.dy = 12; JAW.w = 0.95; JAW.cheek = 0; JAW.light = 0.5; JAW.d = 0.9; JAW.noLines = true; JAW.noChin = true; JAW.mouthK = 1.14; JAW.mouthUp = 0; NOSMILE.on = true; LASHX.style = 'P3'; }

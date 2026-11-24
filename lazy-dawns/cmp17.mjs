@@ -1,0 +1,12 @@
+import { Resvg } from '@resvg/resvg-js'; import { writeFileSync, readFileSync } from 'node:fs'; import { execSync } from 'node:child_process';
+import { renderCharacter as rc, defaultPose as dp, ALLDEFS } from './rig2d/character.mjs'; import { applyFinalFace, applyDay16Face } from './face_final.mjs'; import { defs } from './lazy_lib.mjs';
+const tiles = [];
+[['Día 17 al inicio (como terminó el Día 16)', applyDay16Face], ['Día 17 después de los ojos nuevos', applyFinalFace]].forEach(([n, fn], i) => { fn();
+  const P = dp(); P.eyes.lookX = 0.1; P.mouth.smile = 0.6; P.mouth.open = 0.05; P.noseStyle = 'D'; P.noseK = 1.35; P.hairOv = { lacio: 'C2', len: 0.4, shine: 1, cp: 1, grow: 1 }; P.hair.t = 1; P.skirt.t = 1;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1500" viewBox="0 0 1024 1500">${defs('e3d')}${ALLDEFS}<rect width="1024" height="1500" fill="#3a2540"/>${rc(P)}</svg>`;
+  writeFileSync(`/tmp/c17_${i}.png`, new Resvg(svg, { fitTo: { mode: 'zoom', value: 2 }, font: { loadSystemFonts: true } }).render().asPng()); execSync(`ffmpeg -y -loglevel error -i /tmp/c17_${i}.png -vf crop=900:1100:562:160,scale=600:733 /tmp/c17c_${i}.png`); tiles.push([n, readFileSync(`/tmp/c17c_${i}.png`)]); });
+execSync('ffmpeg -y -loglevel error -i /tmp/d16f.png -vf "scale=480:853" /tmp/d16s.png');
+const b64 = (b) => 'data:image/png;base64,' + Buffer.from(b).toString('base64');
+let body = `<image href="${b64(readFileSync('/tmp/d16s.png'))}" x="5" y="5" width="480" height="853"/><text x="245" y="905" font-family="Anton" font-size="30" text-anchor="middle" fill="#fff">Cuadro real del video del Día 16</text>`;
+tiles.forEach(([n, t], i) => { const x = 500 + i * 610; body += `<image href="${b64(t)}" x="${x}" y="60" width="600" height="733"/><text x="${x + 300}" y="905" font-family="Anton" font-size="30" text-anchor="middle" fill="#fff">${n}</text>`; });
+writeFileSync('Rostro_inicio_dia17.png', new Resvg(`<svg xmlns="http://www.w3.org/2000/svg" width="1730" height="950"><rect width="1730" height="950" fill="#1d1426"/>${body}</svg>`, { font: { loadSystemFonts: true } }).render().asPng());
