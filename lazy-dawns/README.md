@@ -249,3 +249,10 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
 - Descargar de internet lo necesario cuando la red lo permita (hoy el proxy bloquea ambientcg/polyhaven: usar texturas procedurales).
 - Opciones del voto del día 16: maquillaje o ojos (día 17).
 - OJOS FINALES (opción D "Almendra mediana", aprobada): forma almendrada con esquinas (interna redondeada, externa en punta), iris anime texturizado, pupila pequeña, pestañas P3 adaptadas al contorno del párpado. Ya incluidos en `applyFinalFace()`.
+
+## Día 17 — "Ella no sabe que la siguen"
+- Votado: ojos → ojos negro café profundo (rostro final aprobado desde aquí). Estructura nueva PERMANENTE: intro corta de M planeando en la oscuridad (sin spoilers), luego claqueta con el título del día sobre fondo animado, luego el episodio. Votación final siempre con fondo animado.
+- Nuevos: Dra. Ivana (oculista, voz K), Will (voz Y). Escenas 2D: guarida de M, clínica Iris, calle nocturna con balcón. M rehecho: piernas articuladas con rodilla y botas pegadas (rig2d/m_legs2.mjs).
+- M moja a Lazy con un cubo de agua: maquillaje corrido, labios sin labial, pestañas se quedan. Will le ofrece su abrigo.
+- Votación: maquillaje o peinado (día 18).
+- ElevenLabs: SIN CRÉDITOS al terminar el día 17; hace falta recargar para generar voces del día 18.
