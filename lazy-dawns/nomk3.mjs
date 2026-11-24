@@ -9,7 +9,7 @@ const drips = (k, wet) => { if (k <= 0) return ''; const R = (i) => { const s = 
   g += `<ellipse cx="${516 + 8 * wet}" cy="${400 + 4 * wet}" rx="${40 + 12 * wet}" ry="${14 + 4 * wet}" fill="#c43a96" opacity="${0.3 * wet}"/>`;
   for (let i = 0; i < 5; i++) g += `<path d="M${420 + R(i + 60) * 180},${250 + R(i + 61) * 30} q2,${50 + R(i + 62) * 80 * wet} -1,${90 + R(i + 63) * 110 * wet}" stroke="url(#dpW)" stroke-width="${2.4 + R(i) * 2.4}" stroke-linecap="round" fill="none"/>`;
   return g + '</g>'; };
-const ST = [['Sin maquillaje · pestañas largas arriba y abajo', 'none', 0, 0], ['Sin maquillaje · sonriendo', 'none2', 0, 0]];
+const ST = [['Con maquillaje', 'full', 0, 0], ['Sin maquillaje', 'none', 0, 0]];
 const tiles = [];
 ST.forEach(([name, mode, k, wet], i) => { applyFinalFace();
   Object.keys(LOOK).forEach((q) => delete LOOK[q]); Object.assign(LOOK, JSON.parse(JSON.stringify(FULL)));
@@ -19,4 +19,4 @@ ST.forEach(([name, mode, k, wet], i) => { applyFinalFace();
   writeFileSync(`/tmp/nm_${i}.png`, new Resvg(svg, { fitTo: { mode: 'zoom', value: 2 }, font: { loadSystemFonts: true } }).render().asPng()); execSync(`ffmpeg -y -loglevel error -i /tmp/nm_${i}.png -vf crop=900:1200:562:160,scale=780:1040 /tmp/nmc_${i}.png`); tiles.push([name, readFileSync(`/tmp/nmc_${i}.png`)]); });
 const b64 = (b) => 'data:image/png;base64,' + Buffer.from(b).toString('base64'); let body = '';
 tiles.forEach(([n, t], i) => { const x = i * 790 + 5; body += `<image href="${b64(t)}" x="${x}" y="5" width="780" height="1040"/><text x="${x + 285}" y="1090" font-family="Anton" font-size="34" text-anchor="middle" fill="#fff">${n}</text>`; });
-writeFileSync('SinMaquillaje_cara2.png', new Resvg(`<svg xmlns="http://www.w3.org/2000/svg" width="1590" height="1130"><rect width="1590" height="1130" fill="#1d1426"/>${body}</svg>`, { font: { loadSystemFonts: true } }).render().asPng());
+writeFileSync('Cara_final_pestanas_iguales.png', new Resvg(`<svg xmlns="http://www.w3.org/2000/svg" width="1590" height="1130"><rect width="1590" height="1130" fill="#1d1426"/>${body}</svg>`, { font: { loadSystemFonts: true } }).render().asPng());

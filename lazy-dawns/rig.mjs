@@ -85,7 +85,7 @@ function eyeSvg(x, open, blink, squint, gx, gy, tear, tearT, side, mk) {
       const tx = rx + dx * len + dir * len * 0.22, ty = ry + dy * len * 0.85 - 3;
       const w = 3.6 + 1.6 * lsh;
       lashes += `<path d="M${f1(rx - dir * w * 0.6)},${f1(ry + 2)} Q${f1(mx - dir * w * 0.3)},${f1(my)} ${f1(tx)},${f1(ty)} Q${f1(mx + dir * w * 0.9)},${f1(my + 1)} ${f1(rx + dir * w * 0.6)},${f1(ry + 2)}Z" fill="#0b0506"/>`; } }
-  if (LASHX.style && c < 0.9) lashes = postizas(LASHX.style, dir, PX, edge, c, yl);
+  if (LASHX.style && c < 0.9) lashes = dir > 0 ? postizas(LASHX.style, dir, PX, edge, c, yl) : `<g transform="scale(-1,1)">${postizas(LASHX.style, 1, (u) => -PX(u), edge, c, yl)}</g>`;
   if (EYEX.corner && c < 0.9) { const pts = []; for (let i = 0; i <= 14; i++) { const q = almondPt(dir, i / 14, true); pts.push(`${f1x(q.x)},${f1x(q.y)}`); } const O = almondPt(dir, 1, true); const wing = (mk.wing ?? 0.8); liner = `<path d="M${pts.join(' L')} L${f1x(O.x + dir * (14 + 12 * wing))},${f1x(O.y - 7 - 7 * wing)}" fill="none" stroke="${lc}" stroke-width="${f1x(2.4 + th * 0.16)}" stroke-linecap="round" stroke-linejoin="round"/>`; }
   return `<g transform="translate(${f1x(x + Math.sign(x) * EYEX.dx)},${-6 + EYEX.dy}) rotate(${EYEX.tilt * side}) scale(${EYEX.sx},${EYEX.sy})">
     ${shadow}
@@ -636,12 +636,12 @@ export function drawHandOnly(style, curl = 0.1, spread = 0.5, sd = 1) { NST = st
 export const HAND_DEFS = () => SHADE_DEFS + OUTFIT_DEFS;
 
 export const LASHX = { style: null };
-function lashHairP(x, y, a0, len, curlK, w, toward, col) { const N = 9, pts = []; let px = x, py = y; const a1 = a0 + (toward - a0) * Math.min(1.25, curlK); const wv = EYEX.corner ? 1 : 0; const ph = (x * 0.37 + y * 0.21) % 6.28;
-  for (let i = 0; i <= N; i++) { const u = i / N; const a = a0 + (a1 - a0) * Math.pow(u, 1.35) + wv * 11 * Math.sin(u * 5.2 + ph) * u; if (i > 0) { px += Math.cos(a * Math.PI / 180) * len / N; py += Math.sin(a * Math.PI / 180) * len / N; } pts.push([px, py, w * (1 - 0.8 * Math.pow(u, 1.4))]); }
+function lashHairP(x, y, a0, len, curlK, w, toward, col) { const N = 9, pts = []; let px = x, py = y; const a1 = a0 + (toward - a0) * Math.min(1.25, curlK); const wv = EYEX.corner ? 1 : 0; const ph = (Math.abs(x) * 0.37 + y * 0.21) % 6.28, wd = EYEX._dir || 1;
+  for (let i = 0; i <= N; i++) { const u = i / N; const a = a0 + (a1 - a0) * Math.pow(u, 1.35) + wd * wv * 11 * Math.sin(u * 5.2 + ph) * u; if (i > 0) { px += Math.cos(a * Math.PI / 180) * len / N; py += Math.sin(a * Math.PI / 180) * len / N; } pts.push([px, py, w * (1 - 0.8 * Math.pow(u, 1.4))]); }
   let Lp = '', Rp = ''; pts.forEach(([X, Y, ww], i) => { const q = pts[Math.min(N, i + 1)], p = pts[Math.max(0, i - 1)]; const dx = q[0] - p[0], dy = q[1] - p[1], l = Math.hypot(dx, dy) || 1; const nx = -dy / l, ny = dx / l; Lp += `${(X + nx * ww).toFixed(1)},${(Y + ny * ww).toFixed(1)} `; Rp = `${(X - nx * ww).toFixed(1)},${(Y - ny * ww).toFixed(1)} ` + Rp; });
   const hl = wv ? `<path d="M${pts.slice(3).map((q) => q[0].toFixed(1) + ',' + q[1].toFixed(1)).join(' L')}" stroke="#6a5048" stroke-opacity="0.55" stroke-width="${(w * 0.5).toFixed(2)}" fill="none" stroke-linecap="round"/>` : '';
   return `<polygon points="${Lp}${Rp}" fill="${col}"/>${hl}`; }
-function postizas(style, dir, PX, edge, c, yl) { let seed = 131; const R = () => (seed = (seed * 16807) % 2147483647) / 2147483647; let up = '', lo = '';
+function postizas(style, dir, PX, edge, c, yl) { EYEX._dir = dir; let seed = 131; const R = () => (seed = (seed * 16807) % 2147483647) / 2147483647; let up = '', lo = '';
   const C = { P1: { n: 22, fan: 3, len: 30, outer: 1.0, curl: 0.55, lo: 9, lfan: 2, llen: 5 }, P2: { n: 26, fan: 3, len: 36, outer: 0.5, curl: 0.8, lo: 11, lfan: 2, llen: 6 }, P3: { n: 26, fan: 3, len: 25, outer: 1.7, curl: 1.0, lo: 8, lfan: 2, llen: 4.5 }, P4: { n: 18, fan: 4, len: 31, outer: 1.2, curl: 0.7, lo: 10, lfan: 2, llen: 5.5 } }[style];
   for (let i = 0; i < C.n; i++) { const k = (i + 0.5) / C.n, u = -0.92 + k * 1.92; let x = PX(u), y = edge(u) - 0.5, nAng = -90; if (EYEX.corner) { const q = almondPt(dir, 0.04 + 0.92 * (u + 0.92) / 1.84, true); x = q.x - q.nx * 1.2; y = q.y - q.ny * 1.2; nAng = Math.atan2(q.ny, q.nx) * 180 / Math.PI; } const outer = Math.max(0, u), inner = Math.max(0, -u);
     const a0 = (EYEX.corner ? nAng + dir * u * 9 : -90 + dir * u * 50) + (R() - 0.5) * 6; let len = EYEX.corner ? C.len * 0.82 * (0.8 + 0.5 * Math.sin(Math.PI * Math.min(1, (u + 0.92) / 1.84 * 0.92 + 0.04)) + 0.25 * outer * C.outer * 0.5) * (1 - 0.3 * Math.pow(inner, 2)) * (0.92 + R() * 0.16) : C.len * (1 + C.outer * 0.5 * outer) * (1 - 0.35 * inner) * (0.9 + R() * 0.2); if (style === 'P4' && i % 3 === 0) len *= 1.3; len *= (1 - c);
