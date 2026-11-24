@@ -82,6 +82,13 @@
   .sw { width:30px; height:30px; border-radius:50%; border:3px solid transparent; cursor:pointer; }
   .sw.sel { border-color:#fff; }
   .note { font-size:12px; opacity:.6; line-height:1.4; }
+  .lib { display:flex; flex-direction:column; gap:8px; }
+  .game { display:flex; gap:8px; align-items:stretch; }
+  .game .play { flex:1; min-width:0; text-align:left; }
+  .game .play span { display:flex; flex-direction:column; min-width:0; }
+  .game .play b { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:600; }
+  .game .play small { opacity:.6; font-size:11px; }
+  .game .del { height:auto; width:44px; color:#ff8fa8; }
   #install { display:none; }
   #rotate { display:none; position:fixed; inset:0; z-index:9; background:var(--bg); flex-direction:column; align-items:center; justify-content:center; gap:16px; text-align:center; font-size:16px; padding:24px; }
   #rotate svg { width:72px; height:72px; animation:rot 1.6s ease-in-out infinite; }
@@ -107,6 +114,7 @@
   <symbol id="i-cart" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 7h6M9 17h.01M15 17h.01"/></symbol>
   <symbol id="i-keys" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M6 9h.01M10 9h.01M14 9h.01M18 9h.01M7 15h10"/></symbol>
   <symbol id="i-up" viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
 </svg>
 
 <div id="rotate"><svg class="i" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2"/></svg><b>Gira tu celular</b><span style="opacity:.6;font-size:13px">Jessito Emu se juega en horizontal</span></div>
@@ -155,10 +163,17 @@
     <button class="chip" data-game="run"><svg class="i"><use href="#i-run"/></svg>Jessito Run</button>
     <button class="chip" data-game="atrapa"><svg class="i"><use href="#i-star"/></svg>Atrapa</button>
     <button class="chip" data-game="teclas"><svg class="i"><use href="#i-grid"/></svg>Teclas</button>
-    <button class="chip hidden" id="last"><svg class="i"><use href="#i-cart"/></svg><span></span></button>
-    <label class="chip"><svg class="i"><use href="#i-folder"/></svg>Cargar ROM<input id="file" type="file" accept=".zip,.nes,.fds,.sfc,.smc,.gba,.gb,.gbc,.md,.gen,.smd,.bin,.sms,.gg,.n64,.z64,.v64,.pce,.a26,.nds,.ch8,.c8,.rom" hidden></label>
+    <label class="chip"><svg class="i"><use href="#i-folder"/></svg>Cargar ROM<input id="file" type="file" accept=".zip,.7z,.cue,.pbp,.chd,.iso,.m3u,.nes,.fds,.sfc,.smc,.gba,.gb,.gbc,.md,.gen,.smd,.bin,.sms,.gg,.n64,.z64,.v64,.pce,.a26,.nds,.ch8,.c8,.rom" hidden></label>
   </div>
-  <div class="note">Carga tus propias ROMs de NES (.nes) o CHIP-8 (.ch8). Se quedan solo en tu dispositivo.</div>
+  <h2 id="libTitle" class="hidden">Mi biblioteca</h2>
+  <div class="lib" id="lib"></div>
+  <div class="note">Toca «Cargar ROM» para agregar juegos (.zip, .7z, .nes, .sfc, .gba, .bin/.cue de PlayStation…). Se guardan en tu biblioteca, solo en este dispositivo.</div>
+</div></div>
+
+<div class="sheet hidden" id="picker"><div>
+  <h2>¿De qué consola es?</h2>
+  <div class="note" id="pickName"></div>
+  <div class="games" id="pickList"></div>
 </div></div>
 
 <div class="sheet hidden" id="sheet"><div>
@@ -301,10 +316,10 @@ function chip8System(rom,name,keypad){
 // ================= Multi-consola (EmulatorJS en un iframe) =================
 // Consolas por extensión del archivo
 const CORES={nes:'nes',fds:'nes',unf:'nes',unif:'nes',sfc:'snes',smc:'snes',fig:'snes',swc:'snes',gba:'gba',gb:'gb',gbc:'gb',
-  md:'segaMD',gen:'segaMD',smd:'segaMD',bin:'segaMD',sms:'segaMS',gg:'segaGG',n64:'n64',z64:'n64',v64:'n64',pce:'pce',a26:'atari2600',nds:'nds'};
+  md:'segaMD',gen:'segaMD',smd:'segaMD',bin:'segaMD',sms:'segaMS',gg:'segaGG',n64:'n64',z64:'n64',v64:'n64',pce:'pce',a26:'atari2600',nds:'nds',cue:'psx',pbp:'psx',chd:'psx',iso:'psx',m3u:'psx',ecm:'psx'};
 const CONSOLE_INFO={nes:['NES','4/3',[]],snes:['Super Nintendo','4/3',['x','y','l','r']],gba:['Game Boy Advance','3/2',['l','r']],gb:['Game Boy','10/9',[]],
   segaMD:['Sega Genesis','4/3',['x','y','l']],segaMS:['Master System','4/3',[]],segaGG:['Game Gear','10/9',[]],n64:['Nintendo 64','4/3',['x','y','l','r']],
-  pce:['PC Engine','4/3',[]],atari2600:['Atari 2600','4/3',[]],nds:['Nintendo DS','4/3',['x','y','l','r']]};
+  pce:['PC Engine','4/3',[]],atari2600:['Atari 2600','4/3',[]],nds:['Nintendo DS','4/3',['x','y','l','r']],psx:['PlayStation','4/3',['x','y','l','r']]};
 const RETROPAD={b:0,y:1,select:2,start:3,up:4,down:5,left:6,right:7,a:8,x:9,l:10,r:11};
 function zipInnerName(b){ // nombre del primer archivo dentro de un .zip
   if(!(b[0]===0x50&&b[1]===0x4B))return null; const n=b[26]|(b[27]<<8); return new TextDecoder().decode(b.subarray(30,30+n)); }
@@ -456,26 +471,70 @@ const GAMES={
 const selChip=el=>{document.querySelectorAll('.games .chip').forEach(c=>c.classList.remove('sel'));el?.classList.add('sel');};
 document.querySelectorAll('[data-game]').forEach(b=>b.onclick=()=>{initAudio();selChip(b);GAMES[b.dataset.game]();});
 
-function loadRom(name,bytes){
-  const clean=name.replace(/\.\w+$/,'');
-  try{
-    const core=coreFor(name,bytes);
-    if(core){if(!navigator.onLine){showHint('Conéctate a internet para cargar el emulador de '+CONSOLE_INFO[core][0]);return;}
-      launch(ejsSystem(bytes,clean,core),'Cargando '+CONSOLE_INFO[core][0]+'…');}
-    else if(/\.(ch8|c8)$/i.test(name)||bytes.length<=3584)launch(chip8System(bytes,clean),'CHIP-8 · joystick = 2/4/6/8, A = 5');
-    else showHint('Formato no reconocido: '+name);
-  }catch(err){showHint('No se pudo abrir la ROM: '+err.message);}
-}
-$('file').onchange=async e=>{const f=e.target.files[0];if(!f)return;initAudio();const bytes=new Uint8Array(await f.arrayBuffer());
-  loadRom(f.name,bytes);dbPut(f.name,bytes);showLast(f.name);selChip($('last'));e.target.value='';};
+// ================= Mi biblioteca (IndexedDB: los juegos se quedan solo en este dispositivo) =================
+function db(){return new Promise((ok,ko)=>{const r=indexedDB.open('jemu',2);
+  r.onupgradeneeded=()=>{const d=r.result;if(!d.objectStoreNames.contains('roms'))d.createObjectStore('roms');if(!d.objectStoreNames.contains('lib'))d.createObjectStore('lib',{keyPath:'name'});};
+  r.onsuccess=()=>ok(r.result);r.onerror=()=>ko(r.error);});}
+const tx=(st,mode,fn)=>db().then(d=>new Promise((ok,ko)=>{const t=d.transaction(st,mode);const q=fn(t.objectStore(st));t.oncomplete=()=>ok(q?.result);t.onerror=()=>ko(t.error);t.onabort=()=>ko(t.error);}));
+const libAll=()=>tx('lib','readonly',s=>s.getAll()).catch(()=>[]);
+const libGet=n=>tx('lib','readonly',s=>s.get(n));
+const libPut=g=>tx('lib','readwrite',s=>s.put(g));
+const libDel=n=>tx('lib','readwrite',s=>s.delete(n));
+navigator.storage?.persist?.().catch(()=>{});
+const fmtSize=b=>b>=1e6?Math.round(b/1e6)+' MB':Math.max(1,Math.round(b/1e3))+' KB';
+const prettyName=n=>n.replace(/\.\w+$/,'').replace(/\s*[\[(][^\])]*[\])]/g,'').trim()||n;
 
-// Recordar la última ROM (IndexedDB, solo en este dispositivo)
-function db(){return new Promise((ok,ko)=>{const r=indexedDB.open('jemu',1);r.onupgradeneeded=()=>r.result.createObjectStore('roms');r.onsuccess=()=>ok(r.result);r.onerror=ko;});}
-async function dbPut(name,bytes){try{const d=await db();d.transaction('roms','readwrite').objectStore('roms').put({name,bytes},'last');}catch(e){}}
-async function dbGet(){try{const d=await db();return await new Promise(ok=>{const q=d.transaction('roms').objectStore('roms').get('last');q.onsuccess=()=>ok(q.result);q.onerror=()=>ok(null);});}catch(e){return null;}}
-function showLast(name){$('last').classList.remove('hidden');$('last').querySelector('span').textContent=name.replace(/\.\w+$/,'').slice(0,18);}
-dbGet().then(r=>{if(!r)return;showLast(r.name);$('last').onclick=async()=>{initAudio();const x=await dbGet();if(x){selChip($('last'));loadRom(x.name,x.bytes);}};});
-$('last').onclick=async()=>{initAudio();const x=await dbGet();if(x){selChip($('last'));loadRom(x.name,x.bytes);}};
+async function renderLib(){
+  const list=(await libAll()).sort((a,b)=>b.added-a.added), box=$('lib'); box.innerHTML='';
+  $('libTitle').classList.toggle('hidden',!list.length);
+  for(const g of list){
+    const el=document.createElement('div');el.className='game';
+    el.innerHTML='<button class="chip play"><svg class="i"><use href="#i-cart"/></svg><span><b></b><small></small></span></button><button class="ib del" aria-label="Borrar"><svg class="i"><use href="#i-x"/></svg></button>';
+    el.querySelector('b').textContent=prettyName(g.name);
+    el.querySelector('small').textContent=(CONSOLE_INFO[g.core]?.[0]||'CHIP-8')+' · '+fmtSize(g.size);
+    el.querySelector('.play').onclick=async()=>{initAudio();const x=await libGet(g.name);if(x)runGame(x.name,x.blob,x.core);};
+    el.querySelector('.del').onclick=async()=>{if(confirm('¿Borrar «'+prettyName(g.name)+'» de este dispositivo?')){await libDel(g.name);renderLib();}};
+    box.appendChild(el);
+  }
+}
+
+async function detectCore(name,blob){
+  const head=new Uint8Array(await blob.slice(0,1024).arrayBuffer());
+  if(head[0]===0x4E&&head[1]===0x45&&head[2]===0x53&&head[3]===0x1A)return 'nes';
+  let ext=(name.split('.').pop()||'').toLowerCase();
+  if(ext==='zip'){const inner=zipInnerName(head);if(inner)ext=(inner.split('.').pop()||'').toLowerCase();}
+  if(CORES[ext])return CORES[ext];
+  if(/\b(SLES|SLUS|SCUS|SCES|SLPS|SLPM|SCPS|SIPS)[-_ ]?\d/i.test(name))return 'psx'; // código de disco de PlayStation
+  if(/\.(ch8|c8)$/i.test(name)||blob.size<=3584)return 'chip8';
+  return null;
+}
+function pickConsole(name){ // si no se reconoce, se pregunta la consola
+  return new Promise(ok=>{const s=$('picker'),box=$('pickList');$('pickName').textContent=prettyName(name);box.innerHTML='';
+    for(const k in CONSOLE_INFO){const b=document.createElement('button');b.className='chip';b.textContent=CONSOLE_INFO[k][0];b.onclick=()=>{s.classList.add('hidden');ok(k);};box.appendChild(b);}
+    s.onclick=e=>{if(e.target===s){s.classList.add('hidden');ok(null);}};s.classList.remove('hidden');});
+}
+async function runGame(name,blob,core){
+  const clean=prettyName(name);
+  try{
+    if(core==='chip8'){launch(chip8System(new Uint8Array(await blob.arrayBuffer()),clean),'CHIP-8 · joystick = 2/4/6/8, A = 5');return;}
+    if(!navigator.onLine){showHint('Conéctate a internet para cargar el emulador de '+CONSOLE_INFO[core][0]);return;}
+    launch(ejsSystem(blob,clean,core),'Cargando '+CONSOLE_INFO[core][0]+'…'+(blob.size>5e7?' juego grande, puede tardar':''));
+  }catch(err){showHint('No se pudo abrir: '+err.message);}
+}
+async function addGame(file){
+  initAudio();
+  const core=(await detectCore(file.name,file))||(await pickConsole(file.name)); if(!core)return;
+  showHint('Guardando en tu biblioteca…');
+  try{await libPut({name:file.name,blob:file,core,size:file.size,added:Date.now()});}
+  catch(e){showHint('No hubo espacio para guardarlo, pero se abrirá igual');}
+  renderLib(); runGame(file.name,file,core);
+}
+function loadRom(name,bytes){return addGame(new File([bytes],name));}
+$('file').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)addGame(f);};
+// Migrar el antiguo "último juego" a la biblioteca
+tx('roms','readonly',s=>s.get('last')).then(async r=>{
+  if(r){const blob=new Blob([r.bytes]);await libPut({name:r.name,blob,core:(await detectCore(r.name,blob))||'nes',size:blob.size,added:Date.now()});await tx('roms','readwrite',s=>s.delete('last'));}
+}).catch(()=>{}).finally(renderLib);
 
 // Bucle principal a 60 fps fijos
 let last=performance.now(),acc=0;
@@ -532,7 +591,7 @@ const _setPaused=setPaused;setPaused=function(p){_setPaused(p);if(p&&updatePendi
 // Atajo: ?juego=run abre directo un juego
 {const j=new URLSearchParams(location.search).get('juego');if(GAMES[j]){selChip(document.querySelector(`[data-game="${j}"]`));GAMES[j]();}}
 // Abrir ROMs desde el sistema (Android: "Abrir con")
-if('launchQueue' in window)launchQueue.setConsumer(async p=>{for(const h of p.files||[]){const f=await h.getFile();const b=new Uint8Array(await f.arrayBuffer());loadRom(f.name,b);dbPut(f.name,b);showLast(f.name);}});
+if('launchQueue' in window)launchQueue.setConsumer(async p=>{for(const h of p.files||[])addGame(await h.getFile());});
 </script>
 </body>
 </html>
