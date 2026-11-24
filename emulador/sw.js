@@ -1,14 +1,24 @@
-// Caché offline: sirve rápido desde caché y actualiza en segundo plano
-const C = 'jemu-v5';
+// Service worker: SIEMPRE intenta la red primero (así cada actualización llega al instante)
+// y usa la caché solo si no hay internet.
+const C = 'jemu-cache';
 const FILES = ['./', 'index.html', 'jsnes.min.js', 'icon.svg', 'icon-192.png', 'icon-512.png', 'manifest.webmanifest'];
-self.addEventListener('install', e => { self.skipWaiting(); e.waitUntil(caches.open(C).then(c => c.addAll(FILES))); });
+
+self.addEventListener('install', e => { self.skipWaiting(); e.waitUntil(caches.open(C).then(c => c.addAll(FILES)).catch(() => {})); });
 self.addEventListener('activate', e => e.waitUntil(
   caches.keys().then(ks => Promise.all(ks.filter(k => k !== C).map(k => caches.delete(k)))).then(() => self.clients.claim())));
+
 self.addEventListener('fetch', e => {
-  if (e.request.method !== 'GET') return;
-  e.respondWith(caches.open(C).then(async c => {
-    const hit = await c.match(e.request, { ignoreSearch: true });
-    const net = fetch(e.request).then(r => { if (r.ok) c.put(e.request, r.clone()); return r; }).catch(() => hit);
-    return hit || net;
-  }));
+  const req = e.request;
+  if (req.method !== 'GET' || new URL(req.url).origin !== location.origin) return;
+  if (req.url.includes('version.json')) return; // siempre directo a la red
+  e.respondWith((async () => {
+    const c = await caches.open(C);
+    try {
+      const r = await fetch(req, { cache: 'no-store' });
+      if (r.ok) c.put(req, r.clone());
+      return r;
+    } catch (_) {
+      return (await c.match(req, { ignoreSearch: true })) || (await c.match('./')) || Response.error();
+    }
+  })());
 });

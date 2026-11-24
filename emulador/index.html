@@ -483,7 +483,26 @@ let deferred;
 addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;$('install').style.display='grid';});
 $('install').onclick=async()=>{if(!deferred)return;deferred.prompt();await deferred.userChoice;deferred=null;$('install').style.display='none';};
 addEventListener('appinstalled',()=>$('install').style.display='none');
-if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js');
+// ================= Actualización automática =================
+// El script de publicación escribe la versión aquí y en version.json.
+const APP_VERSION='dev';
+let swReg=null, updatePending=false;
+if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>swReg=r).catch(()=>{});
+function applyUpdate(){ // recarga en cuanto no estés jugando (pausa, menú o app en segundo plano)
+  updatePending=true;
+  if(!running||document.hidden||!$('menu').classList.contains('hidden')){location.reload();return;}
+  showHint('Nueva versión lista · se aplica al pausar');
+}
+async function checkUpdate(){
+  if(APP_VERSION==='dev'||!navigator.onLine)return;
+  try{const v=await (await fetch('version.json?t='+Date.now(),{cache:'no-store'})).json();
+    if(v.version&&v.version!==APP_VERSION){swReg?.update();applyUpdate();}}catch(e){}
+}
+setInterval(checkUpdate,30000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkUpdate();else if(updatePending)location.reload();});
+addEventListener('focus',checkUpdate);addEventListener('online',checkUpdate);
+setTimeout(checkUpdate,1500);
+const _setPaused=setPaused;setPaused=function(p){_setPaused(p);if(p&&updatePending)location.reload();};
 // Atajo: ?juego=run abre directo un juego
 {const j=new URLSearchParams(location.search).get('juego');if(GAMES[j]){selChip(document.querySelector(`[data-game="${j}"]`));GAMES[j]();}}
 // Abrir ROMs desde el sistema (Android: "Abrir con")
