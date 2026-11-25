@@ -929,10 +929,33 @@ async function srvList(){
   }catch(e){showHint(e.message==='Failed to fetch'?'No hay conexión con tu servidor':e.message);}
 }
 // Descarga el juego del servidor a la biblioteca del celular (solo la primera vez) y lo abre
+// ===== Caché de juegos del servidor (se administra sola) =====
+// La copia principal vive en tu servidor. Aquí solo se guarda una copia temporal para abrir al instante;
+// si pasa del límite, se borran primero los juegos que hace más tiempo no abres.
+const JUEGOS_CACHE='jemu-juegos', CACHE_MAX=2e9;
+const juegoCacheKey=j=>'https://cache.jessito/juego/'+j.id+'-'+(j.tamano||0);   // cambia si el juego cambia en el servidor
+function marcarUso(k){const u=store.cacheUso||{};u[k]={t:Date.now(),s:(u[k]?.s)||0};store.cacheUso=u;save();}
+async function guardarEnCache(k,blob){
+  try{
+    const c=await caches.open(JUEGOS_CACHE);
+    const u=store.cacheUso||{};
+    // liberar espacio si hace falta (los menos usados primero)
+    let total=Object.values(u).reduce((a,x)=>a+(x.s||0),0)+blob.size;
+    for(const [key] of Object.entries(u).sort((a,b)=>a[1].t-b[1].t)){if(total<=CACHE_MAX)break;await c.delete(key);total-=u[key].s||0;delete u[key];}
+    if(blob.size>CACHE_MAX)return;
+    await c.put(k,new Response(blob,{headers:{'Content-Type':'application/octet-stream','Content-Length':String(blob.size)}}));
+    u[k]={t:Date.now(),s:blob.size};store.cacheUso=u;save();diag('Guardado en caché ('+Math.round(blob.size/1e6)+' MB)');
+  }catch(e){diag('No se pudo guardar en caché: '+(e.name||e.message));}
+}
 async function srvPlay(j){
   // Los juegos de tu servidor NO se guardan en el dispositivo: se descargan a la memoria temporal
   // para jugar y al cerrar no queda nada. (Tus partidas sí se guardan, en tu cuenta en el servidor.)
   const name=j.nombre+((j.archivo||'').match(/\.[^.]+$/)||[''])[0];
+  // 1) Caché automática: si ya lo abriste antes en este dispositivo, abre AL INSTANTE (sin descargar)
+  const cacheKey=juegoCacheKey(j);
+  try{const c=await caches.open(JUEGOS_CACHE);const hit=await c.match(cacheKey);
+    if(hit){const blob=await hit.blob();marcarUso(cacheKey);diag('Abierto desde la caché: '+name);
+      window.__ultimoSrv=j;$('menu').classList.add('hidden');return runGame(name,blob,j.consola);}}catch(e){}
   const ctl=new AbortController();
   try{
     cargaShow('Cargando '+j.nombre,()=>ctl.abort());cargaSet(0,'Conectando con tu servidor…');
@@ -946,6 +969,7 @@ async function srvPlay(j){
     armado.push(new Blob(trozos));trozos=null;
     const blob=new Blob(armado);armado=null;
     cargaSet(100,'Abriendo el juego…');cargaHide(600);
+    guardarEnCache(cacheKey,blob);   // la próxima vez abre al instante
     diag('Descargado del servidor a memoria temporal: '+name+' ('+Math.round(blob.size/1e6)+' MB)');
     window.__ultimoSrv=j;$('menu').classList.add('hidden');runGame(name,blob,j.consola);
   }catch(e){if(e.name==='AbortError'){showHint('Carga cancelada');return;}cargaSet(null,'No se pudo cargar: '+e.message);$('cBtn').textContent='Cerrar';cargaCancelar=null;}
