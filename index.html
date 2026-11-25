@@ -205,6 +205,7 @@
     <button class="chip" data-game="run"><svg class="i"><use href="#i-run"/></svg>Jessito Run</button>
     <button class="chip" data-game="atrapa"><svg class="i"><use href="#i-star"/></svg>Atrapa</button>
     <button class="chip" data-game="teclas"><svg class="i"><use href="#i-grid"/></svg>Teclas</button>
+    <button class="chip" id="ps2Btn"><svg class="i"><use href="#i-pad"/></svg>PlayStation 2 (experimental)</button>
     <label class="chip"><svg class="i"><use href="#i-folder"/></svg>Cargar ROM<input id="file" type="file" class="picker-input"></label>
   </div>
   <h2>Mi cuenta <small style="font-weight:400;opacity:.55;font-size:11px">tus juegos y partidas en todos tus dispositivos</small></h2>
@@ -789,6 +790,21 @@ function guessCore(size,name){
   if(/\.bin$/i.test(name)&&size>32e6)return 'psx';
   if(size<=1.1e6)return 'nes'; if(size<=6.5e6)return 'snes'; if(size<=33e6)return 'gba'; if(size<=65e6)return 'n64'; return 'psx';
 }
+// ===== PlayStation 2 (experimental): emulador libre Play!.js en su propia ventana =====
+// Necesita mucha potencia y discos de 1–4 GB: funciona en COMPUTADORA; en iPhone Safari no lo soporta.
+const PS2_URL='https://playjs.purei.org/';
+function abrirPS2(nombre){
+  const aviso=(nombre?'«'+nombre+'» parece un disco de PlayStation 2.\n\n':'')+
+    'PlayStation 2 se abre en el emulador experimental Play!.js, en otra ventana.\n\n'+
+    '• Funciona en computadora con buen procesador (en iPhone no).\n'+
+    '• Muchos juegos van lentos o no arrancan: es experimental.\n'+
+    '• Ahí eliges el disco (.iso) de tu propio juego con su botón para abrir archivos.\n\n¿Abrirlo ahora?';
+  if(!confirm(aviso))return;
+  if(isIOS){showHint('PlayStation 2 no funciona en iPhone: ábrelo desde una computadora');return;}
+  const w=window.open(PS2_URL,'_blank','noopener');if(!w)location.href=PS2_URL;
+  diag('Abierto PlayStation 2 experimental'+(nombre?' para '+nombre:''));
+}
+$('ps2Btn').onclick=()=>abrirPS2();
 async function addGame(file){
   diag('Archivo recibido: '+file.name+' ('+Math.round(file.size/1e6)+' MB)');
   cargaShow('Cargando '+file.name);cargaSet(null,fmtSize(file.size));
@@ -804,6 +820,9 @@ async function addGame(file){
       if(!main){cargaHide();showHint('No encontré ningún juego dentro de '+file.name);return;}
       diag('Extraído: '+main.name+' ('+Math.round(main.size/1e6)+' MB)');file=main;}
   }catch(e){cargaHide();showHint('No se pudo descomprimir: '+e.message);return;}
+  // ¿Disco de PlayStation 2? (DVD en formato ISO de más de 800 MB): se abre en el emulador de PS2 experimental
+  try{if(file.size>800e6){const h=new Uint8Array(await file.slice(0x8000,0x8010).arrayBuffer());
+    if(String.fromCharCode(...h.subarray(1,6))==='CD001'){cargaHide();abrirPS2(file.name);return;}}}catch(e){}
   if(/\.ecm$/i.test(file.name)){file=await unEcm(file);if(!file)return;}
   const core=(await detectCore(file.name,file))||guessCore(file.size,file.name);
   if(isIOS&&core==='psx'&&file.size>300e6)showHint('Aviso: en iPhone los discos de más de 300 MB pueden cerrarse por falta de memoria');
@@ -1102,7 +1121,7 @@ $('install').onclick=async()=>{if(!deferred)return;deferred.prompt();await defer
 addEventListener('appinstalled',()=>$('install').style.display='none');
 // ================= Actualización automática =================
 // El script de publicación escribe la versión aquí y en version.json.
-const APP_VERSION='20261125-222922-d3384b6';
+const APP_VERSION='20261125-223305-86fa471';
 diag('App abierta (versión '+APP_VERSION+')');
 let swReg=null, updatePending=false;
 if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>swReg=r).catch(()=>{});
