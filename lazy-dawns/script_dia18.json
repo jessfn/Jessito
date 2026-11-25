@@ -17,19 +17,19 @@
   "id": "l1",
   "who": "N",
   "text": "Día dieciocho. Eligieron el maquillaje. Y todo empezó en mi casa.",
-  "pad": 3.9
+  "pad": 4.3
  },
  {
   "id": "l2",
   "who": "Y",
   "text": "Ya estamos en tu casa, Lazy. Te acompañé hasta la puerta. Aquí estarás a salvo.",
-  "pad": 0.15
+  "pad": 0.2
  },
  {
   "id": "l4",
   "who": "S",
   "text": "Hija, ¿qué te pasó? Ven, siéntate. Primero te limpiamos la cara con calma.",
-  "pad": 0.15
+  "pad": 1.3
  },
  {
   "id": "l5",
@@ -41,60 +41,60 @@
   "id": "l8",
   "who": "S",
   "text": "Ahora la sombra. Vino y ciruela, con un poco de brillo arriba. Cierra los ojos.",
-  "pad": 0.15
+  "pad": 3.8
  },
  {
   "id": "l10",
   "who": "S",
   "text": "Y para terminar, un rubor cálido, y labios rojo oscuro. Mírate.",
-  "pad": 0.15
+  "pad": 3.3
  },
  {
   "id": "l12",
   "who": "Y",
   "text": "Lazy... estás hermosa.",
-  "pad": 0.15
+  "pad": 0.2
  },
  {
   "id": "l13",
   "who": "N",
   "text": "Y entonces, los tres celulares sonaron a la vez.",
-  "pad": 0.2
+  "pad": 0.5
  },
  {
   "id": "l14",
   "who": "T",
   "text": "Última hora. La joven Mari desapareció anoche, camino a casa de una amiga.",
-  "pad": 0.15
+  "pad": 0.3
  },
  {
   "id": "l15",
   "who": "N",
   "text": "Mari. Iba a verla anoche, y nunca llegué.",
-  "pad": 0.15
+  "pad": 0.3
  },
  {
   "id": "l17",
   "who": "S",
   "text": "Hija, tranquila. Llamemos a la policía. Pero así no puedes salir.",
-  "pad": 0.15
+  "pad": 2.4
  },
  {
   "id": "l18",
   "who": "N",
   "text": "Mi cabello era un desastre. Pero no podía esperar.",
-  "pad": 0.15
+  "pad": 0.2
  },
  {
   "id": "l19",
   "who": "Y",
   "text": "Iremos juntos, Lazy. Pero primero, ¿qué prefieres arreglar?",
-  "pad": 0.15
+  "pad": 0.2
  },
  {
   "id": "l20",
   "who": "N",
   "text": "Cabello o piel. Comenta tu elección y sígueme para el día diecinueve.",
-  "pad": 0.3
+  "pad": 0.35
  }
 ]
