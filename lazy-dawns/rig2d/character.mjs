@@ -252,7 +252,7 @@ export function part_head(P) { const hd = P.head; const jd = jawDrop(P) * 0.0;
 export function part_earring(side, P) { const x = side === 'L' ? 380 : 641, a = side === 'L' ? P.acc.earL : P.acc.earR; return `<g id="earring_${side}" transform="${rot(a, [x, 332])}"><circle cx="${x}" cy="332" r="7" fill="url(#zGold)" stroke="${OUT}" stroke-width="3"/><path d="M${x},339 v14" stroke="${C.goldD}" stroke-width="4"/><circle cx="${x}" cy="356" r="6.5" fill="url(#zGold)" stroke="${OUT}" stroke-width="3"/><path d="M${x},364 l-15,22 l15,22 l15,-22Z" fill="url(#zGold)" stroke="${OUT}" stroke-width="4" stroke-linejoin="round"/><path d="M${x},364 l-6,22 l6,10" stroke="#fff6b0" stroke-width="3" fill="none" opacity="0.8"/></g>`; }
 
 // ================= CUERPO: cuello, pecho, corse, abdomen =================
-export function part_neck(P) { return `<g id="neck"><path d="M480,356 L544,356 L548,462 Q512,482 476,462Z" fill="url(#zSkin)" stroke="${OUT}" stroke-width="7" stroke-linejoin="round"/><path d="M478,420 Q512,452 546,420 L546,440 Q512,466 478,440Z" fill="#8f4f2b" opacity="0.28"/></g>`; }
+export function part_neck(P) { return `<g id="neck" transform="translate(512,0) scale(${NECK.w || 1},1) translate(-512,0)"><path d="M480,356 L544,356 L548,462 Q512,482 476,462Z" fill="url(#zSkin)" stroke="${OUT}" stroke-width="7" stroke-linejoin="round"/><path d="M478,420 Q512,452 546,420 L546,440 Q512,466 478,440Z" fill="#8f4f2b" opacity="0.28"/></g>`; }
 export function part_chest(P) { return `<g id="torso_chest"><path d="M440,470 Q476,452 512,462 Q548,452 584,470 C600,478 606,500 602,548 L428,548 C424,500 430,478 440,470Z" fill="url(#zSkin)" stroke="${OUT}" stroke-width="7" stroke-linejoin="round"/><path d="M470,474 Q494,486 508,480 M554,474 Q530,486 516,480" stroke="#8f4f2b" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.6"/><path d="M468,480 Q490,492 506,486 M556,480 Q534,492 518,486" stroke="#f0b080" stroke-width="3" fill="none" opacity="0.5" transform="translate(0,4)"/></g>`; }
 const CORSET = 'M429,550 C440,534 458,532 476,540 Q494,548 512,556 Q530,548 548,540 C566,532 584,534 597,550 C601,590 598,640 584,686 Q512,696 440,686 C427,640 425,590 429,550Z';
 export function part_corset(P) { const bones = [-0.78, -0.52, -0.26, 0, 0.26, 0.52, 0.78].map((k) => `<path d="M${f1(512 + k * 76)},${k === 0 ? 556 : 546} C${f1(512 + k * 82)},600 ${f1(512 + k * 66)},650 ${f1(512 + k * 66)},688" stroke="#2a0006" stroke-opacity="0.5" stroke-width="3.4" fill="none"/>`).join('');
@@ -349,7 +349,7 @@ let LIDC = null;
 function lidColor() { if (LIDC) return LIDC; const P = defaultPose(); const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1536" viewBox="0 0 1024 1536">${oldDefs('e3d')}${DEFS}${part_face(P, 'url(#skin)')}</svg>`;
   const im = new Resvg(svg).render(), px = im.pixels; let R = 0, G = 0, B = 0, n = 0; for (const [x, y] of [[460, 219], [564, 219], [460, 298], [564, 298], [460, 258], [564, 258]]) { const i = (y * im.width + x) * 4; R += px[i]; G += px[i + 1]; B += px[i + 2]; n++; }
   LIDC = '#' + [R, G, B].map((v) => Math.round(v / n).toString(16).padStart(2, '0')).join(''); return LIDC; }
-export const NECK = { dy: 0 };
+export const NECK = { dy: 0, w: 1 };
 const headWrap = (P, inner) => `<g transform="${rot(P.head.rot, SK.neck)} translate(${HEAD_POS[0]},${HEAD_POS[1] + NECK.dy}) scale(${HEAD_SCALE})">${inner}</g>`;
 export const headBack = (P) => headWrap(P, drawLazyHeadBack(oldHeadPose(P)));
 export const headFront = (P) => headWrap(P, drawLazyHeadFront(oldHeadPose(P)));
