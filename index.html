@@ -795,7 +795,10 @@ function coverCandidates(fileName,core){
   const base=fileName.replace(/\.[^.]+$/,'').replace(/[&*\/:`<>?\\|"]/g,'_').trim();
   const sin=base.replace(/\s*[\[(][^\])]*[\])]/g,'').trim();
   const nombres=[...new Set([base,sin+' (USA)',sin+' (World)',sin+' (Europe)',sin+' (USA, Europe)',sin+' (Japan, USA)',sin])];
-  const urls=[];for(const repo of COVER_REPO[core]||[])for(const n of nombres)urls.push('https://raw.githubusercontent.com/libretro-thumbnails/'+repo+'/master/Named_Boxarts/'+encodeURIComponent(n)+'.png');
+  const urls=[];
+  // Con servidor vinculado: búsqueda inteligente primero (encuentra nombres con región/versión distinta)
+  if(store.srvToken&&COVER_REPO[core])urls.push('https://gamesdata.geodatos.com.mx/api/portada?nombre='+encodeURIComponent(base)+'&consola='+encodeURIComponent(core)+'&t='+encodeURIComponent(store.srvToken));
+  for(const repo of COVER_REPO[core]||[])for(const n of nombres)urls.push('https://raw.githubusercontent.com/libretro-thumbnails/'+repo+'/master/Named_Boxarts/'+encodeURIComponent(n)+'.png');
   return {key,urls};
 }
 function makeTile({name,sub,consola,cover,coverId,badge,onPlay,actions=[]}){const coverKey=coverId||null;
@@ -931,7 +934,7 @@ $('install').onclick=async()=>{if(!deferred)return;deferred.prompt();await defer
 addEventListener('appinstalled',()=>$('install').style.display='none');
 // ================= Actualización automática =================
 // El script de publicación escribe la versión aquí y en version.json.
-const APP_VERSION='20261125-215655-ac7f114';
+const APP_VERSION='20261125-215910-c8ea1cf';
 diag('App abierta (versión '+APP_VERSION+')');
 let swReg=null, updatePending=false;
 if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>swReg=r).catch(()=>{});
