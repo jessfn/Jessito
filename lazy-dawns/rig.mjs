@@ -64,7 +64,7 @@ function eyeSvg(x, open, blink, squint, gx, gy, tear, tearT, side, mk) {
       <ellipse cx="${f1(dir * 4)}" cy="${f1(edge(0) - 8)}" rx="15" ry="4" fill="${sc[2]}" opacity="0.55" filter="url(#eb)"/></g>
       ${clamp(mk.sparkle || 0) > 0.02 ? [...Array(9)].map((_, i) => { const u = -0.5 + i * 0.13; return `<circle cx="${f1(PX(u))}" cy="${f1(edge(u) - 6 - (i % 3) * 4)}" r="${1.2 + (i % 3) * 0.7}" fill="#fff" opacity="${0.9 * mk.sparkle}"/>`; }).join('') + `<circle cx="${f1(-dir * 25)}" cy="${f1(edge(-0.8) - 3)}" r="3.6" fill="${col.gem || '#fff'}" stroke="#fff" stroke-width="1.2"/>` : ''}`; }
   EYEX._gl = '';
-  if (EYEX.corner && sh > 0.02 && c < 0.85) { const sc2 = col.shadow || ['#8a4b1e', '#e0a84a', '#f6d98a']; const SA = [], SB = []; for (let i = 0; i <= 22; i++) { const t = i / 22, q = almondPt(dir, t, true), hh = 26 + 22 * Math.sin(Math.PI * Math.min(1, t * 0.95 + 0.03)) + 16 * t; SA.push(`${f1(q.x)},${f1(q.y)}`); SB.push(`${f1(q.x + q.nx * hh + dir * t * 7)},${f1(q.y + q.ny * hh)}`); }
+  if (EYEX.corner && sh > 0.02 && c < 0.85) { const sc2 = col.shadow || ['#8a4b1e', '#e0a84a', '#f6d98a']; const SA = [], SB = []; for (let i = 0; i <= 22; i++) { const t = i / 22, q = almondPt(dir, t, true), hh = (EYEX.shH || 1) * (26 + 22 * Math.sin(Math.PI * Math.min(1, t * 0.95 + 0.03)) + 16 * t); SA.push(`${f1(q.x)},${f1(q.y)}`); SB.push(`${f1(q.x + q.nx * hh + dir * t * 7)},${f1(q.y + q.ny * hh)}`); }
     const poly = 'M' + SA.join(' L') + ' L' + SB.slice().reverse().join(' L') + 'Z'; const gc = 'esc' + side; const qo = almondPt(dir, 0.82, true), qi = almondPt(dir, 0.1, true);
     shadow = `<defs><linearGradient id="${gc}" x1="${dir > 0 ? 0 : 1}" y1="0" x2="${dir > 0 ? 1 : 0}" y2="0"><stop offset="0" stop-color="${sc2[2]}"/><stop offset="0.5" stop-color="${sc2[1]}"/><stop offset="1" stop-color="${sc2[0]}"/></linearGradient></defs><path d="${poly}" fill="url(#${gc})" opacity="${sh}"/><ellipse cx="${f1(qo.x + qo.nx * 12 + dir * 8)}" cy="${f1(qo.y + qo.ny * 12)}" rx="16" ry="12" fill="${sc2[0]}" opacity="${0.55 * sh}"/><ellipse cx="${f1(qi.x + qi.nx * 8)}" cy="${f1(qi.y + qi.ny * 8)}" rx="10" ry="6" fill="${col.inner || '#fff6cf'}" opacity="${0.8 * sh}"/>`; }
   if (EYEX.glit && shadow) { let gp = ''; const GC = EYEX.glitCol || ['#fff2c4', '#ffffff', '#f6c870']; for (let i = 0; i < 80; i++) { const u = -0.85 + (i / 79) * 1.75, rr = (n) => { const sd = Math.sin((i + 1) * n * 12.9 + side) * 43758.5; return sd - Math.floor(sd); }; const qg = EYEX.corner ? almondPt(dir, 0.05 + (i / 79) * 0.9, true) : null, og = 6 + rr(2.1) * 34; gp += `<circle cx="${EYEX.corner ? f1(qg.x + qg.nx * og) : f1(PX(u) + (rr(1.3) - 0.5) * 5)}" cy="${EYEX.corner ? f1(qg.y + qg.ny * og) : f1(edge(u) - 3 - rr(2.1) * 15)}" r="${(1.1 + rr(3.3) * 2.2).toFixed(1)}" fill="${GC[i % 3]}" opacity="${(0.55 + rr(4.1) * 0.45).toFixed(2)}"/>`; } if (EYEX.corner) for (let k = 0; k < 7; k++) { const qg = almondPt(dir, 0.12 + k * 0.12, true), og = 12 + (k % 3) * 10, gx = qg.x + qg.nx * og, gy = qg.y + qg.ny * og, z = 5 + (k % 3) * 1.8; gp += `<path d="M${f1(gx)},${f1(gy - z)} Q${f1(gx + 0.6)},${f1(gy - 0.6)} ${f1(gx + z)},${f1(gy)} Q${f1(gx + 0.6)},${f1(gy + 0.6)} ${f1(gx)},${f1(gy + z)} Q${f1(gx - 0.6)},${f1(gy + 0.6)} ${f1(gx - z)},${f1(gy)} Q${f1(gx - 0.6)},${f1(gy - 0.6)} ${f1(gx)},${f1(gy - z)}Z" fill="#fff" opacity="0.95"/>`; } EYEX._gl = `<g>${gp}</g>`; }
@@ -105,7 +105,7 @@ function eyeSvg(x, open, blink, squint, gx, gy, tear, tearT, side, mk) {
       <path d="M-46,70 L-46,${yl} Q0,${yl + 10} 46,${yl} L46,70Z" fill="${LID}"/>
     </g>
     ${EYEX.corner ? `<path d="${almond(dir)}" fill="none" stroke="${OUT}" stroke-width="${c < 0.5 ? 3 : 4.5}" stroke-linejoin="round"/>` : `<ellipse rx="36" ry="40" fill="none" stroke="${OUT}" stroke-width="${c < 0.5 ? 4.5 : 7}"/>`}
-    ${liner}${lashes}${tearDrop}
+    ${liner}${lashes}${tearDrop}${EYEX.side ? sideSparkles(dir, side) : ''}
   </g>`;
 }
 function browSvg(side, r, i, k = 0, shortF = 0) {
@@ -114,6 +114,7 @@ function browSvg(side, r, i, k = 0, shortF = 0) {
   const a = { x: side * lerp(70, 86, k), y: -108 - 20 * k + dy - i * 6 };
   const n = { x: side * lerp(6, 46, k), y: -62 + dy - i * 28 + 4 * k };
   if (shortF > 0) o = { x: o.x + (a.x - o.x) * shortF * 0.7, y: o.y + (a.y - o.y) * shortF * 0.7 };
+  if (BROWX.style) return browModernSvg(side, o, a, n, BROWX.style);
   const stray = k < 0.7 ? [0.2, 0.45, 0.7].map((u, j) => `<path d="M${lerp(o.x, a.x, u)},${lerp(o.y, a.y, u) - 14} l${side * (3 + j)},-${12 + j * 3}" stroke="#0f0a08" stroke-width="3.5" stroke-linecap="round" opacity="${(1 - k / 0.7) * 0.8}"/>`).join('') : '';
   return `<path d="M${o.x},${o.y} Q${a.x},${a.y} ${n.x},${n.y} L${n.x},${n.y + th} Q${a.x},${a.y + th * 1.4} ${o.x},${o.y + 6}Z" fill="#0f0a08" stroke="${OUT}" stroke-width="${lerp(5, 4, k)}" stroke-linejoin="round"/>${stray}`;
 }
@@ -667,7 +668,7 @@ function postizas(style, dir, PX, edge, c, yl) { EYEX._dir = dir; let seed = 131
 
 export const NOSMILE = { on: false };
 
-export const EYEX = { drape: 0, blushK: null, shK: null, glit: 0, glitCol: null, blushCol: null, nomk: 0, corner: 0, sx: 1, sy: 1, irK: 1, irX: 1, prK: 1, dx: 0, dy: 0, tilt: 0, tex: 0, pal: null, anime: 0, thick: null };
+export const EYEX = { side: 0, sideCol: null, shH: null, drape: 0, blushK: null, shK: null, glit: 0, glitCol: null, blushCol: null, nomk: 0, corner: 0, sx: 1, sy: 1, irK: 1, irX: 1, prK: 1, dx: 0, dy: 0, tilt: 0, tex: 0, pal: null, anime: 0, thick: null };
 const f1x = (n) => Math.round(n * 10) / 10;
 function irisTex(ix, iy, gx, side) { if (EYEX.anime) return irisAnime(ix, iy, gx, side); const P = EYEX.pal || ['#e0aa62', '#8a4a1e', '#2a1208'], k = EYEX.irK, sx = EYEX.sx, sy = EYEX.sy, pr = 11 * EYEX.prK; const id = 'ix' + (side > 0 ? 'L' : 'R');
   let fib = ''; for (let i = 0; i < 64; i++) { const a = i / 64 * 6.2832, r0 = pr + 2, r1 = 21 + (i % 3) * 0.6; fib += `<path d="M${f1x(Math.cos(a) * r0)},${f1x(Math.sin(a) * r0)} L${f1x(Math.cos(a + 0.04) * r1)},${f1x(Math.sin(a + 0.04) * r1)}" stroke="${i % 2 ? '#f7d28a' : '#3a1a08'}" stroke-opacity="${i % 2 ? 0.35 : 0.5}" stroke-width="${i % 4 === 0 ? 1.6 : 0.9}"/>`; }
@@ -704,3 +705,22 @@ function fadeWrap(shadow, d, side, extra) { const A = almondSeg(d); const I = A.
     <mask id="${id}my" maskUnits="userSpaceOnUse" x="${xa - 10}" y="-120" width="${xb - xa + 20}" height="100"><rect x="${xa - 10}" y="-120" width="${xb - xa + 20}" height="100" fill="url(#${id}y)"/></mask><mask id="${id}mx" maskUnits="userSpaceOnUse" x="${xa - 10}" y="-120" width="${xb - xa + 20}" height="100"><rect x="${xa - 10}" y="-120" width="${xb - xa + 20}" height="100" fill="url(#${id}x)"/></mask><filter id="${id}b" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation="3.4"/></filter></defs><g clip-path="url(#${id}c)"><g mask="url(#${id}mx)"><g mask="url(#${id}my)" opacity="${EYEX.shK ?? 0.78}"><g filter="url(#${id}b)">${shadow}</g>${extra || ''}</g></g></g>`; }
 
 export const LIPX = { tex: 0, gloss: 1, shimmer: 0 };
+
+// Brillos al lado de cada ojo (esquina externa): puntos, estrellitas y pedreria
+function sideSparkles(d, side) { const GC = EYEX.sideCol || ['#ffffff', '#ffc0e0', '#ff7ac0']; const O = almondPt(d, 0.98, true); const R = (n, i) => { const sd = Math.sin((i + 1) * n * 12.9 + side) * 43758.5; return sd - Math.floor(sd); }; let g = '';
+  for (let i = 0; i < 16; i++) g += `<circle cx="${f1x(O.x + d * (8 + R(1.3, i) * 54))}" cy="${f1x(O.y - 34 + R(2.1, i) * 56)}" r="${(0.9 + R(3.3, i) * 1.7).toFixed(1)}" fill="${GC[i % 3]}" opacity="${(0.6 + R(4.1, i) * 0.4).toFixed(2)}"/>`;
+  for (let k = 0; k < 4; k++) { const gx = O.x + d * (14 + k * 14), gy = O.y - 20 + ((k * 23) % 30), z = 4.5 + (k % 2) * 2.4; g += `<path d="M${f1x(gx)},${f1x(gy - z)} Q${f1x(gx + 0.6)},${f1x(gy - 0.6)} ${f1x(gx + z)},${f1x(gy)} Q${f1x(gx + 0.6)},${f1x(gy + 0.6)} ${f1x(gx)},${f1x(gy + z)} Q${f1x(gx - 0.6)},${f1x(gy + 0.6)} ${f1x(gx - z)},${f1x(gy)} Q${f1x(gx - 0.6)},${f1x(gy - 0.6)} ${f1x(gx)},${f1x(gy - z)}Z" fill="#fff" opacity="0.95"/>`; }
+  for (const [kx, ky, rr, col] of [[30, -6, 3.6, '#ff4a9a'], [48, 12, 2.6, '#ff90c8'], [20, 18, 2.2, '#ffffff']]) g += `<circle cx="${f1x(O.x + d * kx)}" cy="${f1x(O.y + ky)}" r="${rr}" fill="${col}" stroke="#ffffff" stroke-width="0.8"/><circle cx="${f1x(O.x + d * kx - 0.9)}" cy="${f1x(O.y + ky - 0.9)}" r="${(rr * 0.35).toFixed(1)}" fill="#fff"/>`;
+  return `<g>${g}</g>`; }
+
+export const BROWX = { style: null, col: '#2a160c' };
+// Cejas modernas (puntos: o = extremo externo, a = pico, n = inicio interno)
+function browModernSvg(sg, o, a, n, style) { const lift = -12; const inner = [n.x, n.y + lift], outer = [o.x, o.y + lift + 4]; const mid = [(inner[0] + outer[0]) / 2, (inner[1] + outer[1]) / 2]; const fa = { straight: 0.13, arch: 0.4, fluffy: 0.24, ombre: 0.3 }[style] ?? 0.25; const peak = [mid[0] + (a.x - mid[0]) * fa + sg * (style === 'arch' ? 8 : 0), mid[1] + (a.y + lift - mid[1]) * fa]; const S = 1.1;
+  const C = [2 * peak[0] - (inner[0] + outer[0]) / 2, 2 * peak[1] - (inner[1] + outer[1]) / 2]; const Pt = (t) => { const u = 1 - t; return [u * u * inner[0] + 2 * u * t * C[0] + t * t * outer[0], u * u * inner[1] + 2 * u * t * C[1] + t * t * outer[1]]; };
+  const Tg = (t) => { const p = Pt(Math.max(0, t - 0.02)), q = Pt(Math.min(1, t + 0.02)); const dx = q[0] - p[0], dy = q[1] - p[1], l = Math.hypot(dx, dy) || 1; return [dx / l, dy / l]; }; const tp = (t, s0, k) => Math.pow(Math.max(0, (t - s0) / (1 - s0)), k);
+  const Wd = { straight: (t) => ((t < 0.1 ? 9 + t * 60 : 15) * (1 - 0.62 * tp(t, 0.5, 1.5)) + 1.5) * S, arch: (t) => (9 * (1 - 0.65 * Math.pow(t, 1.6)) + 1.5) * S, fluffy: (t) => ((t < 0.12 ? 10 + t * 70 : 19) * (1 - 0.5 * tp(t, 0.55, 1.4)) + 2) * S, ombre: (t) => ((t < 0.1 ? 11 + t * 60 : 18) * (1 - 0.58 * tp(t, 0.45, 1.3)) + 1.5) * S }[style] || (() => 20);
+  const Lp = [], Rp = []; for (let i = 0; i <= 18; i++) { const t = i / 18, p = Pt(t), tg = Tg(t), nx = -tg[1], ny = tg[0], w = Wd(t) / 2; Lp.push(`${f1x(p[0] + nx * w)},${f1x(p[1] + ny * w)}`); Rp.unshift(`${f1x(p[0] - nx * w)},${f1x(p[1] - ny * w)}`); }
+  const col = BROWX.col, a0 = { straight: 0.8, arch: 0.9, fluffy: 0.5, ombre: 0.22 }[style] ?? 0.85, gid = 'bgx' + (sg > 0 ? 'p' : 'm');
+  const cnt = { straight: 22, arch: 10, fluffy: 42, ombre: 28 }[style] || 16; let hairs = ''; for (let i = 0; i < cnt; i++) { const t = (i + 0.5) / cnt, p = Pt(t), tg = Tg(t), up = style === 'fluffy' ? 0.95 : 0.5, len = ((style === 'fluffy' ? 9 : 6) + (i % 4) * 2) * S, w0 = Wd(t) * 0.3, off = ((i * 7) % 5 - 2) * w0 * 0.35;
+    const x0 = p[0] - tg[1] * off, y0 = p[1] + tg[0] * off, vx = tg[0] * 0.85, vy = tg[1] * 0.85 - up, l = Math.hypot(vx, vy); hairs += `<path d="M${f1x(x0)},${f1x(y0)} L${f1x(x0 + vx / l * len)},${f1x(y0 + vy / l * len)}" stroke="${i % 3 ? '#4e301c' : '#120804'}" stroke-opacity="${(0.45 + (i % 3) * 0.2).toFixed(2)}" stroke-width="${style === 'fluffy' ? 2.2 : 1.7}" stroke-linecap="round"/>`; }
+  return `<defs><linearGradient id="${gid}" gradientUnits="userSpaceOnUse" x1="${f1x(inner[0])}" y1="0" x2="${f1x(outer[0])}" y2="0"><stop offset="0" stop-color="${col}" stop-opacity="${a0}"/><stop offset="0.38" stop-color="${col}" stop-opacity="0.96"/><stop offset="1" stop-color="${col}" stop-opacity="0.85"/></linearGradient></defs><path d="M${Lp.join(' L')} L${Rp.join(' L')}Z" fill="url(#${gid})" stroke="${col}" stroke-width="1.5" stroke-linejoin="round"/>${hairs}`; }
