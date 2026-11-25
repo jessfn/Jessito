@@ -1,0 +1,22 @@
+[Unit]
+Description=Servidor privado de juegos Jessito Emu (gamesdata.geodatos.com.mx)
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=gamesdata
+Group=gamesdata
+WorkingDirectory=/opt/jessito/servidor-juegos
+EnvironmentFile=/etc/gamesdata.env
+ExecStart=/usr/bin/node server.js
+Restart=always
+RestartSec=3
+# Aislamiento: solo puede escribir en su carpeta de datos
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/gamesdata
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

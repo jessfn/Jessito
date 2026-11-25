@@ -1,0 +1,16 @@
+{
+  "name": "servidor-juegos",
+  "version": "1.0.0",
+  "description": "Servidor privado de juegos para Jessito Emu (gamesdata.geodatos.com.mx)",
+  "private": true,
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "contrasena": "node poner-contrasena.js"
+  },
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "pg": "^8.13.0"
+  }
+}
