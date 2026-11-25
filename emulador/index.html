@@ -896,7 +896,7 @@ async function srvList(){
       box.appendChild(makeTile({
         name:j.nombre, sub:est, consola:j.consola,
         ...(()=>{if(!listo)return {};if(j.portada)return {cover:portadaURL(j.id)};const cc=coverCandidates(j.nombre+'.x',j.consola);return {cover:cc.urls,coverId:cc.key};})(),
-        badge:!listo?(j.estado==='error'?['Error','err']:['Preparando','wait']):enCel.has(j.id)?['✓ En tu celular','ok']:null,
+        badge:!listo?(j.estado==='error'?['Error','err']:['Preparando','wait']):null,
         onPlay:()=>{if(listo)srvPlay(j);else showHint(est);},
         actions:[{icon:'i-x',label:'Borrar del servidor',fn:async()=>{if(!confirm('¿Borrar «'+j.nombre+'» de tu servidor?'))return;
           try{await srvFetch('/api/juegos/'+j.id,{method:'DELETE'});srvList();}catch(e){showHint(e.message);}}}],
@@ -907,9 +907,9 @@ async function srvList(){
 }
 // Descarga el juego del servidor a la biblioteca del celular (solo la primera vez) y lo abre
 async function srvPlay(j){
+  // Los juegos de tu servidor NO se guardan en el dispositivo: se descargan a la memoria temporal
+  // para jugar y al cerrar no queda nada. (Tus partidas sí se guardan, en tu cuenta en el servidor.)
   const name=j.nombre+((j.archivo||'').match(/\.[^.]+$/)||[''])[0];
-  const ya=(await libAll()).find(g=>g.srv===j.id);
-  if(ya){const x=await libGet(ya.name);if(x){$('menu').classList.add('hidden');return runGame(x.name,x.blob,x.core);}}
   try{
     showHint('Descargando '+j.nombre+'… 0%');
     const r=await srvFetch('/api/juegos/'+j.id+'/archivo');const total=+r.headers.get('Content-Length')||+j.tamano||1;
@@ -920,9 +920,8 @@ async function srvPlay(j){
       if(n-last>2e6){last=n;$('toast').textContent='Descargando '+j.nombre+'… '+Math.round(n/total*100)+'%';$('toast').style.opacity=1;}}
     armado.push(new Blob(trozos));trozos=null;
     const blob=new Blob(armado);armado=null;
-    await libPut({name,blob,core:j.consola,size:blob.size,added:Date.now(),srv:j.id});diag('Descargado del servidor: '+name);
-    renderLib();srvList();
-    const x=await libGet(name);$('menu').classList.add('hidden');runGame(name,x?.blob||blob,j.consola);
+    diag('Descargado del servidor a memoria temporal: '+name+' ('+Math.round(blob.size/1e6)+' MB)');
+    $('menu').classList.add('hidden');runGame(name,blob,j.consola);
   }catch(e){showHint('No se pudo descargar: '+e.message);}
 }
 // Subir al servidor: el archivo viaja directo desde el almacenamiento (no se carga en memoria)
@@ -936,6 +935,8 @@ $('srvFile').onchange=e=>{const inp=e.target,f=inp.files&&inp.files[0];if(!f)ret
   xhr.onerror=()=>{inp.value='';showHint('Se cortó la subida');};
   diag('Subiendo al servidor: '+f.name+' ('+Math.round(f.size/1e6)+' MB)');
   xhr.send(f);};
+// Limpieza: las copias de juegos del servidor que versiones anteriores guardaron en el dispositivo se borran (liberan espacio)
+libAll().then(async l=>{const viejos=l.filter(g=>g.srv);for(const g of viejos)await libDel(g.name);if(viejos.length){diag('Espacio liberado: '+viejos.length+' juego(s) del servidor quitados del dispositivo');renderLib();}}).catch(()=>{});
 srvUI();
 $('file').onchange=e=>{const inp=e.target, f=inp.files&&inp.files[0];
   if(!f){showHint('No se recibió ningún archivo');return;}
