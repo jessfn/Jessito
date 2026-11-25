@@ -22,4 +22,4 @@ export function applyDay18Face() {
   Object.assign(LOOK, { blush: 0, contour: 0.35, highlight: 0.25, shadow: 1, liner: 0.9, wing: 0.9, thick: 4, tex: 1, cols: { blush: '#c06048', contour: '#5a2038', shadow: ['#4a0f3a', '#8a2a6a', '#e0b0d8'], inner: '#f8e8f4', hl: '#fff0f4', liner: '#1a0612' } });
   MK.lipColor = '#9c0f1c'; LIPX.tex = 1; LIPX.shimmer = 1; LIPX.gloss = 0.5;
   Object.assign(EYEX, { glit: 1, glitCol: ['#f0d8f0', '#ffffff', '#d070c0'], blushCol: '#c06048', shK: 1, drape: 1, blushK: 1.1, shH: 1.4, side: 1, sideCol: ['#ffffff', '#e8b0e0', '#b050a0'] });
-  BROWX.style = 'ombre'; JAW.light = 0.25; JAW.d = 0.3; FACEK.hi = 0.35; FACEK.glow = 0.4; NECK.dy = 22; NOSEDY.dy = 8; }
+  BROWX.style = 'ombre'; JAW.light = 0.25; JAW.d = 0.3; FACEK.hi = 0.35; FACEK.glow = 0.4; NECK.dy = 22; NOSEDY.dy = 8; EYEX.dx = 0; MOUTHX.dy = 1; EYEX.shp = 'clasico'; EYEX.ip = 0; EYEX.inn = { len: 16, dy: 3, w: 4, lowK: 0.4, gel: 1 }; }
