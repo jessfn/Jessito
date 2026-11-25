@@ -3,7 +3,7 @@ import { renderCharacter as rc, defaultPose as dp, ALLDEFS, LOOK, MK, JAW, FACEK
 const FULL = JSON.parse(JSON.stringify(LOOK));
 const SH = ['#4a0f3a', '#8a2a6a', '#e0b0d8'], GL = ['#f0d8f0', '#ffffff', '#d070c0'], SP = ['#ffffff', '#e8b0e0', '#b050a0'];
 const A = { sh: SH, bl: '#c06048', ct: '#5a2038', lip: '#9c0f1c', gl: GL, sp: SP };
-const PAL = [['Actual', 3, 4], ['Ojos +5 · boca -1', 8, 1], ['Ojos +9 · boca -3', 12, -1], ['Ojos +13 · boca -5', 16, -3]].map(([n, dx, my]) => [n, Object.assign({ dx, my }, A), 22, 8]);
+const PAL = [['Actual', 3, 4], ['Ojos juntos -3 · boca -1', 0, 1], ['Ojos juntos -7 · boca -3', -4, -1], ['Ojos juntos -11 · boca -5', -8, -3]].map(([n, dx, my]) => [n, Object.assign({ dx, my }, A), 22, 8]);
 const tiles = [];
 PAL.forEach(([n, c, nw, nd], i) => { applyFinalFace(); Object.assign(EYEX, { sx: 0.85, sy: 0.68, irK: 0.95, prK: 0.49 }); Object.keys(LOOK).forEach((q) => delete LOOK[q]); Object.assign(LOOK, JSON.parse(JSON.stringify(FULL)));
   Object.assign(LOOK, { blush: 0, contour: 0.35, highlight: 0.25, shadow: 1, liner: 0.9, wing: 0.9, thick: 4, cols: { blush: c.bl, contour: c.ct, shadow: c.sh, inner: '#f8e8f4', hl: '#fff0f4', liner: '#1a0612' } }); LOOK.tex = 1; MK.lipColor = c.lip; LIPX.tex = 1; LIPX.shimmer = 1; LIPX.gloss = 0.5; EYEX.glit = 1; EYEX.glitCol = c.gl; EYEX.blushCol = c.bl; EYEX.shK = 1; EYEX.drape = 1; EYEX.blushK = 1.1; BROWX.style = 'ombre'; JAW.light = 0.25; JAW.d = 0.3; FACEK.hi = 0.35; FACEK.glow = 0.4; EYEX.shH = 1.4; EYEX.side = 1; EYEX.sideCol = c.sp; NECK.w = 1; NECK.dy = nw; NOSEDY.dy = nd; EYEX.dx = c.dx; MOUTHX.dy = c.my;
@@ -14,4 +14,4 @@ PAL.forEach(([n, c, nw, nd], i) => { applyFinalFace(); Object.assign(EYEX, { sx:
 BROWX.style = null; FACEK.hi = 1; FACEK.glow = 1;
 const b64 = (b) => 'data:image/png;base64,' + Buffer.from(b).toString('base64'); let body = '';
 tiles.forEach(([n, t], i) => { const x = (i % 3) * 610 + 5, y = Math.floor(i / 3) * 690 + 5; body += `<image href="${b64(t)}" x="${x}" y="${y}" width="600" height="628"/><text x="${x + 300}" y="${y + 665}" font-family="Anton" font-size="34" text-anchor="middle" fill="#fff">${n}</text>`; });
-writeFileSync('Ojos_boca_opciones.png', new Resvg(`<svg xmlns="http://www.w3.org/2000/svg" width="1840" height="1390"><rect width="1840" height="1390" fill="#1d1426"/>${body}</svg>`, { font: { loadSystemFonts: true } }).render().asPng());
+writeFileSync('Ojos_juntos_opciones.png', new Resvg(`<svg xmlns="http://www.w3.org/2000/svg" width="1840" height="1390"><rect width="1840" height="1390" fill="#1d1426"/>${body}</svg>`, { font: { loadSystemFonts: true } }).render().asPng());
