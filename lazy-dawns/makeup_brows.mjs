@@ -1,11 +1,12 @@
 import { Resvg } from '@resvg/resvg-js'; import { writeFileSync, readFileSync } from 'node:fs'; import { execSync } from 'node:child_process';
 import { renderCharacter as rc, defaultPose as dp, ALLDEFS, LOOK, MK, JAW, FACEK, BROW } from './rig2d/character.mjs'; import { applyFinalFace } from './face_final.mjs'; import { EYEX, LIPX, BROWX } from './rig.mjs'; import { defs } from './lazy_lib.mjs';
 const FULL = JSON.parse(JSON.stringify(LOOK));
+const SH = ['#4a0f3a', '#8a2a6a', '#e0b0d8'], GL = ['#f0d8f0', '#ffffff', '#d070c0'], SP = ['#ffffff', '#e8b0e0', '#b050a0'];
 const PAL = [
- ['A · Vino y ciruela', { sh: ['#4a0f3a', '#8a2a6a', '#e0b0d8'], bl: '#b02050', ct: '#5a2038', lip: '#c4101e', gl: ['#f0d8f0', '#ffffff', '#d070c0'], sp: ['#ffffff', '#e8b0e0', '#b050a0'] }],
- ['B · Rojo y violeta', { sh: ['#6a0f1e', '#7a2a9a', '#e8c0f0'], bl: '#c02040', ct: '#5a1a30', lip: '#d0101c', gl: ['#f8d0e0', '#ffffff', '#c080e0'], sp: ['#ffffff', '#f0b0d0', '#9a50d0'] }],
- ['C · Granate y lila', { sh: ['#7a1020', '#a040a0', '#f0d0f0'], bl: '#d04060', ct: '#602030', lip: '#b8001a', gl: ['#fce0f0', '#ffffff', '#d890e0'], sp: ['#ffffff', '#f4c0e0', '#c060c0'] }],
- ['D · Ciruela ahumado', { sh: ['#2a0a30', '#6a2a7a', '#d0a0e0'], bl: '#a02848', ct: '#40182c', lip: '#e0102a', gl: ['#e8d0f4', '#ffffff', '#b070d0'], sp: ['#ffffff', '#d8b0f0', '#8a40b0'] }]];
+ ['A · Rubor terracota', { sh: SH, bl: '#c06048', ct: '#5a2038', lip: '#9c0f1c', gl: GL, sp: SP }],
+ ['B · Rubor ciruela', { sh: SH, bl: '#8a3a6a', ct: '#4a2038', lip: '#9c0f1c', gl: GL, sp: SP }],
+ ['C · Rubor cobre dorado', { sh: SH, bl: '#d08850', ct: '#5a3020', lip: '#9c0f1c', gl: GL, sp: SP }],
+ ['D · Rubor borgoña', { sh: SH, bl: '#9a3048', ct: '#4a1a28', lip: '#9c0f1c', gl: GL, sp: SP }]];
 const tiles = [];
 PAL.forEach(([n, c], i) => { applyFinalFace(); Object.assign(EYEX, { sx: 0.85, sy: 0.68, irK: 0.95, prK: 0.49 }); Object.keys(LOOK).forEach((q) => delete LOOK[q]); Object.assign(LOOK, JSON.parse(JSON.stringify(FULL)));
   Object.assign(LOOK, { blush: 0, contour: 0.35, highlight: 0.25, shadow: 1, liner: 0.9, wing: 0.9, thick: 4, cols: { blush: c.bl, contour: c.ct, shadow: c.sh, inner: '#f8e8f4', hl: '#fff0f4', liner: '#1a0612' } }); LOOK.tex = 1; MK.lipColor = c.lip; LIPX.tex = 1; LIPX.shimmer = 1; LIPX.gloss = 0.5; EYEX.glit = 1; EYEX.glitCol = c.gl; EYEX.blushCol = c.bl; EYEX.shK = 1; EYEX.drape = 1; EYEX.blushK = 1.1; BROWX.style = 'ombre'; JAW.light = 0.25; JAW.d = 0.3; FACEK.hi = 0.35; FACEK.glow = 0.4; EYEX.shH = 1.4; EYEX.side = 1; EYEX.sideCol = c.sp;
@@ -16,4 +17,4 @@ PAL.forEach(([n, c], i) => { applyFinalFace(); Object.assign(EYEX, { sx: 0.85, s
 BROWX.style = null; FACEK.hi = 1; FACEK.glow = 1;
 const b64 = (b) => 'data:image/png;base64,' + Buffer.from(b).toString('base64'); let body = '';
 tiles.forEach(([n, t], i) => { const x = (i % 3) * 610 + 5, y = Math.floor(i / 3) * 690 + 5; body += `<image href="${b64(t)}" x="${x}" y="${y}" width="600" height="628"/><text x="${x + 300}" y="${y + 665}" font-family="Anton" font-size="34" text-anchor="middle" fill="#fff">${n}</text>`; });
-writeFileSync('OpcionesMaquillajeRojo.png', new Resvg(`<svg xmlns="http://www.w3.org/2000/svg" width="1840" height="1390"><rect width="1840" height="1390" fill="#1d1426"/>${body}</svg>`, { font: { loadSystemFonts: true } }).render().asPng());
+writeFileSync('OpcionesMaquillajeRojo2.png', new Resvg(`<svg xmlns="http://www.w3.org/2000/svg" width="1840" height="1390"><rect width="1840" height="1390" fill="#1d1426"/>${body}</svg>`, { font: { loadSystemFonts: true } }).render().asPng());
