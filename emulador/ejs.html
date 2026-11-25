@@ -33,6 +33,20 @@
     'mupen64plus-Framerate': 'Fullspeed',
   };
   window.EJS_onGameStart = () => parent.postMessage({ ejs: 'start' }, location.origin);
+  // iPhone/Safari: el sonido y el bucle del juego necesitan un toque. Registramos los AudioContext
+  // para que cualquier toque en los controles de Jessito Emu (fuera de este iframe) los despierte.
+  (function(){
+    const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+    const ctxs = [];
+    function Tracked(...a){ const c = new AC(...a); ctxs.push(c); return c; }
+    Tracked.prototype = AC.prototype;
+    window.AudioContext = Tracked; window.webkitAudioContext = Tracked;
+    window.__unlock = () => {
+      for (const c of ctxs) if (c.state !== 'running') c.resume().catch(() => {});
+      try { const E = window.EJS_emulator; if (E && E.started && !E.paused) E.Module?.resumeMainLoop?.(); } catch (e) {}
+    };
+    ['touchstart', 'pointerdown', 'keydown'].forEach(ev => addEventListener(ev, window.__unlock, { passive: true }));
+  })();
   // Reenviar el teclado al padre para que funcionen los mismos atajos
   ['keydown', 'keyup'].forEach(t => addEventListener(t, e => parent.dispatchEvent(new KeyboardEvent(t, { key: e.key }))));
 </script>

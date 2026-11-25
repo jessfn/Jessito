@@ -228,7 +228,8 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden){releaseAll
 addEventListener('pagehide',()=>sys?.save?.());
 // Red de seguridad: si no hay ningún dedo en pantalla, nada debe seguir presionado
 let touches=0;
-document.addEventListener('pointerdown',()=>touches++,true);
+document.addEventListener('pointerdown',()=>{touches++;try{document.querySelector('iframe.ejs')?.contentWindow?.__unlock?.();}catch(e){}},true);
+document.addEventListener('touchstart',()=>{try{document.querySelector('iframe.ejs')?.contentWindow?.__unlock?.();}catch(e){}},{capture:true,passive:true});
 ['pointerup','pointercancel'].forEach(ev=>document.addEventListener(ev,()=>{touches=Math.max(0,touches-1);if(!touches)setTimeout(()=>{if(!touches)releaseAll();},30);},true));
 
 // Joystick táctil: la base aparece donde tocas y la bolita sigue tu dedo (8 direcciones)
@@ -657,11 +658,49 @@ $('biosFile').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(
   if(f.size<256e3||f.size>4e6){showHint('Ese archivo no parece un BIOS de PlayStation');return;}
   await tx('roms','readwrite',s=>s.put({name:f.name,blob:f},'bios_psx'));showBios();showHint('BIOS guardado. Vuelve a abrir el juego.');};
 showBios();
+const isIOS=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+// ===== Descompresión dentro de la app (.7z y .zip) con los descompresores de EmulatorJS =====
+const META=/\.(txt|nfo|diz|jpe?g|png|gif|bmp|pdf|htm|html|url|sfv|md5|sha1|xml|dat|ini|cfg|sbi|m3u|cue|ccd|sub|mds)$/i;
+async function extractArchive(file,kind){
+  const js=kind==='7z'?'extract7z.js':'extractzip.js';
+  const code=await (await fetch(EJS_CDN+'compression/'+js)).text();
+  const wk=new Worker(URL.createObjectURL(new Blob([code],{type:'text/javascript'})));
+  const buf=new Uint8Array(await file.arrayBuffer());
+  return new Promise((ok,ko)=>{const files=[];
+    wk.onmessage=e=>{const d=e.data;
+      if(d.t===2&&d.data&&!/\/$/.test(d.file))files.push(new File([d.data],d.file.split('/').pop()));
+      else if(d.t===4&&d.total){$('toast').textContent='Descomprimiendo… '+Math.round(d.current/d.total*100)+'%';$('toast').style.opacity=1;}
+      else if(d.t===1){wk.terminate();ok(files);}};
+    wk.onerror=e=>{wk.terminate();ko(new Error('archivo comprimido dañado'));};
+    wk.postMessage(buf);});
+}
+// Elige el archivo del juego dentro del comprimido: el más grande que no sea texto/imagen/hoja de pistas
+function pickMain(files){
+  const games=files.filter(f=>!META.test(f.name)).sort((a,b)=>b.size-a.size);
+  return games[0]||null;
+}
+// Último recurso si no hay firma ni pistas: adivinar por tamaño (nunca se pregunta)
+function guessCore(size,name){
+  if(/\.bin$/i.test(name)&&size>32e6)return 'psx';
+  if(size<=1.1e6)return 'nes'; if(size<=6.5e6)return 'snes'; if(size<=33e6)return 'gba'; if(size<=65e6)return 'n64'; return 'psx';
+}
 async function addGame(file){
   initAudio();
+  try{
+    const h=new Uint8Array(await file.slice(0,6).arrayBuffer());
+    const kind=(h[0]===0x37&&h[1]===0x7A&&h[2]===0xBC&&h[3]===0xAF)?'7z':(h[0]===0x50&&h[1]===0x4B&&h[2]===3&&h[3]===4)?'zip':null;
+    // Un .zip sencillo con un juego reconocible se deja así (ahorra memoria); el resto se descomprime aquí
+    let open=!!kind;
+    if(kind==='zip'){const z=await zipPeek(file,new Uint8Array(await file.slice(0,0x10400).arrayBuffer()));
+      if(z&&!/\.ecm$/i.test(z.name)&&sniffConsole(z.data,z.size))open=false;}
+    if(open){showHint('Descomprimiendo…');const main=pickMain(await extractArchive(file,kind));
+      if(!main){showHint('No encontré ningún juego dentro de '+file.name);return;}
+      file=main;}
+  }catch(e){showHint('No se pudo descomprimir: '+e.message);return;}
   if(/\.ecm$/i.test(file.name)){file=await unEcm(file);if(!file)return;}
-  const core=(await detectCore(file.name,file))||(await pickConsole(file.name)); if(!core)return;
-  showHint('Guardando en tu biblioteca…');
+  const core=(await detectCore(file.name,file))||guessCore(file.size,file.name);
+  if(isIOS&&core==='psx'&&file.size>300e6)showHint('Aviso: en iPhone los discos de más de 300 MB pueden cerrarse por falta de memoria');
+  else showHint(CONSOLE_INFO[core]?.[0]?('Detectado: '+CONSOLE_INFO[core][0]):'Detectado: CHIP-8');
   try{await libPut({name:file.name,blob:file,core,size:file.size,added:Date.now()});}
   catch(e){showHint('No hubo espacio para guardarlo, pero se abrirá igual');}
   renderLib(); runGame(file.name,file,core);
