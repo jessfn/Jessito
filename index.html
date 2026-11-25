@@ -196,6 +196,7 @@
   <div class="opt" style="flex-direction:column;align-items:stretch;gap:6px"><span id="storTxt">Espacio: calculando…</span><div style="height:8px;border-radius:99px;background:#ffffff14;overflow:hidden"><div id="storBar" style="height:100%;width:0;background:linear-gradient(90deg,var(--acc),var(--acc2))"></div></div><span class="note" id="storProt"></span></div>
   <div class="opt"><label><input type="checkbox" id="autosave" checked> Guardar la partida automáticamente</label></div>
   <button class="chip" id="freshStart" style="justify-content:center"><svg class="i"><use href="#i-reset"/></svg>Empezar este juego desde cero</button>
+  <div class="opt" style="flex-direction:column;align-items:stretch;gap:6px"><b style="font-size:13px">Diagnóstico</b><span class="note" id="diagVer"></span><pre id="diagLog" style="margin:0;max-height:150px;overflow:auto;font-size:10px;line-height:1.35;background:#0b0c1a;border:1px solid var(--line);border-radius:10px;padding:8px;white-space:pre-wrap;user-select:text;-webkit-user-select:text"></pre><button class="chip" id="diagCopy" style="justify-content:center">Copiar diagnóstico</button></div>
   <button class="chip" id="kpToggle" style="justify-content:center"><svg class="i"><use href="#i-keys"/></svg>Mostrar teclado CHIP-8</button>
   <div class="note">Teclado en PC: flechas = joystick, Z = B, X = A, Enter = Start, Shift = Select.<br>Las ROMs se quedan solo en tu dispositivo, no se suben a ningún lado.</div>
   <button class="chip" id="closeCfg" style="justify-content:center">Listo</button>
@@ -203,14 +204,19 @@
 
 <script>
 const $=id=>document.getElementById(id), cv=$('cv'), ctx=cv.getContext('2d');
+// Diagnóstico: registra cada paso y error, y lo conserva aunque Safari cierre la página
+function diag(m){try{const L=JSON.parse(localStorage.getItem('jemu_diag')||'[]');const mem=performance.memory?' ['+Math.round(performance.memory.usedJSHeapSize/1e6)+'MB]':'';L.push(new Date().toLocaleTimeString()+' '+m+mem);localStorage.setItem('jemu_diag',JSON.stringify(L.slice(-80)));}catch(e){}}
 let store={};try{store=JSON.parse(localStorage.getItem('jemu')||'{}');}catch(e){}
 const save=()=>{try{localStorage.setItem('jemu',JSON.stringify(store));}catch(e){}};
 store.sound??=true; store.color??='#a5f3fc'; store.vib??=true;
 
 // ================= Audio =================
 let actx, master;
-function initAudio(){ if(!actx){actx=new (window.AudioContext||window.webkitAudioContext)();master=actx.createGain();master.connect(actx.destination);}
-  master.gain.value=store.sound?1:0; if(actx.state==='suspended')actx.resume(); }
+// El sonido es opcional: si el dispositivo no lo permite, el juego carga igual (nunca debe bloquear)
+function initAudio(){ try{
+  if(!actx){const AC=window.AudioContext||window.webkitAudioContext; if(!AC)return; actx=new AC();master=actx.createGain();master.connect(actx.destination);}
+  master.gain.value=store.sound?1:0; if(actx.state==='suspended')actx.resume().catch(()=>{});
+}catch(e){ actx=null; master=null; } }
 function sfx(freq,dur=.08,type='square',vol=.06,slide=0){ if(!actx||!store.sound)return; const o=actx.createOscillator(),g=actx.createGain();
   o.type=type;o.frequency.setValueAtTime(freq,actx.currentTime); if(slide)o.frequency.exponentialRampToValueAtTime(slide,actx.currentTime+dur);
   g.gain.setValueAtTime(vol,actx.currentTime);g.gain.exponentialRampToValueAtTime(.0001,actx.currentTime+dur);o.connect(g).connect(master);o.start();o.stop(actx.currentTime+dur); }
@@ -332,14 +338,14 @@ const C8MAP={up:2,down:8,left:4,right:6,a:5,b:0xA,start:0xF,select:0};
 function chip8System(rom,name,keypad){
   const c=new Chip8();c.reset(rom);let beeping=false,osc,g;
   return {name,size:[64,32],aspect:'2/1',keypad,
-    start(){initAudio();osc=actx.createOscillator();g=actx.createGain();osc.type='square';osc.frequency.value=520;g.gain.value=0;osc.connect(g).connect(master);osc.start();},
+    start(){initAudio();if(!actx)return;try{osc=actx.createOscillator();g=actx.createGain();osc.type='square';osc.frequency.value=520;g.gain.value=0;osc.connect(g).connect(master);osc.start();}catch(e){g=null;}},
     stop(){try{osc.stop();}catch(e){}},
     reset(){c.reset(rom);},
     input(b,on){const k=C8MAP[b];if(k!==undefined)on?c.keyDown(k):c.keyUp(k);},
     key(k,on){const i=parseInt(k,16);if(k.length===1&&!isNaN(i))on?c.keyDown(i):c.keyUp(i);},
     pad:c,
     frame(){const s=+$('speed').value;for(let i=0;i<s;i++)c.step();c.tick();
-      const b=c.st>0;if(b!==beeping){beeping=b;g.gain.setTargetAtTime(b?.05:0,actx.currentTime,.01);}},
+      const b=c.st>0;if(b!==beeping&&g&&actx){beeping=b;g.gain.setTargetAtTime(b?.05:0,actx.currentTime,.01);}},
     draw(){if(!c.dirty)return;c.dirty=false;ctx.fillStyle='#04050b';ctx.fillRect(0,0,64,32);ctx.fillStyle=store.color;
       for(let i=0;i<2048;i++)if(c.disp[i])ctx.fillRect(i%64,i/64|0,1,1);},
     mute(){g&&g.gain.setTargetAtTime(0,actx.currentTime,.01);beeping=false;}};
@@ -513,7 +519,7 @@ function launch(s,hint){
 function fit(){ if(!sys)return; if(sys.fluid){const side=parseFloat(getComputedStyle(document.getElementById('app')).gridTemplateColumns)||0,w=innerWidth-2*side,h=innerHeight;
   cv.width=Math.round(Math.min(480,Math.max(256,240*w/h)));cv.style.aspectRatio=cv.width+'/240';} else cv.style.aspectRatio=sys.aspect; ctx.imageSmoothingEnabled=false; }
 addEventListener('resize',fit);
-let hintT;function showHint(t){const h=$('toast');h.textContent=t||'';h.style.opacity=t?1:0;clearTimeout(hintT);hintT=setTimeout(()=>h.style.opacity=0,3500);}
+let hintT;function showHint(t){if(t)diag(t);const h=$('toast');h.textContent=t||'';h.style.opacity=t?1:0;clearTimeout(hintT);hintT=setTimeout(()=>h.style.opacity=0,3500);}
 const openMenu=()=>{$('menu').classList.remove('hidden');if(running)setPaused(true);libAll().then(l=>{const r=l.sort((a,b)=>b.added-a.added)[0];if(r)warmUp(r.name);});};
 $('menuBtn').onclick=openMenu;$('ov').onclick=openMenu;
 $('menu').onclick=e=>{if(e.target===$('menu')){$('menu').classList.add('hidden');if(sys)setPaused(false);}};
@@ -699,6 +705,7 @@ function guessCore(size,name){
   if(size<=1.1e6)return 'nes'; if(size<=6.5e6)return 'snes'; if(size<=33e6)return 'gba'; if(size<=65e6)return 'n64'; return 'psx';
 }
 async function addGame(file){
+  diag('Archivo recibido: '+file.name+' ('+Math.round(file.size/1e6)+' MB)');
   initAudio();
   try{
     const h=new Uint8Array(await file.slice(0,6).arrayBuffer());
@@ -709,7 +716,7 @@ async function addGame(file){
       if(z&&!/\.ecm$/i.test(z.name)&&sniffConsole(z.data,z.size))open=false;}
     if(open){showHint('Descomprimiendo…');const main=pickMain(await extractArchive(file,kind));
       if(!main){showHint('No encontré ningún juego dentro de '+file.name);return;}
-      file=main;}
+      diag('Extraído: '+main.name+' ('+Math.round(main.size/1e6)+' MB)');file=main;}
   }catch(e){showHint('No se pudo descomprimir: '+e.message);return;}
   if(/\.ecm$/i.test(file.name)){file=await unEcm(file);if(!file)return;}
   const core=(await detectCore(file.name,file))||guessCore(file.size,file.name);
@@ -717,7 +724,7 @@ async function addGame(file){
   else showHint(CONSOLE_INFO[core]?.[0]?('Detectado: '+CONSOLE_INFO[core][0]):'Detectado: CHIP-8');
   // En iPhone se guarda una copia simple (Blob) en vez del File del selector: Safari a veces no puede guardar el File
   let stored=file; try{ if(file.size<50e6) stored=new Blob([await file.arrayBuffer()],{type:'application/octet-stream'}); }catch(e){}
-  try{await libPut({name:file.name,blob:stored,core,size:file.size,added:Date.now()});}
+  try{await libPut({name:file.name,blob:stored,core,size:file.size,added:Date.now()});diag('Guardado en la biblioteca ('+core+')');}
   catch(e){showHint('No hubo espacio para guardarlo, pero se abrirá igual');}
   // Para jugar se usa la copia guardada (vive en el almacenamiento, no en la RAM) y se suelta la copia en memoria
   const name=file.name; let toRun=file; try{const rec=await libGet(name); if(rec?.blob){toRun=rec.blob; file=null; stored=null;}}catch(e){}
@@ -747,7 +754,11 @@ $('reset').onclick=()=>{if(sys){sys.reset();setPaused(false);}};
 $('sound').onclick=()=>{store.sound=!store.sound;save();icon($('sound'),store.sound?'i-vol':'i-mute');if(master)master.gain.value=store.sound?1:0;sys?.setSound?.(store.sound);};
 icon($('sound'),store.sound?'i-vol':'i-mute');
 $('full').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else{await document.documentElement.requestFullscreen({navigationUI:'hide'});await screen.orientation?.lock?.('landscape').catch(()=>{});}}catch(e){}};
-$('cfg').onclick=()=>{$('sheet').classList.remove('hidden');showStorage();};
+$('cfg').onclick=()=>{$('sheet').classList.remove('hidden');showStorage();showDiag();};
+function showDiag(){let L=[];try{L=JSON.parse(localStorage.getItem('jemu_diag')||'[]');}catch(e){}
+  $('diagVer').textContent='Versión '+APP_VERSION+' · '+(isIOS?'iPhone/iPad':'otro dispositivo')+' · '+navigator.userAgent.replace(/.*(OS [0-9_]+).*/,'$1');
+  $('diagLog').textContent=L.length?L.join('\n'):'(sin registros todavía)';$('diagLog').scrollTop=1e9;}
+$('diagCopy').onclick=async()=>{try{await navigator.clipboard.writeText($('diagVer').textContent+'\n'+$('diagLog').textContent);showHint('Diagnóstico copiado');}catch(e){showHint('No se pudo copiar');}};
 // Espacio de almacenamiento: cuánto usan tus juegos, cuánto permite el sistema y si está protegido contra borrado
 async function showStorage(){try{
   let prot=await navigator.storage?.persisted?.();if(!prot)prot=await navigator.storage?.persist?.().catch(()=>false);
@@ -779,7 +790,8 @@ $('install').onclick=async()=>{if(!deferred)return;deferred.prompt();await defer
 addEventListener('appinstalled',()=>$('install').style.display='none');
 // ================= Actualización automática =================
 // El script de publicación escribe la versión aquí y en version.json.
-const APP_VERSION='20261125-201830-b135c15';
+const APP_VERSION='20261125-203140-3f690a8';
+diag('App abierta (versión '+APP_VERSION+')');
 let swReg=null, updatePending=false;
 if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>swReg=r).catch(()=>{});
 function applyUpdate(){ // recarga en cuanto no estés jugando (pausa, menú o app en segundo plano)
