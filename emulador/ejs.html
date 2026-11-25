@@ -17,7 +17,7 @@
   const g = parent.__ejsGame || {};
   window.EJS_player = '#game';
   window.EJS_core = g.core;
-  window.EJS_gameUrl = g.url;
+  window.EJS_gameUrl = g.file || g.url;   // el archivo con su extensión (.chd, .bin, .nes…) para que el emulador sepa leerlo
   window.EJS_gameName = g.name;
   if (g.bios) window.EJS_biosUrl = g.bios;
   window.EJS_pathtodata = 'https://cdn.emulatorjs.org/stable/data/';

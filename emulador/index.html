@@ -174,6 +174,12 @@
     <button class="chip" data-game="teclas"><svg class="i"><use href="#i-grid"/></svg>Teclas</button>
     <label class="chip"><svg class="i"><use href="#i-folder"/></svg>Cargar ROM<input id="file" type="file" class="picker-input"></label>
   </div>
+  <h2>Mi servidor <small style="font-weight:400;opacity:.55;font-size:11px">gamesdata.geodatos.com.mx</small></h2>
+  <div id="srvLogin" class="opt" style="gap:8px"><input id="srvPass" type="password" placeholder="Contraseña de tu biblioteca" autocomplete="current-password" style="flex:1;background:var(--card);color:var(--txt);border:1px solid var(--line);border-radius:12px;padding:10px;font-size:15px"><button class="chip" id="srvEnter">Entrar</button></div>
+  <div id="srvPanel" class="hidden" style="display:flex;flex-direction:column;gap:8px">
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><label class="chip"><svg class="i"><use href="#i-folder"/></svg>Subir juego a mi servidor<input id="srvFile" type="file" class="picker-input"></label><button class="chip" id="srvRefresh"><svg class="i"><use href="#i-reset"/></svg>Actualizar</button><button class="chip" id="srvOut">Salir</button></div>
+    <div class="lib" id="srvList"></div>
+  </div>
   <h2 id="libTitle" class="hidden">Mi biblioteca</h2>
   <div class="lib" id="lib"></div>
   <div class="note">Toca «Cargar ROM» para agregar juegos (.zip, .7z, .nes, .sfc, .gba, .bin/.cue de PlayStation…). Se guardan en tu biblioteca, solo en este dispositivo.</div>
@@ -367,7 +373,7 @@ function coreFor(name,bytes){
   if(bytes[0]===0x4E&&bytes[1]===0x45&&bytes[2]===0x53)return 'nes';
   return CORES[ext]||null;
 }
-function ejsSystem(bytes,name,core){
+function ejsSystem(bytes,name,core,fullName){
   const [label,aspect,extra,labels]=CONSOLE_INFO[core];
   const url=URL.createObjectURL(new Blob([bytes]));
   let frame,emu=null,ready=false;
@@ -393,7 +399,7 @@ function ejsSystem(bytes,name,core){
     setTimeout(restore,400); clearInterval(timer); timer=setInterval(()=>{if(running)saveNow();},45000);}};
   return {name,size:[4,3],aspect,extra,labels,ps:core==='psx',
     async start(){let bios=null;if(core==='psx'){const b=await tx('roms','readonly',s=>s.get('bios_psx')).catch(()=>null);if(b)bios=URL.createObjectURL(b.blob);}
-      window.__ejsGame={core,url,name,bios,volume:store.sound?.8:0,shader:store.quality||'disabled'};addEventListener('message',onMsg);
+      window.__ejsGame={core,url,name,bios,file:new File([bytes],fullName||name),volume:store.sound?.8:0,shader:store.quality||'disabled'};addEventListener('message',onMsg);
       frame=document.createElement('iframe');frame.src='ejs.html';frame.className='ejs';frame.allow='autoplay; gamepad; fullscreen';
       document.querySelector('.screen').appendChild(frame);},
     stop(){saveNow();clearInterval(timer);removeEventListener('message',onMsg);frame?.remove();URL.revokeObjectURL(url);},
@@ -520,7 +526,7 @@ function fit(){ if(!sys)return; if(sys.fluid){const side=parseFloat(getComputedS
   cv.width=Math.round(Math.min(480,Math.max(256,240*w/h)));cv.style.aspectRatio=cv.width+'/240';} else cv.style.aspectRatio=sys.aspect; ctx.imageSmoothingEnabled=false; }
 addEventListener('resize',fit);
 let hintT;function showHint(t){if(t)diag(t);const h=$('toast');h.textContent=t||'';h.style.opacity=t?1:0;clearTimeout(hintT);hintT=setTimeout(()=>h.style.opacity=0,3500);}
-const openMenu=()=>{$('menu').classList.remove('hidden');if(running)setPaused(true);libAll().then(l=>{const r=l.sort((a,b)=>b.added-a.added)[0];if(r)warmUp(r.name);});};
+const openMenu=()=>{$('menu').classList.remove('hidden');if(store.srvToken)srvList();if(running)setPaused(true);libAll().then(l=>{const r=l.sort((a,b)=>b.added-a.added)[0];if(r)warmUp(r.name);});};
 $('menuBtn').onclick=openMenu;$('ov').onclick=openMenu;
 $('menu').onclick=e=>{if(e.target===$('menu')){$('menu').classList.add('hidden');if(sys)setPaused(false);}};
 const GAMES={
@@ -660,7 +666,7 @@ async function runGame(name,blob,core){
   try{
     if(core==='chip8'){launch(chip8System(new Uint8Array(await blob.arrayBuffer()),clean),'CHIP-8 · joystick = 2/4/6/8, A = 5');return;}
     if(!navigator.onLine)showHint('Sin internet: usando el motor guardado de '+CONSOLE_INFO[core][0]);
-    launch(ejsSystem(blob,clean,core),'Cargando '+CONSOLE_INFO[core][0]+'…'+(blob.size>5e7?' juego grande, puede tardar':''));
+    launch(ejsSystem(blob,clean,core,name),'Cargando '+CONSOLE_INFO[core][0]+'…'+(blob.size>5e7?' juego grande, puede tardar':''));
   }catch(err){showHint('No se pudo abrir: '+err.message);}
 }
 // .ecm -> .bin en segundo plano (Web Worker), mostrando el avance
@@ -741,6 +747,81 @@ async function addGame(file){
   renderLib(); runGame(name,toRun,core);
 }
 function loadRom(name,bytes){return addGame(new File([bytes],name));}
+// ================= Mi servidor (gamesdata.geodatos.com.mx) =================
+// Tu biblioteca privada en tu VPS: el servidor prepara los juegos (descomprime, reconstruye .ecm,
+// convierte PlayStation a .chd) y el celular solo descarga el juego listo, una vez.
+const SRV='https://gamesdata.geodatos.com.mx';
+let srvPoll=null;
+function srvUI(){const on=!!store.srvToken;$('srvLogin').classList.toggle('hidden',on);$('srvPanel').classList.toggle('hidden',!on);if(on)srvList();}
+async function srvFetch(path,opt={}){
+  const r=await fetch(SRV+path,{...opt,headers:{...(opt.headers||{}),Authorization:'Bearer '+(store.srvToken||'')}});
+  if(r.status===401){store.srvToken=null;save();srvUI();throw new Error('Sesión vencida: vuelve a entrar');}
+  if(!r.ok)throw new Error((await r.json().catch(()=>({}))).error||('Error '+r.status));
+  return r;
+}
+$('srvEnter').onclick=async()=>{const pw=$('srvPass').value;if(!pw)return;
+  try{const r=await fetch(SRV+'/api/entrar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contrasena:pw})});
+    const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'No se pudo entrar');
+    store.srvToken=j.token;save();$('srvPass').value='';showHint('Conectado a tu servidor');srvUI();}
+  catch(e){showHint(e.message==='Failed to fetch'?'No hay conexión con tu servidor':e.message);}};
+$('srvPass').addEventListener('keydown',e=>{if(e.key==='Enter')$('srvEnter').click();});
+$('srvOut').onclick=()=>{store.srvToken=null;save();srvUI();};
+$('srvRefresh').onclick=()=>srvList();
+const ESTADOS={'en cola':'En cola…','subiendo':'Subiendo…','procesando':'Preparando…','descomprimiendo':'Descomprimiendo…','reconstruyendo disco':'Reconstruyendo disco…','convirtiendo a CHD':'Comprimiendo a CHD…','error':'Error:'};
+async function srvList(){
+  clearTimeout(srvPoll);
+  try{
+    const {juegos}=await (await srvFetch('/api/juegos')).json(); const box=$('srvList'); box.innerHTML='';
+    if(!juegos.length)box.innerHTML='<div class="note">Aún no hay juegos en tu servidor. Toca «Subir juego a mi servidor».</div>';
+    const enCel=new Set((await libAll()).map(g=>g.srv).filter(Boolean));
+    for(const j of juegos){
+      const el=document.createElement('div');el.className='game';
+      el.innerHTML='<button class="chip play"><svg class="i"><use href="#i-cart"/></svg><span><b></b><small></small></span></button><button class="ib del" aria-label="Borrar del servidor"><svg class="i"><use href="#i-x"/></svg></button>';
+      el.querySelector('b').textContent=j.nombre;
+      const est=j.estado==='listo'
+        ?(CONSOLE_INFO[j.consola]?.[0]||j.consola)+' · '+fmtSize(+j.tamano)+(enCel.has(j.id)?' · en tu celular ✓':' · toca para descargar y jugar')
+        :(ESTADOS[j.estado]||j.estado)+(j.mensaje?' '+j.mensaje:'');
+      el.querySelector('small').textContent=est;
+      el.querySelector('.play').onclick=()=>{if(j.estado==='listo')srvPlay(j);else showHint(est);};
+      el.querySelector('.del').onclick=async()=>{if(!confirm('¿Borrar «'+j.nombre+'» de tu servidor?'))return;
+        try{await srvFetch('/api/juegos/'+j.id,{method:'DELETE'});srvList();}catch(e){showHint(e.message);}};
+      box.appendChild(el);
+    }
+    if(juegos.some(j=>!['listo','error'].includes(j.estado)))srvPoll=setTimeout(srvList,4000);
+  }catch(e){showHint(e.message==='Failed to fetch'?'No hay conexión con tu servidor':e.message);}
+}
+// Descarga el juego del servidor a la biblioteca del celular (solo la primera vez) y lo abre
+async function srvPlay(j){
+  const name=j.nombre+((j.archivo||'').match(/\.[^.]+$/)||[''])[0];
+  const ya=(await libAll()).find(g=>g.srv===j.id);
+  if(ya){const x=await libGet(ya.name);if(x){$('menu').classList.add('hidden');return runGame(x.name,x.blob,x.core);}}
+  try{
+    showHint('Descargando '+j.nombre+'… 0%');
+    const r=await srvFetch('/api/juegos/'+j.id+'/archivo');const total=+r.headers.get('Content-Length')||+j.tamano||1;
+    const rd=r.body.getReader();let trozos=[],armado=[],n=0,last=0,acum=0;
+    for(;;){const {value,done}=await rd.read();if(done)break;trozos.push(value);n+=value.length;acum+=value.length;
+      // cada ~32 MB se juntan en un Blob para no acumular miles de pedazos en memoria
+      if(acum>32e6){armado.push(new Blob(trozos));trozos=[];acum=0;}
+      if(n-last>2e6){last=n;$('toast').textContent='Descargando '+j.nombre+'… '+Math.round(n/total*100)+'%';$('toast').style.opacity=1;}}
+    armado.push(new Blob(trozos));trozos=null;
+    const blob=new Blob(armado);armado=null;
+    await libPut({name,blob,core:j.consola,size:blob.size,added:Date.now(),srv:j.id});diag('Descargado del servidor: '+name);
+    renderLib();srvList();
+    const x=await libGet(name);$('menu').classList.add('hidden');runGame(name,x?.blob||blob,j.consola);
+  }catch(e){showHint('No se pudo descargar: '+e.message);}
+}
+// Subir al servidor: el archivo viaja directo desde el almacenamiento (no se carga en memoria)
+$('srvFile').onchange=e=>{const inp=e.target,f=inp.files&&inp.files[0];if(!f)return;
+  const xhr=new XMLHttpRequest();xhr.open('PUT',SRV+'/api/subir');
+  xhr.setRequestHeader('Authorization','Bearer '+store.srvToken);xhr.setRequestHeader('X-Nombre',encodeURIComponent(f.name));
+  xhr.upload.onprogress=ev=>{if(ev.lengthComputable){$('toast').textContent='Subiendo '+f.name+'… '+Math.round(ev.loaded/ev.total*100)+'%';$('toast').style.opacity=1;}};
+  xhr.onload=()=>{inp.value='';if(xhr.status===200){showHint('Subido. Tu servidor lo está preparando…');srvList();}
+    else if(xhr.status===401){store.srvToken=null;save();srvUI();showHint('Sesión vencida: vuelve a entrar');}
+    else showHint('Error al subir ('+xhr.status+')');};
+  xhr.onerror=()=>{inp.value='';showHint('Se cortó la subida');};
+  diag('Subiendo al servidor: '+f.name+' ('+Math.round(f.size/1e6)+' MB)');
+  xhr.send(f);};
+srvUI();
 $('file').onchange=e=>{const inp=e.target, f=inp.files&&inp.files[0];
   if(!f){showHint('No se recibió ningún archivo');return;}
   showHint('Cargando '+f.name+'…');
