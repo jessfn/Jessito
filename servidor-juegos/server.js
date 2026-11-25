@@ -12,7 +12,9 @@ const DIR = { juegos: path.join(BASE, 'juegos'), entrada: path.join(BASE, 'entra
   portadas: path.join(BASE, 'portadas'), partidas: path.join(BASE, 'partidas') };
 const ORIGENES = (process.env.ALLOWED_ORIGINS || 'https://jessfn.github.io').split(',').map(s => s.trim());
 const SECRETO = process.env.TOKEN_SECRET || '';
-const MAX_SUBIDA = +process.env.MAX_UPLOAD_BYTES || 4 * 1024 ** 3;
+// Sin límite de tamaño: solo se exige dejar libre un colchón en el disco (para no tumbar los otros sitios del VPS)
+const RESERVA_DISCO = +process.env.RESERVA_DISCO_BYTES || 5 * 1024 ** 3;
+const libreEnDisco = () => { try { const s = fs.statfsSync(BASE); return s.bavail * s.bsize; } catch (e) { return Infinity; } };
 const MAX_PARTIDA = 64 * 1024 ** 2;
 Object.values(DIR).forEach(d => fs.mkdirSync(d, { recursive: true }));
 
@@ -198,12 +200,14 @@ async function manejar(req, res) {
   if (ruta === '/api/subir' && req.method === 'PUT') {
     const original = nombreSeguro(decodeURIComponent(req.headers['x-nombre'] || url.searchParams.get('nombre') || 'juego'));
     const largo = +req.headers['content-length'] || 0;
-    if (largo > MAX_SUBIDA) return json(res, 413, { error: 'Archivo demasiado grande' });
+    const disponible = libreEnDisco() - RESERVA_DISCO;
+    if (largo && largo > disponible) return json(res, 507, { error: 'No hay espacio suficiente en el servidor (quedan ' + Math.max(0, Math.round(disponible / 1e9)) + ' GB libres)' });
     const { rows } = await db.query(`INSERT INTO juegos (nombre, original, estado, usuario_id) VALUES ($1,$2,'subiendo',$3) RETURNING id`, [original.replace(/\.[^.]+$/, ''), original, uid]);
     const id = rows[0].id, destino = path.join(DIR.entrada, id + '-' + original);
     const out = fs.createWriteStream(destino);
     let recibido = 0, cortado = false;
-    req.on('data', c => { recibido += c.length; if (recibido > MAX_SUBIDA && !cortado) { cortado = true; req.destroy(); } });
+    const tope = Math.max(0, disponible);
+    req.on('data', c => { recibido += c.length; if (recibido > tope && !cortado) { cortado = true; req.destroy(); } });
     req.pipe(out);
     out.on('finish', async () => {
       if (cortado || (largo && recibido < largo)) { fs.rmSync(destino, { force: true }); await db.query(`DELETE FROM juegos WHERE id=$1`, [id]); return json(res, 400, { error: 'Subida incompleta' }); }
