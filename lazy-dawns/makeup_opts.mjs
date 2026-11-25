@@ -1,0 +1,20 @@
+import { Resvg } from '@resvg/resvg-js'; import { writeFileSync, readFileSync } from 'node:fs'; import { execSync } from 'node:child_process';
+import { renderCharacter as rc, defaultPose as dp, ALLDEFS, LOOK, MK } from './rig2d/character.mjs'; import { applyFinalFace } from './face_final.mjs'; import { EYEX, LIPX } from './rig.mjs'; import { defs } from './lazy_lib.mjs';
+const FULL = JSON.parse(JSON.stringify(LOOK));
+const LK = [
+ ['Actual (morado y rosa)', null],
+ ['A · Rojo clásico', { look: { blush: 0.55, contour: 0.5, highlight: 0.85, shadow: 0.8, liner: 1, wing: 1, thick: 5, cols: { blush: '#e87a8a', contour: '#6a3a28', shadow: ['#7a4428', '#d49a6a', '#f6e0c0'], inner: '#fff0dc', hl: '#fff0dc', liner: '#140808' } }, lip: '#c8102e', gloss: 0.85, tex: 1, shimmer: 0, glit: 0, blush: '#e87a8a' }],
+ ['B · Ahumado y vino', { look: { blush: 0.45, contour: 0.75, highlight: 0.7, shadow: 1, liner: 1, wing: 1.2, thick: 7, cols: { blush: '#b04a5a', contour: '#4a2018', shadow: ['#140408', '#5a1428', '#b04a68'], inner: '#f0d0d8', hl: '#fbe6d0', liner: '#0a0408' } }, lip: '#8a0f2a', gloss: 0.25, tex: 1, shimmer: 0, glit: 0, blush: '#b04a5a' }],
+ ['C · Dorado y rojo naranja', { look: { blush: 0.6, contour: 0.5, highlight: 1, shadow: 0.9, liner: 0.9, wing: 1, thick: 4, cols: { blush: '#ff9a7a', contour: '#7a4a28', shadow: ['#9a5a08', '#f0b020', '#fff0a0'], inner: '#fff6d0', hl: '#fff2c8', liner: '#2a1608' } }, lip: '#e8301a', gloss: 0.9, tex: 1, shimmer: 1, glit: 1, blush: '#ff9a7a' }],
+ ['D · Rosa y rojo frambuesa', { look: { blush: 0.75, contour: 0.4, highlight: 0.9, shadow: 0.85, liner: 0.9, wing: 0.9, thick: 4, cols: { blush: '#ff7aa8', contour: '#7a3a4a', shadow: ['#a0206a', '#f060a8', '#ffd0e8'], inner: '#fff0f8', hl: '#fff0f4', liner: '#2a0a1a' } }, lip: '#b0185a', gloss: 1, tex: 1, shimmer: 1, glit: 0, blush: '#ff7aa8' }],
+ ['E · Cobre y rojo profundo', { look: { blush: 0.5, contour: 0.95, highlight: 0.8, shadow: 1, liner: 1, wing: 1.4, thick: 6, cols: { blush: '#d8604a', contour: '#4a2010', shadow: ['#6a1004', '#d04a14', '#ffb070'], inner: '#ffe0c0', hl: '#ffe6c8', liner: '#120606' } }, lip: '#a80f1a', gloss: 0.55, tex: 1, shimmer: 0, glit: 1, blush: '#d8604a' }]];
+const tiles = [];
+LK.forEach(([n, o], i) => { applyFinalFace(); Object.keys(LOOK).forEach((q) => delete LOOK[q]); Object.assign(LOOK, JSON.parse(JSON.stringify(FULL))); MK.lipColor = null; MK.lips = 1; LIPX.tex = 0; LIPX.gloss = 1; LIPX.shimmer = 0; EYEX.glit = 0; EYEX.blushCol = null; EYEX.shK = null;
+  if (o) { Object.assign(LOOK, o.look); LOOK.tex = o.tex; MK.lipColor = o.lip; LIPX.tex = o.tex; LIPX.gloss = o.gloss; LIPX.shimmer = o.shimmer; EYEX.glit = o.glit; EYEX.blushCol = o.blush; EYEX.shK = 1; }
+  const P = dp(); P.eyes.lookX = 0.1; P.mouth.smile = 0.5; P.mouth.open = 0.03; P.noseStyle = 'D'; P.noseK = 1.35; P.hairOv = { lacio: 'C2', len: 0.4, shine: 1, cp: 1, grow: 1 }; P.hair.t = 1; P.skirt.t = 1;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1500" viewBox="0 0 1024 1500">${defs('e3d')}${ALLDEFS}<rect width="1024" height="1500" fill="#3a2540"/>${rc(P)}</svg>`;
+  writeFileSync(`/tmp/mk_${i}.png`, new Resvg(svg, { fitTo: { mode: 'zoom', value: 2 }, font: { loadSystemFonts: true } }).render().asPng());
+  execSync(`ffmpeg -y -loglevel error -i /tmp/mk_${i}.png -vf crop=860:900:582:150,scale=600:628 /tmp/mkc_${i}.png`); tiles.push([n, readFileSync(`/tmp/mkc_${i}.png`)]); });
+const b64 = (b) => 'data:image/png;base64,' + Buffer.from(b).toString('base64'); let body = '';
+tiles.forEach(([n, t], i) => { const x = (i % 3) * 610 + 5, y = Math.floor(i / 3) * 690 + 5; body += `<image href="${b64(t)}" x="${x}" y="${y}" width="600" height="628"/><text x="${x + 300}" y="${y + 665}" font-family="Anton" font-size="34" text-anchor="middle" fill="#fff">${n}</text>`; });
+writeFileSync('OpcionesMaquillaje.png', new Resvg(`<svg xmlns="http://www.w3.org/2000/svg" width="1840" height="1390"><rect width="1840" height="1390" fill="#1d1426"/>${body}</svg>`, { font: { loadSystemFonts: true } }).render().asPng());

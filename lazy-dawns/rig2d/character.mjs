@@ -127,7 +127,7 @@ export function hairFront(P) { const h = P.hair; return `<g id="hair_front"><g t
 // ================= CABEZA Y ROSTRO =================
 const EYE = { L: [454, 262], R: [570, 262] };
 const jawDrop = (P) => P.jaw * 1 + P.mouth.open * 30;
-export const MK = { lips: 1, wet: 0 };
+export const MK = { lips: 1, wet: 0, lipColor: null };
 export const JAW = { style: null, w: 1, cheek: 0, light: 0, d: 0, noLines: false, mouthK: 1, noChin: false, mouthUp: 0, fxK: 1 };
 // Mandibulas suaves (solo curvas, sin picos). Cada una: segmentos cubicos del lado derecho desde la mejilla (128,268) hasta el menton.
 const JAWS = {
@@ -325,7 +325,7 @@ export function oldHeadPose(P, withFace = true) { const e = P.eyes, b = P.brows,
   const br = (raise, fr) => ({ r: clamp(raise * 0.9, -1, 1), i: clamp(raise * 0.9 - fr * 0.9, -1, 1) });
   return { yaw: P.head.yaw, pitch: P.head.pitch * 0.3, roll: 0, bob: 0, sway: 0, breath: P.chest.breath, shoulders: 0, flare: 0, squint: e.squint, tears: 0, tearT: 0, gaze: { x: e.lookX, y: e.lookY },
     lid: { l: 1 + e.wide * 0.25, r: 1 + e.wide * 0.25 }, blink: { l: e.blinkL, r: e.blinkR }, brow: { l: br(b.Lraise, b.Lfrown), r: br(b.Rraise, b.Rfrown) },
-    mouth: { open: clamp(m.open), wide: m.round > 0.5 ? -0.8 * m.round : clamp(m.wide, -1, 1), smile: m.smile, asym: 0, press: m.press || 0, teeth: { clean: 1, braces: 0, crooked: 0, extra: 0, shine: true }, lip: MK.lips < 0.5 ? null : '#b0206a', tstyle: 'A' },
+    mouth: { open: clamp(m.open), wide: m.round > 0.5 ? -0.8 * m.round : clamp(m.wide, -1, 1), smile: m.smile, asym: 0, press: m.press || 0, teeth: { clean: 1, braces: 0, crooked: 0, extra: 0, shine: true }, lip: MK.lips < 0.5 ? null : (MK.lipColor || '#b0206a'), tstyle: 'A' },
     skin: { acne: 0, mask: 0, dry: 0, foam: 0, patch: 0, glow: 1, red: 0 }, lidColor: lidColor(), hair: { hd: 'long', len: 0.82, shine: 1, cp: 1, grow: 1, ...(P.hairOv || {}), bounce: h.bounce, wind: 0, sway: clamp(hs / 18 + Math.sin(h.t * 1.3) * 0.12, -0.6, 0.6) },
     frontHair: true, noseStyle: P.noseStyle, noseK: P.noseK, makeup: LOOK, browStyle: { k: 1, kl: 1, kr: 1, red: 0, shortL: 0 }, fem: 1, skinTex: { tex: 'glass', shape: 'A' }, slim: 3.8, outfit: { kind: 'gown', prog: 1, jewel: 1 }, faceWrinkle: 0,
     faceClip: withFace ? { d: facePath(P), tf: `scale(${f1(1000 / (HEAD_SCALE * 0.8)) / 1000},${f1(1000 / (HEAD_SCALE * 0.86)) / 1000}) translate(${-HEAD_POS[0]},${-HEAD_POS[1]})` } : undefined,
