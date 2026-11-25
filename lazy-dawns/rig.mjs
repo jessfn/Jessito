@@ -332,7 +332,7 @@ export function noseSvg(style, flare = 0, k = 1.35) { NOSEK = k; const S = NOSES
   const wing = (s) => `<path d="M${f(s * (w - 2))},${ny - 12} Q${f(s * (w + 3))},${ny - 2} ${f(s * (w * 0.7))},${ny + 5}" stroke="${ln}" stroke-width="2.4" fill="none" stroke-linecap="round" opacity="0.55"/>`;
   const g = (id, col) => `<linearGradient id="${id}" gradientUnits="userSpaceOnUse" x1="0" y1="-30" x2="0" y2="${ty - 6}"><stop offset="0" stop-color="${col}" stop-opacity="0"/><stop offset="1" stop-color="${col}" stop-opacity="1"/></linearGradient>`;
   const fade = `<defs>${g('nfS', '#5a2e16')}${g('nfH', '#ffffff')}${g('nfB', '#b87648')}</defs>`;
-  return `<g transform="translate(0,46) scale(${NOSEK}) translate(0,-46)">${fade}<g><path d="${body}" fill="url(#nfB)" opacity="0.9"/>${side}${hiStrip}${ski}${tipShade}${wing(-1)}${wing(1)}${nost(-1)}${nost(1)}${under}<ellipse cx="${f(-tw * 0.25)}" cy="${ty + 4}" rx="${f(tw * 0.5)}" ry="${f(tw * 0.3)}" fill="#fff" opacity="0.5"/><path d="M${f(-tw * 0.3)},${ny + 6} Q0,${ny + 4 + lift * 0.4} ${f(tw * 0.3)},${ny + 6}" stroke="#fff" stroke-width="2" fill="none" opacity="0.35"/></g></g>`; }
+  return `<g transform="translate(0,${NOSEDY.dy}) translate(0,46) scale(${NOSEK}) translate(0,-46)">${fade}<g><path d="${body}" fill="url(#nfB)" opacity="0.9"/>${side}${hiStrip}${ski}${tipShade}${wing(-1)}${wing(1)}${nost(-1)}${nost(1)}${under}<ellipse cx="${f(-tw * 0.25)}" cy="${ty + 4}" rx="${f(tw * 0.5)}" ry="${f(tw * 0.3)}" fill="#fff" opacity="0.5"/><path d="M${f(-tw * 0.3)},${ny + 6} Q0,${ny + 4 + lift * 0.4} ${f(tw * 0.3)},${ny + 6}" stroke="#fff" stroke-width="2" fill="none" opacity="0.35"/></g></g>`; }
 function headSvg(p) {
   const hr = { ...HAIR_DEFAULT, ...(p.hair || {}) };
   const yaw = p.yaw || 0, jaw = clamp(p.mouth.open, 0, 1) * 26;
@@ -666,7 +666,7 @@ function postizas(style, dir, PX, edge, c, yl) { EYEX._dir = dir; let seed = 131
   if (c < 0.6) for (let i = 0; i < C.lo; i++) { const k = i / (C.lo - 1), u = -0.82 + k * 1.64; let x = PX(u), yb = Math.min(yl + 4, 40 * Math.sqrt(Math.max(0, 1 - Math.pow(u * 0.95, 2)))) - 1, a0 = 90 + dir * u * 42; if (EYEX.corner) { const q = almondPt(dir, 0.08 + 0.84 * (u + 0.82) / 1.64, false); x = q.x; yb = q.y - 1; a0 = Math.atan2(q.ny, q.nx) * 180 / Math.PI + dir * u * 14; } for (let q = 0; q < C.lfan; q++) lo += lashHairP(x, yb, a0 + (q - (C.lfan - 1) / 2) * 9 * dir, C.llen * (0.85 + R() * 0.3) * (1 + 0.5 * Math.max(0, u)), 0.55, 1.0, 90 + dir * u * 70, '#0a0406'); }
   return `<g>${lo}</g>${up}`; }
 
-export const NOSMILE = { on: false };
+export const NOSMILE = { on: false }; export const NOSEDY = { dy: 0 };
 
 export const EYEX = { side: 0, sideCol: null, shH: null, drape: 0, blushK: null, shK: null, glit: 0, glitCol: null, blushCol: null, nomk: 0, corner: 0, sx: 1, sy: 1, irK: 1, irX: 1, prK: 1, dx: 0, dy: 0, tilt: 0, tex: 0, pal: null, anime: 0, thick: null };
 const f1x = (n) => Math.round(n * 10) / 10;
