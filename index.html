@@ -660,7 +660,7 @@ $('biosFile').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(
 showBios();
 const isIOS=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
 // ===== Descompresión dentro de la app (.7z y .zip) con los descompresores de EmulatorJS =====
-const META=/\.(txt|nfo|diz|jpe?g|png|gif|bmp|pdf|htm|html|url|sfv|md5|sha1|xml|dat|ini|cfg|sbi|m3u|cue|ccd|sub|mds)$/i;
+const META=/\.(txt|nfo|diz|jpe?g|png|gif|bmp|pdf|htm|html|url|sfv|md5|sha1|xml|ini|cfg|sbi|m3u|cue|ccd|sub|mds)$/i;
 async function extractArchive(file,kind){
   const js=kind==='7z'?'extract7z.js':'extractzip.js';
   const code=await (await fetch(EJS_CDN+'compression/'+js)).text();
@@ -677,7 +677,7 @@ async function extractArchive(file,kind){
 // Elige el archivo del juego dentro del comprimido: el más grande que no sea texto/imagen/hoja de pistas
 function pickMain(files){
   const games=files.filter(f=>!META.test(f.name)).sort((a,b)=>b.size-a.size);
-  return games[0]||null;
+  return games[0]||files.filter(f=>!/.(txt|nfo|jpe?g|png|pdf)$/i.test(f.name)).sort((a,b)=>b.size-a.size)[0]||null;
 }
 // Último recurso si no hay firma ni pistas: adivinar por tamaño (nunca se pregunta)
 function guessCore(size,name){
@@ -749,7 +749,7 @@ $('install').onclick=async()=>{if(!deferred)return;deferred.prompt();await defer
 addEventListener('appinstalled',()=>$('install').style.display='none');
 // ================= Actualización automática =================
 // El script de publicación escribe la versión aquí y en version.json.
-const APP_VERSION='20261125-194238-812ba9e';
+const APP_VERSION='20261125-194412-28c35ec';
 let swReg=null, updatePending=false;
 if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>swReg=r).catch(()=>{});
 function applyUpdate(){ // recarga en cuanto no estés jugando (pausa, menú o app en segundo plano)
