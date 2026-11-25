@@ -28,26 +28,44 @@
  {
   "id": "l4",
   "who": "S",
-  "text": "Hija, ¿qué te pasó? Ven, siéntate. Primero te limpiamos la cara con calma.",
+  "text": "Hija, ¿qué te pasó? Ven, siéntate.",
   "pad": 1.3
  },
  {
-  "id": "l5",
+  "id": "lm",
+  "who": "S",
+  "text": "Primero, agua micelar para quitar todo lo que quedó.",
+  "pad": 0.2
+ },
+ {
+  "id": "lc",
+  "who": "S",
+  "text": "Ahora una crema fría para calmar la piel.",
+  "pad": 0.15
+ },
+ {
+  "id": "lb",
   "who": "N",
-  "text": "Mi mamá, doña Susan, abrió su tocador.",
+  "text": "Después, una base ligera, para unificar el tono.",
   "pad": 0.15
  },
  {
   "id": "l8",
   "who": "S",
   "text": "Ahora la sombra. Vino y ciruela, con un poco de brillo arriba. Cierra los ojos.",
-  "pad": 3.8
+  "pad": 0.2
+ },
+ {
+  "id": "ll",
+  "who": "S",
+  "text": "Un delineado fino, con una punta suave junto a la nariz.",
+  "pad": 0.15
  },
  {
   "id": "l10",
   "who": "S",
   "text": "Y para terminar, un rubor cálido, y labios rojo oscuro. Mírate.",
-  "pad": 3.3
+  "pad": 0.15
  },
  {
   "id": "l12",
