@@ -399,7 +399,7 @@ function ejsSystem(bytes,name,core,fullName){
     setTimeout(restore,400); clearInterval(timer); timer=setInterval(()=>{if(running)saveNow();},45000);}};
   return {name,size:[4,3],aspect,extra,labels,ps:core==='psx',
     async start(){let bios=null;if(core==='psx'){const b=await tx('roms','readonly',s=>s.get('bios_psx')).catch(()=>null);if(b)bios=URL.createObjectURL(b.blob);}
-      window.__ejsGame={core,url,name,bios,file:new File([bytes],fullName||name),volume:store.sound?.8:0,shader:store.quality||'disabled'};addEventListener('message',onMsg);
+      window.__ejsGame={core,url,name,bios,fullName:(fullName||name),volume:store.sound?.8:0,shader:store.quality||'disabled'};addEventListener('message',onMsg);
       frame=document.createElement('iframe');frame.src='ejs.html';frame.className='ejs';frame.allow='autoplay; gamepad; fullscreen';
       document.querySelector('.screen').appendChild(frame);},
     stop(){saveNow();clearInterval(timer);removeEventListener('message',onMsg);frame?.remove();URL.revokeObjectURL(url);},
