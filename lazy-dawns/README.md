@@ -259,5 +259,5 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
 
 ## Día 18 — "Todo cambia con una llamada" (EN PREPARACIÓN)
 - Votado: maquillaje → look A final (`face_final.mjs` → `applyDay18Face()`: sombra vino/ciruela con brillos, rubor terracota, labios rojo oscuro, cejas D difuminadas, ojos clásicos almendrados `EYEX.shp='clasico'` con delineado interno A, cuello −10, nariz +8, ojos juntos −3, boca −1).
-- Guion en `script_dia18.json` (Will + doña Susan, mamá de Lazy, la limpia y maquilla; suenan los celulares: Mari desaparecida, M la raptó; Lazy no puede salir por su cabello; voto cabello o piel para el día 19).
+- Guion en `script_dia18.json` (Will acompaña a Lazy hasta su casa; ahí está doña Susan, su mamá, que la limpia y maquilla en el tocador; suenan los celulares: Mari desaparecida, M la raptó; Lazy no puede salir por su cabello; voto cabello o piel para el día 19).
 - BLOQUEO: ElevenLabs con 0 créditos (comprobado de nuevo); falta recargar para generar voces y SFX. Doña Susan usa voz `S` provisional (hay que agregar voz propia en gen_voz_multi.py si se prefiere otra); presentadora de noticias voz `T`.

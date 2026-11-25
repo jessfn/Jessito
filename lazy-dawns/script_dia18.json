@@ -16,31 +16,31 @@
  {
   "id": "l1",
   "who": "N",
-  "text": "Día dieciocho. Eligieron el maquillaje. Pero antes de pintarme, tenía que quitarme todo lo que me había arruinado.",
+  "text": "Día dieciocho. Eligieron el maquillaje. Pero primero tenía que llegar a casa, con todo el rostro arruinado.",
   "pad": 3.9
  },
  {
   "id": "l2",
   "who": "Y",
-  "text": "Lazy, tu mamá viene en camino. Me escribió hace diez minutos.",
+  "text": "Ya estamos en tu casa, Lazy. Te acompañé hasta la puerta. Aquí estarás a salvo.",
   "pad": 0.15
  },
  {
   "id": "l3",
   "who": "N",
-  "text": "Will no se había movido de mi lado en toda la noche.",
+  "text": "Will no me dejó sola ni un minuto desde que salimos de la calle.",
   "pad": 0.15
  },
  {
   "id": "l4",
   "who": "S",
-  "text": "Hija, ¿qué te pasó? Ven aquí. Primero te limpiamos la cara con calma.",
+  "text": "Hija, ¿qué te pasó? Ven, siéntate. Primero te limpiamos la cara con calma.",
   "pad": 0.15
  },
  {
   "id": "l5",
   "who": "N",
-  "text": "Mi mamá, doña Susan, traía una bolsa con todo lo que necesitaba.",
+  "text": "Mi mamá, doña Susan, abrió el tocador y sacó todo lo que necesitaba.",
   "pad": 0.15
  },
  {
