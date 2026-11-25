@@ -33,7 +33,8 @@ function verificarContrasena(pw) {
   return esperado.length === calc.length && crypto.timingSafeEqual(calc, esperado);
 }
 const firmar = exp => crypto.createHmac('sha256', SECRETO).update(String(exp)).digest('base64url');
-function crearToken(dias = 60) { const exp = Date.now() + dias * 864e5; return exp + '.' + firmar(exp); }
+// Sesión de ~10 años: la contraseña se pide UNA sola vez por dispositivo
+function crearToken(dias = 3650) { const exp = Date.now() + dias * 864e5; return exp + '.' + firmar(exp); }
 function tokenValido(t) {
   if (!t || !SECRETO) return false;
   const [exp, sig] = String(t).split('.');
