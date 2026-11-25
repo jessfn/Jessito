@@ -3,10 +3,11 @@
 const http = require('http'), fs = require('fs'), path = require('path'), crypto = require('crypto');
 const { Pool } = require('pg');
 const { procesar } = require('./lib/procesar');
+const { buscarPortada } = require('./lib/portadas');
 
 const PUERTO = +process.env.PORT || 3077;
 const BASE = process.env.DATA_DIR || '/var/lib/gamesdata';
-const DIR = { juegos: path.join(BASE, 'juegos'), entrada: path.join(BASE, 'entrada'), trabajo: path.join(BASE, 'trabajo') };
+const DIR = { juegos: path.join(BASE, 'juegos'), entrada: path.join(BASE, 'entrada'), trabajo: path.join(BASE, 'trabajo'), portadas: path.join(BASE, 'portadas') };
 const ORIGENES = (process.env.ALLOWED_ORIGINS || 'https://jessfn.github.io').split(',').map(s => s.trim());
 const SECRETO = process.env.TOKEN_SECRET || '';
 const HASH = process.env.PASSWORD_HASH || '';            // "scrypt:<sal>:<hash>" — lo crea poner-contrasena.js
@@ -20,6 +21,8 @@ async function prepararBD() {
     id SERIAL PRIMARY KEY, nombre TEXT NOT NULL, original TEXT NOT NULL, consola TEXT,
     archivo TEXT, tamano BIGINT DEFAULT 0, estado TEXT NOT NULL DEFAULT 'en cola', mensaje TEXT,
     creado TIMESTAMPTZ NOT NULL DEFAULT now())`);
+  await db.query(`ALTER TABLE juegos ADD COLUMN IF NOT EXISTS portada BOOLEAN NOT NULL DEFAULT false`);
+  await db.query(`ALTER TABLE juegos ADD COLUMN IF NOT EXISTS portada_intentos INT NOT NULL DEFAULT 0`);
   // Si el servidor se reinició a mitad de un proceso, se reintenta
   await db.query(`UPDATE juegos SET estado='en cola' WHERE estado NOT IN ('listo','error')`);
 }
@@ -84,12 +87,27 @@ async function siguiente() {
         const tam = fs.statSync(r.ruta).size;
         await db.query(`UPDATE juegos SET estado='listo', mensaje=NULL, consola=$2, archivo=$3, tamano=$4, nombre=$5 WHERE id=$1`, [j.id, r.consola, path.basename(r.ruta), tam, r.nombre]);
         console.log(`[listo] #${j.id} ${r.nombre} (${r.consola}, ${Math.round(tam / 1e6)} MB)`);
+        portadaDe({ id: j.id, nombre: r.nombre, consola: r.consola });
       } catch (e) {
         console.error(`[error] #${j.id}`, e.message);
         await db.query(`UPDATE juegos SET estado='error', mensaje=$2 WHERE id=$1`, [j.id, e.message.slice(0, 300)]);
       }
     }
   } finally { trabajando = false; }
+}
+
+// ===== Portadas =====
+async function portadaDe(j) {
+  try {
+    const ok = await buscarPortada(j.nombre, j.consola, path.join(DIR.portadas, j.id + '.png'));
+    await db.query(`UPDATE juegos SET portada=$2, portada_intentos=portada_intentos+1 WHERE id=$1`, [j.id, ok]);
+    if (ok) console.log(`[portada] #${j.id} ${j.nombre}`);
+  } catch (e) { console.error('[portada]', e.message); }
+}
+// Busca portadas que falten (máximo 3 intentos por juego, por si GitHub no respondía)
+async function completarPortadas() {
+  const { rows } = await db.query(`SELECT id, nombre, consola FROM juegos WHERE estado='listo' AND NOT portada AND portada_intentos < 3`);
+  for (const j of rows) await portadaDe(j);
 }
 
 // ===== Rutas =====
@@ -114,7 +132,7 @@ async function manejar(req, res) {
   if (!tokenValido(tokenDe(req, url))) return json(res, 401, { error: 'Necesitas iniciar sesión' });
 
   if (ruta === '/api/juegos' && req.method === 'GET') {
-    const { rows } = await db.query(`SELECT id, nombre, original, consola, archivo, tamano, estado, mensaje, creado FROM juegos ORDER BY creado DESC`);
+    const { rows } = await db.query(`SELECT id, nombre, original, consola, archivo, tamano, estado, mensaje, portada, creado FROM juegos ORDER BY creado DESC`);
     return json(res, 200, { juegos: rows });
   }
 
@@ -140,6 +158,13 @@ async function manejar(req, res) {
   }
 
   let m;
+  // Portada (imagen guardada en el VPS)
+  if ((m = ruta.match(/^\/api\/juegos\/(\d+)\/portada$/)) && req.method === 'GET') {
+    const f = path.join(DIR.portadas, (+m[1]) + '.png');
+    if (!fs.existsSync(f)) return json(res, 404, { error: 'Sin portada' });
+    res.writeHead(200, { 'Content-Type': 'image/png', 'Content-Length': fs.statSync(f).size, 'Cache-Control': 'private, max-age=2592000' });
+    return fs.createReadStream(f).pipe(res);
+  }
   // Descarga del juego preparado, por partes (Range) para no cargar todo de golpe
   if ((m = ruta.match(/^\/api\/juegos\/(\d+)\/archivo$/)) && req.method === 'GET') {
     const { rows } = await db.query(`SELECT * FROM juegos WHERE id=$1 AND estado='listo'`, [+m[1]]);
@@ -180,4 +205,5 @@ server.headersTimeout = 60e3;
 prepararBD().then(() => {
   server.listen(PUERTO, '127.0.0.1', () => console.log(`Servidor de juegos en http://127.0.0.1:${PUERTO} (configurado: ${!!(HASH && SECRETO)})`));
   siguiente();
+  completarPortadas().catch(() => {});
 }).catch(e => { console.error('No se pudo preparar la base de datos:', e.message); process.exit(1); });
