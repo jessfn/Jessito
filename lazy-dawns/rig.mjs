@@ -689,12 +689,20 @@ function irisAnime(ix, iy, gx, side) { const P = EYEX.pal || ['#1c0f08', '#4a2e1
     <circle r="${f1x(pr)}" fill="#070302"/><circle cx="-8" cy="-9" r="7.2" fill="#fff"/><circle cx="-8" cy="-9" r="7.2" fill="none" stroke="#ffe9c0" stroke-opacity="0.5" stroke-width="1.2"/><circle cx="9" cy="9" r="3.6" fill="#fff" opacity="0.9"/><circle cx="1" cy="13" r="1.8" fill="#fff" opacity="0.7"/></g>`; }
 
 // Ojo almendrado con esquinas: interna redondeada (lagrimal) y externa en punta ligeramente alzada.
-function almond(d) { const f = (n) => Math.round(n * 10) / 10; const O = [d * 46, -5], ip = EYEX.ip || 0, I = [-d * (41 + 5 * ip), 9 + 3 * ip];
-  return `M${I[0]},${I[1]} C${f(-d * 40)},${-8} ${f(-d * 30)},-36 ${f(-d * 8)},-43 C${f(d * 14)},-48 ${f(d * 36)},-28 ${O[0]},${O[1]} C${f(d * 36)},18 ${f(d * 16)},40 ${f(-d * 6)},41 C${f(-d * 26)},41 ${f(-d * 40)},26 ${I[0]},${I[1]}Z`; }
+function almond(d) { const f = (n) => Math.round(n * 10) / 10, A = almondSeg(d), q = [...A.up, ...A.lo]; let p = `M${f(q[0][0][0])},${f(q[0][0][1])}`; q.forEach((c) => { p += ` C${f(c[1][0])},${f(c[1][1])} ${f(c[2][0])},${f(c[2][1])} ${f(c[3][0])},${f(c[3][1])}`; }); return p + 'Z'; }
 function creaseP(d) { const f = (n) => Math.round(n * 10) / 10; return `M${f(-d * 30)},-44 C${f(-d * 16)},-58 ${f(d * 12)},-60 ${f(d * 34)},-38`; }
 
 const bz = (p0, p1, p2, p3, t) => { const u = 1 - t; return [u * u * u * p0[0] + 3 * u * u * t * p1[0] + 3 * u * t * t * p2[0] + t * t * t * p3[0], u * u * u * p0[1] + 3 * u * u * t * p1[1] + 3 * u * t * t * p2[1] + t * t * t * p3[1]]; };
-function almondSeg(d) { const ip = EYEX.ip || 0, I = [-d * (41 + 5 * ip), 9 + 3 * ip], O = [d * 46, -5];
+// Formas de ojo: un solo arco superior y uno inferior (cubicas suaves) partidos a la mitad; esquina interna y externa en punta; la externa mas alta.
+export const EYESHAPES = {
+  clasico: { I: [-44, 8], O: [48, -6], u: [[-24, -62], [20, -62]], l: [[26, 52], [-22, 52]] },
+  gatuno: { I: [-44, 10], O: [50, -14], u: [[-26, -58], [24, -66]], l: [[30, 40], [-20, 50]] },
+  alargado: { I: [-48, 9], O: [52, -8], u: [[-30, -54], [22, -58]], l: [[30, 46], [-26, 46]] },
+  abierto: { I: [-42, 8], O: [46, -4], u: [[-34, -66], [14, -70]], l: [[30, 60], [-18, 60]] } };
+const split = (P) => { const m = (a, b) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], ab = m(P[0], P[1]), bc = m(P[1], P[2]), cd = m(P[2], P[3]), abc = m(ab, bc), bcd = m(bc, cd), mid = m(abc, bcd); return [[P[0], ab, abc, mid], [mid, bcd, cd, P[3]]]; };
+function almondSeg(d) {
+  if (EYEX.shp && EYESHAPES[EYEX.shp]) { const S = EYESHAPES[EYEX.shp], X = (p) => [d * p[0], p[1]], I = X(S.I), O = X(S.O); return { up: split([I, X(S.u[0]), X(S.u[1]), O]), lo: split([O, X(S.l[0]), X(S.l[1]), I]) }; }
+  const ip = EYEX.ip || 0, I = [-d * (41 + 5 * ip), 9 + 3 * ip], O = [d * 46, -5];
   return { up: [[I, [-d * 40, -8], [-d * 30, -36], [-d * 8, -43]], [[-d * 8, -43], [d * 14, -48], [d * 36, -28], O]], lo: [[O, [d * 36, 18], [d * 16, 40], [-d * 6, 41]], [[-d * 6, 41], [-d * 26, 41], [-d * 40, 26], I]] }; }
 // punto y direccion normal (hacia afuera del ojo) sobre el borde superior (s=0 interna .. 1 externa) o inferior (s=0 interna .. 1 externa)
 function almondPt(d, s, upper) { const A = almondSeg(d); const segs = upper ? A.up : A.lo.slice().reverse().map((q) => q.slice().reverse()); const k = s < 0.5 ? 0 : 1, t = s < 0.5 ? s * 2 : s * 2 - 1; const q = segs[k]; const p = bz(q[0], q[1], q[2], q[3], t), p2 = bz(q[0], q[1], q[2], q[3], Math.min(1, t + 0.02)), p1 = bz(q[0], q[1], q[2], q[3], Math.max(0, t - 0.02)); let tx = p2[0] - p1[0], ty = p2[1] - p1[1]; const L = Math.hypot(tx, ty) || 1; tx /= L; ty /= L; const dirOut = upper ? (d > 0 ? 1 : -1) : (d > 0 ? -1 : 1); /* normal apuntando hacia afuera */ let nx = ty, ny = -tx; if (upper ? ny > 0 : ny < 0) { nx = -nx; ny = -ny; } return { x: p[0], y: p[1], nx, ny }; }
