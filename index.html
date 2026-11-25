@@ -294,8 +294,13 @@ addEventListener('wheel',e=>{if(e.ctrlKey)e.preventDefault();},{passive:false});
 addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&['+','-','=','0'].includes(e.key))e.preventDefault();});
 // Teclado físico
 const KB={arrowup:'up',arrowdown:'down',arrowleft:'left',arrowright:'right',x:'a',z:'b',s:'x',a:'y',q:'l',w:'r',enter:'start',shift:'select'};
-addEventListener('keydown',e=>{const b=KB[e.key.toLowerCase()];if(b){e.preventDefault();press(b,true);} else if(sys?.key)sys.key(e.key.toLowerCase(),true);});
-addEventListener('keyup',e=>{const b=KB[e.key.toLowerCase()];if(b)press(b,false); else if(sys?.key)sys.key(e.key.toLowerCase(),false);});
+// Los atajos de teclado (flechas, Z/X/A/S/Q/W, Enter, Shift) SOLO controlan el juego.
+// Si estás escribiendo en un campo o hay un menú/ajustes abierto, el teclado escribe normal.
+const escribiendo=e=>{const t=e.target;
+  return !!(t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)))||!$('menu').classList.contains('hidden')||!$('sheet').classList.contains('hidden')||!$('picker').classList.contains('hidden');};
+addEventListener('keydown',e=>{if(escribiendo(e)||e.ctrlKey||e.metaKey||e.altKey)return;
+  const b=KB[e.key.toLowerCase()];if(b){e.preventDefault();press(b,true);} else if(sys?.key)sys.key(e.key.toLowerCase(),true);});
+addEventListener('keyup',e=>{const b=KB[e.key.toLowerCase()];if(b){if(IN[b])press(b,false);return;} if(!escribiendo(e)&&sys?.key)sys.key(e.key.toLowerCase(),false);});
 // Mandos Bluetooth/USB (Gamepad API)
 const GPMAP={12:'up',13:'down',14:'left',15:'right',0:'b',1:'a',2:'y',3:'x',4:'l',5:'r',9:'start',8:'select'};
 function pollGamepad(){ for(const gp of navigator.getGamepads?.()||[]){ if(!gp)continue; for(const i in GPMAP)if(gp.buttons[i])press(GPMAP[i],gp.buttons[i].pressed);
@@ -991,7 +996,7 @@ $('install').onclick=async()=>{if(!deferred)return;deferred.prompt();await defer
 addEventListener('appinstalled',()=>$('install').style.display='none');
 // ================= Actualización automática =================
 // El script de publicación escribe la versión aquí y en version.json.
-const APP_VERSION='20261125-220308-d3a91c8';
+const APP_VERSION='20261125-220551-33856a2';
 diag('App abierta (versión '+APP_VERSION+')');
 let swReg=null, updatePending=false;
 if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>swReg=r).catch(()=>{});
