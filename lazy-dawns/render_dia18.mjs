@@ -169,7 +169,7 @@ function endCard(t) {
   if (b > 0) s += `<g transform="translate(540,1136) scale(${b})"><rect x="-416" y="-72" width="840" height="150" rx="44" fill="#000" opacity="0.35"/><rect x="-420" y="-80" width="840" height="150" rx="44" fill="#ff4d8d" stroke="${OUT}" stroke-width="8"/><rect x="-400" y="-70" width="800" height="36" rx="18" fill="#fff" opacity="0.2"/><g transform="translate(-320,-5)"><circle r="62" fill="#fff" stroke="${OUT}" stroke-width="6"/><g transform="scale(1.25)">${ICON.PIEL}</g></g><text x="82" y="24" font-family="Anton" font-size="${fitFs('B · CUIDAR LA PIEL', 620, 58)}" text-anchor="middle" fill="#fff">B · CUIDAR LA PIEL</text></g>`;
   const c1 = pop(t, T.cta1, 0.3), c2 = pop(t, T.cta2, 0.3);
   if (c1 > 0) s += `<g transform="translate(540,1400) scale(${c1})"><rect x="-400" y="-44" width="800" height="88" rx="44" fill="#ffe14d" stroke="${OUT}" stroke-width="7"/><path d="M-352,-18 h60 a10,10 0 0 1 10,10 v22 a10,10 0 0 1 -10,10 h-34 l-16,14 v-14 h-10 a10,10 0 0 1 -10,-10 v-22 a10,10 0 0 1 10,-10Z" fill="#fff" stroke="${OUT}" stroke-width="5" transform="translate(0,-4)"/><text x="40" y="18" font-family="Anton" font-size="50" text-anchor="middle" fill="${OUT}">COMENTA TU ELECCIÓN</text></g>`;
-  if (c2 > 0) s += `<g transform="translate(540,1510) scale(${c2})"><rect x="-400" y="-44" width="800" height="88" rx="44" fill="#fff" stroke="${OUT}" stroke-width="7"/><circle cx="-338" cy="0" r="30" fill="#ff4d8d" stroke="${OUT}" stroke-width="5"/><path d="M-338,-14 v28 M-352,0 h28" stroke="#fff" stroke-width="8" stroke-linecap="round"/><text x="40" y="18" font-family="Anton" font-size="50" text-anchor="middle" fill="${OUT}">SÍGUEME PARA EL DÍA 18</text></g>`;
+  if (c2 > 0) s += `<g transform="translate(540,1510) scale(${c2})"><rect x="-400" y="-44" width="800" height="88" rx="44" fill="#fff" stroke="${OUT}" stroke-width="7"/><circle cx="-338" cy="0" r="30" fill="#ff4d8d" stroke="${OUT}" stroke-width="5"/><path d="M-338,-14 v28 M-352,0 h28" stroke="#fff" stroke-width="8" stroke-linecap="round"/><text x="40" y="18" font-family="Anton" font-size="50" text-anchor="middle" fill="${OUT}">SÍGUEME PARA EL DÍA 19</text></g>`;
   return s;
 }
 const redEyes = (t) => { const o = 0.5 + 0.5 * Math.sin(t * 2.2), bl = (t % 3.1) < 0.14 ? 0.1 : 1; return [-1, 1].map((s) => `<g transform="translate(${540 + s * 130},300)"><ellipse cx="0" cy="0" rx="110" ry="${f(56 * bl)}" fill="url(#fGlow)" opacity="${(0.5 + 0.3 * o).toFixed(2)}"/><path d="M-52,0 Q0,${f(-34 * bl)} 52,0 Q0,${f(30 * bl)} -52,0Z" fill="#ff2a3a"/><ellipse cx="0" cy="0" rx="7" ry="${f(24 * bl)}" fill="#12040a"/></g>`).join(''); };
@@ -183,13 +183,13 @@ function slateIntro(t) { const END = 3.7; if (t < 0 || t > END) return ''; const
     <rect x="-360" y="-240" width="720" height="90" rx="14" fill="#f5f5f5" stroke="${OUT}" stroke-width="8" opacity="0"/></g>`;
   return `<g><defs><linearGradient id="slB" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4a0f22"/><stop offset="1" stop-color="#1c0610"/></linearGradient><radialGradient id="slBg" cx="0.5" cy="0.4" r="0.8"><stop offset="0" stop-color="#7a1424"/><stop offset="0.5" stop-color="#2a0814"/><stop offset="1" stop-color="#07030a"/></radialGradient></defs>${FDEFS}<rect width="${W}" height="${H}" fill="url(#slBg)" opacity="${k.toFixed(2)}"/><g opacity="${k.toFixed(2)}">${rays}</g><g opacity="${k.toFixed(2)}">${redEyes(t)}</g>${emb}${board}<rect width="${W}" height="${H}" fill="#fff" opacity="${(flash * 0.5).toFixed(3)}"/></g>`; }
 
-function transitionAt(t) { for (const [t0, kind, d] of TRANS) { const a = t0 - (kind === 'cut' ? d / 2 : 0), p = (t - a) / d; if (p < 0 || p > 1) continue;
+function transitionAt(t) { for (const [t0, kind0, d] of TRANS) { const kind = kind0 === 'cut2' ? 'cut' : kind0; const zk = kind0 === 'cut2' ? 0.04 : 0.2; const a = t0 - (kind === 'cut' ? d / 2 : 0), p = (t - a) / d; if (p < 0 || p > 1) continue;
     if (kind === 'in') { const e = ease(p); return { on: true, ghost: p < 0.85, sc: 1.4 - 0.4 * e, v: (1 - e), fl: 0.35 * Math.max(0, 1 - p * 3), gx: 0 }; }
-    const e = smooth(p), mid = 1 - Math.abs(e - 0.5) * 2; const sc = e < 0.5 ? 1 + e * 2 * 0.2 : 1.2 - (e * 2 - 1) * 0.2; return { on: true, ghost: true, sc, v: mid, fl: 0.5 * mid * mid, gx: (e < 0.5 ? 1 : -1) * mid * 40 }; } return { on: false }; }
+    const e = smooth(p), mid = 1 - Math.abs(e - 0.5) * 2; const sc = e < 0.5 ? 1 + e * 2 * zk : 1 + zk - (e * 2 - 1) * zk; return { on: true, ghost: true, sc, v: mid, fl: 0.5 * mid * mid, gx: (e < 0.5 ? 1 : -1) * mid * 40 }; } return { on: false }; }
 
 
 const stepBanners = [];
-const TRANS = [[T.slateA + 3.4, 'in', 0.6], [T.enterA, 'cut', 0.5], [T.swapA - 0.2, 'cut', 0.5]];
+const TRANS = [[T.slateA + 3.4, 'in', 0.6], [T.enterA, 'cut', 0.5], [T.swapA - 0.2, 'cut2', 0.5]];
 // ---- cabello hecho un desastre (hebras sueltas, enredos) en coordenadas del personaje ----
 const messyHair = (t, k = 1) => { let s = ''; const R = (i) => rnd(i * 7 + 3);
   const TL = [[72, 512], [100, 460], [140, 400], [210, 375], [330, 372], [430, 385], [500, 405]], TR = [[72, 512], [100, 580], [150, 630], [230, 650], [330, 655], [410, 648], [455, 630]];
