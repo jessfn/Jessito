@@ -94,6 +94,20 @@
   .game .play b { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:600; }
   .game .play small { opacity:.6; font-size:11px; }
   .game .del, .game .swap { height:auto; width:44px; } .game .del { color:#ff8fa8; } .game .swap { color:#a5f3fc; }
+  /* Cuadrícula de juegos con portadas */
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(108px,1fr)); gap:10px; }
+  .tile { position:relative; aspect-ratio:3/4; border-radius:14px; overflow:hidden; border:1px solid #ffffff1a; background:var(--tg,linear-gradient(160deg,#3a2f8a,#1a1c35)); cursor:pointer; padding:0; text-align:left; box-shadow:0 6px 18px #0006; transition:transform .12s; }
+  .tile:active { transform:scale(.95); }
+  .tile img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .tile .ph { position:absolute; inset:0; display:grid; place-items:center; font-size:30px; font-weight:900; color:#ffffff30; letter-spacing:1px; }
+  .tile .cap { position:absolute; left:0; right:0; bottom:0; padding:22px 8px 7px; background:linear-gradient(transparent,#000d 55%); }
+  .tile .cap b { display:block; font-size:12px; line-height:1.2; max-height:2.4em; overflow:hidden; }
+  .tile .cap small { display:block; font-size:10px; opacity:.75; margin-top:2px; }
+  .tile .badge { position:absolute; top:6px; left:6px; font-size:10px; font-weight:700; padding:3px 7px; border-radius:99px; background:#000b; }
+  .tile .badge.ok { background:#16a34acc; } .tile .badge.wait { background:#7c5cffdd; } .tile .badge.err { background:#dc2626dd; }
+  .tile .acts { position:absolute; top:5px; right:5px; display:flex; gap:4px; }
+  .tile .acts button { width:28px; height:28px; border-radius:9px; border:none; background:#000a; color:#fff; display:grid; place-items:center; padding:0; }
+  .tile .acts svg.i { width:15px; height:15px; }
   #install { display:none; }
   /* Selector de archivos invisible pero activo (en iPhone un input con "hidden" a veces no responde) */
   .picker-input { position:absolute; width:1px; height:1px; opacity:0; overflow:hidden; pointer-events:none; }
@@ -175,9 +189,9 @@
     <label class="chip"><svg class="i"><use href="#i-folder"/></svg>Cargar ROM<input id="file" type="file" class="picker-input"></label>
   </div>
   <h2>Mi servidor <small style="font-weight:400;opacity:.55;font-size:11px">gamesdata.geodatos.com.mx</small></h2>
-  <div id="srvLogin" class="opt" style="gap:8px"><input id="srvPass" type="password" placeholder="Contraseña de tu biblioteca" autocomplete="current-password" style="flex:1;background:var(--card);color:var(--txt);border:1px solid var(--line);border-radius:12px;padding:10px;font-size:15px"><button class="chip" id="srvEnter">Entrar</button></div>
+  <div id="srvLogin" class="note">Este dispositivo todavía no está vinculado a tu servidor. Abre <b>una vez</b> tu enlace de vinculación en este dispositivo y tus juegos aparecerán aquí, sin contraseña.</div>
   <div id="srvPanel" class="hidden" style="display:flex;flex-direction:column;gap:8px">
-    <div style="display:flex;gap:8px;flex-wrap:wrap"><label class="chip"><svg class="i"><use href="#i-folder"/></svg>Subir juego a mi servidor<input id="srvFile" type="file" class="picker-input"></label><button class="chip" id="srvRefresh"><svg class="i"><use href="#i-reset"/></svg>Actualizar</button><button class="chip" id="srvOut">Salir</button></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><label class="chip"><svg class="i"><use href="#i-folder"/></svg>Subir juego a mi servidor<input id="srvFile" type="file" class="picker-input"></label><button class="chip" id="srvRefresh"><svg class="i"><use href="#i-reset"/></svg>Actualizar</button><button class="chip" id="srvOut">Desvincular</button></div>
     <div class="lib" id="srvList"></div>
   </div>
   <h2 id="libTitle" class="hidden">Mi biblioteca</h2>
@@ -583,16 +597,19 @@ async function renderLib(){
   const list=(await libAll()).sort((a,b)=>b.added-a.added), box=$('lib'); box.innerHTML='';
   precargarMotores(list.map(g=>g.core));
   $('libTitle').classList.toggle('hidden',!list.length);
+  box.className='grid';
   for(const g of list){
-    const el=document.createElement('div');el.className='game';
-    el.innerHTML='<button class="chip play"><svg class="i"><use href="#i-cart"/></svg><span><b></b><small></small></span></button><button class="ib swap" aria-label="Cambiar consola"><svg class="i"><use href="#i-swap"/></svg></button><button class="ib del" aria-label="Borrar"><svg class="i"><use href="#i-x"/></svg></button>';
-    el.querySelector('b').textContent=prettyName(g.name);
-    el.querySelector('small').textContent=(CONSOLE_INFO[g.core]?.[0]||'CHIP-8')+' · '+fmtSize(g.size);
-    el.querySelector('.play').onclick=async()=>{initAudio();const w=warmGet(g.name);const x=w||await libGet(g.name);if(x)runGame(x.name,x.blob,x.core);};
-    el.querySelector('.play').addEventListener('pointerdown',()=>warmUp(g.name),{passive:true});
-    el.querySelector('.swap').onclick=async()=>{const c=await pickConsole(g.name);if(!c)return;const x=await libGet(g.name);if(x){x.core=c;await libPut(x);renderLib();showHint(prettyName(g.name)+' → '+CONSOLE_INFO[c][0]);}};
-    el.querySelector('.del').onclick=async()=>{if(confirm('¿Borrar «'+prettyName(g.name)+'» de este dispositivo?')){await libDel(g.name);renderLib();}};
-    box.appendChild(el);
+    const t=makeTile({
+      name:prettyName(g.name), sub:(CONSOLE_INFO[g.core]?.[0]||'CHIP-8')+' · '+fmtSize(g.size), consola:g.core,
+      cover:g.srv&&store.srvToken?portadaURL(g.srv):null,
+      onPlay:async()=>{initAudio();const w=warmGet(g.name);const x=w||await libGet(g.name);if(x)runGame(x.name,x.blob,x.core);},
+      actions:[
+        {icon:'i-swap',label:'Cambiar consola',fn:async()=>{const c=await pickConsole(g.name);if(!c)return;const x=await libGet(g.name);if(x){x.core=c;await libPut(x);renderLib();showHint(prettyName(g.name)+' → '+CONSOLE_INFO[c][0]);}}},
+        {icon:'i-x',label:'Borrar de este dispositivo',fn:async()=>{if(confirm('¿Borrar «'+prettyName(g.name)+'» de este dispositivo?')){await libDel(g.name);renderLib();}}},
+      ],
+    });
+    t.addEventListener('pointerdown',()=>warmUp(g.name),{passive:true});
+    box.appendChild(t);
   }
 }
 
@@ -755,37 +772,51 @@ let srvPoll=null;
 function srvUI(){const on=!!store.srvToken;$('srvLogin').classList.toggle('hidden',on);$('srvPanel').classList.toggle('hidden',!on);if(on)srvList();}
 async function srvFetch(path,opt={}){
   const r=await fetch(SRV+path,{...opt,headers:{...(opt.headers||{}),Authorization:'Bearer '+(store.srvToken||'')}});
-  if(r.status===401){store.srvToken=null;save();srvUI();throw new Error('Sesión vencida: vuelve a entrar');}
+  if(r.status===401){store.srvToken=null;save();srvUI();throw new Error('Este dispositivo ya no está vinculado: abre tu enlace de vinculación');}
   if(!r.ok)throw new Error((await r.json().catch(()=>({}))).error||('Error '+r.status));
   return r;
 }
-$('srvEnter').onclick=async()=>{const pw=$('srvPass').value;if(!pw)return;
-  try{const r=await fetch(SRV+'/api/entrar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contrasena:pw})});
-    const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'No se pudo entrar');
-    store.srvToken=j.token;save();$('srvPass').value='';showHint('Conectado a tu servidor');srvUI();}
-  catch(e){showHint(e.message==='Failed to fetch'?'No hay conexión con tu servidor':e.message);}};
-$('srvPass').addEventListener('keydown',e=>{if(e.key==='Enter')$('srvEnter').click();});
-$('srvOut').onclick=()=>{store.srvToken=null;save();srvUI();};
+// Vinculación SIN contraseña: abrir una vez el enlace ...#vincular=<llave> deja el dispositivo autorizado para siempre
+(function(){const m=location.hash.match(/vincular=([^&]+)/);if(!m)return;
+  store.srvToken=decodeURIComponent(m[1]);save();history.replaceState(null,'',location.pathname+location.search);
+  diag('Dispositivo vinculado a tu servidor');setTimeout(()=>{showHint('¡Dispositivo vinculado! Tus juegos aparecen en el menú');openMenu();},800);})();
+$('srvOut').onclick=()=>{if(confirm('¿Desvincular este dispositivo? Para volver a ver tu servidor tendrás que abrir otra vez tu enlace.')){store.srvToken=null;save();srvUI();}};
+// Cuadrito de juego: portada (o color de la consola), nombre, estado y botones pequeños
+const COLOR_CONSOLA={nes:'#c2410c,#7c2d12',snes:'#7c3aed,#4c1d95',gba:'#4f46e5,#1e1b4b',gb:'#65a30d,#365314',n64:'#16a34a,#14532d',nds:'#64748b,#1e293b',
+  psx:'#2563eb,#1e1b4b',segaMD:'#0f172a,#334155',segaMS:'#b91c1c,#450a0a',segaGG:'#0e7490,#164e63',pce:'#ea580c,#7c2d12',atari2600:'#92400e,#451a03',chip8:'#0891b2,#164e63'};
+function makeTile({name,sub,consola,cover,badge,onPlay,actions=[]}){
+  const t=document.createElement('div');t.className='tile';t.setAttribute('role','button');
+  const c=(COLOR_CONSOLA[consola]||'#3a2f8a,#1a1c35').split(',');t.style.setProperty('--tg','linear-gradient(160deg,'+c[0]+','+c[1]+')');
+  const ph=document.createElement('div');ph.className='ph';ph.textContent=(CONSOLE_INFO[consola]?.[0]||'CHIP-8').replace(/Game Boy Advance/,'GBA').replace(/Super Nintendo/,'SNES').replace(/PlayStation/,'PS1').replace(/Nintendo 64/,'N64').slice(0,8);t.appendChild(ph);
+  if(cover){const im=new Image();im.loading='lazy';im.decoding='async';im.alt='';im.onerror=()=>im.remove();im.onload=()=>ph.remove();im.src=cover;t.appendChild(im);}
+  const cap=document.createElement('div');cap.className='cap';const b=document.createElement('b');b.textContent=name;const s=document.createElement('small');s.textContent=sub||'';cap.append(b,s);t.appendChild(cap);
+  if(badge){const bd=document.createElement('span');bd.className='badge '+(badge[1]||'');bd.textContent=badge[0];t.appendChild(bd);}
+  if(actions.length){const a=document.createElement('div');a.className='acts';
+    for(const ac of actions){const btn=document.createElement('button');btn.setAttribute('aria-label',ac.label);btn.innerHTML='<svg class="i"><use href="#'+ac.icon+'"/></svg>';
+      btn.addEventListener('click',e=>{e.stopPropagation();ac.fn();});a.appendChild(btn);}t.appendChild(a);}
+  t.addEventListener('click',onPlay);
+  return t;
+}
+const portadaURL=id=>SRV+'/api/juegos/'+id+'/portada?t='+encodeURIComponent(store.srvToken||'');
 $('srvRefresh').onclick=()=>srvList();
 const ESTADOS={'en cola':'En cola…','subiendo':'Subiendo…','procesando':'Preparando…','descomprimiendo':'Descomprimiendo…','reconstruyendo disco':'Reconstruyendo disco…','convirtiendo a CHD':'Comprimiendo a CHD…','error':'Error:'};
 async function srvList(){
   clearTimeout(srvPoll);
   try{
-    const {juegos}=await (await srvFetch('/api/juegos')).json(); const box=$('srvList'); box.innerHTML='';
-    if(!juegos.length)box.innerHTML='<div class="note">Aún no hay juegos en tu servidor. Toca «Subir juego a mi servidor».</div>';
+    const {juegos}=await (await srvFetch('/api/juegos')).json(); const box=$('srvList'); box.innerHTML='';box.className='grid';
+    if(!juegos.length)box.innerHTML='<div class="note" style="grid-column:1/-1">Aún no hay juegos en tu servidor. Toca «Subir juego a mi servidor».</div>';
     const enCel=new Set((await libAll()).map(g=>g.srv).filter(Boolean));
     for(const j of juegos){
-      const el=document.createElement('div');el.className='game';
-      el.innerHTML='<button class="chip play"><svg class="i"><use href="#i-cart"/></svg><span><b></b><small></small></span></button><button class="ib del" aria-label="Borrar del servidor"><svg class="i"><use href="#i-x"/></svg></button>';
-      el.querySelector('b').textContent=j.nombre;
-      const est=j.estado==='listo'
-        ?(CONSOLE_INFO[j.consola]?.[0]||j.consola)+' · '+fmtSize(+j.tamano)+(enCel.has(j.id)?' · en tu celular ✓':' · toca para descargar y jugar')
-        :(ESTADOS[j.estado]||j.estado)+(j.mensaje?' '+j.mensaje:'');
-      el.querySelector('small').textContent=est;
-      el.querySelector('.play').onclick=()=>{if(j.estado==='listo')srvPlay(j);else showHint(est);};
-      el.querySelector('.del').onclick=async()=>{if(!confirm('¿Borrar «'+j.nombre+'» de tu servidor?'))return;
-        try{await srvFetch('/api/juegos/'+j.id,{method:'DELETE'});srvList();}catch(e){showHint(e.message);}};
-      box.appendChild(el);
+      const listo=j.estado==='listo';
+      const est=listo?(CONSOLE_INFO[j.consola]?.[0]||j.consola)+' · '+fmtSize(+j.tamano):(ESTADOS[j.estado]||j.estado)+(j.mensaje?' '+j.mensaje:'');
+      box.appendChild(makeTile({
+        name:j.nombre, sub:est, consola:j.consola,
+        cover:listo&&j.portada?portadaURL(j.id):null,
+        badge:!listo?(j.estado==='error'?['Error','err']:['Preparando','wait']):enCel.has(j.id)?['✓ En tu celular','ok']:null,
+        onPlay:()=>{if(listo)srvPlay(j);else showHint(est);},
+        actions:[{icon:'i-x',label:'Borrar del servidor',fn:async()=>{if(!confirm('¿Borrar «'+j.nombre+'» de tu servidor?'))return;
+          try{await srvFetch('/api/juegos/'+j.id,{method:'DELETE'});srvList();}catch(e){showHint(e.message);}}}],
+      }));
     }
     if(juegos.some(j=>!['listo','error'].includes(j.estado)))srvPoll=setTimeout(srvList,4000);
   }catch(e){showHint(e.message==='Failed to fetch'?'No hay conexión con tu servidor':e.message);}
