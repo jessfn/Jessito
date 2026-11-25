@@ -24,7 +24,13 @@
   window.EJS_startOnLoaded = true;
   window.EJS_color = '#7c5cff';
   window.EJS_volume = g.volume ?? 0.8;
-  window.EJS_defaultOptions = { 'virtual-gamepad': 'disabled' };
+  // Rendimiento: si el celular se atrasa, se salta cuadros de imagen (no la velocidad del juego)
+  window.EJS_defaultOptions = {
+    'virtual-gamepad': 'disabled',
+    'pcsx_rearmed_frameskip_type': 'auto',
+    'snes9x_frameskip': 'auto',
+    'mupen64plus-Framerate': 'Fullspeed',
+  };
   window.EJS_onGameStart = () => parent.postMessage({ ejs: 'start' }, location.origin);
   // Reenviar el teclado al padre para que funcionen los mismos atajos
   ['keydown', 'keyup'].forEach(t => addEventListener(t, e => parent.dispatchEvent(new KeyboardEvent(t, { key: e.key }))));
