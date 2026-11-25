@@ -93,7 +93,7 @@
   .game .play span { display:flex; flex-direction:column; min-width:0; }
   .game .play b { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:600; }
   .game .play small { opacity:.6; font-size:11px; }
-  .game .del { height:auto; width:44px; color:#ff8fa8; }
+  .game .del, .game .swap { height:auto; width:44px; } .game .del { color:#ff8fa8; } .game .swap { color:#a5f3fc; }
   #install { display:none; }
   #rotate { display:none; position:fixed; inset:0; z-index:9; background:var(--bg); flex-direction:column; align-items:center; justify-content:center; gap:16px; text-align:center; font-size:16px; padding:24px; }
   #rotate svg { width:72px; height:72px; animation:rot 1.6s ease-in-out infinite; }
@@ -120,6 +120,7 @@
   <symbol id="i-keys" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M6 9h.01M10 9h.01M14 9h.01M18 9h.01M7 15h10"/></symbol>
   <symbol id="i-up" viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-swap" viewBox="0 0 24 24"><path d="M7 4L3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7"/></symbol>
 </svg>
 
 <div id="rotate"><svg class="i" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2"/></svg><b>Gira tu celular</b><span style="opacity:.6;font-size:13px">Jessito Emu se juega en horizontal</span></div>
@@ -487,7 +488,7 @@ function fit(){ if(!sys)return; if(sys.fluid){const side=parseFloat(getComputedS
   cv.width=Math.round(Math.min(480,Math.max(256,240*w/h)));cv.style.aspectRatio=cv.width+'/240';} else cv.style.aspectRatio=sys.aspect; ctx.imageSmoothingEnabled=false; }
 addEventListener('resize',fit);
 let hintT;function showHint(t){const h=$('toast');h.textContent=t||'';h.style.opacity=t?1:0;clearTimeout(hintT);hintT=setTimeout(()=>h.style.opacity=0,3500);}
-const openMenu=()=>{$('menu').classList.remove('hidden');if(running)setPaused(true);};
+const openMenu=()=>{$('menu').classList.remove('hidden');if(running)setPaused(true);libAll().then(l=>{const r=l.sort((a,b)=>b.added-a.added)[0];if(r)warmUp(r.name);});};
 $('menuBtn').onclick=openMenu;$('ov').onclick=openMenu;
 $('menu').onclick=e=>{if(e.target===$('menu')){$('menu').classList.add('hidden');if(sys)setPaused(false);}};
 const GAMES={
@@ -521,31 +522,91 @@ function precargarMotores(cores){
     .map(f=>EJS_CDN+f).concat([...new Set(cores)].filter(c=>CORE_FILE[c]).map(c=>EJS_CDN+'cores/reports/'+CORE_FILE[c]+'.json')); // los motores (.data) ya los guarda EmulatorJS
   (window.requestIdleCallback||setTimeout)(()=>navigator.serviceWorker.controller.postMessage({precargar:urls}));
 }
+// Precarga en memoria (RAM) del juego que probablemente vas a abrir, para que arranque al instante
+let warm=null; const WARM_MAX=80e6;
+async function warmUp(name){
+  if(warm?.name===name)return;
+  try{const x=await libGet(name); if(!x||x.blob.size>WARM_MAX)return;
+    const mem=new Blob([await x.blob.arrayBuffer()]); // copia en memoria (no en disco)
+    warm={name,rec:{...x,blob:mem}};}catch(e){}
+}
+const warmGet=name=>warm?.name===name?warm.rec:null;
 async function renderLib(){
   const list=(await libAll()).sort((a,b)=>b.added-a.added), box=$('lib'); box.innerHTML='';
   precargarMotores(list.map(g=>g.core));
   $('libTitle').classList.toggle('hidden',!list.length);
   for(const g of list){
     const el=document.createElement('div');el.className='game';
-    el.innerHTML='<button class="chip play"><svg class="i"><use href="#i-cart"/></svg><span><b></b><small></small></span></button><button class="ib del" aria-label="Borrar"><svg class="i"><use href="#i-x"/></svg></button>';
+    el.innerHTML='<button class="chip play"><svg class="i"><use href="#i-cart"/></svg><span><b></b><small></small></span></button><button class="ib swap" aria-label="Cambiar consola"><svg class="i"><use href="#i-swap"/></svg></button><button class="ib del" aria-label="Borrar"><svg class="i"><use href="#i-x"/></svg></button>';
     el.querySelector('b').textContent=prettyName(g.name);
     el.querySelector('small').textContent=(CONSOLE_INFO[g.core]?.[0]||'CHIP-8')+' · '+fmtSize(g.size);
-    el.querySelector('.play').onclick=async()=>{initAudio();const x=await libGet(g.name);if(x)runGame(x.name,x.blob,x.core);};
+    el.querySelector('.play').onclick=async()=>{initAudio();const w=warmGet(g.name);const x=w||await libGet(g.name);if(x)runGame(x.name,x.blob,x.core);};
+    el.querySelector('.play').addEventListener('pointerdown',()=>warmUp(g.name),{passive:true});
+    el.querySelector('.swap').onclick=async()=>{const c=await pickConsole(g.name);if(!c)return;const x=await libGet(g.name);if(x){x.core=c;await libPut(x);renderLib();showHint(prettyName(g.name)+' → '+CONSOLE_INFO[c][0]);}};
     el.querySelector('.del').onclick=async()=>{if(confirm('¿Borrar «'+prettyName(g.name)+'» de este dispositivo?')){await libDel(g.name);renderLib();}};
     box.appendChild(el);
   }
 }
 
 async function detectCore(name,blob){
-  const head=new Uint8Array(await blob.slice(0,1024).arrayBuffer());
-  if(head[0]===0x4E&&head[1]===0x45&&head[2]===0x53&&head[3]===0x1A)return 'nes';
-  let ext=(name.split('.').pop()||'').toLowerCase();
-  if(ext==='zip'){const inner=zipInnerName(head);if(inner)ext=(inner.split('.').pop()||'').toLowerCase();}
-  if(ext==='bin'||ext==='iso'||ext==='img'){const id=new TextDecoder().decode(new Uint8Array(await blob.slice(0x9318,0x9340).arrayBuffer()));if(id.includes('PLAYSTATION'))return 'psx';}
-  if(CORES[ext])return CORES[ext];
-  if(/\b(SLES|SLUS|SCUS|SCES|SLPS|SLPM|SCPS|SIPS)[-_ ]?\d/i.test(name))return 'psx'; // código de disco de PlayStation
-  if(/\.(ch8|c8)$/i.test(name)||blob.size<=3584)return 'chip8';
+  // 1) Firma interna del archivo (lo más confiable)
+  const SNIFF=0x10400;
+  let data=new Uint8Array(await blob.slice(0,SNIFF).arrayBuffer()), size=blob.size, inner=name;
+  if(data[0]===0x50&&data[1]===0x4B&&data[2]===3&&data[3]===4){ // .zip: se lee el inicio del primer archivo de adentro
+    const z=await zipPeek(blob,data); if(z){data=z.data;size=z.size;inner=z.name;}
+  }
+  const bySig=sniffConsole(data,size); if(bySig)return bySig;
+  // Disco de PlayStation en formato crudo (.bin de 2352 bytes por sector)
+  if(data.length>=0x9340&&new TextDecoder().decode(data.subarray(0x9318,0x9340)).includes('PLAYSTATION'))return 'psx';
+  // 2) Extensión (también la de adentro del .zip, o la doble: juego.sfc.7z)
+  const exts=[inner,name,name.replace(/\.(zip|7z|rar)$/i,'')].map(n=>(n.split('.').pop()||'').toLowerCase());
+  for(const e of exts)if(CORES[e]&&e!=='bin')return CORES[e];
+  // 3) Pistas en el nombre
+  if(/\b(SLES|SLUS|SCUS|SCES|SLPS|SLPM|SCPS|SIPS)[-_ ]?\d/i.test(name))return 'psx';
+  if(/playstation|\bpsx\b|\bps1\b/i.test(name))return 'psx';
+  if(/\bsnes\b|super nintendo|super famicom/i.test(name))return 'snes';
+  if(/\bgba\b|game ?boy advance/i.test(name))return 'gba';
+  if(/\bgbc?\b|game ?boy/i.test(name))return 'gb';
+  if(/genesis|mega ?drive/i.test(name))return 'segaMD';
+  if(/\bn64\b|nintendo 64/i.test(name))return 'n64';
+  if(/\bnes\b|famicom/i.test(name))return 'nes';
+  if(exts.includes('bin'))return 'segaMD';
+  if(/\.(ch8|c8)$/i.test(inner)||/\.(ch8|c8)$/i.test(name)||size<=3584)return 'chip8';
   return null;
+}
+// Reconoce la consola por los bytes "firma" que cada sistema guarda en una posición fija
+function sniffConsole(d,size){
+  const at=(o,arr)=>arr.every((v,i)=>d[o+i]===v), str=(o,s)=>at(o,[...s].map(c=>c.charCodeAt(0)));
+  const LOGO=[0x24,0xFF,0xAE,0x51,0x69,0x9A];
+  if(str(0,'NES\x1A')||str(0,'FDS\x1A')||str(1,'*NINTENDO-HVC*'))return 'nes';
+  if(at(0,[0x80,0x37,0x12,0x40])||at(0,[0x37,0x80,0x40,0x12])||at(0,[0x40,0x12,0x37,0x80]))return 'n64';
+  if(at(0xC0,LOGO)&&d[0x15C]===0x56&&d[0x15D]===0xCF)return 'nds';
+  if(at(4,LOGO)&&d[0xB2]===0x96)return 'gba';
+  if(at(0x104,[0xCE,0xED,0x66,0x66,0xCC,0x0D]))return 'gb';
+  if(str(0,'\0PBP')||str(0,'MComprHD'))return 'psx';
+  if(str(0x8001,'CD001')&&str(0x8008,'PLAYSTATION'))return 'psx';
+  if(str(0x100,'SEGA')||str(0x101,'SEGA')||(d[8]===0xAA&&d[9]===0xBB))return 'segaMD';
+  for(const o of [0x7FF0,0x3FF0,0x1FF0])if(str(o,'TMR SEGA')){const r=d[o+15]>>4;return (r>=5&&r<=7)?'segaGG':'segaMS';}
+  for(const base of [0x7FC0,0xFFC0])for(const off of [0,512]){const o=base+off; // cabecera interna de Super Nintendo
+    if(o+0x20>d.length)continue; const chk=d[o+0x1E]|(d[o+0x1F]<<8), cmp=d[o+0x1C]|(d[o+0x1D]<<8);
+    if(chk!==0&&((chk^cmp)&0xFFFF)===0xFFFF)return 'snes';}
+  return null;
+}
+// Lee el nombre y el inicio del primer archivo dentro de un .zip (sin descomprimir todo)
+async function zipPeek(blob,head){
+  try{
+    const dv=new DataView(head.buffer), method=dv.getUint16(8,true), csize=dv.getUint32(18,true), usize=dv.getUint32(22,true),
+      nlen=dv.getUint16(26,true), elen=dv.getUint16(28,true), start=30+nlen+elen;
+    const name=new TextDecoder().decode(head.subarray(30,30+nlen));
+    const want=0x10400, raw=blob.slice(start,start+Math.min(csize||blob.size,method?want*4:want));
+    if(method===0)return {name,size:usize,data:new Uint8Array(await raw.arrayBuffer())};
+    if(method!==8||!('DecompressionStream' in window))return {name,size:usize,data:new Uint8Array(0)};
+    const rd=raw.stream().pipeThrough(new DecompressionStream('deflate-raw')).getReader();
+    const out=new Uint8Array(want);let n=0;
+    try{while(n<want){const {value,done}=await rd.read();if(done)break;const k=Math.min(value.length,want-n);out.set(value.subarray(0,k),n);n+=k;}}catch(e){}
+    rd.cancel().catch(()=>{});
+    return {name,size:usize,data:out.subarray(0,n)};
+  }catch(e){return null;}
 }
 function pickConsole(name){ // si no se reconoce, se pregunta la consola
   return new Promise(ok=>{const s=$('picker'),box=$('pickList');$('pickName').textContent=prettyName(name);box.innerHTML='';
@@ -625,7 +686,7 @@ $('install').onclick=async()=>{if(!deferred)return;deferred.prompt();await defer
 addEventListener('appinstalled',()=>$('install').style.display='none');
 // ================= Actualización automática =================
 // El script de publicación escribe la versión aquí y en version.json.
-const APP_VERSION='20261125-171950-662dbfb';
+const APP_VERSION='20261125-172853-866ebff';
 let swReg=null, updatePending=false;
 if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>swReg=r).catch(()=>{});
 function applyUpdate(){ // recarga en cuanto no estés jugando (pausa, menú o app en segundo plano)
