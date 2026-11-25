@@ -87,6 +87,7 @@
   .sw { width:30px; height:30px; border-radius:50%; border:3px solid transparent; cursor:pointer; }
   .sw.sel { border-color:#fff; }
   .note { font-size:12px; opacity:.6; line-height:1.4; }
+  .campo { background:var(--card); color:var(--txt); border:1px solid var(--line); border-radius:12px; padding:11px; font-size:16px; width:100%; user-select:text; -webkit-user-select:text; touch-action:auto; }
   .lib { display:flex; flex-direction:column; gap:8px; }
   .game { display:flex; gap:8px; align-items:stretch; }
   .game .play { flex:1; min-width:0; text-align:left; }
@@ -188,10 +189,10 @@
     <button class="chip" data-game="teclas"><svg class="i"><use href="#i-grid"/></svg>Teclas</button>
     <label class="chip"><svg class="i"><use href="#i-folder"/></svg>Cargar ROM<input id="file" type="file" class="picker-input"></label>
   </div>
-  <h2>Mi servidor <small style="font-weight:400;opacity:.55;font-size:11px">gamesdata.geodatos.com.mx</small></h2>
-  <div id="srvLogin" class="note">Este dispositivo todavía no está vinculado a tu servidor. Abre <b>una vez</b> tu enlace de vinculación en este dispositivo y tus juegos aparecerán aquí, sin contraseña.</div>
+  <h2>Mi cuenta <small style="font-weight:400;opacity:.55;font-size:11px">tus juegos y partidas en todos tus dispositivos</small></h2>
+  <div id="srvLogin" style="display:flex;flex-direction:column;gap:8px"><div style="display:flex;gap:8px"><button class="chip sel" id="acTabIn" style="flex:1;justify-content:center">Entrar</button><button class="chip" id="acTabReg" style="flex:1;justify-content:center">Crear cuenta</button></div><input id="acNombre" class="campo hidden" placeholder="Tu nombre" autocomplete="name"><input id="acCorreo" class="campo" type="email" placeholder="Correo" autocomplete="email" inputmode="email"><input id="acPass" class="campo" type="password" placeholder="Contraseña (mínimo 8)" autocomplete="current-password"><input id="acPass2" class="campo hidden" type="password" placeholder="Confirma tu contraseña" autocomplete="new-password"><button class="chip" id="acGo" style="justify-content:center;background:linear-gradient(135deg,var(--acc),#5b43e0);border:none">Entrar</button><div class="note" id="acMsg"></div></div>
   <div id="srvPanel" class="hidden" style="display:flex;flex-direction:column;gap:8px">
-    <div style="display:flex;gap:8px;flex-wrap:wrap"><label class="chip"><svg class="i"><use href="#i-folder"/></svg>Subir juego a mi servidor<input id="srvFile" type="file" class="picker-input"></label><button class="chip" id="srvRefresh"><svg class="i"><use href="#i-reset"/></svg>Actualizar</button><button class="chip" id="srvOut">Desvincular</button></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><label class="chip"><svg class="i"><use href="#i-folder"/></svg>Subir juego a mi servidor<input id="srvFile" type="file" class="picker-input"></label><button class="chip" id="srvRefresh"><svg class="i"><use href="#i-reset"/></svg>Actualizar</button><span class="note" id="srvHola" style="align-self:center"></span><button class="chip" id="srvOut">Cerrar sesión</button></div>
     <div class="lib" id="srvList"></div>
   </div>
   <h2 id="libTitle" class="hidden">Mi biblioteca</h2>
@@ -398,19 +399,44 @@ function ejsSystem(bytes,name,core,fullName){
   const syncAll=()=>{if(!emuReady())return;for(const b in RETROPAD)send(b,!!IN[b]);};
   // ===== Partidas guardadas (solo en este dispositivo) =====
   const KEY=core+':'+name; let timer=null, lastSave=0;
-  const saveNow=()=>{ // guarda el estado completo del juego y la memoria interna del cartucho
+  // Sube la partida a tu cuenta (si hay sesión). Solo la más reciente gana, así no se pisa entre dispositivos.
+  let subiendo=false, ultimaNube=0;
+  const subirNube=async(st,time)=>{
+    if(!store.srvToken||subiendo)return; subiendo=true;
+    try{const r=await fetch(SRV+'/api/partida?clave='+encodeURIComponent(KEY)+'&tiempo='+time,{method:'PUT',
+        headers:{Authorization:'Bearer '+store.srvToken,'Content-Type':'application/octet-stream'},body:st,keepalive:st.length<60000});
+      if(r.ok){ultimaNube=time;diag('Partida subida a tu cuenta ('+Math.round(st.length/1024)+' KB)');}}
+    catch(e){} finally{subiendo=false;}
+  };
+  let ticks=0;
+  const saveNow=(nube=true)=>{ // guarda el estado completo del juego (en el dispositivo y en tu cuenta)
     if(store.autosave===false||!emuReady())return;
     try{emu.gameManager.saveSaveFiles?.();}catch(e){}
-    try{const st=emu.gameManager.getState(); if(!st||!st.length)return; lastSave=Date.now();
-      tx('states','readwrite',s=>s.put({state:new Uint8Array(st),time:lastSave},KEY)).catch(()=>{});}catch(e){}
+    try{const st=emu.gameManager.getState(); if(!st||!st.length)return; lastSave=Date.now(); const copia=new Uint8Array(st);
+      tx('states','readwrite',s=>s.put({state:copia,time:lastSave},KEY)).catch(()=>{});
+      if(nube)subirNube(copia,lastSave);}catch(e){}
   };
+  // Al abrir: usa la partida MÁS RECIENTE entre la del dispositivo y la de tu cuenta
   const restore=async()=>{
     if(store.autosave===false)return;
-    const r=await tx('states','readonly',s=>s.get(KEY)).catch(()=>null); if(!r?.state||!emuReady())return;
-    try{emu.gameManager.loadState(r.state);showHint('Partida restaurada · '+new Date(r.time).toLocaleString());}catch(e){}
+    const local=await tx('states','readonly',s=>s.get(KEY)).catch(()=>null);
+    let elegido=local?.state?{state:local.state,time:local.time,de:'este dispositivo'}:null;
+    if(store.srvToken){
+      try{const r=await fetch(SRV+'/api/partida?clave='+encodeURIComponent(KEY)+'&desde='+(local?.time||0),{headers:{Authorization:'Bearer '+store.srvToken}});
+        if(r.status===200){const t=+r.headers.get('X-Tiempo')||Date.now();const st=new Uint8Array(await r.arrayBuffer());
+          elegido={state:st,time:t,de:'tu cuenta'};tx('states','readwrite',s=>s.put({state:st,time:t},KEY)).catch(()=>{});}
+        else if(r.status===204)ultimaNube=+r.headers.get('X-Tiempo')||0;
+        // si el dispositivo tiene una partida más nueva que la nube, se sube
+        if(local?.state&&(r.status===404||(r.status===204&&ultimaNube<local.time)))subirNube(local.state,local.time);
+      }catch(e){}
+    }
+    if(!elegido||!emuReady())return;
+    try{emu.gameManager.loadState(elegido.state);showHint('Partida restaurada desde '+elegido.de+' · '+new Date(elegido.time).toLocaleString());}catch(e){}
   };
   const onMsg=e=>{if(e.data?.ejs==='start'&&e.source===frame?.contentWindow){ready=false;emuReady();emu?.setVolume?.(store.sound?.8:0);syncAll();showHint(label+' · ¡a jugar!');
-    setTimeout(restore,400); clearInterval(timer); timer=setInterval(()=>{if(running)saveNow();},45000);}};
+    setTimeout(restore,400); clearInterval(timer);
+    // cada 45 s en el dispositivo; cada 3 min también en tu cuenta (para no gastar datos)
+    timer=setInterval(()=>{if(running){ticks++;saveNow(ticks%4===0);}},45000);}};
   return {name,size:[4,3],aspect,extra,labels,ps:core==='psx',
     async start(){let bios=null;if(core==='psx'){const b=await tx('roms','readonly',s=>s.get('bios_psx')).catch(()=>null);if(b)bios=URL.createObjectURL(b.blob);}
       window.__ejsGame={core,url,name,bios,fullName:(fullName||name),volume:store.sound?.8:0,shader:store.quality||'disabled'};addEventListener('message',onMsg);
@@ -418,7 +444,7 @@ function ejsSystem(bytes,name,core,fullName){
       document.querySelector('.screen').appendChild(frame);},
     stop(){saveNow();clearInterval(timer);removeEventListener('message',onMsg);frame?.remove();URL.revokeObjectURL(url);},
     save:saveNow,
-    async fresh(){await tx('states','readwrite',s=>s.delete(KEY)).catch(()=>{});if(emuReady())emu.gameManager.restart();},
+    async fresh(){await tx('states','readwrite',s=>s.delete(KEY)).catch(()=>{});if(store.srvToken)fetch(SRV+'/api/partida?clave='+encodeURIComponent(KEY),{method:'DELETE',headers:{Authorization:'Bearer '+store.srvToken}}).catch(()=>{});if(emuReady())emu.gameManager.restart();},
     setQuality(v){if(!emuReady())return;try{if(emu.changeSettingOption)emu.changeSettingOption('shader',v);else emu.menuOptionChanged?.('shader',v);}catch(e){}},
     reset(){if(emuReady())emu.gameManager.restart();},
     input:send, sync:syncAll,
@@ -769,18 +795,49 @@ function loadRom(name,bytes){return addGame(new File([bytes],name));}
 // convierte PlayStation a .chd) y el celular solo descarga el juego listo, una vez.
 const SRV='https://gamesdata.geodatos.com.mx';
 let srvPoll=null;
-function srvUI(){const on=!!store.srvToken;$('srvLogin').classList.toggle('hidden',on);$('srvPanel').classList.toggle('hidden',!on);if(on)srvList();}
+function srvUI(){const on=!!store.srvToken;if($('srvHola'))$('srvHola').textContent=on&&store.user?'Hola, '+store.user.nombre:'';$('srvLogin').classList.toggle('hidden',on);$('srvPanel').classList.toggle('hidden',!on);if(on)srvList();}
 async function srvFetch(path,opt={}){
   const r=await fetch(SRV+path,{...opt,headers:{...(opt.headers||{}),Authorization:'Bearer '+(store.srvToken||'')}});
-  if(r.status===401){store.srvToken=null;save();srvUI();throw new Error('Este dispositivo ya no está vinculado: abre tu enlace de vinculación');}
+  if(r.status===401){store.srvToken=null;save();srvUI();throw new Error('Tu sesión terminó: vuelve a entrar con tu correo y contraseña');}
   if(!r.ok)throw new Error((await r.json().catch(()=>({}))).error||('Error '+r.status));
   return r;
 }
 // Vinculación SIN contraseña: abrir una vez el enlace ...#vincular=<llave> deja el dispositivo autorizado para siempre
-(function(){const m=location.hash.match(/vincular=([^&]+)/);if(!m)return;
-  store.srvToken=decodeURIComponent(m[1]);save();history.replaceState(null,'',location.pathname+location.search);
-  diag('Dispositivo vinculado a tu servidor');setTimeout(()=>{showHint('¡Dispositivo vinculado! Tus juegos aparecen en el menú');openMenu();},800);})();
-$('srvOut').onclick=()=>{if(confirm('¿Desvincular este dispositivo? Para volver a ver tu servidor tendrás que abrir otra vez tu enlace.')){store.srvToken=null;save();srvUI();}};
+// ===== Cuenta: crear cuenta / entrar (la contraseña se pide una sola vez por dispositivo) =====
+let modoCuenta='entrar';
+function pintarCuenta(){
+  const reg=modoCuenta==='registro';
+  $('acTabIn').classList.toggle('sel',!reg);$('acTabReg').classList.toggle('sel',reg);
+  $('acNombre').classList.toggle('hidden',!reg);$('acPass2').classList.toggle('hidden',!reg);
+  $('acPass').autocomplete=reg?'new-password':'current-password';
+  $('acGo').textContent=reg?'Crear cuenta':'Entrar';$('acMsg').textContent='';
+}
+$('acTabIn').onclick=()=>{modoCuenta='entrar';pintarCuenta();};
+$('acTabReg').onclick=()=>{modoCuenta='registro';pintarCuenta();};
+$('acGo').onclick=async()=>{
+  const reg=modoCuenta==='registro', nombre=$('acNombre').value.trim(), correo=$('acCorreo').value.trim(), pw=$('acPass').value, pw2=$('acPass2').value;
+  const msg=t=>{$('acMsg').textContent=t;};
+  if(reg&&nombre.length<2)return msg('Escribe tu nombre');
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(correo))return msg('Escribe un correo válido');
+  if(pw.length<8)return msg('La contraseña debe tener al menos 8 caracteres');
+  if(reg&&pw!==pw2)return msg('Las contraseñas no coinciden');
+  $('acGo').disabled=true;msg(reg?'Creando tu cuenta…':'Entrando…');
+  try{
+    const r=await fetch(SRV+(reg?'/api/registro':'/api/entrar'),{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(reg?{nombre,correo,contrasena:pw,confirmacion:pw2}:{correo,contrasena:pw})});
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok)throw new Error(j.error||'No se pudo '+(reg?'crear la cuenta':'entrar'));
+    store.srvToken=j.token;store.user=j.usuario;save();
+    $('acPass').value='';$('acPass2').value='';
+    diag((reg?'Cuenta creada':'Sesión iniciada')+': '+j.usuario.correo);
+    showHint('¡Hola, '+j.usuario.nombre+'! Tus juegos y partidas ya se guardan en tu cuenta');
+    srvUI();renderLib();
+  }catch(e){msg(e.message==='Failed to fetch'?'No hay conexión con el servidor':e.message);}
+  finally{$('acGo').disabled=false;}
+};
+['acCorreo','acPass','acPass2','acNombre'].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter')$('acGo').click();}));
+$('srvOut').onclick=()=>{if(confirm('¿Cerrar sesión en este dispositivo? Tus juegos y partidas siguen guardados en tu cuenta.')){store.srvToken=null;store.user=null;save();srvUI();renderLib();}};
+pintarCuenta();
 // Cuadrito de juego: portada (o color de la consola), nombre, estado y botones pequeños
 const COLOR_CONSOLA={nes:'#c2410c,#7c2d12',snes:'#7c3aed,#4c1d95',gba:'#4f46e5,#1e1b4b',gb:'#65a30d,#365314',n64:'#16a34a,#14532d',nds:'#64748b,#1e293b',
   psx:'#2563eb,#1e1b4b',segaMD:'#0f172a,#334155',segaMS:'#b91c1c,#450a0a',segaGG:'#0e7490,#164e63',pce:'#ea580c,#7c2d12',atari2600:'#92400e,#451a03',chip8:'#0891b2,#164e63'};
