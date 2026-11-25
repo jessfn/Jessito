@@ -189,6 +189,9 @@
   <div class="opt"><label><input type="checkbox" id="vib" checked> Vibrar al tocar</label></div>
   <label class="chip" style="justify-content:center"><svg class="i"><use href="#i-folder"/></svg><span id="biosLbl">Cargar BIOS de PlayStation</span><input id="biosFile" type="file" hidden></label>
   <div class="note">Algunos juegos de PlayStation (como Resident Evil 3) necesitan el BIOS real de la consola (por ejemplo SCPH5502.bin para juegos europeos, SCPH1001.bin para americanos). Se guarda solo en este dispositivo.</div>
+  <div class="opt">Calidad de imagen<select id="quality" style="flex:1;background:var(--card);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:8px"><option value="disabled">Original (nítida, más rápida)</option><option value="2xScaleHQ.glslp">HD suave 2x</option><option value="4xScaleHQ.glslp">HD suave 4x (celulares potentes)</option><option value="crt-easymode.glslp">Tele retro (CRT)</option></select></div>
+  <div class="opt"><label><input type="checkbox" id="autosave" checked> Guardar la partida automáticamente</label></div>
+  <button class="chip" id="freshStart" style="justify-content:center"><svg class="i"><use href="#i-reset"/></svg>Empezar este juego desde cero</button>
   <button class="chip" id="kpToggle" style="justify-content:center"><svg class="i"><use href="#i-keys"/></svg>Mostrar teclado CHIP-8</button>
   <div class="note">Teclado en PC: flechas = joystick, Z = B, X = A, Enter = Start, Shift = Select.<br>Las ROMs se quedan solo en tu dispositivo, no se suben a ningún lado.</div>
   <button class="chip" id="closeCfg" style="justify-content:center">Listo</button>
@@ -221,7 +224,8 @@ let wake=null;
 async function keepAwake(on){try{if(on&&!wake&&navigator.wakeLock&&!document.hidden){wake=await navigator.wakeLock.request('screen');wake.addEventListener('release',()=>wake=null);}
   else if(!on&&wake){await wake.release();wake=null;}}catch(e){}}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&running)keepAwake(true);});
-document.addEventListener('visibilitychange',()=>{if(document.hidden)releaseAll();});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){releaseAll();sys?.save?.();}});
+addEventListener('pagehide',()=>sys?.save?.());
 // Red de seguridad: si no hay ningún dedo en pantalla, nada debe seguir presionado
 let touches=0;
 document.addEventListener('pointerdown',()=>touches++,true);
@@ -361,13 +365,30 @@ function ejsSystem(bytes,name,core){
   const send=(b,on)=>{const i=RETROPAD[b];if(i===undefined||!emuReady())return;try{emu.gameManager.simulateInput(0,i,on?1:0);}catch(e){}};
   // Sincroniza TODOS los botones con el estado real de los dedos (evita botones "pegados" o perdidos)
   const syncAll=()=>{if(!emuReady())return;for(const b in RETROPAD)send(b,!!IN[b]);};
-  const onMsg=e=>{if(e.data?.ejs==='start'&&e.source===frame?.contentWindow){ready=false;emuReady();emu?.setVolume?.(store.sound?.8:0);syncAll();showHint(label+' · ¡a jugar!');}};
+  // ===== Partidas guardadas (solo en este dispositivo) =====
+  const KEY=core+':'+name; let timer=null, lastSave=0;
+  const saveNow=()=>{ // guarda el estado completo del juego y la memoria interna del cartucho
+    if(store.autosave===false||!emuReady())return;
+    try{emu.gameManager.saveSaveFiles?.();}catch(e){}
+    try{const st=emu.gameManager.getState(); if(!st||!st.length)return; lastSave=Date.now();
+      tx('states','readwrite',s=>s.put({state:new Uint8Array(st),time:lastSave},KEY)).catch(()=>{});}catch(e){}
+  };
+  const restore=async()=>{
+    if(store.autosave===false)return;
+    const r=await tx('states','readonly',s=>s.get(KEY)).catch(()=>null); if(!r?.state||!emuReady())return;
+    try{emu.gameManager.loadState(r.state);showHint('Partida restaurada · '+new Date(r.time).toLocaleString());}catch(e){}
+  };
+  const onMsg=e=>{if(e.data?.ejs==='start'&&e.source===frame?.contentWindow){ready=false;emuReady();emu?.setVolume?.(store.sound?.8:0);syncAll();showHint(label+' · ¡a jugar!');
+    setTimeout(restore,400); clearInterval(timer); timer=setInterval(()=>{if(running)saveNow();},45000);}};
   return {name,size:[4,3],aspect,extra,labels,ps:core==='psx',
     async start(){let bios=null;if(core==='psx'){const b=await tx('roms','readonly',s=>s.get('bios_psx')).catch(()=>null);if(b)bios=URL.createObjectURL(b.blob);}
-      window.__ejsGame={core,url,name,bios,volume:store.sound?.8:0};addEventListener('message',onMsg);
+      window.__ejsGame={core,url,name,bios,volume:store.sound?.8:0,shader:store.quality||'disabled'};addEventListener('message',onMsg);
       frame=document.createElement('iframe');frame.src='ejs.html';frame.className='ejs';frame.allow='autoplay; gamepad; fullscreen';
       document.querySelector('.screen').appendChild(frame);},
-    stop(){removeEventListener('message',onMsg);frame?.remove();URL.revokeObjectURL(url);},
+    stop(){saveNow();clearInterval(timer);removeEventListener('message',onMsg);frame?.remove();URL.revokeObjectURL(url);},
+    save:saveNow,
+    async fresh(){await tx('states','readwrite',s=>s.delete(KEY)).catch(()=>{});if(emuReady())emu.gameManager.restart();},
+    setQuality(v){if(!emuReady())return;try{emu.enableShader?emu.enableShader(v):emu.menuOptionChanged?.('shader',v);}catch(e){}},
     reset(){if(emuReady())emu.gameManager.restart();},
     input:send, sync:syncAll,
     setRunning(on){if(emuReady()){on?emu.play():emu.pause();syncAll();}},
@@ -500,8 +521,8 @@ const selChip=el=>{document.querySelectorAll('.games .chip').forEach(c=>c.classL
 document.querySelectorAll('[data-game]').forEach(b=>b.onclick=()=>{initAudio();selChip(b);GAMES[b.dataset.game]();});
 
 // ================= Mi biblioteca (IndexedDB: los juegos se quedan solo en este dispositivo) =================
-function db(){return new Promise((ok,ko)=>{const r=indexedDB.open('jemu',2);
-  r.onupgradeneeded=()=>{const d=r.result;if(!d.objectStoreNames.contains('roms'))d.createObjectStore('roms');if(!d.objectStoreNames.contains('lib'))d.createObjectStore('lib',{keyPath:'name'});};
+function db(){return new Promise((ok,ko)=>{const r=indexedDB.open('jemu',3);
+  r.onupgradeneeded=()=>{const d=r.result;if(!d.objectStoreNames.contains('roms'))d.createObjectStore('roms');if(!d.objectStoreNames.contains('lib'))d.createObjectStore('lib',{keyPath:'name'});if(!d.objectStoreNames.contains('states'))d.createObjectStore('states');};
   r.onsuccess=()=>ok(r.result);r.onerror=()=>ko(r.error);});}
 const tx=(st,mode,fn)=>db().then(d=>new Promise((ok,ko)=>{const t=d.transaction(st,mode);const q=fn(t.objectStore(st));t.oncomplete=()=>ok(q?.result);t.onerror=()=>ko(t.error);t.onabort=()=>ko(t.error);}));
 const libAll=()=>tx('lib','readonly',s=>s.getAll()).catch(()=>[]);
@@ -660,7 +681,7 @@ function loop(t){ pollGamepad();
 requestAnimationFrame(loop);
 
 // Barra superior
-function setPaused(p){if(!sys)return;if(p)releaseAll();running=!p;icon($('pause'),p?'i-play':'i-pause');if(p)sys.mute();sys.setRunning?.(!p);keepAwake(!p);}
+function setPaused(p){if(!sys)return;if(p){releaseAll();sys.save?.();}running=!p;icon($('pause'),p?'i-play':'i-pause');if(p)sys.mute();sys.setRunning?.(!p);keepAwake(!p);}
 $('pause').onclick=()=>setPaused(running);
 $('reset').onclick=()=>{if(sys){sys.reset();setPaused(false);}};
 $('sound').onclick=()=>{store.sound=!store.sound;save();icon($('sound'),store.sound?'i-vol':'i-mute');if(master)master.gain.value=store.sound?1:0;sys?.setSound?.(store.sound);};
@@ -670,6 +691,9 @@ $('cfg').onclick=()=>$('sheet').classList.remove('hidden');
 $('sheet').onclick=e=>{if(e.target===$('sheet')||e.target.closest('#closeCfg')){$('sheet').classList.add('hidden');store.speed=+$('speed').value;save();}};
 $('kpToggle').onclick=()=>{const kp=$('keypad').classList.toggle('hidden');$('ab').classList.toggle('hidden',!kp);};
 $('vib').checked=store.vib;$('vib').onchange=e=>{store.vib=e.target.checked;save();};
+$('quality').value=store.quality||'disabled';$('quality').onchange=e=>{store.quality=e.target.value;save();sys?.setQuality?.(store.quality);showHint('Calidad: '+e.target.selectedOptions[0].text);};
+$('autosave').checked=store.autosave!==false;$('autosave').onchange=e=>{store.autosave=e.target.checked;save();};
+$('freshStart').onclick=async()=>{if(!sys?.fresh){showHint('Abre un juego primero');return;}if(confirm('¿Borrar la partida guardada de este juego y empezar desde cero?')){await sys.fresh();$('sheet').classList.add('hidden');setPaused(false);showHint('Empezando desde cero');}};
 if(store.speed)$('speed').value=store.speed;
 ['#a5f3fc','#86efac','#fcd34d','#f9a8d4','#c4b5fd','#ffffff'].forEach(c=>{const s=document.createElement('div');s.className='sw'+(c===store.color?' sel':'');s.style.background=c;
   s.onclick=()=>{store.color=c;save();if(sys?.pad)sys.pad.dirty=true;document.querySelectorAll('.sw').forEach(x=>x.classList.remove('sel'));s.classList.add('sel');};$('sw').appendChild(s);});
