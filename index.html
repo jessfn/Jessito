@@ -87,6 +87,22 @@
   .sw { width:30px; height:30px; border-radius:50%; border:3px solid transparent; cursor:pointer; }
   .sw.sel { border-color:#fff; }
   .note { font-size:12px; opacity:.6; line-height:1.4; }
+  /* Pantallita de carga (subir/descargar/preparar) */
+  .carga { position:fixed; inset:0; z-index:8; background:#000b; display:grid; place-items:center; padding:16px; }
+  .cbox { width:min(420px,100%); background:#151730; border:1px solid var(--line); border-radius:22px; padding:20px; display:flex; flex-direction:column; gap:10px; box-shadow:0 20px 60px #0009; }
+  .cbox b { font-size:15px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .cbar { height:12px; border-radius:99px; background:#ffffff14; overflow:hidden; }
+  .cbar i { display:block; height:100%; width:0; border-radius:99px; background:linear-gradient(90deg,var(--acc),var(--acc2)); transition:width .25s; }
+  .cbar.indet i { width:35% !important; animation:indet 1.2s ease-in-out infinite; }
+  @keyframes indet { 0%{transform:translateX(-100%)} 100%{transform:translateX(300%)} }
+  .cpct { font-size:28px; font-weight:800; text-align:center; }
+  /* Seguir jugando */
+  .hero { display:flex; gap:14px; align-items:stretch; background:linear-gradient(135deg,#2a2366,#151730); border:1px solid var(--line); border-radius:18px; padding:10px; }
+  .hcover { width:96px; aspect-ratio:3/4; border-radius:12px; overflow:hidden; flex:none; background:var(--tg,#3a2f8a); position:relative; }
+  .hcover img { width:100%; height:100%; object-fit:cover; }
+  .htxt { display:flex; flex-direction:column; gap:4px; justify-content:center; min-width:0; flex:1; }
+  .htxt small { font-size:11px; opacity:.7; text-transform:uppercase; letter-spacing:1px; }
+  .htxt b { font-size:17px; line-height:1.2; }
   .campo { background:var(--card); color:var(--txt); border:1px solid var(--line); border-radius:12px; padding:11px; font-size:16px; width:100%; user-select:text; -webkit-user-select:text; touch-action:auto; }
   .lib { display:flex; flex-direction:column; gap:8px; }
   .game { display:flex; gap:8px; align-items:stretch; }
@@ -182,6 +198,8 @@
 </div>
 
 <div class="sheet hidden" id="menu"><div>
+  <div class="hero hidden" id="seguir"><div class="hcover" id="hCover"></div><div class="htxt"><small>Seguir jugando</small><b id="hName"></b><span class="note" id="hSub"></span><button class="chip" id="hPlay" style="justify-content:center;background:linear-gradient(135deg,var(--acc),#5b43e0);border:none"><svg class="i"><use href="#i-play"/></svg>Continuar</button></div></div>
+  <input id="buscar" class="campo" type="search" placeholder="Buscar en tus juegos…" autocomplete="off">
   <h2>Elige un juego</h2>
   <div class="games">
     <button class="chip" data-game="run"><svg class="i"><use href="#i-run"/></svg>Jessito Run</button>
@@ -199,6 +217,8 @@
   <div class="lib" id="lib"></div>
   <div class="note">Toca «Cargar ROM» para agregar juegos (.zip, .7z, .nes, .sfc, .gba, .bin/.cue de PlayStation…). Se guardan en tu biblioteca, solo en este dispositivo.</div>
 </div></div>
+
+<div class="carga hidden" id="carga"><div class="cbox"><b id="cTit"></b><div class="cbar"><i id="cFill"></i></div><div class="cpct" id="cPct">0%</div><div class="note" id="cInfo"></div><button class="chip" id="cBtn" style="justify-content:center">Cancelar</button></div></div>
 
 <div class="sheet hidden" id="picker"><div>
   <h2>¿De qué consola es?</h2>
@@ -571,7 +591,7 @@ function fit(){ if(!sys)return; if(sys.fluid){const side=parseFloat(getComputedS
   cv.width=Math.round(Math.min(480,Math.max(256,240*w/h)));cv.style.aspectRatio=cv.width+'/240';} else cv.style.aspectRatio=sys.aspect; ctx.imageSmoothingEnabled=false; }
 addEventListener('resize',fit);
 let hintT;function showHint(t){if(t)diag(t);const h=$('toast');h.textContent=t||'';h.style.opacity=t?1:0;clearTimeout(hintT);hintT=setTimeout(()=>h.style.opacity=0,3500);}
-const openMenu=()=>{$('menu').classList.remove('hidden');if(store.srvToken)srvList();if(running)setPaused(true);libAll().then(l=>{const r=l.sort((a,b)=>b.added-a.added)[0];if(r)warmUp(r.name);});};
+const openMenu=()=>{$('menu').classList.remove('hidden');try{pintarSeguir();}catch(e){}if(store.srvToken)srvList();if(running)setPaused(true);libAll().then(l=>{const r=l.sort((a,b)=>b.added-a.added)[0];if(r)warmUp(r.name);});};
 $('menuBtn').onclick=openMenu;$('ov').onclick=openMenu;
 $('menu').onclick=e=>{if(e.target===$('menu')){$('menu').classList.add('hidden');if(sys)setPaused(false);}};
 const GAMES={
@@ -710,6 +730,7 @@ function pickConsole(name){ // si no se reconoce, se pregunta la consola
     s.onclick=e=>{if(e.target===s){s.classList.add('hidden');ok(null);}};s.classList.remove('hidden');});
 }
 async function runGame(name,blob,core){
+  try{recordarUltimo(name,core);}catch(e){}
   const clean=prettyName(name);
   try{
     if(core==='chip8'){launch(chip8System(new Uint8Array(await blob.arrayBuffer()),clean),'CHIP-8 · joystick = 2/4/6/8, A = 5');return;}
@@ -721,7 +742,7 @@ async function runGame(name,blob,core){
 function unEcm(file){
   return new Promise(ok=>{const wk=new Worker('ecm.js');showHint('Descomprimiendo disco… 0%');
     wk.onmessage=e=>{const d=e.data;
-      if(d.progress!==undefined){$('toast').textContent='Descomprimiendo disco… '+Math.round(d.progress*100)+'%';$('toast').style.opacity=1;}
+      if(d.progress!==undefined){cargaSet(d.progress*100,'Reconstruyendo el disco…');}
       else if(d.blob){wk.terminate();ok(new File([d.blob],file.name.replace(/\.ecm$/i,'')));}
       else {wk.terminate();showHint('No se pudo descomprimir: '+d.error);ok(null);}};
     wk.postMessage({file});});
@@ -753,7 +774,7 @@ async function extractArchive(file,kind){
   return new Promise((ok,ko)=>{const files=[];
     wk.onmessage=e=>{const d=e.data;
       if(d.t===2&&d.data&&!/\/$/.test(d.file))files.push(new File([d.data],d.file.split('/').pop()));
-      else if(d.t===4&&d.total){$('toast').textContent='Descomprimiendo… '+Math.round(d.current/d.total*100)+'%';$('toast').style.opacity=1;}
+      else if(d.t===4&&d.total){cargaSet(d.current/d.total*100,'Descomprimiendo… '+fmtSize(d.current)+' de '+fmtSize(d.total));}
       else if(d.t===1){wk.terminate();ok(files);}};
     wk.onerror=e=>{wk.terminate();ko(new Error('archivo comprimido dañado'));};
     wk.postMessage(buf,[buf.buffer]);buf=null;}); // se transfiere (sin copia)
@@ -770,6 +791,7 @@ function guessCore(size,name){
 }
 async function addGame(file){
   diag('Archivo recibido: '+file.name+' ('+Math.round(file.size/1e6)+' MB)');
+  cargaShow('Cargando '+file.name);cargaSet(null,fmtSize(file.size));
   initAudio();
   try{
     const h=new Uint8Array(await file.slice(0,6).arrayBuffer());
@@ -779,9 +801,9 @@ async function addGame(file){
     if(kind==='zip'){const z=await zipPeek(file,new Uint8Array(await file.slice(0,0x10400).arrayBuffer()));
       if(z&&!/\.ecm$/i.test(z.name)&&sniffConsole(z.data,z.size))open=false;}
     if(open){showHint('Descomprimiendo…');const main=pickMain(await extractArchive(file,kind));
-      if(!main){showHint('No encontré ningún juego dentro de '+file.name);return;}
+      if(!main){cargaHide();showHint('No encontré ningún juego dentro de '+file.name);return;}
       diag('Extraído: '+main.name+' ('+Math.round(main.size/1e6)+' MB)');file=main;}
-  }catch(e){showHint('No se pudo descomprimir: '+e.message);return;}
+  }catch(e){cargaHide();showHint('No se pudo descomprimir: '+e.message);return;}
   if(/\.ecm$/i.test(file.name)){file=await unEcm(file);if(!file)return;}
   const core=(await detectCore(file.name,file))||guessCore(file.size,file.name);
   if(isIOS&&core==='psx'&&file.size>300e6)showHint('Aviso: en iPhone los discos de más de 300 MB pueden cerrarse por falta de memoria');
@@ -792,6 +814,7 @@ async function addGame(file){
   catch(e){diag('No se pudo guardar: '+(e&&(e.name+' '+e.message)));showHint('No se pudo guardar en la biblioteca ('+(e&&e.name)+'), pero se abrirá igual');}
   // Para jugar se usa la copia guardada (vive en el almacenamiento, no en la RAM) y se suelta la copia en memoria
   const name=file.name; let toRun=file; try{const rec=await libGet(name); if(rec?.blob){toRun=rec.blob; file=null; stored=null;}}catch(e){}
+  cargaSet(100,'Abriendo el juego…');cargaHide(500);
   renderLib(); runGame(name,toRun,core);
 }
 function loadRom(name,bytes){return addGame(new File([bytes],name));}
@@ -910,38 +933,96 @@ async function srvPlay(j){
   // Los juegos de tu servidor NO se guardan en el dispositivo: se descargan a la memoria temporal
   // para jugar y al cerrar no queda nada. (Tus partidas sí se guardan, en tu cuenta en el servidor.)
   const name=j.nombre+((j.archivo||'').match(/\.[^.]+$/)||[''])[0];
+  const ctl=new AbortController();
   try{
-    showHint('Descargando '+j.nombre+'… 0%');
-    const r=await srvFetch('/api/juegos/'+j.id+'/archivo');const total=+r.headers.get('Content-Length')||+j.tamano||1;
-    const rd=r.body.getReader();let trozos=[],armado=[],n=0,last=0,acum=0;
+    cargaShow('Cargando '+j.nombre,()=>ctl.abort());cargaSet(0,'Conectando con tu servidor…');
+    const r=await srvFetch('/api/juegos/'+j.id+'/archivo',{signal:ctl.signal});const total=+r.headers.get('Content-Length')||+j.tamano||1;
+    const rd=r.body.getReader();let trozos=[],armado=[],n=0,last=0,acum=0;const t0=performance.now();
     for(;;){const {value,done}=await rd.read();if(done)break;trozos.push(value);n+=value.length;acum+=value.length;
       // cada ~32 MB se juntan en un Blob para no acumular miles de pedazos en memoria
       if(acum>32e6){armado.push(new Blob(trozos));trozos=[];acum=0;}
-      if(n-last>2e6){last=n;$('toast').textContent='Descargando '+j.nombre+'… '+Math.round(n/total*100)+'%';$('toast').style.opacity=1;}}
+      if(n-last>1e6){last=n;const ms=performance.now()-t0,vel=n/(ms/1000);
+        cargaSet(n/total*100,fmtSize(n)+' de '+fmtSize(total)+' · '+mbps(n,ms)+(vel>0?' · faltan '+fmtSeg((total-n)/vel):''));}}
     armado.push(new Blob(trozos));trozos=null;
     const blob=new Blob(armado);armado=null;
+    cargaSet(100,'Abriendo el juego…');cargaHide(600);
     diag('Descargado del servidor a memoria temporal: '+name+' ('+Math.round(blob.size/1e6)+' MB)');
-    $('menu').classList.add('hidden');runGame(name,blob,j.consola);
-  }catch(e){showHint('No se pudo descargar: '+e.message);}
+    window.__ultimoSrv=j;$('menu').classList.add('hidden');runGame(name,blob,j.consola);
+  }catch(e){if(e.name==='AbortError'){showHint('Carga cancelada');return;}cargaSet(null,'No se pudo cargar: '+e.message);$('cBtn').textContent='Cerrar';cargaCancelar=null;}
 }
+// ===== Pantallita de carga con porcentaje (subir, preparar en el servidor, descargar) =====
+let cargaCancelar=null;
+function cargaShow(titulo,cancelar){$('cTit').textContent=titulo;$('cFill').style.width='0';$('cPct').textContent='0%';$('cInfo').textContent='';
+  $('carga').querySelector('.cbar').classList.remove('indet');cargaCancelar=cancelar||null;$('cBtn').textContent=cancelar?'Cancelar':'Cerrar';$('carga').classList.remove('hidden');}
+function cargaSet(pct,info){if(pct==null){$('carga').querySelector('.cbar').classList.add('indet');$('cPct').textContent='…';}
+  else{$('carga').querySelector('.cbar').classList.remove('indet');const p=Math.max(0,Math.min(100,Math.round(pct)));$('cFill').style.width=p+'%';$('cPct').textContent=p+'%';}
+  if(info!=null)$('cInfo').textContent=info;}
+function cargaHide(ms=0){setTimeout(()=>$('carga').classList.add('hidden'),ms);cargaCancelar=null;}
+$('cBtn').onclick=()=>{if(cargaCancelar)cargaCancelar();cargaHide();};
+const mbps=(bytes,ms)=>ms>0?(bytes/1e6/(ms/1000)).toFixed(1)+' MB/s':'';
+const fmtSeg=s=>s>=3600?Math.round(s/3600)+' h':s>=60?Math.round(s/60)+' min':Math.max(1,Math.round(s))+' s';
+
 // Subir al servidor: el archivo viaja directo desde el almacenamiento (no se carga en memoria)
 $('srvFile').onchange=e=>{const inp=e.target,f=inp.files&&inp.files[0];if(!f)return;
   const xhr=new XMLHttpRequest();xhr.open('PUT',SRV+'/api/subir');
   xhr.setRequestHeader('Authorization','Bearer '+store.srvToken);xhr.setRequestHeader('X-Nombre',encodeURIComponent(f.name));
-  xhr.upload.onprogress=ev=>{if(ev.lengthComputable){$('toast').textContent='Subiendo '+f.name+'… '+Math.round(ev.loaded/ev.total*100)+'%';$('toast').style.opacity=1;}};
-  xhr.onload=()=>{inp.value='';if(xhr.status===200){showHint('Subido. Tu servidor lo está preparando…');srvList();}
-    else if(xhr.status===401){store.srvToken=null;save();srvUI();showHint('Sesión vencida: vuelve a entrar');}
-    else showHint('Error al subir ('+xhr.status+')');};
-  xhr.onerror=()=>{inp.value='';showHint('Se cortó la subida');};
+  const t0=performance.now();
+  cargaShow('Subiendo '+f.name,()=>xhr.abort());cargaSet(0,'0 de '+fmtSize(f.size));
+  xhr.upload.onprogress=ev=>{if(!ev.lengthComputable)return;const ms=performance.now()-t0,vel=ev.loaded/(ms/1000);
+    cargaSet(ev.loaded/ev.total*100,fmtSize(ev.loaded)+' de '+fmtSize(ev.total)+' · '+mbps(ev.loaded,ms)+(vel>0?' · faltan '+fmtSeg((ev.total-ev.loaded)/vel):''));};
+  xhr.onload=()=>{inp.value='';
+    if(xhr.status===200){let id=null;try{id=JSON.parse(xhr.responseText).id;}catch(_){}
+      diag('Subido al servidor: '+f.name);seguirPreparacion(id,f.name);}
+    else if(xhr.status===401){cargaHide();store.srvToken=null;save();srvUI();showHint('Tu sesión terminó: vuelve a entrar');}
+    else{cargaSet(null,'Error al subir ('+xhr.status+')');$('cBtn').textContent='Cerrar';cargaCancelar=null;}};
+  xhr.onerror=()=>{inp.value='';cargaSet(null,'Se cortó la conexión. Revisa tu internet e inténtalo otra vez.');$('cBtn').textContent='Cerrar';cargaCancelar=null;};
+  xhr.onabort=()=>{inp.value='';showHint('Subida cancelada');};
   diag('Subiendo al servidor: '+f.name+' ('+Math.round(f.size/1e6)+' MB)');
   xhr.send(f);};
+
+// Después de subir: el servidor lo prepara (descomprime, convierte, portada). Se muestra cada paso.
+const PASOS={'en cola':[5,'En la fila del servidor…'],'procesando':[15,'Preparando…'],'descomprimiendo':[35,'Descomprimiendo en tu servidor…'],
+  'reconstruyendo disco':[60,'Reconstruyendo el disco…'],'convirtiendo a CHD':[75,'Comprimiendo el disco (CHD)…']};
+async function seguirPreparacion(id,nombre){
+  $('cTit').textContent='Preparando '+nombre;$('cBtn').textContent='Seguir en segundo plano';cargaCancelar=null;
+  for(let i=0;i<900;i++){
+    if($('carga').classList.contains('hidden')){srvList();return;}   // el usuario la cerró: sigue en segundo plano
+    try{const {juegos}=await (await srvFetch('/api/juegos')).json();const j=juegos.find(x=>x.id===id);
+      if(!j){cargaSet(null,'No se encontró el juego en el servidor');break;}
+      if(j.estado==='listo'){cargaSet(100,'¡Listo! '+(CONSOLE_INFO[j.consola]?.[0]||j.consola)+' · '+fmtSize(+j.tamano)+' · ya está en tu biblioteca');$('cTit').textContent='✓ '+j.nombre;
+        $('cBtn').textContent='Cerrar';srvList();cargaHide(2500);return;}
+      if(j.estado==='error'){cargaSet(null,'No se pudo preparar: '+(j.mensaje||'error'));$('cBtn').textContent='Cerrar';srvList();return;}
+      const p=PASOS[j.estado]||[10,j.estado];cargaSet(p[0],p[1]);
+    }catch(e){cargaSet(null,e.message);}
+    await new Promise(r=>setTimeout(r,2000));
+  }
+}
+
+// ===== Seguir jugando: el último juego, con su portada, en grande arriba del menú =====
+function recordarUltimo(name,core){store.ultimo={name,core,srv:window.__ultimoSrv?.id||null,portada:!!window.__ultimoSrv?.portada,t:Date.now()};window.__ultimoSrv=null;save();}
+function pintarSeguir(){
+  const u=store.ultimo;if(!u){$('seguir').classList.add('hidden');return;}
+  $('seguir').classList.remove('hidden');$('hName').textContent=prettyName(u.name);
+  $('hSub').textContent=(CONSOLE_INFO[u.core]?.[0]||'CHIP-8')+' · '+(u.srv?'en tu servidor':'en este dispositivo')+' · '+new Date(u.t).toLocaleDateString();
+  const c=(COLOR_CONSOLA[u.core]||'#3a2f8a,#1a1c35').split(',');$('hCover').style.setProperty('--tg','linear-gradient(160deg,'+c[0]+','+c[1]+')');$('hCover').innerHTML='';
+  const urls=[...(u.srv&&u.portada&&store.srvToken?[portadaURL(u.srv)]:[]),...coverCandidates(u.name,u.core).urls];
+  if(urls.length){const im=new Image();let i=0;im.onerror=()=>{i++;if(i<urls.length)im.src=urls[i];else im.remove();};im.src=urls[0];$('hCover').appendChild(im);}
+}
+$('hPlay').onclick=async()=>{const u=store.ultimo;if(!u)return;initAudio();
+  if(u.srv){try{const {juegos}=await (await srvFetch('/api/juegos')).json();const j=juegos.find(x=>x.id===u.srv);if(j)return srvPlay(j);}catch(e){return showHint(e.message);}
+    return showHint('Ese juego ya no está en tu servidor');}
+  const x=await libGet(u.name);if(x){$('menu').classList.add('hidden');runGame(x.name,x.blob,x.core);}else showHint('Ese juego ya no está en este dispositivo');};
+
+// ===== Búsqueda: filtra los cuadritos mientras escribes =====
+$('buscar').addEventListener('input',()=>{const q=$('buscar').value.trim().toLowerCase();
+  document.querySelectorAll('#srvList .tile, #lib .tile').forEach(t=>{t.style.display=!q||t.querySelector('b').textContent.toLowerCase().includes(q)?'':'none';});});
 // Limpieza: las copias de juegos del servidor que versiones anteriores guardaron en el dispositivo se borran (liberan espacio)
 libAll().then(async l=>{const viejos=l.filter(g=>g.srv);for(const g of viejos)await libDel(g.name);if(viejos.length){diag('Espacio liberado: '+viejos.length+' juego(s) del servidor quitados del dispositivo');renderLib();}}).catch(()=>{});
 srvUI();
 $('file').onchange=e=>{const inp=e.target, f=inp.files&&inp.files[0];
   if(!f){showHint('No se recibió ningún archivo');return;}
   showHint('Cargando '+f.name+'…');
-  addGame(f).catch(err=>showHint('Error al cargar: '+(err&&err.message||err))).finally(()=>{inp.value='';});};
+  addGame(f).catch(err=>{cargaHide();showHint('Error al cargar: '+(err&&err.message||err));}).finally(()=>{inp.value='';});};
 // Migrar el antiguo "último juego" a la biblioteca
 tx('roms','readonly',s=>s.get('last')).then(async r=>{
   if(r){const blob=new Blob([r.bytes]);await libPut({name:r.name,blob,core:(await detectCore(r.name,blob))||'nes',size:blob.size,added:Date.now()});await tx('roms','readwrite',s=>s.delete('last'));}
@@ -997,7 +1078,7 @@ $('install').onclick=async()=>{if(!deferred)return;deferred.prompt();await defer
 addEventListener('appinstalled',()=>$('install').style.display='none');
 // ================= Actualización automática =================
 // El script de publicación escribe la versión aquí y en version.json.
-const APP_VERSION='20261125-221117-c8dc2cc';
+const APP_VERSION='20261125-221824-02e1169';
 diag('App abierta (versión '+APP_VERSION+')');
 let swReg=null, updatePending=false;
 if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>swReg=r).catch(()=>{});
