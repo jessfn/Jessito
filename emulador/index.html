@@ -601,7 +601,7 @@ async function renderLib(){
   for(const g of list){
     const t=makeTile({
       name:prettyName(g.name), sub:(CONSOLE_INFO[g.core]?.[0]||'CHIP-8')+' · '+fmtSize(g.size), consola:g.core,
-      cover:g.srv&&store.srvToken?portadaURL(g.srv):null,
+      ...(()=>{const cc=coverCandidates(g.name,g.core);return {cover:[...(g.srv&&store.srvToken?[portadaURL(g.srv)]:[]),...cc.urls],coverId:cc.key};})(),
       onPlay:async()=>{initAudio();const w=warmGet(g.name);const x=w||await libGet(g.name);if(x)runGame(x.name,x.blob,x.core);},
       actions:[
         {icon:'i-swap',label:'Cambiar consola',fn:async()=>{const c=await pickConsole(g.name);if(!c)return;const x=await libGet(g.name);if(x){x.core=c;await libPut(x);renderLib();showHint(prettyName(g.name)+' → '+CONSOLE_INFO[c][0]);}}},
@@ -784,11 +784,30 @@ $('srvOut').onclick=()=>{if(confirm('¿Desvincular este dispositivo? Para volver
 // Cuadrito de juego: portada (o color de la consola), nombre, estado y botones pequeños
 const COLOR_CONSOLA={nes:'#c2410c,#7c2d12',snes:'#7c3aed,#4c1d95',gba:'#4f46e5,#1e1b4b',gb:'#65a30d,#365314',n64:'#16a34a,#14532d',nds:'#64748b,#1e293b',
   psx:'#2563eb,#1e1b4b',segaMD:'#0f172a,#334155',segaMS:'#b91c1c,#450a0a',segaGG:'#0e7490,#164e63',pce:'#ea580c,#7c2d12',atari2600:'#92400e,#451a03',chip8:'#0891b2,#164e63'};
-function makeTile({name,sub,consola,cover,badge,onPlay,actions=[]}){
+// Direcciones posibles de la portada en la base pública de libretro (la misma que usa RetroArch)
+const COVER_REPO={nes:['Nintendo_-_Nintendo_Entertainment_System'],snes:['Nintendo_-_Super_Nintendo_Entertainment_System'],gba:['Nintendo_-_Game_Boy_Advance'],
+  gb:['Nintendo_-_Game_Boy','Nintendo_-_Game_Boy_Color'],n64:['Nintendo_-_Nintendo_64'],nds:['Nintendo_-_Nintendo_DS'],psx:['Sony_-_PlayStation'],
+  segaMD:['Sega_-_Mega_Drive_-_Genesis'],segaMS:['Sega_-_Master_System_-_Mark_III'],segaGG:['Sega_-_Game_Gear'],pce:['NEC_-_PC_Engine_-_TurboGrafx_16'],atari2600:['Atari_-_2600']};
+function coverCandidates(fileName,core){
+  const key=core+':'+fileName;const memo=(store.covers||{})[key];
+  if(memo==='-')return {key,urls:[]};            // ya se buscó y no existe
+  if(memo)return {key,urls:[memo]};
+  const base=fileName.replace(/\.[^.]+$/,'').replace(/[&*\/:`<>?\\|"]/g,'_').trim();
+  const sin=base.replace(/\s*[\[(][^\])]*[\])]/g,'').trim();
+  const nombres=[...new Set([base,sin+' (USA)',sin+' (World)',sin+' (Europe)',sin+' (USA, Europe)',sin+' (Japan, USA)',sin])];
+  const urls=[];for(const repo of COVER_REPO[core]||[])for(const n of nombres)urls.push('https://raw.githubusercontent.com/libretro-thumbnails/'+repo+'/master/Named_Boxarts/'+encodeURIComponent(n)+'.png');
+  return {key,urls};
+}
+function makeTile({name,sub,consola,cover,coverId,badge,onPlay,actions=[]}){const coverKey=coverId||null;
   const t=document.createElement('div');t.className='tile';t.setAttribute('role','button');
   const c=(COLOR_CONSOLA[consola]||'#3a2f8a,#1a1c35').split(',');t.style.setProperty('--tg','linear-gradient(160deg,'+c[0]+','+c[1]+')');
   const ph=document.createElement('div');ph.className='ph';ph.textContent=(CONSOLE_INFO[consola]?.[0]||'CHIP-8').replace(/Game Boy Advance/,'GBA').replace(/Super Nintendo/,'SNES').replace(/PlayStation/,'PS1').replace(/Nintendo 64/,'N64').slice(0,8);t.appendChild(ph);
-  if(cover){const im=new Image();im.loading='lazy';im.decoding='async';im.alt='';im.onerror=()=>im.remove();im.onload=()=>ph.remove();im.src=cover;t.appendChild(im);}
+  // Portada: se prueban varias direcciones en orden; la primera que exista se recuerda para la próxima vez
+  const lista=[].concat(cover||[]).filter(Boolean);
+  if(lista.length){const im=new Image();im.decoding='async';im.alt='';let i=0;
+    im.onerror=()=>{i++;if(i<lista.length)im.src=lista[i];else{im.remove();if(coverKey){store.covers=store.covers||{};store.covers[coverKey]='-';save();}}};
+    im.onload=()=>{ph.remove();if(coverKey&&!/\/api\/juegos\//.test(lista[i])){store.covers=store.covers||{};if(store.covers[coverKey]!==lista[i]){store.covers[coverKey]=lista[i];save();}}};
+    im.src=lista[0];t.appendChild(im);}
   const cap=document.createElement('div');cap.className='cap';const b=document.createElement('b');b.textContent=name;const s=document.createElement('small');s.textContent=sub||'';cap.append(b,s);t.appendChild(cap);
   if(badge){const bd=document.createElement('span');bd.className='badge '+(badge[1]||'');bd.textContent=badge[0];t.appendChild(bd);}
   if(actions.length){const a=document.createElement('div');a.className='acts';
@@ -811,7 +830,7 @@ async function srvList(){
       const est=listo?(CONSOLE_INFO[j.consola]?.[0]||j.consola)+' · '+fmtSize(+j.tamano):(ESTADOS[j.estado]||j.estado)+(j.mensaje?' '+j.mensaje:'');
       box.appendChild(makeTile({
         name:j.nombre, sub:est, consola:j.consola,
-        cover:listo&&j.portada?portadaURL(j.id):null,
+        ...(()=>{if(!listo)return {};if(j.portada)return {cover:portadaURL(j.id)};const cc=coverCandidates(j.nombre+'.x',j.consola);return {cover:cc.urls,coverId:cc.key};})(),
         badge:!listo?(j.estado==='error'?['Error','err']:['Preparando','wait']):enCel.has(j.id)?['✓ En tu celular','ok']:null,
         onPlay:()=>{if(listo)srvPlay(j);else showHint(est);},
         actions:[{icon:'i-x',label:'Borrar del servidor',fn:async()=>{if(!confirm('¿Borrar «'+j.nombre+'» de tu servidor?'))return;
