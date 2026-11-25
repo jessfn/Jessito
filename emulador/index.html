@@ -190,6 +190,7 @@
   <label class="chip" style="justify-content:center"><svg class="i"><use href="#i-folder"/></svg><span id="biosLbl">Cargar BIOS de PlayStation</span><input id="biosFile" type="file" hidden></label>
   <div class="note">Algunos juegos de PlayStation (como Resident Evil 3) necesitan el BIOS real de la consola (por ejemplo SCPH5502.bin para juegos europeos, SCPH1001.bin para americanos). Se guarda solo en este dispositivo.</div>
   <div class="opt">Calidad de imagen<select id="quality" style="flex:1;background:var(--card);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:8px"><option value="disabled">Original (nítida, más rápida)</option><option value="2xScaleHQ.glslp">HD suave 2x</option><option value="4xScaleHQ.glslp">HD suave 4x (celulares potentes)</option><option value="crt-easymode.glslp">Tele retro (CRT)</option></select></div>
+  <div class="opt" style="flex-direction:column;align-items:stretch;gap:6px"><span id="storTxt">Espacio: calculando…</span><div style="height:8px;border-radius:99px;background:#ffffff14;overflow:hidden"><div id="storBar" style="height:100%;width:0;background:linear-gradient(90deg,var(--acc),var(--acc2))"></div></div><span class="note" id="storProt"></span></div>
   <div class="opt"><label><input type="checkbox" id="autosave" checked> Guardar la partida automáticamente</label></div>
   <button class="chip" id="freshStart" style="justify-content:center"><svg class="i"><use href="#i-reset"/></svg>Empezar este juego desde cero</button>
   <button class="chip" id="kpToggle" style="justify-content:center"><svg class="i"><use href="#i-keys"/></svg>Mostrar teclado CHIP-8</button>
@@ -726,7 +727,16 @@ $('reset').onclick=()=>{if(sys){sys.reset();setPaused(false);}};
 $('sound').onclick=()=>{store.sound=!store.sound;save();icon($('sound'),store.sound?'i-vol':'i-mute');if(master)master.gain.value=store.sound?1:0;sys?.setSound?.(store.sound);};
 icon($('sound'),store.sound?'i-vol':'i-mute');
 $('full').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else{await document.documentElement.requestFullscreen({navigationUI:'hide'});await screen.orientation?.lock?.('landscape').catch(()=>{});}}catch(e){}};
-$('cfg').onclick=()=>$('sheet').classList.remove('hidden');
+$('cfg').onclick=()=>{$('sheet').classList.remove('hidden');showStorage();};
+// Espacio de almacenamiento: cuánto usan tus juegos, cuánto permite el sistema y si está protegido contra borrado
+async function showStorage(){try{
+  let prot=await navigator.storage?.persisted?.();if(!prot)prot=await navigator.storage?.persist?.().catch(()=>false);
+  const e=await navigator.storage?.estimate?.();if(!e){$('storTxt').textContent='Espacio: sin datos en este navegador';return;}
+  const gb=b=>b>=1e9?(b/1e9).toFixed(1)+' GB':Math.round(b/1e6)+' MB';
+  $('storTxt').textContent='Espacio usado: '+gb(e.usage)+' de '+gb(e.quota)+' disponibles';
+  $('storBar').style.width=Math.min(100,e.usage/e.quota*100).toFixed(1)+'%';
+  $('storProt').textContent=prot?'✓ Protegido: el sistema no borrará tus juegos ni partidas.':'Sin protección: instala la app en la pantalla de inicio para que el sistema no borre tus juegos.';
+}catch(err){}}
 $('sheet').onclick=e=>{if(e.target===$('sheet')||e.target.closest('#closeCfg')){$('sheet').classList.add('hidden');store.speed=+$('speed').value;save();}};
 $('kpToggle').onclick=()=>{const kp=$('keypad').classList.toggle('hidden');$('ab').classList.toggle('hidden',!kp);};
 $('vib').checked=store.vib;$('vib').onchange=e=>{store.vib=e.target.checked;save();};
