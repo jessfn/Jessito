@@ -388,7 +388,7 @@ function ejsSystem(bytes,name,core){
     stop(){saveNow();clearInterval(timer);removeEventListener('message',onMsg);frame?.remove();URL.revokeObjectURL(url);},
     save:saveNow,
     async fresh(){await tx('states','readwrite',s=>s.delete(KEY)).catch(()=>{});if(emuReady())emu.gameManager.restart();},
-    setQuality(v){if(!emuReady())return;try{emu.enableShader?emu.enableShader(v):emu.menuOptionChanged?.('shader',v);}catch(e){}},
+    setQuality(v){if(!emuReady())return;try{if(emu.changeSettingOption)emu.changeSettingOption('shader',v);else emu.menuOptionChanged?.('shader',v);}catch(e){}},
     reset(){if(emuReady())emu.gameManager.restart();},
     input:send, sync:syncAll,
     setRunning(on){if(emuReady()){on?emu.play():emu.pause();syncAll();}},
@@ -710,7 +710,7 @@ $('install').onclick=async()=>{if(!deferred)return;deferred.prompt();await defer
 addEventListener('appinstalled',()=>$('install').style.display='none');
 // ================= Actualización automática =================
 // El script de publicación escribe la versión aquí y en version.json.
-const APP_VERSION='20261125-192643-6563769';
+const APP_VERSION='20261125-192858-5fc17a0';
 let swReg=null, updatePending=false;
 if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>swReg=r).catch(()=>{});
 function applyUpdate(){ // recarga en cuanto no estés jugando (pausa, menú o app en segundo plano)
