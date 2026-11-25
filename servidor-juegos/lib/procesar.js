@@ -4,6 +4,7 @@
 const fs = require('fs'), path = require('path');
 const { spawn } = require('child_process');
 const { detectar } = require('./detectar');
+const { consolaPorSystemCnf } = require('./systemcnf');
 const { decode } = require('./ecm.cjs');
 
 const META = /\.(txt|nfo|diz|jpe?g|png|gif|bmp|pdf|htm|html|url|sfv|md5|sha1|xml|ini|cfg|sbi|sub|ccd|mds)$/i;
@@ -70,7 +71,13 @@ async function procesar(archivo, nombre, trabajo, destinoBase, avisar = () => {}
     const juegos = archivos.filter(f => !META.test(f) && !/\.cue$/i.test(f)).sort((a, b) => fs.statSync(b).size - fs.statSync(a).size);
     const principal = juegos[0];
     if (!principal) throw new Error('no encontré ningún juego dentro del archivo');
-    const consola = detectar(principal, path.basename(principal));
+    let consola = detectar(principal, path.basename(principal));
+    // Discos de PlayStation: SYSTEM.CNF dice con certeza si es PS1 (BOOT) o PS2 (BOOT2)
+    if ((consola === 'psx' || consola === 'ps2') && /.(bin|iso|img)$/i.test(principal)) {
+      const real = consolaPorSystemCnf(principal);
+      if (real) consola = real;
+      else if (fs.statSync(principal).size > 100e6) throw new Error('este disco no es un juego de PlayStation (no tiene SYSTEM.CNF): puede ser un disco de extras o de otra consola');
+    }
     const nombreJuego = path.basename(principal).replace(/\.[^.]+$/, '');
 
     // PlayStation: convertir a .chd (comprimido, lo lee el emulador directo)
