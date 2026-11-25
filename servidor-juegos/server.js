@@ -34,7 +34,11 @@ async function prepararBD() {
   await db.query(`CREATE TABLE IF NOT EXISTS partidas (
     usuario_id INT NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE, clave TEXT NOT NULL, juego TEXT,
     archivo TEXT NOT NULL, tamano INT NOT NULL, tiempo BIGINT NOT NULL, PRIMARY KEY (usuario_id, clave))`);
-  await db.query(`UPDATE juegos SET estado='en cola' WHERE estado NOT IN ('listo','error')`);
+  // Si el servidor se reinició: las subidas que quedaron a medias se descartan (el archivo está incompleto)
+  // y los juegos que se estaban preparando se vuelven a poner en la fila.
+  const { rows: cortadas } = await db.query(`DELETE FROM juegos WHERE estado='subiendo' RETURNING id, original`);
+  for (const c of cortadas) fs.rmSync(path.join(DIR.entrada, c.id + '-' + c.original), { force: true });
+  await db.query(`UPDATE juegos SET estado='en cola' WHERE estado NOT IN ('listo','error','subiendo')`);
 }
 
 // ===== Contraseñas (solo se guarda la huella scrypt) =====
