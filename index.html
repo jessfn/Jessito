@@ -410,7 +410,7 @@ const CORES={nes:'nes',fds:'nes',unf:'nes',unif:'nes',sfc:'snes',smc:'snes',fig:
   md:'segaMD',gen:'segaMD',smd:'segaMD',bin:'segaMD',sms:'segaMS',gg:'segaGG',n64:'n64',z64:'n64',v64:'n64',pce:'pce',a26:'atari2600',nds:'nds',cue:'psx',pbp:'psx',chd:'psx',iso:'psx',m3u:'psx',ecm:'psx'};
 const CONSOLE_INFO={nes:['NES','4/3',[]],snes:['Super Nintendo','4/3',['x','y','l','r']],gba:['Game Boy Advance','3/2',['l','r']],gb:['Game Boy','10/9',[]],
   segaMD:['Sega Genesis','4/3',['x','y','l']],segaMS:['Master System','4/3',[]],segaGG:['Game Gear','10/9',[]],n64:['Nintendo 64','4/3',['x','y','l','r','r2']],
-  pce:['PC Engine','4/3',[]],atari2600:['Atari 2600','4/3',[]],nds:['Nintendo DS','4/3',['x','y','l','r']],psx:['PlayStation','4/3',['x','y','l','r','l2','r2'],{a:'○',b:'✕',x:'△',y:'□',l:'L1',r:'R1'}]};
+  pce:['PC Engine','4/3',[]],atari2600:['Atari 2600','4/3',[]],nds:['Nintendo DS','4/3',['x','y','l','r']],psx:['PlayStation','4/3',['x','y','l','r','l2','r2'],{a:'○',b:'✕',x:'△',y:'□',l:'L1',r:'R1'}],ps2:['PlayStation 2 (experimental)','4/3',[]]};
 const RETROPAD={b:0,y:1,select:2,start:3,up:4,down:5,left:6,right:7,a:8,x:9,l:10,r:11,l2:12,r2:13};
 function zipInnerName(b){ // nombre del primer archivo dentro de un .zip
   if(!(b[0]===0x50&&b[1]===0x4B))return null; const n=b[26]|(b[27]<<8); return new TextDecoder().decode(b.subarray(30,30+n)); }
@@ -893,11 +893,11 @@ $('srvOut').onclick=()=>{if(confirm('¿Cerrar sesión en este dispositivo? Tus j
 pintarCuenta();
 // Cuadrito de juego: portada (o color de la consola), nombre, estado y botones pequeños
 const COLOR_CONSOLA={nes:'#c2410c,#7c2d12',snes:'#7c3aed,#4c1d95',gba:'#4f46e5,#1e1b4b',gb:'#65a30d,#365314',n64:'#16a34a,#14532d',nds:'#64748b,#1e293b',
-  psx:'#2563eb,#1e1b4b',segaMD:'#0f172a,#334155',segaMS:'#b91c1c,#450a0a',segaGG:'#0e7490,#164e63',pce:'#ea580c,#7c2d12',atari2600:'#92400e,#451a03',chip8:'#0891b2,#164e63'};
+  psx:'#2563eb,#1e1b4b',ps2:'#1d4ed8,#0f172a',segaMD:'#0f172a,#334155',segaMS:'#b91c1c,#450a0a',segaGG:'#0e7490,#164e63',pce:'#ea580c,#7c2d12',atari2600:'#92400e,#451a03',chip8:'#0891b2,#164e63'};
 // Direcciones posibles de la portada en la base pública de libretro (la misma que usa RetroArch)
 const COVER_REPO={nes:['Nintendo_-_Nintendo_Entertainment_System'],snes:['Nintendo_-_Super_Nintendo_Entertainment_System'],gba:['Nintendo_-_Game_Boy_Advance'],
   gb:['Nintendo_-_Game_Boy','Nintendo_-_Game_Boy_Color'],n64:['Nintendo_-_Nintendo_64'],nds:['Nintendo_-_Nintendo_DS'],psx:['Sony_-_PlayStation'],
-  segaMD:['Sega_-_Mega_Drive_-_Genesis'],segaMS:['Sega_-_Master_System_-_Mark_III'],segaGG:['Sega_-_Game_Gear'],pce:['NEC_-_PC_Engine_-_TurboGrafx_16'],atari2600:['Atari_-_2600']};
+  ps2:['Sony_-_PlayStation_2'],segaMD:['Sega_-_Mega_Drive_-_Genesis'],segaMS:['Sega_-_Master_System_-_Mark_III'],segaGG:['Sega_-_Game_Gear'],pce:['NEC_-_PC_Engine_-_TurboGrafx_16'],atari2600:['Atari_-_2600']};
 function coverCandidates(fileName,core){
   const key=core+':'+fileName;const memo=(store.covers||{})[key];
   if(memo==='-')return {key,urls:[]};            // ya se buscó y no existe
@@ -973,6 +973,15 @@ async function guardarEnCache(k,blob){
   }catch(e){diag('No se pudo guardar en caché: '+(e.name||e.message));}
 }
 async function srvPlay(j){
+  // PlayStation 2: no corre en el emulador de PS1. En computadora se descarga el disco y se abre en Play!.js
+  if(j.consola==='ps2'){
+    if(isIOS){alert('«'+j.nombre+'» es de PlayStation 2.\n\nPlayStation 2 no funciona en iPhone (Safari no soporta discos de ese tamaño). Ábrelo desde una computadora.');return;}
+    if(!confirm('«'+j.nombre+'» es de PlayStation 2 (experimental).\n\n1) Se descargará el disco a tu computadora.\n2) Se abrirá Play!.js: ahí elige ese archivo con su botón para abrir discos.\n\nNecesita una computadora con buen procesador; muchos juegos van lentos.\n\n¿Continuar?'))return;
+    const a=document.createElement('a');a.href=SRV+'/api/juegos/'+j.id+'/archivo?t='+encodeURIComponent(store.srvToken);a.download=j.nombre+((j.archivo||'').match(/\.[^.]+$/)||['.iso'])[0];
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>{const w=window.open(PS2_URL,'_blank','noopener');if(!w)location.href=PS2_URL;},800);
+    diag('PS2: descarga del disco y Play!.js para '+j.nombre);return;
+  }
   // Los juegos de tu servidor NO se guardan en el dispositivo: se descargan a la memoria temporal
   // para jugar y al cerrar no queda nada. (Tus partidas sí se guardan, en tu cuenta en el servidor.)
   const name=j.nombre+((j.archivo||'').match(/\.[^.]+$/)||[''])[0];
@@ -1175,7 +1184,7 @@ $('install').onclick=async()=>{if(!deferred)return;deferred.prompt();await defer
 addEventListener('appinstalled',()=>$('install').style.display='none');
 // ================= Actualización automática =================
 // El script de publicación escribe la versión aquí y en version.json.
-const APP_VERSION='20261125-224141-58b589a';
+const APP_VERSION='20261125-231755-f24fae7';
 diag('App abierta (versión '+APP_VERSION+')');
 let swReg=null, updatePending=false;
 if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>swReg=r).catch(()=>{});
