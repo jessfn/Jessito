@@ -388,7 +388,7 @@ function ejsSystem(bytes,name,core){
     stop(){saveNow();clearInterval(timer);removeEventListener('message',onMsg);frame?.remove();URL.revokeObjectURL(url);},
     save:saveNow,
     async fresh(){await tx('states','readwrite',s=>s.delete(KEY)).catch(()=>{});if(emuReady())emu.gameManager.restart();},
-    setQuality(v){if(!emuReady())return;try{emu.enableShader?emu.enableShader(v):emu.menuOptionChanged?.('shader',v);}catch(e){}},
+    setQuality(v){if(!emuReady())return;try{if(emu.changeSettingOption)emu.changeSettingOption('shader',v);else emu.menuOptionChanged?.('shader',v);}catch(e){}},
     reset(){if(emuReady())emu.gameManager.restart();},
     input:send, sync:syncAll,
     setRunning(on){if(emuReady()){on?emu.play():emu.pause();syncAll();}},
