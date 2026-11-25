@@ -22,6 +22,9 @@
   if (g.bios) window.EJS_biosUrl = g.bios;
   window.EJS_pathtodata = 'https://cdn.emulatorjs.org/stable/data/';
   window.EJS_startOnLoaded = true;
+  // Ahorro de memoria: EmulatorJS NO guarda otra copia del juego en su base de datos
+  // (la app ya lo tiene en "Mi biblioteca"); los motores los guarda el service worker.
+  window.EJS_disableDatabases = true;
   window.EJS_color = '#7c5cff';
   window.EJS_volume = g.volume ?? 0.8;
   // Rendimiento: si el celular se atrasa, se salta cuadros de imagen (no la velocidad del juego)

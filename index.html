@@ -670,16 +670,23 @@ const isIOS=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='M
 const META=/\.(txt|nfo|diz|jpe?g|png|gif|bmp|pdf|htm|html|url|sfv|md5|sha1|xml|ini|cfg|sbi|m3u|cue|ccd|sub|mds)$/i;
 async function extractArchive(file,kind){
   const js=kind==='7z'?'extract7z.js':'extractzip.js';
-  const code=await (await fetch(EJS_CDN+'compression/'+js)).text();
+  let code=await (await fetch(EJS_CDN+'compression/'+js)).text();
+  // Ahorro de memoria (clave en iPhone):
+  // 1) Reservar desde el inicio la memoria estimada: así el descompresor no "duplica y copia" su memoria al crecer
+  const MB16=16777216, heap=Math.min(2048*1048576-MB16, Math.ceil((file.size*2.6+96e6)/MB16)*MB16);
+  // 2) Devolver cada archivo "transfiriéndolo" (sin hacer otra copia)
+  // 3) Sacar cada archivo con una sola copia rápida en bloque (el original copiaba byte por byte: lentísimo)
+  code=code.replace(/for\(var n=new Uint8Array\(r\),(\w)=0;\1<r;\1\+\+\)n\[\1\]=getValue\(t\+\1\);/,'var n=HEAPU8.slice(t,t+r);');
+  code='var Module={TOTAL_MEMORY:'+heap+'};'+code.replace('postMessage({t:2,file:Pointer_stringify(e),size:r,data:n})','postMessage({t:2,file:Pointer_stringify(e),size:r,data:n},[n.buffer])');
   const wk=new Worker(URL.createObjectURL(new Blob([code],{type:'text/javascript'})));
-  const buf=new Uint8Array(await file.arrayBuffer());
+  let buf=new Uint8Array(await file.arrayBuffer());
   return new Promise((ok,ko)=>{const files=[];
     wk.onmessage=e=>{const d=e.data;
       if(d.t===2&&d.data&&!/\/$/.test(d.file))files.push(new File([d.data],d.file.split('/').pop()));
       else if(d.t===4&&d.total){$('toast').textContent='Descomprimiendo… '+Math.round(d.current/d.total*100)+'%';$('toast').style.opacity=1;}
       else if(d.t===1){wk.terminate();ok(files);}};
     wk.onerror=e=>{wk.terminate();ko(new Error('archivo comprimido dañado'));};
-    wk.postMessage(buf);});
+    wk.postMessage(buf,[buf.buffer]);buf=null;}); // se transfiere (sin copia)
 }
 // Elige el archivo del juego dentro del comprimido: el más grande que no sea texto/imagen/hoja de pistas
 function pickMain(files){
@@ -709,10 +716,12 @@ async function addGame(file){
   if(isIOS&&core==='psx'&&file.size>300e6)showHint('Aviso: en iPhone los discos de más de 300 MB pueden cerrarse por falta de memoria');
   else showHint(CONSOLE_INFO[core]?.[0]?('Detectado: '+CONSOLE_INFO[core][0]):'Detectado: CHIP-8');
   // En iPhone se guarda una copia simple (Blob) en vez del File del selector: Safari a veces no puede guardar el File
-  let stored=file; try{ if(file.size<400e6) stored=new Blob([await file.arrayBuffer()],{type:'application/octet-stream'}); }catch(e){}
+  let stored=file; try{ if(file.size<50e6) stored=new Blob([await file.arrayBuffer()],{type:'application/octet-stream'}); }catch(e){}
   try{await libPut({name:file.name,blob:stored,core,size:file.size,added:Date.now()});}
   catch(e){showHint('No hubo espacio para guardarlo, pero se abrirá igual');}
-  renderLib(); runGame(file.name,file,core);
+  // Para jugar se usa la copia guardada (vive en el almacenamiento, no en la RAM) y se suelta la copia en memoria
+  const name=file.name; let toRun=file; try{const rec=await libGet(name); if(rec?.blob){toRun=rec.blob; file=null; stored=null;}}catch(e){}
+  renderLib(); runGame(name,toRun,core);
 }
 function loadRom(name,bytes){return addGame(new File([bytes],name));}
 $('file').onchange=e=>{const inp=e.target, f=inp.files&&inp.files[0];
@@ -770,7 +779,7 @@ $('install').onclick=async()=>{if(!deferred)return;deferred.prompt();await defer
 addEventListener('appinstalled',()=>$('install').style.display='none');
 // ================= Actualización automática =================
 // El script de publicación escribe la versión aquí y en version.json.
-const APP_VERSION='20261125-195124-7882a61';
+const APP_VERSION='20261125-201830-b135c15';
 let swReg=null, updatePending=false;
 if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>swReg=r).catch(()=>{});
 function applyUpdate(){ // recarga en cuanto no estés jugando (pausa, menú o app en segundo plano)
