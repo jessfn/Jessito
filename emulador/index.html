@@ -210,7 +210,21 @@ function sfx(freq,dur=.08,type='square',vol=.06,slide=0){ if(!actx||!store.sound
 // ================= Entrada unificada =================
 const IN={up:0,down:0,left:0,right:0,a:0,b:0,x:0,y:0,l:0,r:0,l2:0,r2:0,start:0,select:0};
 let sys=null; // sistema activo
-function press(btn,on){ if(IN[btn]===+on)return; IN[btn]=+on; if(on&&store.vib)navigator.vibrate?.(8); initAudio(); sys?.input?.(btn,on); }
+function press(btn,on){ if(IN[btn]===+on)return; IN[btn]=+on; if(on&&store.vib)navigator.vibrate?.(8); if(on)initAudio(); sys?.input?.(btn,on); }
+// Suelta todo (al pausar, abrir menú, cambiar de app o perder un toque) para que nunca quede un botón pegado
+function releaseAll(){ for(const b in IN)if(IN[b])press(b,false);
+  document.querySelectorAll('.on').forEach(el=>el.classList.remove('on')); window.__stickReset?.(); }
+addEventListener('blur',releaseAll);
+// Pantalla siempre encendida mientras juegas
+let wake=null;
+async function keepAwake(on){try{if(on&&!wake&&navigator.wakeLock&&!document.hidden){wake=await navigator.wakeLock.request('screen');wake.addEventListener('release',()=>wake=null);}
+  else if(!on&&wake){await wake.release();wake=null;}}catch(e){}}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&running)keepAwake(true);});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)releaseAll();});
+// Red de seguridad: si no hay ningún dedo en pantalla, nada debe seguir presionado
+let touches=0;
+document.addEventListener('pointerdown',()=>touches++,true);
+['pointerup','pointercancel'].forEach(ev=>document.addEventListener(ev,()=>{touches=Math.max(0,touches-1);if(!touches)setTimeout(()=>{if(!touches)releaseAll();},30);},true));
 
 // Joystick táctil: la base aparece donde tocas y la bolita sigue tu dedo (8 direcciones)
 const zone=$('zone'), stick=$('stick'), knob=$('knob'); let stickId=null, sx=0, sy=0;
@@ -225,9 +239,10 @@ zone.addEventListener('pointerdown',e=>{e.preventDefault();if(stickId!==null)ret
   sx=Math.min(Math.max(e.clientX,r.left+R),r.right-R); sy=Math.min(Math.max(e.clientY,r.top+R),r.bottom-R);
   stick.classList.add('active'); stick.style.left=(sx-r.left)+'px'; stick.style.top=(sy-r.top)+'px'; stickMove(e);});
 zone.addEventListener('pointermove',e=>{if(e.pointerId===stickId)stickMove(e);});
-['pointerup','pointercancel','lostpointercapture'].forEach(ev=>zone.addEventListener(ev,e=>{if(e.pointerId!==stickId)return;stickId=null;
-  stick.classList.remove('active');stick.style.left='50%';stick.style.top='50%';knob.style.transform='translate(-50%,-50%)';
-  ['up','down','left','right'].forEach(d=>press(d,false));}));
+function stickReset(){stickId=null;stick.classList.remove('active');stick.style.left='50%';stick.style.top='50%';knob.style.transform='translate(-50%,-50%)';
+  ['up','down','left','right'].forEach(d=>press(d,false));}
+window.__stickReset=stickReset;
+['pointerup','pointercancel','lostpointercapture'].forEach(ev=>zone.addEventListener(ev,e=>{if(e.pointerId===stickId)stickReset();}));
 // Botones A, B, Start, Select (multi-touch)
 document.querySelectorAll('[data-b]').forEach(el=>{const b=el.dataset.b;
   el.addEventListener('pointerdown',e=>{e.preventDefault();el.setPointerCapture(e.pointerId);el.classList.add('on');press(b,true);});
@@ -339,11 +354,13 @@ function coreFor(name,bytes){
 function ejsSystem(bytes,name,core){
   const [label,aspect,extra,labels]=CONSOLE_INFO[core];
   const url=URL.createObjectURL(new Blob([bytes]));
-  let frame,emu=null,queue=[];
-  const emuReady=()=>{try{emu=frame.contentWindow.EJS_emulator;return !!emu?.gameManager;}catch(e){return false;}};
-  const send=(b,on)=>{const i=RETROPAD[b];if(i===undefined)return;
-    if(emuReady())emu.gameManager.simulateInput(0,i,on?1:0); else if(on)queue.push(b);};
-  const onMsg=e=>{if(e.data?.ejs==='start'){emuReady();emu?.setVolume?.(store.sound?.8:0);queue=[];showHint(label+' · ¡a jugar!');}};
+  let frame,emu=null,ready=false;
+  const emuReady=()=>{if(ready)return true;try{emu=frame.contentWindow.EJS_emulator;ready=!!(emu?.started&&emu.gameManager);}catch(e){ready=false;}return ready;};
+  // Envía el estado de un botón; si el juego aún no arranca, se aplicará al sincronizar
+  const send=(b,on)=>{const i=RETROPAD[b];if(i===undefined||!emuReady())return;try{emu.gameManager.simulateInput(0,i,on?1:0);}catch(e){}};
+  // Sincroniza TODOS los botones con el estado real de los dedos (evita botones "pegados" o perdidos)
+  const syncAll=()=>{if(!emuReady())return;for(const b in RETROPAD)send(b,!!IN[b]);};
+  const onMsg=e=>{if(e.data?.ejs==='start'&&e.source===frame?.contentWindow){ready=false;emuReady();emu?.setVolume?.(store.sound?.8:0);syncAll();showHint(label+' · ¡a jugar!');}};
   return {name,size:[4,3],aspect,extra,labels,ps:core==='psx',
     async start(){let bios=null;if(core==='psx'){const b=await tx('roms','readonly',s=>s.get('bios_psx')).catch(()=>null);if(b)bios=URL.createObjectURL(b.blob);}
       window.__ejsGame={core,url,name,bios,volume:store.sound?.8:0};addEventListener('message',onMsg);
@@ -351,8 +368,8 @@ function ejsSystem(bytes,name,core){
       document.querySelector('.screen').appendChild(frame);},
     stop(){removeEventListener('message',onMsg);frame?.remove();URL.revokeObjectURL(url);},
     reset(){if(emuReady())emu.gameManager.restart();},
-    input:send,
-    setRunning(on){if(emuReady())on?emu.play():emu.pause();},
+    input:send, sync:syncAll,
+    setRunning(on){if(emuReady()){on?emu.play():emu.pause();syncAll();}},
     setSound(on){if(emuReady())emu.setVolume(on?.8:0);},
     frame(){}, draw(){}, mute(){}};
 }
@@ -464,7 +481,7 @@ function launch(s,hint){
   $('ab').classList.toggle('four',ex.includes('x'));$('ab').classList.toggle('ps',!!s.ps);
   const LB=Object.assign({a:'A',b:'B',x:'X',y:'Y',l:'L',r:'R',l2:'L2',r2:'R2'},s.labels||{});
   document.querySelectorAll('.btn[data-b],.sh[data-b]').forEach(b=>b.textContent=LB[b.dataset.b]);
-  s.start();running=true;icon($('pause'),'i-pause');
+  releaseAll();s.start();running=true;icon($('pause'),'i-pause');keepAwake(true);
 }
 function fit(){ if(!sys)return; if(sys.fluid){const side=parseFloat(getComputedStyle(document.getElementById('app')).gridTemplateColumns)||0,w=innerWidth-2*side,h=innerHeight;
   cv.width=Math.round(Math.min(480,Math.max(256,240*w/h)));cv.style.aspectRatio=cv.width+'/240';} else cv.style.aspectRatio=sys.aspect; ctx.imageSmoothingEnabled=false; }
@@ -494,8 +511,19 @@ navigator.storage?.persist?.().catch(()=>{});
 const fmtSize=b=>b>=1e6?Math.round(b/1e6)+' MB':Math.max(1,Math.round(b/1e3))+' KB';
 const prettyName=n=>n.replace(/\.\w+$/,'').replace(/\s*[\[(][^\])]*[\])]/g,'').trim()||n;
 
+// Precarga en segundo plano los motores de las consolas que tienes en tu biblioteca (arranque instantáneo y sin internet)
+const CORE_FILE={nes:'fceumm',snes:'snes9x',gba:'mgba',gb:'gambatte',segaMD:'genesis_plus_gx',segaMS:'smsplus',segaGG:'genesis_plus_gx',
+  n64:'mupen64plus_next',psx:'pcsx_rearmed',pce:'mednafen_pce',atari2600:'stella2014',nds:'melonds'};
+const EJS_CDN='https://cdn.emulatorjs.org/stable/data/';
+function precargarMotores(cores){
+  if(!navigator.serviceWorker?.controller||!navigator.onLine||navigator.connection?.saveData)return;
+  const urls=['loader.js','emulator.min.js','emulator.min.css','version.json','compression/extract7z.js','compression/extractzip.js','compression/libunrar.js']
+    .map(f=>EJS_CDN+f).concat([...new Set(cores)].filter(c=>CORE_FILE[c]).map(c=>EJS_CDN+'cores/'+CORE_FILE[c]+'-wasm.data'));
+  (window.requestIdleCallback||setTimeout)(()=>navigator.serviceWorker.controller.postMessage({precargar:urls}));
+}
 async function renderLib(){
   const list=(await libAll()).sort((a,b)=>b.added-a.added), box=$('lib'); box.innerHTML='';
+  precargarMotores(list.map(g=>g.core));
   $('libTitle').classList.toggle('hidden',!list.length);
   for(const g of list){
     const el=document.createElement('div');el.className='game';
@@ -528,7 +556,7 @@ async function runGame(name,blob,core){
   const clean=prettyName(name);
   try{
     if(core==='chip8'){launch(chip8System(new Uint8Array(await blob.arrayBuffer()),clean),'CHIP-8 · joystick = 2/4/6/8, A = 5');return;}
-    if(!navigator.onLine){showHint('Conéctate a internet para cargar el emulador de '+CONSOLE_INFO[core][0]);return;}
+    if(!navigator.onLine)showHint('Sin internet: usando el motor guardado de '+CONSOLE_INFO[core][0]);
     launch(ejsSystem(blob,clean,core),'Cargando '+CONSOLE_INFO[core][0]+'…'+(blob.size>5e7?' juego grande, puede tardar':''));
   }catch(err){showHint('No se pudo abrir: '+err.message);}
 }
@@ -571,7 +599,7 @@ function loop(t){ pollGamepad();
 requestAnimationFrame(loop);
 
 // Barra superior
-function setPaused(p){if(!sys)return;running=!p;icon($('pause'),p?'i-play':'i-pause');if(p)sys.mute();sys.setRunning?.(!p);}
+function setPaused(p){if(!sys)return;if(p)releaseAll();running=!p;icon($('pause'),p?'i-play':'i-pause');if(p)sys.mute();sys.setRunning?.(!p);keepAwake(!p);}
 $('pause').onclick=()=>setPaused(running);
 $('reset').onclick=()=>{if(sys){sys.reset();setPaused(false);}};
 $('sound').onclick=()=>{store.sound=!store.sound;save();icon($('sound'),store.sound?'i-vol':'i-mute');if(master)master.gain.value=store.sound?1:0;sys?.setSound?.(store.sound);};
