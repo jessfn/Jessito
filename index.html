@@ -399,7 +399,7 @@ function ejsSystem(bytes,name,core,fullName){
     setTimeout(restore,400); clearInterval(timer); timer=setInterval(()=>{if(running)saveNow();},45000);}};
   return {name,size:[4,3],aspect,extra,labels,ps:core==='psx',
     async start(){let bios=null;if(core==='psx'){const b=await tx('roms','readonly',s=>s.get('bios_psx')).catch(()=>null);if(b)bios=URL.createObjectURL(b.blob);}
-      window.__ejsGame={core,url,name,bios,file:new File([bytes],fullName||name),volume:store.sound?.8:0,shader:store.quality||'disabled'};addEventListener('message',onMsg);
+      window.__ejsGame={core,url,name,bios,fullName:(fullName||name),volume:store.sound?.8:0,shader:store.quality||'disabled'};addEventListener('message',onMsg);
       frame=document.createElement('iframe');frame.src='ejs.html';frame.className='ejs';frame.allow='autoplay; gamepad; fullscreen';
       document.querySelector('.screen').appendChild(frame);},
     stop(){saveNow();clearInterval(timer);removeEventListener('message',onMsg);frame?.remove();URL.revokeObjectURL(url);},
@@ -881,7 +881,7 @@ $('install').onclick=async()=>{if(!deferred)return;deferred.prompt();await defer
 addEventListener('appinstalled',()=>$('install').style.display='none');
 // ================= Actualización automática =================
 // El script de publicación escribe la versión aquí y en version.json.
-const APP_VERSION='20261125-214540-9d06285';
+const APP_VERSION='20261125-214727-6484c8b';
 diag('App abierta (versión '+APP_VERSION+')');
 let swReg=null, updatePending=false;
 if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>swReg=r).catch(()=>{});
