@@ -31,7 +31,11 @@
   window.EJS_defaultOptions = {
     'virtual-gamepad': 'disabled',
     'shader': g.shader || 'disabled',   // calidad de imagen elegida en Ajustes
+    // PlayStation 1: fluidez primero (si el celular se atrasa salta cuadros, no se pone en cámara lenta)
     'pcsx_rearmed_frameskip_type': 'auto',
+    'pcsx_rearmed_dithering': 'disabled',        // menos trabajo de dibujo, casi no se nota
+    'pcsx_rearmed_spu_reverb': 'disabled',       // el eco del sonido es caro y apenas se nota
+    'pcsx_rearmed_spu_interpolation': 'simple',
     'snes9x_frameskip': 'auto',
     'mupen64plus-Framerate': 'Fullspeed',
   };
