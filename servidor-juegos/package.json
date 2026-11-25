@@ -7,9 +7,11 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "contrasena": "node poner-contrasena.js"
+    "importar": "node importar.js"
   },
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "dependencies": {
     "pg": "^8.13.0"
   }
