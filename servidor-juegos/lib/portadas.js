@@ -5,7 +5,7 @@ const fs = require('fs'), path = require('path');
 const REPO = {
   nes: 'Nintendo_-_Nintendo_Entertainment_System', snes: 'Nintendo_-_Super_Nintendo_Entertainment_System',
   gba: 'Nintendo_-_Game_Boy_Advance', gb: ['Nintendo_-_Game_Boy', 'Nintendo_-_Game_Boy_Color'],
-  n64: 'Nintendo_-_Nintendo_64', nds: 'Nintendo_-_Nintendo_DS', psx: 'Sony_-_PlayStation',
+  n64: 'Nintendo_-_Nintendo_64', nds: 'Nintendo_-_Nintendo_DS', psx: 'Sony_-_PlayStation', ps2: 'Sony_-_PlayStation_2',
   segaMD: 'Sega_-_Mega_Drive_-_Genesis', segaMS: 'Sega_-_Master_System_-_Mark_III', segaGG: 'Sega_-_Game_Gear',
   pce: 'NEC_-_PC_Engine_-_TurboGrafx_16', atari2600: 'Atari_-_2600',
 };

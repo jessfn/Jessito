@@ -18,7 +18,7 @@ function leerInicio(ruta, n = 0x10400) {
   finally { fs.closeSync(fd); }
 }
 
-function porFirma(d) {
+function porFirma(d, size = 0) {
   const at = (o, arr) => arr.every((v, i) => d[o + i] === v);
   const str = (o, s) => at(o, [...s].map(c => c.charCodeAt(0)));
   const LOGO = [0x24, 0xFF, 0xAE, 0x51, 0x69, 0x9A];
@@ -28,7 +28,7 @@ function porFirma(d) {
   if (at(4, LOGO) && d[0xB2] === 0x96) return 'gba';
   if (at(0x104, [0xCE, 0xED, 0x66, 0x66, 0xCC, 0x0D])) return 'gb';
   if (str(0, '\0PBP') || str(0, 'MComprHD')) return 'psx';
-  if (str(0x8001, 'CD001') && str(0x8008, 'PLAYSTATION')) return 'psx';
+  if (str(0x8001, 'CD001') && str(0x8008, 'PLAYSTATION')) return size > 700e6 ? 'ps2' : 'psx';   // un CD de PS1 no pasa de ~700 MB; más grande es DVD de PS2
   if (d.length >= 0x9340 && d.subarray(0x9318, 0x9340).toString('latin1').includes('PLAYSTATION')) return 'psx';
   if (str(0x100, 'SEGA') || str(0x101, 'SEGA') || (d[8] === 0xAA && d[9] === 0xBB)) return 'segaMD';
   for (const o of [0x7FF0, 0x3FF0, 0x1FF0]) if (str(o, 'TMR SEGA')) { const r = d[o + 15] >> 4; return (r >= 5 && r <= 7) ? 'segaGG' : 'segaMS'; }
@@ -53,7 +53,9 @@ function porNombre(nombre) {
 
 // Devuelve la consola (nunca pregunta). Último recurso: por tamaño.
 function detectar(ruta, nombre) {
-  try { const f = porFirma(leerInicio(ruta)); if (f) return f; } catch (e) {}
+  const tam = fs.statSync(ruta).size;
+  try { const f = porFirma(leerInicio(ruta), tam); if (f) return f; } catch (e) {}
+  if (/.iso$/i.test(nombre) && tam > 700e6) return 'ps2';
   const ext = (nombre.split('.').pop() || '').toLowerCase();
   if (POR_EXTENSION[ext]) return POR_EXTENSION[ext];
   const n = porNombre(nombre); if (n) return n;
