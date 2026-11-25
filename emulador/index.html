@@ -125,6 +125,10 @@
   .tile .acts { position:absolute; top:5px; right:5px; display:flex; gap:4px; }
   .tile .acts button { width:28px; height:28px; border-radius:9px; border:none; background:#000a; color:#fff; display:grid; place-items:center; padding:0; }
   .tile .acts svg.i { width:15px; height:15px; }
+  .tile .tbar { position:absolute; left:8px; right:8px; bottom:46px; height:6px; border-radius:99px; background:#0008; overflow:hidden; }
+  .tile .tbar i { display:block; height:100%; width:0; border-radius:99px; background:linear-gradient(90deg,var(--acc),var(--acc2)); transition:width .25s linear; }
+  #subidas { margin-bottom:10px; }
+  .subpill { position:fixed; left:50%; top:max(8px,env(safe-area-inset-top)); transform:translateX(-50%); z-index:6; background:#151730ee; border:1px solid var(--line); border-radius:99px; padding:6px 14px; font-size:12px; font-weight:700; box-shadow:0 6px 20px #0008; cursor:pointer; }
   #install { display:none; }
   /* Selector de archivos invisible pero activo (en iPhone un input con "hidden" a veces no responde) */
   .picker-input { position:absolute; width:1px; height:1px; opacity:0; overflow:hidden; pointer-events:none; }
@@ -211,7 +215,8 @@
   <h2>Mi cuenta <small style="font-weight:400;opacity:.55;font-size:11px">tus juegos y partidas en todos tus dispositivos</small></h2>
   <div id="srvLogin" style="display:flex;flex-direction:column;gap:8px"><div style="display:flex;gap:8px"><button class="chip sel" id="acTabIn" style="flex:1;justify-content:center">Entrar</button><button class="chip" id="acTabReg" style="flex:1;justify-content:center">Crear cuenta</button></div><input id="acNombre" class="campo hidden" placeholder="Tu nombre" autocomplete="name"><input id="acCorreo" class="campo" type="email" placeholder="Correo" autocomplete="email" inputmode="email"><input id="acPass" class="campo" type="password" placeholder="Contraseña (mínimo 8)" autocomplete="current-password"><input id="acPass2" class="campo hidden" type="password" placeholder="Confirma tu contraseña" autocomplete="new-password"><button class="chip" id="acGo" style="justify-content:center;background:linear-gradient(135deg,var(--acc),#5b43e0);border:none">Entrar</button><div class="note" id="acMsg"></div></div>
   <div id="srvPanel" class="hidden" style="display:flex;flex-direction:column;gap:8px">
-    <div style="display:flex;gap:8px;flex-wrap:wrap"><label class="chip"><svg class="i"><use href="#i-folder"/></svg>Subir juego a mi servidor<input id="srvFile" type="file" class="picker-input"></label><button class="chip" id="srvRefresh"><svg class="i"><use href="#i-reset"/></svg>Actualizar</button><span class="note" id="srvHola" style="align-self:center"></span><button class="chip" id="srvOut">Cerrar sesión</button></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><label class="chip"><svg class="i"><use href="#i-folder"/></svg>Subir juego a mi servidor<input id="srvFile" type="file" class="picker-input" multiple></label><button class="chip" id="srvRefresh"><svg class="i"><use href="#i-reset"/></svg>Actualizar</button><span class="note" id="srvHola" style="align-self:center"></span><button class="chip" id="srvOut">Cerrar sesión</button></div>
+    <div class="grid hidden" id="subidas"></div>
     <div class="lib" id="srvList"></div>
   </div>
   <h2 id="libTitle" class="hidden">Mi biblioteca</h2>
@@ -219,6 +224,7 @@
   <div class="note">Toca «Cargar ROM» para agregar juegos (.zip, .7z, .nes, .sfc, .gba, .bin/.cue de PlayStation…). Se guardan en tu biblioteca, solo en este dispositivo.</div>
 </div></div>
 
+<div class="subpill hidden" id="subPill" onclick="openMenu()"></div>
 <div class="carga hidden" id="carga"><div class="cbox"><b id="cTit"></b><div class="cbar"><i id="cFill"></i></div><div class="cpct" id="cPct">0%</div><div class="note" id="cInfo"></div><button class="chip" id="cBtn" style="justify-content:center">Cancelar</button></div></div>
 
 <div class="sheet hidden" id="picker"><div>
@@ -1006,22 +1012,70 @@ const mbps=(bytes,ms)=>ms>0?(bytes/1e6/(ms/1000)).toFixed(1)+' MB/s':'';
 const fmtSeg=s=>s>=3600?Math.round(s/3600)+' h':s>=60?Math.round(s/60)+' min':Math.max(1,Math.round(s))+' s';
 
 // Subir al servidor: el archivo viaja directo desde el almacenamiento (no se carga en memoria)
-$('srvFile').onchange=e=>{const inp=e.target,f=inp.files&&inp.files[0];if(!f)return;
-  const xhr=new XMLHttpRequest();xhr.open('PUT',SRV+'/api/subir');
-  xhr.setRequestHeader('Authorization','Bearer '+store.srvToken);xhr.setRequestHeader('X-Nombre',encodeURIComponent(f.name));
-  const t0=performance.now();
-  cargaShow('Subiendo '+f.name,()=>xhr.abort());cargaSet(0,'0 de '+fmtSize(f.size));
-  xhr.upload.onprogress=ev=>{if(!ev.lengthComputable)return;const ms=performance.now()-t0,vel=ev.loaded/(ms/1000);
-    cargaSet(ev.loaded/ev.total*100,fmtSize(ev.loaded)+' de '+fmtSize(ev.total)+' · '+mbps(ev.loaded,ms)+(vel>0?' · faltan '+fmtSeg((ev.total-ev.loaded)/vel):''));};
-  xhr.onload=()=>{inp.value='';
-    if(xhr.status===200){let id=null;try{id=JSON.parse(xhr.responseText).id;}catch(_){}
-      diag('Subido al servidor: '+f.name);seguirPreparacion(id,f.name);}
-    else if(xhr.status===401){cargaHide();store.srvToken=null;save();srvUI();showHint('Tu sesión terminó: vuelve a entrar');}
-    else{cargaSet(null,'Error al subir ('+xhr.status+')');$('cBtn').textContent='Cerrar';cargaCancelar=null;}};
-  xhr.onerror=()=>{inp.value='';cargaSet(null,'Se cortó la conexión. Revisa tu internet e inténtalo otra vez.');$('cBtn').textContent='Cerrar';cargaCancelar=null;};
-  xhr.onabort=()=>{inp.value='';showHint('Subida cancelada');};
-  diag('Subiendo al servidor: '+f.name+' ('+Math.round(f.size/1e6)+' MB)');
-  xhr.send(f);};
+// ===== Cola de subidas: varios juegos a la vez, cada uno con su cuadrito y su barra =====
+// No bloquea: mientras suben puedes navegar, agregar más o jugar. Se suben 2 en paralelo.
+const subidas=[]; const SUB_PARALELO=2;
+function tileSubida(s){
+  const t=makeTile({name:prettyName(s.file.name),sub:'',consola:null,badge:['En espera','wait'],onPlay:()=>{},
+    actions:[{icon:'i-x',label:'Cancelar',fn:()=>cancelarSubida(s)}]});
+  const bar=document.createElement('div');bar.className='tbar';bar.innerHTML='<i></i>';t.appendChild(bar);
+  s.el=t;s.elBar=bar.firstChild;s.elSub=t.querySelector('small');s.elBadge=t.querySelector('.badge');
+  $('subidas').prepend(t);actualizarSubida(s);
+}
+function actualizarSubida(s){
+  if(!s.el)return;const pct=s.total?Math.floor(s.loaded/s.total*100):0;
+  s.elBar.style.width=(s.estado==='espera'?0:pct)+'%';
+  s.elBadge.className='badge '+(s.estado==='error'?'err':s.estado==='subido'?'ok':'wait');
+  s.elBadge.textContent=s.estado==='espera'?'En espera':s.estado==='subiendo'?pct+'%':s.estado==='subido'?'✓ Subido':'Error';
+  s.elSub.textContent=s.estado==='subiendo'?fmtSize(s.loaded)+' de '+fmtSize(s.total)+(s.vel?' · '+s.vel:'')
+    :s.estado==='espera'?fmtSize(s.total)+' · esperando turno':s.estado==='subido'?'Tu servidor lo está preparando…':s.msg||'';
+  if(s.estado==='error'&&!s.reintento){s.reintento=true;const a=s.el.querySelector('.acts');const b=document.createElement('button');
+    b.setAttribute('aria-label','Reintentar');b.innerHTML='<svg class="i"><use href="#i-reset"/></svg>';
+    b.addEventListener('click',e=>{e.stopPropagation();s.estado='espera';s.loaded=0;s.reintento=false;b.remove();actualizarSubida(s);siguienteSubida();});a.prepend(b);}
+  pintarPill();
+}
+function quitarSubida(s,ms=0){setTimeout(()=>{s.el?.remove();s.el=null;const i=subidas.indexOf(s);if(i>=0)subidas.splice(i,1);
+  $('subidas').classList.toggle('hidden',!subidas.length);pintarPill();},ms);}
+function cancelarSubida(s){s.cancelada=true;try{s.xhr?.abort();}catch(e){}quitarSubida(s);siguienteSubida();}
+// Indicador pequeño con el avance total (se ve aunque el menú esté cerrado)
+function pintarPill(){
+  const lote=subidas.filter(s=>!s.cancelada), act=lote.filter(s=>s.estado==='subiendo'||s.estado==='espera');
+  const p=$('subPill');if(!act.length){p.classList.add('hidden');return;}
+  const total=lote.reduce((a,s)=>a+s.total,0),hecho=lote.reduce((a,s)=>a+(s.estado==='subido'?s.total:s.loaded),0);
+  const n=lote.filter(s=>s.estado==='subido').length;
+  p.textContent='⬆ Subiendo '+Math.min(lote.length,n+1)+' de '+lote.length+' · '+Math.floor(hecho/Math.max(1,total)*100)+'%';p.classList.remove('hidden');
+}
+function siguienteSubida(){
+  while(subidas.filter(s=>s.estado==='subiendo').length<SUB_PARALELO){
+    const s=subidas.find(x=>x.estado==='espera');if(!s)break;subirUno(s);
+  }
+}
+function subirUno(s){
+  const xhr=new XMLHttpRequest();s.xhr=xhr;s.estado='subiendo';s.loaded=0;s.t0=performance.now();actualizarSubida(s);
+  xhr.open('PUT',SRV+'/api/subir');
+  xhr.setRequestHeader('Authorization','Bearer '+store.srvToken);xhr.setRequestHeader('X-Nombre',encodeURIComponent(s.file.name));
+  let ultimo=0;
+  xhr.upload.onprogress=ev=>{if(!ev.lengthComputable)return;s.loaded=ev.loaded;s.total=ev.total;
+    const ahora=performance.now();if(ahora-ultimo<250)return;ultimo=ahora;   // máximo 4 actualizaciones por segundo (fluido)
+    s.vel=mbps(ev.loaded,ahora-s.t0);actualizarSubida(s);};
+  xhr.onload=()=>{
+    if(xhr.status===200){s.estado='subido';s.loaded=s.total;actualizarSubida(s);diag('Subido al servidor: '+s.file.name);
+      srvList();quitarSubida(s,2500);}
+    else if(xhr.status===401){s.estado='error';s.msg='Tu sesión terminó: vuelve a entrar';actualizarSubida(s);store.srvToken=null;save();srvUI();}
+    else{let m='Error '+xhr.status;try{m=JSON.parse(xhr.responseText).error||m;}catch(_){}s.estado='error';s.msg=m;actualizarSubida(s);}
+    siguienteSubida();};
+  xhr.onerror=()=>{s.estado='error';s.msg='Se cortó la conexión';actualizarSubida(s);siguienteSubida();};
+  xhr.onabort=()=>{};
+  xhr.send(s.file);
+}
+$('srvFile').onchange=e=>{const inp=e.target,files=[...(inp.files||[])];inp.value='';if(!files.length)return;
+  if(!store.srvToken){showHint('Primero entra a tu cuenta');return;}
+  $('subidas').classList.remove('hidden');
+  for(const f of files){const s={file:f,total:f.size,loaded:0,estado:'espera'};subidas.push(s);tileSubida(s);}
+  diag('En cola para subir: '+files.length+' juego(s)');showHint(files.length+' juego(s) en cola para subir');
+  siguienteSubida();};
+// Aviso si intentas cerrar la app con subidas en curso
+addEventListener('beforeunload',e=>{if(subidas.some(s=>s.estado==='subiendo'||s.estado==='espera')){e.preventDefault();e.returnValue='';}});
 
 // Después de subir: el servidor lo prepara (descomprime, convierte, portada). Se muestra cada paso.
 const PASOS={'en cola':[5,'En la fila del servidor…'],'procesando':[15,'Preparando…'],'descomprimiendo':[35,'Descomprimiendo en tu servidor…'],
