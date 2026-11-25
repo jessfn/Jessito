@@ -157,6 +157,20 @@ async function manejar(req, res) {
     return;
   }
 
+  // Portada por nombre (para juegos guardados solo en el celular): búsqueda inteligente + caché en el VPS
+  if (ruta === '/api/portada' && req.method === 'GET') {
+    const nombre = String(url.searchParams.get('nombre') || '').slice(0, 200), consola = String(url.searchParams.get('consola') || '').slice(0, 20);
+    if (!nombre || !consola) return json(res, 400, { error: 'Falta nombre o consola' });
+    const clave = crypto.createHash('sha1').update(consola + '|' + nombre.toLowerCase()).digest('hex');
+    const f = path.join(DIR.portadas, 'nombre', clave + '.png'), nada = f + '.no';
+    if (!fs.existsSync(f)) {
+      if (fs.existsSync(nada) && Date.now() - fs.statSync(nada).mtimeMs < 7 * 864e5) return json(res, 404, { error: 'Sin portada' });
+      const ok = await buscarPortada(nombre, consola, f).catch(() => false);
+      if (!ok) { fs.mkdirSync(path.dirname(nada), { recursive: true }); fs.writeFileSync(nada, ''); return json(res, 404, { error: 'Sin portada' }); }
+    }
+    res.writeHead(200, { 'Content-Type': 'image/png', 'Content-Length': fs.statSync(f).size, 'Cache-Control': 'private, max-age=2592000' });
+    return fs.createReadStream(f).pipe(res);
+  }
   let m;
   // Portada (imagen guardada en el VPS)
   if ((m = ruta.match(/^\/api\/juegos\/(\d+)\/portada$/)) && req.method === 'GET') {
