@@ -64,7 +64,7 @@ const b64 = (buf) => 'data:image/png;base64,' + Buffer.from(buf).toString('base6
 const grainPng = b64(new Resvg(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><filter id="g" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="7"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.9 -0.42"/></filter><rect width="${W}" height="${H}" filter="url(#g)" opacity="0.28"/></svg>`, ropt).render().asPng());
 const charDefs = defs('e3d');
 const PL = (n) => b64(readFileSync(path.join(here, 'plates2d', n + '.png')));
-const platePng = { lair: PL('lair17'), door: PL('door18'), home: PL('home18') };
+const platePng = { lair: PL('warehouse18'), door: PL('door18'), home: PL('home18') };
 const lazyThumb = (() => { applyDay16Face(); const P = defPose2(); P.noseStyle = 'D'; P.noseK = 1.35; P.hairOv = { lacio: 'C2', len: 0.4, shine: 1, cp: 1, grow: 1 }; P.hair.t = 1; P.skirt.t = 1; P.eyes.lookX = 0.2; P.mouth.smile = 0.5;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1500" viewBox="0 0 1024 1500">${charDefs}${ALLDEFS}<rect width="1024" height="1500" fill="#2a1830"/>${renderCharacter(P)}</svg>`; return b64(new Resvg(svg, { fitTo: { mode: 'width', value: 700 } }).render().asPng()); })();
 
@@ -192,12 +192,13 @@ const stepBanners = [];
 const TRANS = [[T.slateA + 3.4, 'in', 0.6], [T.enterA, 'cut', 0.5], [T.swapA - 0.2, 'cut', 0.5]];
 // ---- cabello hecho un desastre (hebras sueltas, enredos) en coordenadas del personaje ----
 const messyHair = (t, k = 1) => { let s = ''; const R = (i) => rnd(i * 7 + 3);
-  for (let i = 0; i < 26; i++) { const u = R(i), a = Math.PI * (0.92 + 1.16 * u), cx = 512 + Math.cos(a) * 148, cy = 305 + Math.sin(a) * 228; const ang = a + (R(i + 50) - 0.5) * 1.1, len = (22 + R(i + 9) * 46) * k, bend = (R(i + 20) - 0.5) * 60, sw = Math.sin(t * 1.6 + i) * 5;
-    const mx = cx + Math.cos(ang) * len * 0.5 - Math.sin(ang) * bend + sw, my = cy + Math.sin(ang) * len * 0.5 + Math.cos(ang) * bend, ex = cx + Math.cos(ang) * len + sw, ey = cy + Math.sin(ang) * len;
-    s += `<path d="M${f(cx)},${f(cy)} Q${f(mx)},${f(my)} ${f(ex)},${f(ey)}" stroke="#3a2012" stroke-width="8" fill="none" stroke-linecap="round"/><path d="M${f(cx)},${f(cy)} Q${f(mx)},${f(my)} ${f(ex)},${f(ey)}" stroke="#8a5a36" stroke-width="2.6" fill="none" stroke-linecap="round" opacity="0.8"/>`; }
-  for (const sg of [-1, 1]) for (let i = 0; i < 7; i++) { const y = 360 + i * 45 + R(i + sg * 11) * 18, x = 512 + sg * (150 + (y - 300) * 0.05 + R(i + 77) * 6), len = 22 + R(i + 5) * 44, c1 = sg * (len * 0.6), sw = Math.sin(t * 1.4 + i * 2 + sg) * 6;
-    s += `<path d="M${f(x)},${f(y)} q${f(c1)},${f(-16 + R(i) * 30)} ${f(sg * len + sw)},${f(10 + R(i + 3) * 40)}" stroke="#3a2012" stroke-width="8" fill="none" stroke-linecap="round"/><path d="M${f(x)},${f(y)} q${f(c1)},${f(-16 + R(i) * 30)} ${f(sg * len + sw)},${f(10 + R(i + 3) * 40)}" stroke="#8a5a36" stroke-width="2.6" fill="none" stroke-linecap="round" opacity="0.8"/>`; }
-  for (const [x, y] of [[366, 640], [660, 620], [420, 100], [610, 96]]) s += `<path d="M${x},${y} c-18,-12 -6,-30 10,-20 c15,11 -3,26 -15,15 c-9,-9 4,-19 11,-12" stroke="#3a2012" stroke-width="7" fill="none" stroke-linecap="round"/>`;
+  const TL = [[72, 512], [100, 460], [140, 400], [210, 375], [330, 372], [430, 385], [500, 405]], TR = [[72, 512], [100, 580], [150, 630], [230, 650], [330, 655], [410, 648], [455, 630]];
+  const interp = (TT, y) => { let i = 0; while (i < TT.length - 2 && TT[i + 1][0] <= y) i++; const p = TT[i], q = TT[i + 1], u = clamp((y - p[0]) / (q[0] - p[0])); return lerp(p[1], q[1], u); };
+  const edge = (y) => [interp(TL, y), interp(TR, y)];
+  const strand = (rx, ry, ang, len, bend, i) => { const sw = Math.sin(t * 1.6 + i) * 3, c = Math.cos(ang), sn = Math.sin(ang), ex = rx + c * len + sw, ey = ry + sn * len, mx = rx + c * len * 0.5 - sn * bend, my = ry + sn * len * 0.5 + c * bend; const d = `M${f(rx)},${f(ry)} Q${f(mx)},${f(my)} ${f(ex)},${f(ey)}`;
+    return `<path d="${d}" stroke="#1d0d06" stroke-width="7" fill="none" stroke-linecap="round"/><path d="${d}" stroke="#4a2a16" stroke-width="4.4" fill="none" stroke-linecap="round"/><path d="${d}" stroke="#8a5a36" stroke-width="1.6" fill="none" stroke-linecap="round" opacity="0.8"/>`; };
+  for (let i = 0; i < 22; i++) { const y = 92 + R(i) * 350, [lo, hi] = edge(y), side = i % 2 ? 1 : -1; const rx = side > 0 ? hi - 10 : lo + 10, ry = y, ang = (side > 0 ? 0 : Math.PI) + (R(i + 30) - 0.5) * 1.0 + (y < 200 ? -side * 0.6 : 0.25 * side), len = (18 + R(i + 9) * 46) * k + 16, bend = (R(i + 20) - 0.5) * 40; s += strand(rx, ry, ang, len, bend, i); }
+  for (let i = 0; i < 9; i++) { const x = 470 + R(i + 60) * 85, y = 82 + R(i + 61) * 8; s += strand(x, y, -Math.PI / 2 + (R(i + 62) - 0.5) * 1.3, (14 + R(i + 63) * 36) * k + 10, (R(i + 64) - 0.5) * 30, i + 40); }
   return `<g opacity="${k.toFixed(2)}">${s}</g>`; };
 
 // ---- estado del rostro (maquillaje por pasos) ----
@@ -254,10 +255,11 @@ function mirrorCard(t) { const a = T.mirrorA, b = T.mirrorB; const k = win(t, a,
     <ellipse cx="540" cy="760" rx="420" ry="580" fill="url(#mrG)" stroke="${OUT}" stroke-width="10"/><ellipse cx="540" cy="760" rx="400" ry="560" fill="#20283a"/><g clip-path="url(#mrC)"><g clip-path="url(#mrL)"><g transform="${ctr}">${A}</g></g><g clip-path="url(#mrR)"><g transform="${ctr}">${Bf}</g></g><path d="M${f(cx)},200 V1320" stroke="#fff" stroke-width="5" opacity="0.8"/><circle cx="${f(cx)}" cy="760" r="26" fill="#fff" stroke="${OUT}" stroke-width="5"/><text x="300" y="260" font-family="Anton" font-size="46" text-anchor="middle" fill="#fff" stroke="${OUT}" stroke-width="10" paint-order="stroke">ANTES</text><text x="780" y="260" font-family="Anton" font-size="46" text-anchor="middle" fill="#ffe14d" stroke="${OUT}" stroke-width="10" paint-order="stroke">DESPUÉS</text></g>${SPK(t, 14, 160, 260, 760, 900, 0.9)}</g></g>`; }
 
 const lairFg = (t) => { const pT = t - L.i2.start; const clip = t >= L.i2.end - 0.9 ? 'laugh' : (t >= L.i2.start && pT < 0.9 ? 'point' : 'idle'); const tt = clip === 'laugh' ? t - (L.i2.end - 0.9) : clip === 'point' ? pT : t; const P = poseClip(clip, Math.max(0, tt)); P.eyes.glow = 1 + 0.25 * Math.sin(t * 7);
-  const mon = [[70, 180], [400, 180], [730, 180], [70, 520], [730, 520]].map(([x, y], i) => `<g opacity="${(0.82 + 0.1 * Math.sin(t * 9 + i * 2)).toFixed(2)}"><clipPath id="mn${i}"><rect x="${x}" y="${y}" width="300" height="290" rx="8"/></clipPath><g clip-path="url(#mn${i})"><image href="${lazyThumb}" transform="translate(${f(x - 330 * 0.564)},${f(y - 40 * 0.564)}) scale(0.564)" x="0" y="0" width="1024" height="1500"/></g><rect x="${x}" y="${y}" width="300" height="290" rx="8" fill="#ff2a3a" opacity="0.28"/>${[...Array(5)].map((_, k) => `<rect x="${x}" y="${f(y + ((t * 60 + k * 58) % 290))}" width="300" height="4" fill="#ff8a9a" opacity="0.25"/>`).join('')}<rect x="${x + 110}" y="${y + 120}" width="80" height="80" fill="none" stroke="#ff4a5a" stroke-width="3" opacity="${(0.5 + 0.4 * Math.sin(t * 5 + i)).toFixed(2)}"/></g>`).join('');
+  const pins = [[230, 520, -5], [480, 560, 4], [740, 520, -3], [330, 760, 3], [650, 770, -6]];
+  const ph = pins.map(([x, y, r], i) => `<g transform="translate(${x},${y}) rotate(${r})"><rect x="-8" y="-8" width="196" height="224" fill="#000" opacity="0.35" transform="translate(6,8)"/><rect width="180" height="208" fill="#f4f0e6" stroke="#1a1010" stroke-width="3"/><clipPath id="ph${i}"><rect x="10" y="10" width="160" height="164"/></clipPath><g clip-path="url(#ph${i})"><image href="${lazyThumb}" transform="translate(-60,-26) scale(0.48)" x="0" y="0" width="1024" height="1500"/></g><rect x="10" y="10" width="160" height="164" fill="#1a1020" opacity="0.18"/><circle cx="90" cy="-2" r="9" fill="#c8102a" stroke="#1a1010" stroke-width="2"/></g>`).join('');
+  const strings = pins.map(([x, y], i) => { const [x2, y2] = pins[(i + 1) % pins.length]; return `<path d="M${x + 90},${y - 2} Q${(x + x2) / 2 + 90},${Math.max(y, y2) + 80} ${x2 + 90},${y2 - 2}" stroke="#c8102a" stroke-width="3" fill="none" opacity="0.85"/>`; }).join('');
   const k = clamp((t - 0.3) / 1.0);
-  return `${mon}<g opacity="${k.toFixed(2)}"><ellipse cx="540" cy="1322" rx="${f(300 * 0.62)}" ry="26" fill="#000" opacity="0.5" filter="url(#fb)"/><g transform="translate(540,1230) scale(0.62) translate(-520,-1385)">${renderM(P)}</g></g>`; };
-
+  return `${strings}${ph}<g opacity="${k.toFixed(2)}"><ellipse cx="540" cy="1322" rx="${f(300 * 0.62)}" ry="26" fill="#000" opacity="0.5" filter="url(#fb)"/><g transform="translate(540,1230) scale(0.62) translate(-520,-1385)">${renderM(P)}</g></g>`; };
 
 // ---------------- FRAME ----------------
 function frame(t) {

@@ -62,4 +62,33 @@ function home() {
   // sofa izquierda
   s += `<g transform="translate(0,1010)"><rect x="-40" y="0" width="360" height="200" rx="40" fill="#5a2a44" stroke="${OUT}" stroke-width="6"/><rect x="-40" y="-50" width="360" height="90" rx="40" fill="#6a3252" stroke="${OUT}" stroke-width="6"/>${tex('grain', -40, -50, 360, 250, 0.12)}<ellipse cx="260" cy="40" rx="50" ry="40" fill="#f0c070" stroke="${OUT}" stroke-width="5"/></g>`;
   s += `<ellipse cx="540" cy="900" rx="700" ry="600" fill="#ffcf7a" opacity="0.08" filter="url(#b30)"/>` + plant(980, 1220, 1.0) + `<rect width="${W}" height="${H}" fill="url(#gVig)" opacity="0.7"/>`; return s; }
-for (const [n, fn] of [['door18', door], ['home18', home]]) { const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${fn()}</svg>`; writeFileSync(`plates2d/${n}.png`, new Resvg(svg, ropt).render().asPng()); console.log(n); }
+
+// ---------------- BODEGA ABANDONADA (cold-open de M, oscura, una sola bombilla) ----------------
+function warehouse() {
+  let s = `${DEFS}<defs><linearGradient id="gWh" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#05060a"/><stop offset="0.6" stop-color="#10131c"/><stop offset="1" stop-color="#07080d"/></linearGradient><radialGradient id="gBulb" cx="0.5" cy="0.3" r="0.75"><stop offset="0" stop-color="#ffd98a" stop-opacity="0.55"/><stop offset="0.5" stop-color="#ffb04a" stop-opacity="0.16"/><stop offset="1" stop-color="#ffb04a" stop-opacity="0"/></radialGradient></defs><rect width="${W}" height="${H}" fill="url(#gWh)"/>`; const R = rnd(53);
+  // muro de ladrillo con textura
+  s += `<rect y="120" width="${W}" height="1130" fill="#1a1620"/>${tex('conc', 0, 120, W, 1130, 0.5)}`;
+  for (let j = 0; j < 22; j++) for (let i = 0; i < 9; i++) s += `<rect x="${i * 130 + (j % 2) * 65 - 40}" y="${130 + j * 50}" width="124" height="44" rx="3" fill="${R() > 0.5 ? '#2a2230' : '#231c2a'}" opacity="0.55"/>`;
+  // vigas de acero y tuberias oxidadas
+  s += `<rect y="0" width="${W}" height="120" fill="#0b0a10"/>`; for (let i = 0; i < 4; i++) s += `<path d="M${i * 300 - 40},0 L${i * 300 + 120},130" stroke="#15131c" stroke-width="22"/>`;
+  s += `<path d="M0,200 H${W}" stroke="#2a2630" stroke-width="26"/><path d="M0,200 H${W}" stroke="#4a3a34" stroke-width="6" opacity="0.6"/><path d="M0,250 Q540,290 ${W},250" stroke="#221e28" stroke-width="18" fill="none"/>`;
+  // ventana alta rota con luz de luna
+  s += `<g transform="translate(80,300)"><rect width="260" height="170" fill="#0a1030" stroke="#07060a" stroke-width="10"/><rect x="8" y="8" width="244" height="154" fill="#2a3a78"/><path d="M130,8 V162 M8,85 H252" stroke="#07060a" stroke-width="8"/><path d="M60,8 L120,100 L80,162" stroke="#cfe0ff" stroke-width="3" opacity="0.8" fill="none"/><path d="M-10,170 L260,170 L420,1000 L-160,1000Z" fill="#9fb8ff" opacity="0.07" filter="url(#b14)"/></g>`;
+  // tablero de corcho con hilo rojo (sin identificar a nadie)
+  s += `<g transform="translate(160,420)"><rect width="760" height="560" rx="10" fill="#4a3220" stroke="#0a0710" stroke-width="10"/>${tex('grain', 0, 0, 760, 560, 0.5)}<rect x="14" y="14" width="732" height="532" fill="#7a5632" opacity="0.7"/>${tex('plaster', 14, 14, 732, 532, 0.4)}</g>`;
+  // mapa viejo y notas en el corcho
+  s += `<g transform="translate(560,470) rotate(2)"><rect width="300" height="220" fill="#d8c9a0" stroke="#3a2a18" stroke-width="4"/>${tex('plaster', 0, 0, 300, 220, 0.4)}<path d="M20,40 Q80,10 140,60 T280,50 M30,120 Q110,90 170,140 T280,130 M40,190 L260,170" stroke="#6a4a2a" stroke-width="3" fill="none"/><circle cx="200" cy="110" r="10" fill="#c8102a"/><path d="M200,110 l-8,-18 M200,110 l8,-18" stroke="#c8102a" stroke-width="3"/></g>`;
+  // cajas de madera y barriles
+  const crate = (x, y, w, h) => `<g><rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#4a3220" stroke="#0a0710" stroke-width="6"/><rect x="${x}" y="${y}" width="${w}" height="${h}" filter="url(#wood)" opacity="0.5"/><path d="M${x},${y} L${x + w},${y + h} M${x + w},${y} L${x},${y + h}" stroke="#2a1a10" stroke-width="7"/><rect x="${x}" y="${y}" width="${w}" height="12" fill="#6a4a2c" opacity="0.6"/></g>`;
+  s += crate(20, 1030, 190, 220) + crate(60, 880, 150, 150) + crate(880, 1060, 190, 190) + `<g><ellipse cx="930" cy="1260" rx="70" ry="14" fill="#000" opacity="0.4"/><rect x="860" y="1060" width="140" height="200" rx="24" fill="#3a3a44" stroke="#0a0710" stroke-width="6"/><path d="M860,1110 H1000 M860,1210 H1000" stroke="#1a1a22" stroke-width="8"/></g>`;
+  // piso de concreto manchado + charcos
+  s += `<rect y="1250" width="${W}" height="${H - 1250}" fill="#0f0e14"/>${tex('conc', 0, 1250, W, H - 1250, 0.6)}`;
+  for (let i = 0; i < 9; i++) s += `<path d="M${540 + (i - 4) * 40},1250 L${540 + (i - 4) * 300},${H}" stroke="#1c1a24" stroke-width="3" opacity="0.25"/>`;
+  s += `<ellipse cx="300" cy="1560" rx="180" ry="30" fill="#2a3a58" opacity="0.35" filter="url(#b6)"/><ellipse cx="760" cy="1700" rx="140" ry="22" fill="#2a3a58" opacity="0.3" filter="url(#b6)"/>`;
+  s += `<rect width="${W}" height="${H}" fill="#03040a" opacity="0.5"/>`;
+  // telaranas en las esquinas
+  s += `<g stroke="#8a8a9a" stroke-width="1.5" opacity="0.4" fill="none">${[0, 1, 2, 3, 4].map((i) => `<path d="M0,120 L${60 + i * 36},${40 + i * 34}"/>`).join('')}${[1, 2, 3].map((i) => `<path d="M${i * 40},120 Q${i * 36},${i * 30 + 20} 0,${i * 40 + 120}"/>`).join('')}</g>`;
+  // bombilla colgante con cono de luz suave (degradado, sin bordes)
+  s += `<path d="M540,0 V230" stroke="#08060c" stroke-width="5"/><ellipse cx="540" cy="250" rx="26" ry="30" fill="#fff0c0"/><ellipse cx="540" cy="250" rx="120" ry="120" fill="url(#gBulb)"/><ellipse cx="540" cy="420" rx="520" ry="620" fill="url(#gBulb)" opacity="0.9" filter="url(#b30)"/>`;
+  s += `<rect width="${W}" height="${H}" fill="url(#gVig)"/><rect width="${W}" height="${H}" fill="url(#gVig)" opacity="0.7"/>`; return s; }
+for (const [n, fn] of [['door18', door], ['home18', home], ['warehouse18', warehouse]]) { const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${fn()}</svg>`; writeFileSync(`plates2d/${n}.png`, new Resvg(svg, ropt).render().asPng()); console.log(n); }
