@@ -95,6 +95,9 @@
   .game .play small { opacity:.6; font-size:11px; }
   .game .del, .game .swap { height:auto; width:44px; } .game .del { color:#ff8fa8; } .game .swap { color:#a5f3fc; }
   #install { display:none; }
+  /* Selector de archivos invisible pero activo (en iPhone un input con "hidden" a veces no responde) */
+  .picker-input { position:absolute; width:1px; height:1px; opacity:0; overflow:hidden; pointer-events:none; }
+  label.chip { position:relative; }
   #rotate { display:none; position:fixed; inset:0; z-index:9; background:var(--bg); flex-direction:column; align-items:center; justify-content:center; gap:16px; text-align:center; font-size:16px; padding:24px; }
   #rotate svg { width:72px; height:72px; animation:rot 1.6s ease-in-out infinite; }
   @keyframes rot { 0%,30%{transform:rotate(0)} 60%,100%{transform:rotate(-90deg)} }
@@ -169,7 +172,7 @@
     <button class="chip" data-game="run"><svg class="i"><use href="#i-run"/></svg>Jessito Run</button>
     <button class="chip" data-game="atrapa"><svg class="i"><use href="#i-star"/></svg>Atrapa</button>
     <button class="chip" data-game="teclas"><svg class="i"><use href="#i-grid"/></svg>Teclas</button>
-    <label class="chip"><svg class="i"><use href="#i-folder"/></svg>Cargar ROM<input id="file" type="file" accept=".zip,.7z,.cue,.pbp,.chd,.iso,.m3u,.nes,.fds,.sfc,.smc,.gba,.gb,.gbc,.md,.gen,.smd,.bin,.sms,.gg,.n64,.z64,.v64,.pce,.a26,.nds,.ch8,.c8,.rom" hidden></label>
+    <label class="chip"><svg class="i"><use href="#i-folder"/></svg>Cargar ROM<input id="file" type="file" class="picker-input"></label>
   </div>
   <h2 id="libTitle" class="hidden">Mi biblioteca</h2>
   <div class="lib" id="lib"></div>
@@ -187,7 +190,7 @@
   <div class="opt">Velocidad CHIP-8<input id="speed" type="range" min="2" max="40" value="12"></div>
   <div class="opt">Color CHIP-8<div class="swatches" id="sw"></div></div>
   <div class="opt"><label><input type="checkbox" id="vib" checked> Vibrar al tocar</label></div>
-  <label class="chip" style="justify-content:center"><svg class="i"><use href="#i-folder"/></svg><span id="biosLbl">Cargar BIOS de PlayStation</span><input id="biosFile" type="file" hidden></label>
+  <label class="chip" style="justify-content:center"><svg class="i"><use href="#i-folder"/></svg><span id="biosLbl">Cargar BIOS de PlayStation</span><input id="biosFile" type="file" class="picker-input"></label>
   <div class="note">Algunos juegos de PlayStation (como Resident Evil 3) necesitan el BIOS real de la consola (por ejemplo SCPH5502.bin para juegos europeos, SCPH1001.bin para americanos). Se guarda solo en este dispositivo.</div>
   <div class="opt">Calidad de imagen<select id="quality" style="flex:1;background:var(--card);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:8px"><option value="disabled">Original (nítida, más rápida)</option><option value="2xScaleHQ.glslp">HD suave 2x</option><option value="4xScaleHQ.glslp">HD suave 4x (celulares potentes)</option><option value="crt-easymode.glslp">Tele retro (CRT)</option></select></div>
   <div class="opt" style="flex-direction:column;align-items:stretch;gap:6px"><span id="storTxt">Espacio: calculando…</span><div style="height:8px;border-radius:99px;background:#ffffff14;overflow:hidden"><div id="storBar" style="height:100%;width:0;background:linear-gradient(90deg,var(--acc),var(--acc2))"></div></div><span class="note" id="storProt"></span></div>
@@ -659,6 +662,9 @@ $('biosFile').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(
   if(f.size<256e3||f.size>4e6){showHint('Ese archivo no parece un BIOS de PlayStation');return;}
   await tx('roms','readwrite',s=>s.put({name:f.name,blob:f},'bios_psx'));showBios();showHint('BIOS guardado. Vuelve a abrir el juego.');};
 showBios();
+// Cualquier error inesperado se muestra en pantalla (así nunca "no pasa nada")
+addEventListener('error',e=>{try{showHint('Error: '+(e.message||'desconocido'));}catch(_){}});
+addEventListener('unhandledrejection',e=>{try{showHint('Error: '+((e.reason&&e.reason.message)||e.reason||'desconocido'));}catch(_){}});
 const isIOS=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
 // ===== Descompresión dentro de la app (.7z y .zip) con los descompresores de EmulatorJS =====
 const META=/\.(txt|nfo|diz|jpe?g|png|gif|bmp|pdf|htm|html|url|sfv|md5|sha1|xml|ini|cfg|sbi|m3u|cue|ccd|sub|mds)$/i;
@@ -702,12 +708,17 @@ async function addGame(file){
   const core=(await detectCore(file.name,file))||guessCore(file.size,file.name);
   if(isIOS&&core==='psx'&&file.size>300e6)showHint('Aviso: en iPhone los discos de más de 300 MB pueden cerrarse por falta de memoria');
   else showHint(CONSOLE_INFO[core]?.[0]?('Detectado: '+CONSOLE_INFO[core][0]):'Detectado: CHIP-8');
-  try{await libPut({name:file.name,blob:file,core,size:file.size,added:Date.now()});}
+  // En iPhone se guarda una copia simple (Blob) en vez del File del selector: Safari a veces no puede guardar el File
+  let stored=file; try{ if(file.size<400e6) stored=new Blob([await file.arrayBuffer()],{type:'application/octet-stream'}); }catch(e){}
+  try{await libPut({name:file.name,blob:stored,core,size:file.size,added:Date.now()});}
   catch(e){showHint('No hubo espacio para guardarlo, pero se abrirá igual');}
   renderLib(); runGame(file.name,file,core);
 }
 function loadRom(name,bytes){return addGame(new File([bytes],name));}
-$('file').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)addGame(f);};
+$('file').onchange=e=>{const inp=e.target, f=inp.files&&inp.files[0];
+  if(!f){showHint('No se recibió ningún archivo');return;}
+  showHint('Cargando '+f.name+'…');
+  addGame(f).catch(err=>showHint('Error al cargar: '+(err&&err.message||err))).finally(()=>{inp.value='';});};
 // Migrar el antiguo "último juego" a la biblioteca
 tx('roms','readonly',s=>s.get('last')).then(async r=>{
   if(r){const blob=new Blob([r.bytes]);await libPut({name:r.name,blob,core:(await detectCore(r.name,blob))||'nes',size:blob.size,added:Date.now()});await tx('roms','readwrite',s=>s.delete('last'));}
