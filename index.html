@@ -537,8 +537,18 @@ function db(){return new Promise((ok,ko)=>{const r=indexedDB.open('jemu',3);
   r.onsuccess=()=>ok(r.result);r.onerror=()=>ko(r.error);});}
 const tx=(st,mode,fn)=>db().then(d=>new Promise((ok,ko)=>{const t=d.transaction(st,mode);const q=fn(t.objectStore(st));t.oncomplete=()=>ok(q?.result);t.onerror=()=>ko(t.error);t.onabort=()=>ko(t.error);}));
 const libAll=()=>tx('lib','readonly',s=>s.getAll()).catch(()=>[]);
-const libGet=n=>tx('lib','readonly',s=>s.get(n));
-const libPut=g=>tx('lib','readwrite',s=>s.put(g));
+// Si el juego se guardó como datos crudos (modo compatible con Safari), se convierte de vuelta a archivo al leerlo
+const libGet=n=>tx('lib','readonly',s=>s.get(n)).then(r=>{if(r&&!r.blob&&r.buf)r.blob=new Blob([r.buf]);return r;});
+// Guardar: primero como archivo (Blob); si Safari lo rechaza, como datos crudos (ArrayBuffer), que Safari sí acepta
+async function libPut(g){
+  try{ return await tx('lib','readwrite',s=>s.put(g)); }
+  catch(e1){
+    diag('Guardado como archivo falló ('+(e1&&(e1.name||e1.message))+'), probando modo compatible');
+    if(!g.blob)throw e1;
+    const {blob,...rest}=g; const buf=await blob.arrayBuffer();
+    return await tx('lib','readwrite',s=>s.put({...rest,buf}));
+  }
+}
 const libDel=n=>tx('lib','readwrite',s=>s.delete(n));
 navigator.storage?.persist?.().catch(()=>{});
 const fmtSize=b=>b>=1e6?Math.round(b/1e6)+' MB':Math.max(1,Math.round(b/1e3))+' KB';
@@ -725,7 +735,7 @@ async function addGame(file){
   // En iPhone se guarda una copia simple (Blob) en vez del File del selector: Safari a veces no puede guardar el File
   let stored=file; try{ if(file.size<50e6) stored=new Blob([await file.arrayBuffer()],{type:'application/octet-stream'}); }catch(e){}
   try{await libPut({name:file.name,blob:stored,core,size:file.size,added:Date.now()});diag('Guardado en la biblioteca ('+core+')');}
-  catch(e){showHint('No hubo espacio para guardarlo, pero se abrirá igual');}
+  catch(e){diag('No se pudo guardar: '+(e&&(e.name+' '+e.message)));showHint('No se pudo guardar en la biblioteca ('+(e&&e.name)+'), pero se abrirá igual');}
   // Para jugar se usa la copia guardada (vive en el almacenamiento, no en la RAM) y se suelta la copia en memoria
   const name=file.name; let toRun=file; try{const rec=await libGet(name); if(rec?.blob){toRun=rec.blob; file=null; stored=null;}}catch(e){}
   renderLib(); runGame(name,toRun,core);
@@ -790,7 +800,7 @@ $('install').onclick=async()=>{if(!deferred)return;deferred.prompt();await defer
 addEventListener('appinstalled',()=>$('install').style.display='none');
 // ================= Actualización automática =================
 // El script de publicación escribe la versión aquí y en version.json.
-const APP_VERSION='20261125-203140-3f690a8';
+const APP_VERSION='20261125-203723-5a5494f';
 diag('App abierta (versión '+APP_VERSION+')');
 let swReg=null, updatePending=false;
 if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>swReg=r).catch(()=>{});
