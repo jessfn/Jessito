@@ -518,7 +518,7 @@ const EJS_CDN='https://cdn.emulatorjs.org/stable/data/';
 function precargarMotores(cores){
   if(!navigator.serviceWorker?.controller||!navigator.onLine||navigator.connection?.saveData)return;
   const urls=['loader.js','emulator.min.js','emulator.min.css','version.json','compression/extract7z.js','compression/extractzip.js','compression/libunrar.js']
-    .map(f=>EJS_CDN+f).concat([...new Set(cores)].filter(c=>CORE_FILE[c]).map(c=>EJS_CDN+'cores/'+CORE_FILE[c]+'-wasm.data'));
+    .map(f=>EJS_CDN+f).concat([...new Set(cores)].filter(c=>CORE_FILE[c]).map(c=>EJS_CDN+'cores/reports/'+CORE_FILE[c]+'.json')); // los motores (.data) ya los guarda EmulatorJS
   (window.requestIdleCallback||setTimeout)(()=>navigator.serviceWorker.controller.postMessage({precargar:urls}));
 }
 async function renderLib(){
