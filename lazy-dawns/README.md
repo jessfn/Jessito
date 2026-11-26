@@ -287,3 +287,4 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
 - Desenlace: Will (M) termina internado en el psiquiátrico. Dustin termina en la CÁRCEL, pero se ve como buena persona: todo indica que Will, su mejor amigo, lo influyó (no era malo ni estaba tan convencido).
 - **NO colocar revelaciones todavía.** Hasta la gran final, la audiencia sigue creyendo que M es Mari: mantener pistas falsas hacia Mari, y solo sembrar pistas sutiles hacia Will que pasen desapercibidas (sin delatarlo). Will actúa como aliado/protector de Lazy. La voz y silueta de M no cambian; no mostrar a M con rasgos de Will. El giro ocurre en la gran final (Día 29/30).
 - Día 30 (sueño de la pasarela: mujer de rojo con lentes que la invita a Hollywood) se mantiene.
+- **Pista oculta del nombre:** la "M" es la inicial de Will (W) al revés. Se puede sembrar muy sutilmente (letras W/M invertidas en objetos, firmas, marcas) sin delatar el secreto hasta la gran final.
