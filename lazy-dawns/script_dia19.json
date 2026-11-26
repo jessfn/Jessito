@@ -1,0 +1,96 @@
+[
+ {
+  "id": "i1",
+  "who": "M",
+  "text": "¿Hay alguien? Por favor... ayúdenme.",
+  "pad": 0.7,
+  "fx": "lowpass=f=1500,highpass=f=180,aecho=0.6:0.5:40:0.25"
+ },
+ {
+  "id": "i2",
+  "who": "D",
+  "text": "Nadie te escucha aquí. Pero ella sí vendrá.",
+  "pad": 0.5,
+  "fx": "asetrate=44100*0.8,aresample=44100,atempo=1.25,aecho=0.8:0.7:70|140:0.4|0.25,highpass=f=80"
+ },
+ {
+  "id": "l1",
+  "who": "N",
+  "text": "Día diecinueve. Eligieron el cabello. Y mi mamá ya tenía todo listo.",
+  "pad": 4.3
+ },
+ {
+  "id": "l2",
+  "who": "S",
+  "text": "Hija, siéntate frente al espejo. Primero, un lavado con champú suave y acondicionador.",
+  "pad": 0.3
+ },
+ {
+  "id": "l3",
+  "who": "N",
+  "text": "Después, desenredó cada mechón con un peine de dientes anchos.",
+  "pad": 0.2
+ },
+ {
+  "id": "l4",
+  "who": "S",
+  "text": "Ahora, la crema definidora de rizos, y el secado con difusor.",
+  "pad": 0.2
+ },
+ {
+  "id": "l5",
+  "who": "N",
+  "text": "Mis rizos regresaron. Mi mamá hizo la raya al centro, y alisó la parte de arriba con una plancha tibia.",
+  "pad": 0.25
+ },
+ {
+  "id": "l6",
+  "who": "N",
+  "text": "Luego, dos coletas bajas, con ligas pequeñas, y los rizos cayendo por detrás de mis hombros.",
+  "pad": 0.2
+ },
+ {
+  "id": "l7",
+  "who": "Y",
+  "text": "Lazy... te ves increíble.",
+  "pad": 0.35
+ },
+ {
+  "id": "l8",
+  "who": "N",
+  "text": "Entonces, mi celular vibró. Número desconocido.",
+  "pad": 0.5
+ },
+ {
+  "id": "l9",
+  "who": "D",
+  "text": "Si quieres recuperar a tu amiga, ven sola mañana a las diez de la noche, al bosque del Cerro Negro.",
+  "pad": 0.35,
+  "fx": "asetrate=44100*0.8,aresample=44100,atempo=1.25,aecho=0.8:0.7:70|140:0.4|0.25,highpass=f=80"
+ },
+ {
+  "id": "l10",
+  "who": "D",
+  "text": "Si avisas a alguien, no volverás a verla.",
+  "pad": 0.5,
+  "fx": "asetrate=44100*0.8,aresample=44100,atempo=1.25,aecho=0.8:0.7:70|140:0.4|0.25,highpass=f=80"
+ },
+ {
+  "id": "l11",
+  "who": "Y",
+  "text": "Lazy, no puedes ir sola.",
+  "pad": 0.3
+ },
+ {
+  "id": "l12",
+  "who": "N",
+  "text": "Pero con este vestido y estos tacones, jamás llegaría corriendo por un bosque.",
+  "pad": 0.25
+ },
+ {
+  "id": "l13",
+  "who": "N",
+  "text": "Zapatillas o ropa. Tú decides. Comenta tu elección, comparte este video y sígueme para el día veinte.",
+  "pad": 0.35
+ }
+]
