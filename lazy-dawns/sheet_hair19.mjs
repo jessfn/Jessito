@@ -1,12 +1,12 @@
 import { Resvg } from '@resvg/resvg-js'; import { writeFileSync, readFileSync } from 'node:fs'; import { execSync } from 'node:child_process';
 import { renderCharacter as rc, defaultPose as dp, ALLDEFS } from './rig2d/character.mjs'; import { applyDay18Face } from './face_final.mjs'; import { defs } from './lazy_lib.mjs';
-const OPT = JSON.parse(process.env.OPT || '[["A · Coleta alta de rizos","ponyhigh","Cascada de rizos con liga dorada y perlas"],["B · Bob rizado con perlas","bob","Rizos a la altura de la barbilla y pasador de perlas"],["C · Rizos XL con volumen","vol","Rizos voluminosos con estrellas doradas"],["D · Coleta lateral con moño","sidepony","Rizos sobre el hombro con moño rojo de listón"]]');
+const OPT = [["A · Coletas laterales largas","twin","Arriba lisa, rizos largos y ligas rosas","xl"],["B · Coletas altas largas","twinhigh","Coletas altas, rizos largos, ligas rosas","xl"],["C · Coletas largas con moños","twin","Rizos muy largos con moños rosados","xlbow"],["D · Coletas bajas al frente","twin","Atadas junto a la mandíbula, liga rosa","low"]];
 const tiles = [];
-OPT.forEach(([n, st, d], i) => { applyDay18Face();
-  const P = dp(); P.eyes.lookX = 0.1; P.mouth.smile = 0.5; P.mouth.open = 0.03; P.noseStyle = 'D'; P.noseK = 1.35; P.hairOv = { hd: st, len: 0.7, shine: 1, cp: 1, grow: 1 }; P.hair.t = 1; P.skirt.t = 1;
+OPT.forEach(([n, st, d, tv], i) => { applyDay18Face();
+  const P = dp(); P.eyes.lookX = 0.1; P.mouth.smile = 0.5; P.mouth.open = 0.03; P.noseStyle = 'D'; P.noseK = 1.35; P.hairOv = { hd: st, tv, len: 0.7, shine: 1, cp: 1, grow: 1 }; P.hair.t = 1; P.skirt.t = 1;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1500" viewBox="0 0 1024 1500">${defs('e3d')}${ALLDEFS}<rect width="1024" height="1500" fill="#2a1830"/>${rc(P)}</svg>`;
   writeFileSync(`/tmp/hr_${i}.png`, new Resvg(svg, { fitTo: { mode: 'zoom', value: 2 }, font: { loadSystemFonts: true } }).render().asPng());
   execSync(`ffmpeg -y -loglevel error -i /tmp/hr_${i}.png -vf crop=1200:1300:424:20,scale=540:585 /tmp/hrc_${i}.png`); tiles.push([n, d, readFileSync(`/tmp/hrc_${i}.png`)]); });
 const b64 = (b) => 'data:image/png;base64,' + Buffer.from(b).toString('base64'); let body = '';
 tiles.forEach(([n, d, t], i) => { const x = (i % 2) * 560 + 5, y = Math.floor(i / 2) * 720 + 5; body += `<image href="${b64(t)}" x="${x}" y="${y}" width="540" height="585"/><text x="${x + 270}" y="${y + 635}" font-family="Anton" font-size="38" text-anchor="middle" fill="#ffe14d">${n}</text><text x="${x + 270}" y="${y + 677}" font-family="Inter" font-weight="600" font-size="24" text-anchor="middle" fill="#fff">${d}</text>`; });
-writeFileSync(process.env.OUTP || 'OpcionesPeinado19.png', new Resvg(`<svg xmlns="http://www.w3.org/2000/svg" width="1130" height="1450"><rect width="1130" height="1450" fill="#1d1426"/>${body}</svg>`, { font: { loadSystemFonts: true } }).render().asPng());
+writeFileSync(process.env.OUTP || 'OpcionesPeinado19b.png', new Resvg(`<svg xmlns="http://www.w3.org/2000/svg" width="1130" height="1450"><rect width="1130" height="1450" fill="#1d1426"/>${body}</svg>`, { font: { loadSystemFonts: true } }).render().asPng());

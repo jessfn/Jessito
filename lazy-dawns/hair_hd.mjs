@@ -11,7 +11,7 @@ export const hdDefs = (h) => `<radialGradient id="hdScr" cx="0.35" cy="0.3" r="0
   <linearGradient id="hdGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff0a8"/><stop offset="0.5" stop-color="#d4a24c"/><stop offset="1" stop-color="#8a5f1c"/></linearGradient>`;
 const LIGHT = [-0.55, -0.83];
 let CUR = { cp: 1, bounce: 0, wind: 0, grow: 1 };
-const MEMO = new Map(); const memo = (tag, h, fn) => { const key = tag + JSON.stringify([h.hd, h.len, Math.round((h.cp ?? 1) * 40), Math.round((h.bounce || 0) * 40), Math.round((h.wind || 0) * 40), Math.round((h.sway || 0) * 20), Math.round((h.grow ?? 1) * 40)]); if (MEMO.has(key)) return MEMO.get(key); CUR = { cp: h.cp ?? 1, bounce: h.bounce || 0, wind: h.wind || 0, grow: h.grow ?? 1 }; const v = fn(); if (MEMO.size > 400) MEMO.clear(); MEMO.set(key, v); return v; };
+const MEMO = new Map(); const memo = (tag, h, fn) => { const key = tag + JSON.stringify([h.hd, h.len, Math.round((h.cp ?? 1) * 40), Math.round((h.bounce || 0) * 40), Math.round((h.wind || 0) * 40), Math.round((h.sway || 0) * 20), Math.round((h.grow ?? 1) * 40), h.tv || '']); if (MEMO.has(key)) return MEMO.get(key); CUR = { cp: h.cp ?? 1, bounce: h.bounce || 0, wind: h.wind || 0, grow: h.grow ?? 1 }; const v = fn(); if (MEMO.size > 400) MEMO.clear(); MEMO.set(key, v); return v; };
 const styleOf = (h) => h.hd === true ? 'long' : h.hd;
 
 // espina: nace en p0, sale en direccion ang, y la gravedad la curva hacia abajo
@@ -131,10 +131,11 @@ function twinTop(h, st) { const R = rng(31); const cap = (m) => `<path d="M0,-21
   // rizos sueltos delante de las orejas y en la linea de nacimiento (pequenos)
   for (const m of [-1, 1]) for (let i = 0; i < 3; i++) { const sp = spine([m * (182 + i * 4), -86 + i * 22], deg(90 - m * 12), 60 + i * 16, 0.0006, R, 3); o += lock(sp, 9, 6.5, 22, R() * 6, R, { taper: 0.3 }); }
   return o + '</g>'; }
-function twinFront(h, st) { const R = rng(37); let o = ''; const high = st === 'twinhigh';
-  for (const m of [-1, 1]) { const tx = m * (high ? 176 : 206), ty = high ? -134 : -52; const base = deg(90 + m * (high ? -62 : -26));
+function twinFront(h, st) { const R = rng(37); let o = ''; const high = st === 'twinhigh'; const tv = h.tv || '', low = tv === 'low', LK = tv === 'xl' || tv === 'xlbow' ? 1.6 : low ? 1.3 : 1.15, bow = tv === 'bow' || tv === 'xlbow';
+  for (const m of [-1, 1]) { const tx = m * (high ? 176 : low ? 196 : 206), ty = high ? -134 : low ? 34 : -52; const base = deg(90 + m * (high ? -62 : low ? -8 : -26));
     // masa trasera de la coleta
-    for (let k = 0; k < 11; k++) { const a = base + m * (k - 5) * 0.09; o += clump([tx + m * (k - 5) * 3.4, ty], a, (high ? 270 : 300) * (0.85 + R() * 0.25), high ? 0.0046 : 0.0028, 22, R, 3); }
-    // liga/scrunchie
-    o += `<g transform="translate(${tx},${ty}) rotate(${m * 20})"><ellipse rx="30" ry="22" fill="url(#hdScr)" stroke="${OUT}" stroke-width="6"/>${[-18, -6, 6, 18].map((x) => `<path d="M${x},-17 Q${x + 6},0 ${x},17" stroke="#fff" stroke-width="2.4" fill="none" opacity="0.5"/>`).join('')}<ellipse cx="-8" cy="-8" rx="10" ry="4" fill="#fff" opacity="0.5"/></g>`; }
+    for (let k = 0; k < 11; k++) { const a = base + m * (k - 5) * 0.09; o += clump([tx + m * (k - 5) * 3.4, ty], a, (high ? 270 : 300) * LK * (0.85 + R() * 0.25), high ? 0.0046 : low ? 0.0012 : 0.0028, 22, R, 3); }
+    // liga rosa / moño rosa
+    if (bow) o += `<g transform="translate(${tx},${ty}) rotate(${m * 24})"><path d="M0,0 L${-m * 46},-26 Q${-m * 58},0 ${-m * 46},26Z" fill="#f472b6" stroke="${OUT}" stroke-width="5" stroke-linejoin="round"/><path d="M0,0 L${m * 46},-26 Q${m * 58},0 ${m * 46},26Z" fill="#f472b6" stroke="${OUT}" stroke-width="5" stroke-linejoin="round"/><path d="M${-m * 34},-12 L${-m * 8},-2 M${m * 34},-12 L${m * 8},-2" stroke="#fbcfe8" stroke-width="3" opacity="0.9"/><rect x="-10" y="-13" width="20" height="26" rx="8" fill="#ec4899" stroke="${OUT}" stroke-width="5"/></g>`;
+    else o += `<g transform="translate(${tx},${ty}) rotate(${m * 20})"><ellipse rx="30" ry="22" fill="url(#hdScr)" stroke="${OUT}" stroke-width="6"/>${[-18, -6, 6, 18].map((x) => `<path d="M${x},-17 Q${x + 6},0 ${x},17" stroke="#fff" stroke-width="2.4" fill="none" opacity="0.5"/>`).join('')}<ellipse cx="-8" cy="-8" rx="10" ry="4" fill="#fff" opacity="0.5"/></g>`; }
   return o; }
