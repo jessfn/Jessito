@@ -50,9 +50,9 @@ const deg = (d) => d * Math.PI / 180;
 export function hdBack(h) { const st = styleOf(h); if (!st || st === 'turban' || st === 'twin' || st === 'twinhigh') return ''; return memo('b', h, () => hdBackI(h, st)); }
 function hdBackI(h, st) { const R = rng(11);
   const g = Math.min(1, Math.max(0, h.grow ?? 1)), sh = g >= 0.99 ? 0 : 1 - g;   // pelo ralo: la masa oscura de atras se encoge (sin halo negro)
-  let o = `<ellipse cx="0" cy="${-24 - 50 * sh}" rx="${(st === 'afro' ? 262 : 226) - 60 * sh}" ry="${(st === 'afro' ? 258 : 232) - 70 * sh}" fill="url(#hdBase)" stroke="${OUT}" stroke-width="${g >= 0.99 ? 8 : 8 * Math.max(0, g - 0.4) / 0.6}"/>`;
+  const sm = st === 'bob' || st === 'ponyhigh' || st === 'sidepony'; let o = `<ellipse cx="0" cy="${(sm ? -44 : -24) - 50 * sh}" rx="${(st === 'afro' ? 262 : sm ? 214 : 226) - 60 * sh}" ry="${(st === 'afro' ? 258 : sm ? 196 : 232) - 70 * sh}" fill="url(#hdBase)" stroke="${OUT}" stroke-width="${g >= 0.99 ? 8 : 8 * Math.max(0, g - 0.4) / 0.6}"/>`;
   if (st === 'afro') { for (let a = 150; a <= 390; a += 7) o += clump(scalp(deg(a), 200, 200), deg(a), 130 + R() * 50, 0.0009, 22, R, 3); return `<g>${o}</g>`; }
-  const hang = st === 'half' ? 0.8 : st === 'side' ? 0.62 : 1;
+  const hang = st === 'half' ? 0.8 : st === 'side' ? 0.62 : st === 'bob' ? 0.22 : st === 'ponyhigh' ? 0.12 : st === 'sidepony' ? 0.2 : 1;
   for (let a = 150; a <= 215; a += 13) o += clump(scalp(deg(a), 196, 150), lerp(deg(a), Math.PI / 2, 0.6), (200 + R() * 60) * (0.7 + 0.5 * hang) * 0.55, 0.0030, 19, R, 3);
   for (let a = 325; a <= 390; a += 13) o += clump(scalp(deg(a), 196, 150), lerp(deg(a), Math.PI / 2, 0.6), (200 + R() * 60) * (0.7 + 0.5 * hang) * 0.55, 0.0030, 19, R, 3);
   return `<g>${o}</g>`; }
@@ -67,6 +67,10 @@ function hdTopI(h, st) { const R = rng(23);
   if (st === 'afro') { ringA(160, 380, 7, 208, 206, 170, 0.0012, 22, 3); ringA(172, 368, 9, 178, 176, 140, 0.0012, 19, 3); }
   else if (st === 'half') { ringA(160, 380, 9, 206, 204, 200, 0.0030, 19, 3); ringA(176, 364, 11, 178, 176, 160, 0.0028, 17, 3); }
   else if (st === 'side') { ringA(160, 380, 8, 206, 204, 240, 0.0030, 19, 3); ringA(176, 364, 10, 176, 172, 200, 0.0028, 17, 3); }
+  else if (st === 'bob') { ringA(160, 380, 8, 206, 204, 150, 0.0030, 20, 3); ringA(176, 364, 10, 176, 172, 120, 0.0028, 18, 3); }
+  else if (st === 'ponyhigh') { ringA(160, 380, 8, 206, 204, 70, 0.0012, 18, 3); ringA(176, 364, 10, 176, 172, 50, 0.0012, 16, 3); }
+  else if (st === 'sidepony') { ringA(160, 380, 8, 206, 204, 90, 0.0020, 18, 3); ringA(176, 364, 10, 176, 172, 70, 0.0018, 16, 3); }
+  else if (st === 'vol') { ringA(160, 380, 7, 214, 212, 250, 0.0034, 22, 3); ringA(170, 370, 8, 190, 188, 220, 0.0030, 20, 3); ringA(180, 360, 10, 160, 158, 180, 0.0028, 18, 3); }
   else { ringA(160, 380, 8, 206, 204, 260, 0.0030, 19, 3); ringA(176, 364, 10, 176, 172, 210, 0.0028, 17, 3); }
   // raya
   if (st !== 'afro') o += `<path d="M${st === 'side' ? -62 : 0},-198 q${st === 'side' ? 10 : 0},22 ${st === 'side' ? 28 : 0},46" stroke="#b07a54" stroke-width="7" stroke-linecap="round" opacity="0.9"/>`;
@@ -76,6 +80,16 @@ function hdTopI(h, st) { const R = rng(23);
   if (st === 'half') { // pompon de rizos arriba y liga dorada
     for (let a = 200; a <= 340; a += 14) { const aa = deg(a); o += clump([Math.cos(aa) * 30, -232], aa, 150, 0.0052, 24, R, 3); }
     o += `<g transform="translate(0,-232)"><ellipse rx="92" ry="21" fill="url(#hdGold)" stroke="${OUT}" stroke-width="6"/><ellipse cx="-14" cy="-6" rx="56" ry="6" fill="#fff" opacity="0.5"/>${[-54, -27, 0, 27, 54].map((x) => `<circle cx="${x}" cy="3" r="5" fill="#fff6c8" stroke="${OUT}" stroke-width="2"/>`).join('')}</g>`; }
+
+  if (st === 'ponyhigh') { // coleta alta: cascada de rizos que cae por detras/derecha, con liga dorada y perlas
+    for (let a = 205; a <= 335; a += 10) { const aa = deg(a); o += clump([Math.cos(aa) * 26, -236], deg(300 + (a - 270) * 0.35), 330 + R() * 90, 0.0016, 24, R, 3); }
+    for (let a = 215; a <= 325; a += 14) { const aa = deg(a); o += clump([Math.cos(aa) * 22, -238], deg(255 + (a - 270) * 0.3), 260 + R() * 80, 0.0014, 22, R, 3); }
+    o += `<g transform="translate(0,-238)"><ellipse rx="70" ry="18" fill="url(#hdGold)" stroke="${OUT}" stroke-width="6"/><ellipse cx="-12" cy="-5" rx="42" ry="5" fill="#fff" opacity="0.5"/>${[-42, -21, 0, 21, 42].map((x) => `<circle cx="${x}" cy="3" r="5" fill="#fff6e8" stroke="${OUT}" stroke-width="2"/>`).join('')}</g>`; }
+  if (st === 'sidepony') { // coleta baja lateral sobre el hombro izquierdo con moño de listón
+    for (let k = 0; k < 9; k++) o += clump([-150 + k * 4, 40 + k * 6], deg(96 - k * 1.5), 360 + R() * 80, 0.00025, 24, R, 3);
+    o += `<g transform="translate(-150,86) rotate(-12)"><path d="M0,0 L-52,-30 Q-64,0 -52,30Z" fill="#c4122a" stroke="${OUT}" stroke-width="5" stroke-linejoin="round"/><path d="M0,0 L52,-30 Q64,0 52,30Z" fill="#c4122a" stroke="${OUT}" stroke-width="5" stroke-linejoin="round"/><path d="M-40,-14 L-10,-2 M40,-14 L10,-2" stroke="#ff7080" stroke-width="3" opacity="0.8"/><rect x="-11" y="-13" width="22" height="26" rx="8" fill="#9c0f1c" stroke="${OUT}" stroke-width="5"/></g>`; }
+  if (st === 'bob') o += `<g transform="translate(150,-104) rotate(12)"><rect x="-44" y="-8" width="88" height="16" rx="8" fill="url(#hdGold)" stroke="${OUT}" stroke-width="5"/>${[-30, -10, 10, 30].map((x) => `<circle cx="${x}" cy="0" r="9" fill="#fff6ee" stroke="${OUT}" stroke-width="3"/><circle cx="${x - 3}" cy="-3" r="3" fill="#fff" opacity="0.9"/>`).join('')}</g>`;
+  if (st === 'vol') o += [[-150, -104, -14], [156, -92, 16]].map(([x, y, r]) => `<g transform="translate(${x},${y}) rotate(${r})"><path d="M0,-26 L8,-8 L28,-6 L12,6 L18,26 L0,14 L-18,26 L-12,6 L-28,-6 L-8,-8Z" fill="url(#hdGold)" stroke="${OUT}" stroke-width="5" stroke-linejoin="round"/><circle r="5" fill="#fff6c8"/></g>`).join('');
   if (st === 'afro') o += `<g><path d="M-212,-52 Q0,-248 212,-52" stroke="${OUT}" stroke-width="40" fill="none" stroke-linecap="round"/><path d="M-212,-52 Q0,-248 212,-52" stroke="url(#hdGold)" stroke-width="28" fill="none" stroke-linecap="round"/><path d="M-196,-62 Q0,-236 196,-62" stroke="#fff" stroke-width="6" fill="none" opacity="0.5" stroke-linecap="round"/>${[-120, -60, 0, 60, 120].map((x, i) => `<g transform="translate(${x},${-151 - (1 - Math.pow(x / 120, 2)) * 18 + (Math.abs(x) > 100 ? 4 : 0)})"><circle r="${i === 2 ? 15 : 10}" fill="${['#34d399', '#f472b6', '#fde68a', '#f472b6', '#34d399'][i]}" stroke="${OUT}" stroke-width="4"/><circle cx="-3" cy="-4" r="3.4" fill="#fff" opacity="0.8"/></g>`).join('')}</g>`;
   return o + '</g>'; }
 
@@ -83,7 +97,7 @@ export function hdFront(h, yaw = 0, t = 0) { const st = styleOf(h); if (!st || s
 function hdFrontI(h, st) { const R = rng(41), sw = (h.sway || 0), L = clamp(h.len ?? 1); let o = '';
   const sway = (g) => g; void sway;
   if (st === 'afro') { for (const m of [-1, 1]) for (let i = 0; i < 3; i++) o += clump([m * (196 + i * 4), -6 + i * 36], deg(90 - m * 14), 90 + i * 16, 0.0004, 18, R, 2); return o; }
-  const ln = (st === 'half' ? 0.74 : st === 'side' ? 0.86 : 1) * (190 + 540 * L) * 0.62;
+  const ln = (st === 'half' ? 0.74 : st === 'side' ? 0.86 : st === 'bob' ? 0.36 : st === 'ponyhigh' ? 0.1 : st === 'sidepony' ? 0.3 : st === 'vol' ? 0.95 : 1) * (190 + 540 * L) * 0.62;
   for (const m of [-1, 1]) {
     for (let i = 0; i < 5; i++) { const ang = deg(90 - m * (8 + i * 2.2) + sw * 6 * m); o += clump([m * (206 + i * 7), 14 + i * 24], ang, ln * (0.62 + 0.38 * (i / 4)) * (0.9 + R() * 0.2), 0.00012 * (1 + i * 0.2), 18 - i * 0.5, R, 3); }
     for (let i = 0; i < 3; i++) o += clump([m * (214 + i * 3), -20 + i * 22], deg(92 - m * 5), 120 + i * 50, 0.0002, 11, R, 2);
