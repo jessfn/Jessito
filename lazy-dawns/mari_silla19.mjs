@@ -2,7 +2,7 @@
 import { Resvg } from '@resvg/resvg-js'; import { writeFileSync } from 'node:fs';
 const OUT = '#0c0709', O = `stroke="${OUT}" stroke-width="7" stroke-linejoin="round"`;
 export function mariSilla(t = 0, o = {}) {
-  const br = Math.sin(t * 2.6) * 0.5 + 0.5, sw = Math.sin(t * 1.3) * 3, tilt = o.tilt ?? -5;
+  const st = o.struggle ?? 0, tk = o.talk ?? 0, br = Math.sin(t * (2.6 + 3 * st)) * 0.5 + 0.5, sw = Math.sin(t * 1.3) * 3 + st * Math.sin(t * 13) * 5, tilt = (o.tilt ?? -5) + st * Math.sin(t * 8.5) * 4 + tk * Math.sin(t * 17) * 2;
   const cord = Math.sin(t * 1.1) * 6;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920" viewBox="0 0 1080 1920">
 <defs>
@@ -59,7 +59,7 @@ ${[0, 1, 2, 3, 4, 5].map((i) => `<rect x="${i * 220 - 20}" y="0" width="14" heig
   <g clip-path="url(#sackc)"><rect x="-120" y="-180" width="240" height="310" filter="url(#weave)" opacity="0.55"/>
    ${[-70, -34, 4, 40, 72].map((x, i) => `<path d="M${x},-160 Q${x + (i % 2 ? 10 : -10)},-20 ${x + (i % 2 ? -6 : 8)},118" stroke="#5a4020" stroke-width="3" fill="none" opacity="0.5"/>`).join('')}
    <path d="M-100,-40 Q0,-70 100,-40" stroke="#5a4020" stroke-width="4" fill="none" opacity="0.5"/>
-   <ellipse cx="${-8 + br * 2}" cy="${14}" rx="${26 + br * 4}" ry="${14 + br * 5}" fill="#3a2810" opacity="0.28" filter="url(#b6)"/>
+   <ellipse cx="${-8 + br * 2}" cy="${14}" rx="${26 + br * 4 + tk * 6}" ry="${14 + br * 5 + tk * 8}" fill="#3a2810" opacity="0.28" filter="url(#b6)"/>
    <path d="M-94,-92 Q-30,-150 40,-150" stroke="#fff" stroke-width="12" fill="none" opacity="0.18" stroke-linecap="round" filter="url(#b6)"/>
    <path d="M64,-110 Q100,-60 98,10" stroke="#000" stroke-width="16" fill="none" opacity="0.2" filter="url(#b6)"/>
   </g>
@@ -70,5 +70,4 @@ ${[0, 1, 2, 3, 4, 5].map((i) => `<rect x="${i * 220 - 20}" y="0" width="14" heig
 ${(o.dust ?? true) ? [...Array(26)].map((_, i) => { const x = (i * 211) % 1000 + 40, y = 260 + ((i * 331 + t * (14 + i % 6) * 6) % 1200), r = 1.4 + (i % 3); return `<circle cx="${x}" cy="${y}" r="${r}" fill="#ffe8b8" opacity="${0.12 + (i % 4) * 0.06}"/>`; }).join('') : ''}
 <rect width="1080" height="1920" fill="url(#vig)"/>
 </svg>`; }
-const svg = mariSilla(0.6);
-writeFileSync('Mari_silla_bolsa.png', new Resvg(svg, { font: { loadSystemFonts: true } }).render().asPng());
+if (process.argv[1] && process.argv[1].endsWith('mari_silla19.mjs')) { writeFileSync('Mari_silla_bolsa.png', new Resvg(mariSilla(0.6), { font: { loadSystemFonts: true } }).render().asPng()); }
