@@ -142,6 +142,7 @@ function twinFront(h, st) { const R = rng(37); let o = ''; const high = st === '
     else if (tv === 'lowb' || tv === 'lowb2') { // liga pequena color cafe + mechones delanteros que tapan un poco el rostro de cada lado
       for (let k = 0; k < 2; k++) o += clump([m * (172 + k * 6), -8 + k * 22], deg(90 + m * (12 + k * 3)), 118 + k * 14, 0.0004, 20, R, 3);
       for (let k = 0; k < 6; k++) o += clump([m * (200 + (k % 2) * 5), -44 + k * 18], deg(90 + m * (4 + (k % 3) * 3)), 120 + k * 12, 0.0003, 22, R, 3);  // cubren orejas y aretes
+      for (let k = 0; k < 5; k++) o += clump([m * (166 + (k % 2) * 6), -96 + k * 20], deg(90 + m * (13 + (k % 3) * 2)), 150 + k * 10, 0.0003, 21, R, 3);  // tapan un poco mas junto a los ojos
       o += `<g transform="translate(${tx},${ty}) rotate(${m * 20})"><ellipse rx="17" ry="12.5" fill="#6b4226" stroke="${OUT}" stroke-width="4.5"/>${[-9, -3, 3, 9].map((x) => `<path d="M${x},-9 Q${x + 3},0 ${x},9" stroke="#c89468" stroke-width="1.6" fill="none" opacity="0.6"/>`).join('')}<ellipse cx="-5" cy="-4.5" rx="6" ry="2.4" fill="#e8c9a4" opacity="0.5"/></g>`; }
     else o += `<g transform="translate(${tx},${ty}) rotate(${m * 20})"><ellipse rx="30" ry="22" fill="url(#hdScr)" stroke="${OUT}" stroke-width="6"/>${[-18, -6, 6, 18].map((x) => `<path d="M${x},-17 Q${x + 6},0 ${x},17" stroke="#fff" stroke-width="2.4" fill="none" opacity="0.5"/>`).join('')}<ellipse cx="-8" cy="-8" rx="10" ry="4" fill="#fff" opacity="0.5"/></g>`; }
   return o; }
