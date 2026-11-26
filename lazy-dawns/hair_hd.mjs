@@ -139,5 +139,8 @@ function twinFront(h, st) { const R = rng(37); let o = ''; const high = st === '
     // liga rosa / moño rosa
     if (PART === 'curls') continue;
     if (bow) o += `<g transform="translate(${tx},${ty}) rotate(${m * 24})"><path d="M0,0 L${-m * 46},-26 Q${-m * 58},0 ${-m * 46},26Z" fill="#f472b6" stroke="${OUT}" stroke-width="5" stroke-linejoin="round"/><path d="M0,0 L${m * 46},-26 Q${m * 58},0 ${m * 46},26Z" fill="#f472b6" stroke="${OUT}" stroke-width="5" stroke-linejoin="round"/><path d="M${-m * 34},-12 L${-m * 8},-2 M${m * 34},-12 L${m * 8},-2" stroke="#fbcfe8" stroke-width="3" opacity="0.9"/><rect x="-10" y="-13" width="20" height="26" rx="8" fill="#ec4899" stroke="${OUT}" stroke-width="5"/></g>`;
+    else if (tv === 'lowb' || tv === 'lowb2') { // liga pequena color cafe + mechones delanteros que tapan un poco el rostro de cada lado
+      for (let k = 0; k < 2; k++) o += clump([m * (172 + k * 6), -8 + k * 22], deg(90 + m * (12 + k * 3)), 118 + k * 14, 0.0004, 20, R, 3);
+      o += `<g transform="translate(${tx},${ty}) rotate(${m * 20})"><ellipse rx="17" ry="12.5" fill="#6b4226" stroke="${OUT}" stroke-width="4.5"/>${[-9, -3, 3, 9].map((x) => `<path d="M${x},-9 Q${x + 3},0 ${x},9" stroke="#c89468" stroke-width="1.6" fill="none" opacity="0.6"/>`).join('')}<ellipse cx="-5" cy="-4.5" rx="6" ry="2.4" fill="#e8c9a4" opacity="0.5"/></g>`; }
     else o += `<g transform="translate(${tx},${ty}) rotate(${m * 20})"><ellipse rx="30" ry="22" fill="url(#hdScr)" stroke="${OUT}" stroke-width="6"/>${[-18, -6, 6, 18].map((x) => `<path d="M${x},-17 Q${x + 6},0 ${x},17" stroke="#fff" stroke-width="2.4" fill="none" opacity="0.5"/>`).join('')}<ellipse cx="-8" cy="-8" rx="10" ry="4" fill="#fff" opacity="0.5"/></g>`; }
   return o; }
