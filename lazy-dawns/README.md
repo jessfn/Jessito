@@ -280,3 +280,10 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
 
 ## REGLA PERMANENTE: SIN ESPEJOS (desde Día 20)
 - No usar escenas ni tomas con espejos (ni reflejos de Lazy, ni espejitos en acercamientos, ni tarjeta de "antes/después" en espejo). Se ve mal y no es lógico. Las revelaciones se muestran con tomas directas de Lazy (acercamiento, giro de cámara, reacción de los demás).
+
+## CANON ACTUALIZADO DEL FINAL (reemplaza el final anterior de Mari = M)
+- **M es Will** (no Mari). Mari NO es M: es la víctima (secuestrada desde el Día 18). Sus aliados: **Dante** (ya aliado de M desde el Día 10) y **Dustin** (amigo de Will desde la infancia, pero no estaba convencido de hacerlo: no era malo).
+- Motivo: en la infancia, en la escuela, Will fue rechazado (por Lazy / el grupo); Dustin era su amigo y lo acompañaba, sin la misma maldad.
+- Desenlace: Will (M) termina internado en el psiquiátrico (el desenlace que antes era de Mari). Dustin no termina como villano.
+- **NO colocar revelaciones todavía.** Hasta la gran final, la audiencia sigue creyendo que M es Mari: mantener pistas falsas hacia Mari, y solo sembrar pistas sutiles hacia Will que pasen desapercibidas (sin delatarlo). Will actúa como aliado/protector de Lazy. La voz y silueta de M no cambian; no mostrar a M con rasgos de Will. El giro ocurre en la gran final (Día 29/30).
+- Día 30 (sueño de la pasarela: mujer de rojo con lentes que la invita a Hollywood) se mantiene.
