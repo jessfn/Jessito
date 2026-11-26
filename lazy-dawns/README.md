@@ -277,3 +277,6 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
 
 ## REGLA PERMANENTE DE PORTADAS (desde Día 19)
 - Sin título del episodio en la portada. Solo: logo arriba, la caja "DÍA N" centrada y Lazy centrada (mitad del cuerpo hacia arriba, pose/reacción únicas). Fondo oscuro; sin extras salvo que se pida. Implementado en `build_cover2.mjs` (`CENTERED` para días ≥ 19).
+
+## REGLA PERMANENTE: SIN ESPEJOS (desde Día 20)
+- No usar escenas ni tomas con espejos (ni reflejos de Lazy, ni espejitos en acercamientos, ni tarjeta de "antes/después" en espejo). Se ve mal y no es lógico. Las revelaciones se muestran con tomas directas de Lazy (acercamiento, giro de cámara, reacción de los demás).
