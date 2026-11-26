@@ -288,3 +288,10 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
 - **NO colocar revelaciones todavía.** Hasta la gran final, la audiencia sigue creyendo que M es Mari: mantener pistas falsas hacia Mari, y solo sembrar pistas sutiles hacia Will que pasen desapercibidas (sin delatarlo). Will actúa como aliado/protector de Lazy. La voz y silueta de M no cambian; no mostrar a M con rasgos de Will. El giro ocurre en la gran final (Día 29/30).
 - Día 30 (sueño de la pasarela: mujer de rojo con lentes que la invita a Hollywood) se mantiene.
 - **Pista oculta del nombre:** la "M" es la inicial de Will (W) al revés. Se puede sembrar muy sutilmente (letras W/M invertidas en objetos, firmas, marcas) sin delatar el secreto hasta la gran final.
+
+## GRAN FINAL (Día 29) — REVELACIÓN "MODO PELÍCULA" (canon)
+- En el Día 29 se revela todo con **grabaciones de cámaras de seguridad / grabadora vieja / cintas** que muestran lo que realmente pasó en los capítulos anteriores y cómo fue (estilo película, repaso por días).
+- **M es una identidad compartida**: la voz con filtro y la silueta de M las usan distintas personas. Cuando Will estaba con Lazy (o no podía ser él), quien actuaba como M era **Dustin** (cubriéndolo); a veces era **Dante**, que en realidad es **el papá de Will** (se revela al final).
+- Por eso, en los episodios (desde ya) mantener coartadas coherentes: si M aparece mientras Will está con Lazy, cuidar que el diseño de M no muestre rasgos identificables (siempre silueta/capucha, voz D con filtro) y anotar en README, por día, quién estaba detrás de M (para armar el montaje del Día 29).
+- Registro de quién fue M (a completar): Día 17 (agua sobre Lazy en la calle): pendiente; Día 18 (secuestro de Mari): Dustin/Dante (Will estaba con Lazy); Día 19 (sótano con Mari): Dante o Dustin (voz D con filtro).
+- El montaje del Día 29 debe poder mostrar escenas de los 28 días anteriores desde ángulos de cámara de vigilancia/grabadora con grano, fecha/hora y ruido.
