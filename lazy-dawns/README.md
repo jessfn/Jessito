@@ -274,3 +274,6 @@ Cada voto ofrece 2 opciones del banco de abajo (las que no hayan ganado se recic
 - CIERRE: al final de cada episodio, además de "comenta tu elección" y "sígueme para el día N+1", pedir que COMPARTAN el video (narración + elemento visual de compartir en la tarjeta final).
 - MÚSICA: usar instrumentales de fondo de SUSPENSO/ambiente que cambien según la escena y la emoción (intro oscura; casa tranquila con tensión latente; reveal bello que se vuelve ominoso; mensaje/amenaza con cuerdas en tremolo y latido; tarjeta final con pulso rítmico de intriga). Se generan con la API de ElevenLabs Music (`POST /v1/music`, `prompt` + `music_length_ms`; máx. ~2 llamadas simultáneas por 429) y se mezclan con ducking bajo la voz. SFX nuevos del día por escena.
 - Los tests de la intro: el fondo del cold-open de M/Mari es SIEMPRE distinto y oscuro cada día.
+
+## REGLA PERMANENTE DE PORTADAS (desde Día 19)
+- Sin título del episodio en la portada. Solo: logo arriba, la caja "DÍA N" centrada y Lazy centrada (mitad del cuerpo hacia arriba, pose/reacción únicas). Fondo oscuro; sin extras salvo que se pida. Implementado en `build_cover2.mjs` (`CENTERED` para días ≥ 19).
