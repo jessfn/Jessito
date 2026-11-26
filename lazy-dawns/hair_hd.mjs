@@ -131,8 +131,8 @@ function twinTop(h, st) { const R = rng(31); const cap = (m) => `<path d="M0,-21
   // rizos sueltos delante de las orejas y en la linea de nacimiento (pequenos)
   for (const m of [-1, 1]) for (let i = 0; i < 3; i++) { const sp = spine([m * (182 + i * 4), -86 + i * 22], deg(90 - m * 12), 60 + i * 16, 0.0006, R, 3); o += lock(sp, 9, 6.5, 22, R() * 6, R, { taper: 0.3 }); }
   return o + '</g>'; }
-function twinFront(h, st) { const R = rng(37); let o = ''; const high = st === 'twinhigh'; const tv = h.tv || '', low = tv === 'low', LK = tv === 'xl' || tv === 'xlbow' ? 1.6 : low ? 1.3 : 1.15, bow = tv === 'bow' || tv === 'xlbow';
-  for (const m of [-1, 1]) { const tx = m * (high ? 176 : low ? 196 : 206), ty = high ? -134 : low ? 34 : -52; const base = deg(90 + m * (high ? -62 : low ? -8 : -26));
+function twinFront(h, st) { const R = rng(37); let o = ''; const high = st === 'twinhigh'; const tv = h.tv || '', cl = tv === 'close' ? 1 : tv === 'closer' ? 2 : 0, low = tv === 'low', LK = cl || tv === 'xl' || tv === 'xlbow' ? 1.6 : low ? 1.3 : 1.15, bow = tv === 'bow' || tv === 'xlbow';
+  for (const m of [-1, 1]) { const tx = m * (cl ? 186 - 14 * (cl - 1) : high ? 176 : low ? 196 : 206), ty = cl ? -40 : high ? -134 : low ? 34 : -52; const base = deg(90 + m * (cl ? 9 + 8 * (cl - 1) : high ? -62 : low ? -8 : -26));
     // masa trasera de la coleta
     for (let k = 0; k < 11; k++) { const a = base + m * (k - 5) * 0.09; o += clump([tx + m * (k - 5) * 3.4, ty], a, (high ? 270 : 300) * LK * (0.85 + R() * 0.25), high ? 0.0046 : low ? 0.0012 : 0.0028, 22, R, 3); }
     // liga rosa / moño rosa
