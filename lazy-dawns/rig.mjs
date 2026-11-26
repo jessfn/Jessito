@@ -354,7 +354,7 @@ function headSvg(p) {
     ${p.faceSvg ? p.faceSvg : FEM > 0.02 ? `<path d="${femPathStr(yaw)}" fill="${SKIN}" ${O8}/>` : `<ellipse cx="${yaw * 4}" cy="0" rx="${208 * (1 - 0.07 * Math.min(SLIM, 1.4) - 0.03 * FACEW)}" ry="210" fill="${SKIN}" ${O8}/>`}
     ${p.faceSvg ? '' : `    <ellipse cx="${-70 + yaw * 10}" cy="-70" rx="110" ry="80" fill="#fff" opacity="0.13" filter="url(#blur20)"/>
     <ellipse cx="${90 + yaw * 10}" cy="${130 + jaw * 0.6}" rx="150" ry="70" fill="#000" opacity="0.18" filter="url(#blur20)"/>`}
-    ${p.faceSvg ? '' : ear(-1) + ear(1)}
+    ${p.faceSvg || p.hideEars ? '' : ear(-1) + ear(1)}
     ${hr.lacio ? (p.frontHair ? '' : (isBob(hr) ? bobTop(hr, yaw) : lacioTop(hr, yaw))) : hr.hd ? `<g transform="translate(${yaw * 10},0)">${hdTop(hr, yaw)}</g>` : `<g transform="translate(${yaw * 10},0)">${hairCurly(hr)}${hairTop(hr)}</g>`}
     <g transform="translate(${fx},${(p.pitch || 0) * 12})">
       <!-- pomulos / mejillas -->
