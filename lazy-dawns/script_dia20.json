@@ -1,0 +1,108 @@
+[
+ {
+  "id": "i1",
+  "who": "M",
+  "text": "Un poco más... ya casi.",
+  "pad": 0.5
+ },
+ {
+  "id": "i2",
+  "who": "D",
+  "text": "Nadie va a salvarte. Solo ella puede venir.",
+  "pad": 0.4,
+  "fx": "asetrate=44100*0.8,aresample=44100,atempo=1.25,aecho=0.8:0.7:70|140:0.4|0.25,highpass=f=80"
+ },
+ {
+  "id": "l1",
+  "who": "N",
+  "text": "Día veinte. Eligieron la ropa, y no tenía tiempo que perder.",
+  "pad": 4.2
+ },
+ {
+  "id": "l2",
+  "who": "N",
+  "text": "Tomé de mi clóset lo primero cómodo: un chaleco acolchado negro, leggings y una playera de manga larga.",
+  "pad": 0.2
+ },
+ {
+  "id": "l3",
+  "who": "N",
+  "text": "A las diez de la noche, llegué sola al bosque del Cerro Negro.",
+  "pad": 0.25
+ },
+ {
+  "id": "l4",
+  "who": "D",
+  "text": "Llegaste puntual. Si quieres a tu amiga de regreso, harás algo por mí.",
+  "pad": 0.35,
+  "fx": "asetrate=44100*0.8,aresample=44100,atempo=1.25,aecho=0.8:0.7:70|140:0.4|0.25,highpass=f=80"
+ },
+ {
+  "id": "l5",
+  "who": "D",
+  "text": "Publica un video, diciendo que jamás estarías en una pasarela de modelo.",
+  "pad": 0.3,
+  "fx": "asetrate=44100*0.8,aresample=44100,atempo=1.25,aecho=0.8:0.7:70|140:0.4|0.25,highpass=f=80"
+ },
+ {
+  "id": "l6",
+  "who": "N",
+  "text": "No entendí por qué. Pero no tenía opción.",
+  "pad": 0.25
+ },
+ {
+  "id": "l7",
+  "who": "N",
+  "text": "Grabé el video. Mi dedo temblaba sobre publicar.",
+  "pad": 0.25
+ },
+ {
+  "id": "l8",
+  "who": "M",
+  "text": "¡Lazy, corre!",
+  "pad": 0.2
+ },
+ {
+  "id": "l9",
+  "who": "N",
+  "text": "Mari se había soltado. Corrimos juntas, entre los árboles.",
+  "pad": 0.2
+ },
+ {
+  "id": "l10",
+  "who": "D",
+  "text": "¡No se escapen!",
+  "pad": 0.2,
+  "fx": "asetrate=44100*0.8,aresample=44100,atempo=1.25,aecho=0.8:0.7:70|140:0.4|0.25,highpass=f=80"
+ },
+ {
+  "id": "l11",
+  "who": "N",
+  "text": "Entonces, M me empujó, y caí en el lodo.",
+  "pad": 0.2
+ },
+ {
+  "id": "l12",
+  "who": "N",
+  "text": "Mi ropa quedó cubierta de barro. Pero no nos detuvimos.",
+  "pad": 0.25
+ },
+ {
+  "id": "l13",
+  "who": "Q",
+  "text": "¡Alto, policía! Quédense detrás de mí.",
+  "pad": 0.2
+ },
+ {
+  "id": "l14",
+  "who": "N",
+  "text": "Estábamos a salvo. Pero mi ropa estaba destruida.",
+  "pad": 0.3
+ },
+ {
+  "id": "l15",
+  "who": "N",
+  "text": "Ropa o zapatillas. Tú decides. Comenta tu elección, comparte este video, y sígueme para el día veintiuno.",
+  "pad": 0.35
+ }
+]

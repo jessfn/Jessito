@@ -284,13 +284,13 @@ export function part_arm(side, P, pass) { const S = SK['shoulder' + side], E = S
   const handG = `<g transform="${rot(A.wrist, Wr)}"><g transform="translate(${Wr[0]},${Wr[1] + 2})">${part_hand(side, P, pass)}</g></g>`;
   const shade = pass === 'f' ? `<path d="${up}" fill="url(#zSkin)" opacity="0.0"/>` : '';
   const elbowShade = pass === 'f' ? `<ellipse cx="${E[0] + (side === 'L' ? -8 : 8)}" cy="${E[1] + 2}" rx="12" ry="9" fill="#8f4f2b" opacity="0.2"/>` : '';
-  return `<g transform="${rot(A.r1, S)}">${seg(up, pass, fill)}${shade}<g transform="${rot(A.r2, E)}">${seg(fo, pass, fill)}${elbowShade}${handG}${pass === 'f' ? (FIT.on ? `<g transform="translate(${Wr[0]},${Wr[1] - 8})"><rect x="-24" y="-12" width="48" height="22" rx="9" fill="url(#zRib)" stroke="${OUT}" stroke-width="4"/></g>` : brace) : ''}</g>${cap}</g>`; }
+  return `<g transform="${rot(A.r1, S)}">${seg(up, pass, fill)}${shade}<g transform="${rot(A.r2, E)}">${seg(fo, pass, fill)}${elbowShade}${FIT.on && pass === 'f' ? mudLimb(E, Wr, side === 'L' ? 81 : 91, 3) : ''}${handG}${pass === 'f' ? (FIT.on ? `<g transform="translate(${Wr[0]},${Wr[1] - 8})"><rect x="-24" y="-12" width="48" height="22" rx="9" fill="url(#zRib)" stroke="${OUT}" stroke-width="4"/></g>` : brace) : ''}</g>${cap}</g>`; }
 export function arms(P, which) { const sides = which || ['L', 'R']; return sides.map((s) => `<g id="arm_${s}">${part_arm(s, P, 'o')}${part_arm(s, P, 'f')}</g>`).join(''); }
 
 // ================= PIERNAS Y PIES =================
 export function part_leg(side, P, pass) { const H = SK['hip' + side], K = SK['knee' + side], A = SK['ankle' + side], L = side === 'L' ? P.legL : P.legR; const th = taper(H, K, 84, 58), sh = taper(K, A, 56, 34);
   const foot = `<g transform="${rot(L.foot, A)}">${part_foot(side, pass)}</g>`;
-  return `<g transform="${rot(L.r1, H)}">${seg(th, pass, FIT.on ? 'url(#zBlk)' : 'url(#zSkin)')}${fitLegX(side, H, K, A, pass)}<g transform="${rot(L.r2, K)}">${seg(sh, pass, FIT.on ? 'url(#zBlk)' : 'url(#zSkin)')}${pass === 'f' ? `${FIT.on ? '' : `<ellipse cx="${K[0] - 6}" cy="${K[1]}" rx="18" ry="12" fill="#8f4f2b" opacity="0.2"/>`}` : ''}${foot}</g></g>`; }
+  return `<g transform="${rot(L.r1, H)}">${seg(th, pass, FIT.on ? 'url(#zBlk)' : 'url(#zSkin)')}${fitLegX(side, H, K, A, pass)}<g transform="${rot(L.r2, K)}">${seg(sh, pass, FIT.on ? 'url(#zBlk)' : 'url(#zSkin)')}${pass === 'f' ? `${FIT.on ? mudLimb(K, A, side === 'L' ? 61 : 71, 5) : ''}${FIT.on ? '' : `<ellipse cx="${K[0] - 6}" cy="${K[1]}" rx="18" ry="12" fill="#8f4f2b" opacity="0.2"/>`}` : ''}${foot}</g></g>`; }
 export function part_foot(side, pass) { const A = SK['ankle' + side]; const x = A[0], y = A[1]; const body = `M${x - 17},${y - 6} C${x - 22},${y + 40} ${x - 32},${y + 70} ${x - 32},${y + 92} Q${x},${y + 108} ${x + 32},${y + 92} C${x + 32},${y + 70} ${x + 22},${y + 40} ${x + 17},${y - 6}Z`;
   const o = pass === 'o'; let s = `<path d="${body}" fill="${o ? OUT : 'url(#zSkin)'}" ${o ? `stroke="${OUT}" stroke-width="9" stroke-linejoin="round"` : ''}/>`;
   if (!o) { for (let i = 0; i < 5; i++) { const tx = x - 24 + i * 12, ty = y + 100 - Math.abs(i - 2) * 1.5, r = 9 - i * 0.4 * 0 - (i === 4 ? 1.5 : 0); s += `<circle cx="${tx}" cy="${ty}" r="${r}" fill="url(#zSkin)" stroke="${OUT}" stroke-width="3"/><ellipse cx="${tx}" cy="${ty + 2}" rx="4" ry="3" fill="#f08ab8"/>`; }
@@ -356,11 +356,26 @@ export const headFront = (P) => headWrap(P, drawLazyHeadFront(oldHeadPose(P)));
 
 
 // ================= ROPA CÓMODA NEGRA (FIT): sudadera, bomber, deportivo, chaleco =================
-export const FIT = { on: false, kind: 'hoodie' };
+export const FIT = { on: false, kind: 'hoodie', mud: 0 };
 const FITDEFS = `<defs><linearGradient id="zBlk" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3a3a44"/><stop offset="0.45" stop-color="#1b1b21"/><stop offset="1" stop-color="#09090c"/></linearGradient><linearGradient id="zBlk2" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#101014"/><stop offset="0.5" stop-color="#2a2a32"/><stop offset="1" stop-color="#0c0c10"/></linearGradient><linearGradient id="zRib" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#26262e"/><stop offset="1" stop-color="#0a0a0e"/></linearGradient></defs>`;
 const FS = 'stroke="#12090a" stroke-width="7" stroke-linejoin="round"';
 const fold = (d, o = 0.13) => `<path d="${d}" stroke="#ffffff" stroke-width="3" fill="none" stroke-linecap="round" opacity="${o}"/>`;
 const shadeF = (d, o = 0.35) => `<path d="${d}" stroke="#000" stroke-width="8" fill="none" stroke-linecap="round" opacity="${o}"/>`;
+
+// ---- lodo (FIT.mud 0..1): manchas, salpicaduras y rayas con degradado ----
+const MUDDEFS = `<defs><radialGradient id="zMud" cx="0.4" cy="0.35" r="0.75"><stop offset="0" stop-color="#8a6236"/><stop offset="0.6" stop-color="#5a3c1e"/><stop offset="1" stop-color="#2e1c0c"/></radialGradient><radialGradient id="zMud2" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#4a3018" stop-opacity="0.95"/><stop offset="1" stop-color="#4a3018" stop-opacity="0"/></radialGradient></defs>`;
+const mrnd = (i) => { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+const mudBlob = (cx, cy, r, seed, op = 1) => { const n = 9; const pts = []; for (let i = 0; i < n; i++) { const a = (i / n) * Math.PI * 2, rr = r * (0.7 + 0.5 * mrnd(seed + i)); pts.push([cx + Math.cos(a) * rr, cy + Math.sin(a) * rr * 0.85]); }
+  let d = `M${f1((pts[0][0] + pts[n - 1][0]) / 2)},${f1((pts[0][1] + pts[n - 1][1]) / 2)}`; for (let i = 0; i < n; i++) { const p = pts[i], q = pts[(i + 1) % n]; d += ` Q${f1(p[0])},${f1(p[1])} ${f1((p[0] + q[0]) / 2)},${f1((p[1] + q[1]) / 2)}`; }
+  return `<g opacity="${op}"><ellipse cx="${cx}" cy="${cy}" rx="${f1(r * 1.5)}" ry="${f1(r * 1.3)}" fill="url(#zMud2)"/><path d="${d}Z" fill="url(#zMud)"/><path d="M${f1(cx - r * 0.35)},${f1(cy - r * 0.3)} q${f1(r * 0.25)},${f1(-r * 0.2)} ${f1(r * 0.5)},0" stroke="#d8b98a" stroke-width="2.4" fill="none" stroke-linecap="round" opacity="0.4"/></g>`; };
+const mudDrip = (x, y, len, w, seed) => `<path d="M${x},${y} q${f1(w * 0.5)},${f1(len * 0.5)} 0,${len} q${f1(-w * 0.5)},${f1(-len * 0.4)} 0,${-len}Z" fill="url(#zMud)" opacity="0.92" stroke="#2e1c0c" stroke-width="1.2"/>`;
+const mudSet = (spec, k) => spec.filter(([th]) => th <= k).map(([th, cx, cy, r, seed]) => mudBlob(cx, cy, r * (0.5 + 0.5 * Math.min(1, k)), seed)).join('');
+const MUD_TORSO = [[0.05, 470, 690, 38, 1], [0.1, 560, 650, 30, 3], [0.15, 450, 560, 26, 5], [0.2, 575, 720, 34, 7], [0.25, 520, 610, 22, 9], [0.3, 482, 500, 18, 11], [0.35, 566, 540, 20, 13], [0.4, 510, 700, 26, 15]];
+const MUD_PELVIS = [[0.05, 470, 760, 44, 21], [0.1, 556, 775, 40, 23], [0.15, 512, 730, 34, 25], [0.25, 430, 730, 30, 27], [0.3, 595, 740, 28, 29]];
+export function mudTorso() { const k = FIT.mud; if (!k || k <= 0.01) return ''; return `<g id="mud_t">${mudSet(MUD_TORSO, k)}${k > 0.3 ? mudDrip(470, 700, 30, 12, 1) + mudDrip(562, 690, 24, 10, 2) : ''}</g>`; }
+export function mudPelvis() { const k = FIT.mud; if (!k || k <= 0.01) return ''; return `<g id="mud_p">${mudSet(MUD_PELVIS, k)}</g>`; }
+const mudLimb = (p0, p1, seed, spots = 4) => { const k = FIT.mud; if (!k || k <= 0.01) return ''; let o = ''; for (let i = 0; i < spots; i++) { const u = 0.25 + 0.65 * mrnd(seed + i), th = 0.1 + i * 0.12; if (th > k) break; const x = p0[0] + (p1[0] - p0[0]) * u + (mrnd(seed + i * 3) - 0.5) * 22, y = p0[1] + (p1[1] - p0[1]) * u; o += mudBlob(f1(x), f1(y), 12 + 16 * mrnd(seed + i * 7), seed + i); } return o; };
+export function faceMud(P) { const k = FIT.mud; if (!k || k <= 0.01) return ''; return headWrap(P, `<g>${k > 0.12 ? mudBlob(-72, 44, 14 * Math.min(1, k + 0.3), 31) : ''}${k > 0.3 ? mudBlob(62, 68, 11, 33) + mudBlob(-20, -150, 18, 35, 0.9) : ''}${k > 0.5 ? mudBlob(122, -30, 16, 37, 0.9) + mudBlob(-120, 90, 14, 39, 0.9) : ''}</g>`); }
 export function fitTorso(P) { const k = FIT.kind; let o = '';
   const body = 'M438,472 Q474,456 512,466 Q550,456 586,472 C606,482 612,520 610,580 C612,640 606,700 600,730 Q512,742 424,730 C418,700 412,640 414,580 C412,520 418,482 438,472Z';
   const slim = 'M440,472 Q476,458 512,468 Q548,458 584,472 C600,484 604,530 598,580 C596,630 592,690 590,722 Q512,732 434,722 C432,690 428,630 426,580 C420,530 424,484 440,472Z';
@@ -385,18 +400,18 @@ export function fitTorso(P) { const k = FIT.kind; let o = '';
     for (const y of [520, 560, 600, 640, 680]) o += `<path d="M430,${y} Q466,${y + 8} 498,${y}" stroke="#000" stroke-width="3" fill="none" opacity="0.5"/><path d="M526,${y} Q560,${y + 8} 594,${y}" stroke="#000" stroke-width="3" fill="none" opacity="0.5"/>${fold('M432,' + (y - 4) + ' Q466,' + (y + 4) + ' 496,' + (y - 4), 0.1)}`;
     o += `<path d="M498,500 L498,726 M526,500 L526,726" stroke="#c9ccd6" stroke-width="3" opacity="0.7"/>`;
   }
-  return `<g id="fit_torso">${o}</g>`; }
+  return `<g id="fit_torso">${o}${mudTorso()}</g>`; }
 export function fitPelvis(P) { const k = FIT.kind; const w = k === 'bomber' ? 92 : 86;
   let o = `<path d="M${512 - w - 8},698 Q512,718 ${512 + w + 8},698 L${512 + w + 14},796 Q512,822 ${512 - w - 14},796Z" fill="url(#zBlk)" ${FS}/>`;
   o += `<path d="M436,712 Q512,730 590,712" stroke="#000" stroke-width="5" fill="none" opacity="0.5"/>${k === 'sport' ? '<path d="M512,712 L512,800" stroke="#000" stroke-width="2" opacity="0.35"/>' : ''}`;
-  return `<g id="fit_pelvis">${o}</g>`; }
+  return `<g id="fit_pelvis">${o}${mudPelvis()}</g>`; }
 const fitLegX = (side, H, K, A, pass) => { if (!FIT.on || pass !== 'f') return ''; const sg = side === 'L' ? -1 : 1; let o = '';
   const mx = (H[0] + K[0]) / 2, my = (H[1] + K[1]) / 2;
   if (FIT.kind === 'bomber') { o += `<rect x="${mx - 20 + sg * 6}" y="${my - 14}" width="40" height="50" rx="7" fill="url(#zBlk2)" ${FS.replace('7', '5')}/><path d="M${mx - 20 + sg * 6},${my + 2} H${mx + 20 + sg * 6}" stroke="#000" stroke-width="3" opacity="0.5"/>${fold(`M${mx - 14 + sg * 6},${my - 8} H${mx + 14 + sg * 6}`)}`; }
   if (FIT.kind === 'sport') { o += `<path d="M${H[0] + sg * 24},${H[1] + 20} L${K[0] + sg * 18},${K[1]} L${A[0] + sg * 12},${A[1] - 20}" stroke="#cfd2dc" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.85"/><rect x="${A[0] - 26}" y="${A[1] - 30}" width="52" height="22" rx="9" fill="url(#zRib)" ${FS.replace('7', '4')}/>`; }
-  o += fold(`M${mx - 8},${my - 30} L${mx - 8},${my + 30}`, 0.1);
+  o += fold(`M${mx - 8},${my - 30} L${mx - 8},${my + 30}`, 0.1); o += mudLimb(H, K, side === 'L' ? 41 : 57, 3);
   return o; };
-export const ALLDEFS = DEFS + oldDefs('e3d') + FITDEFS;
+export const ALLDEFS = DEFS + oldDefs('e3d') + FITDEFS + MUDDEFS;
 export const PART_FNS = { hair_back: hairBack, hair_front: hairFront, head: part_head, neck: part_neck, torso_chest: part_chest, corset: part_corset, midriff: part_midriff, necklace: part_necklace, skirt_back: part_skirt_back, slit_inner: part_slit_inner, skirt_panel_left: part_skirt_panel, skirt_ruffle: part_skirt_ruffle, skirt_rosette: part_rosette, waistband: part_waistband, legs, arms };
 export function hipsT(P) { return `${mv(P.hips.x, P.hips.y)} ${rot(P.hips.rot, SK.hips)}`; }
 export function chestT(P) { const b = P.chest.breath; return `${rot(P.chest.rot, SK.chest)} translate(512,640) scale(${f1((1 + 0.006 * b) * 1000) / 1000},${f1((1 + 0.012 * b) * 1000) / 1000}) translate(-512,-640)`; }
@@ -404,7 +419,7 @@ export function renderCharacter(P) {
   const HT = hipsT(P), CT = chestT(P);
   if (FIT.on) return `<g id="lazy2d">
   <g transform="${HT}">${legs(P)}${fitPelvis(P)}</g>
-  <g transform="${HT} ${CT}">${part_neck(P)}${headBack(P)}${fitTorso(P)}${headFront(P)}</g>
+  <g transform="${HT} ${CT}">${part_neck(P)}${headBack(P)}${fitTorso(P)}${headFront(P)}${faceMud(P)}</g>
   <g transform="${HT} ${CT}">${arms(P)}</g></g>`;
   return `<g id="lazy2d">
   <g transform="${HT}">${part_skirt_back(P)}${part_slit_inner(P)}${legs(P)}${part_skirt_panel(P)}${part_skirt_ruffle(P)}${part_rosette(P)}${part_midriff(P)}${part_waistband(P)}</g>

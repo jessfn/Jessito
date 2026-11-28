@@ -69,6 +69,10 @@ for L in lines:
             if not cur: s = x
             cur += c; e = y
     if cur: words.append([cur, s, e])
+    TEMPO = float(os.environ.get('TEMPO', '1'))
+    if TEMPO != 1:
+        subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', f"{out}/lines/{L['id']}.mp3", '-filter:a', f'atempo={TEMPO}', f"{out}/lines/{L['id']}_t.mp3"], check=True); os.replace(f"{out}/lines/{L['id']}_t.mp3", f"{out}/lines/{L['id']}.mp3")
+        words = [[w_, s_ / TEMPO, e_ / TEMPO] for w_, s_, e_ in words]
     L['words'] = words
     L['dur'] = float(subprocess.check_output(['ffprobe', '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', f"{out}/lines/{L['id']}.mp3"]).decode())
     json.dump({'text': L['text'], 'who': L['who'], 'words': L['words'], 'dur': L['dur']}, open(cache, 'w'), ensure_ascii=False)
