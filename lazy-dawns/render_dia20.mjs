@@ -266,7 +266,7 @@ const scrollAt = (t) => (t < T.forestA ? 0 : t < T.l4A ? (t - T.forestA) * 150 :
 const running = (t) => t >= T.runA && t < T.policeA - 0.2 && !(t >= T.pushA && t < T.pushA + 1.5);
 const walking = (t) => t >= T.forestA && t < T.l4A;
 const mudK = (t) => clamp((t - T.mudA) / 0.9);
-const CAM = [[0, 1.0, 540, 960], [L.i1.start, 1.18, 540, 840], [L.i1.end - 0.2, 1.5, 540, 640], [L.i2.start - 0.1, 1.1, 640, 900], [T.slateA, 1.0, 540, 960], [T.slateA + 2.0, 1.0, 540, 960], [T.hookA, 1.04, 540, 990], [T.l2A, 1.15, 800, 900], [T.vestA, 1.2, 760, 900], [T.dressA - 0.2, 1.0, 540, 960], [T.dressA + 0.4, 1.05, 540, 980], [T.forestA + 0.05, 1.0, 540, 960], [T.l3A, 1.1, 540, 1000], [T.l4A - 0.3, 1.0, 540, 960], [T.l4A, 1.18, 660, 940], [T.l5A, 1.4, 760, 840], [T.l6A, 1.45, 440, 880], [T.recA, 1.0, 540, 960], [T.mariA - 0.1, 1.15, 380, 960], [T.runA, 1.05, 540, 1020], [T.pushA - 0.6, 1.2, 540, 1000], [T.pushA, 1.55, 540, 1140], [T.mudA, 1.5, 540, 1200], [T.l12A, 1.05, 540, 1020], [T.policeA - 0.1, 1.05, 540, 1020], [T.l13A - 0.2, 1.0, 540, 960], [T.l13A, 1.18, 700, 900], [T.l14A, 1.12, 440, 980], [T.vote, 1.0, 540, 960]];
+const CAM = [[0, 1.0, 540, 960], [L.i1.start, 1.18, 540, 840], [L.i1.end - 0.2, 1.5, 540, 640], [L.i2.start - 0.1, 1.1, 640, 900], [T.slateA, 1.0, 540, 960], [T.slateA + 2.0, 1.0, 540, 960], [T.hookA, 1.04, 540, 990], [T.l2A, 1.1, 700, 920], [T.vestA, 1.15, 700, 920], [T.dressA - 0.2, 1.0, 540, 960], [T.dressA + 0.4, 1.05, 540, 980], [T.forestA + 0.05, 1.0, 540, 960], [T.l3A, 1.1, 540, 1000], [T.l4A - 0.3, 1.0, 540, 960], [T.l4A, 1.1, 560, 960], [T.l5A, 1.2, 600, 940], [T.l6A, 1.25, 470, 940], [T.recA, 1.0, 540, 960], [T.mariA - 0.1, 1.15, 380, 960], [T.runA, 1.05, 540, 1020], [T.pushA - 0.6, 1.15, 540, 1000], [T.pushA, 1.3, 540, 1120], [T.mudA, 1.3, 540, 1160], [T.l12A, 1.05, 540, 1020], [T.policeA - 0.1, 1.05, 540, 1020], [T.l13A - 0.2, 1.0, 540, 960], [T.l13A, 1.18, 700, 900], [T.l14A, 1.12, 440, 980], [T.vote, 1.0, 540, 960]];
 function camAt(t) {
   let i = 0; while (i < CAM.length - 1 && CAM[i + 1][0] <= t) i++; const a = CAM[i], b = CAM[Math.min(i + 1, CAM.length - 1)]; const u = smooth((t - a[0]) / Math.max(1e-3, b[0] - a[0]));
   const shake = win(t, T.l8A - 0.2, T.l8A + 0.4, 0.02, 0.3) * 8 + win(t, T.slateA + 0.55, T.slateA + 1.1, 0.02, 0.4) * 8 + (t >= T.runA && t < T.pushA ? 6 : 0) + win(t, T.pushA, T.pushA + 0.6, 0.02, 0.4) * 18 + (t >= T.l12A && t < T.policeA ? 5 : 0) + win(t, L.i1.start, L.i1.end, 0.1, 0.2) * 3;
@@ -288,9 +288,9 @@ function frame(t) {
     return renderCharacter(P2); };
   const lzInner = (sc === 'cabin') ? '' : mkLazy();
   let lx = 540, ly = 1655, ls = NEWS, lrot = 0; const lvis = sc !== 'cabin';
-  if (sc === 'home') lx = 330;
+  if (sc === 'home') lx = 400;
   if (sc === 'forest') { if (t < T.l4A) lx = lerp(-160, 360, ease((t - T.forestA) / (T.l4A - T.forestA))); else if (t < T.mariA) lx = 330; else if (t < T.runA) lx = 380; else if (t < T.pushA) lx = 560 + 30 * Math.sin(t * 6); else lx = 540;
-    if (t >= T.pushA) { const u = clamp((t - T.pushA) / 0.55), v = clamp((t - (T.pushA + 0.55)) / 0.9); const fall = ease(u) * (1 - smooth(v)); lrot = 78 * fall; ly = 1655 + 200 * fall; lx += 60 * fall; } }
+    if (t >= T.pushA) { const u = clamp((t - T.pushA) / 0.55), v = clamp((t - (T.pushA + 0.55)) / 0.9); const fall = ease(u) * (1 - smooth(v)); lrot = 78 * fall; ly = 1655 + 200 * fall; lx += 30 * fall; } }
   if (sc === 'police') lx = lerp(-200, 470, ease((t - T.policeA) / 1.4));
   const lazyG = lvis ? `<g transform="translate(${f(lx)},${f(ly)}) rotate(${f(lrot)}) translate(${f(-lx)},${f(-ly)})"><g transform="translate(${f(lx - 512 * ls)},${f(ly - 1500 * ls)}) scale(${ls})"><use href="#lzSrc"/></g></g>` : '';
   const shadowL = lvis ? `<ellipse cx="${f(lx)}" cy="${f(ly - 6)}" rx="${f(300 * ls)}" ry="22" fill="#000" opacity="0.35"/>` : '';
@@ -298,7 +298,7 @@ function frame(t) {
   if (mari && (sc === 'forest' || sc === 'police')) {
     if (mari.mode === 'burst') { const u = ease(clamp((t - T.mariA) / 1.0)); const mx = lerp(-300, 200, u); mariG = `<g transform="translate(${f(mx)},1413) scale(0.75)">${drawMariRun(t, { talk: MOUTHW('M', t), speed: 3.2 * (1 - 0.7 * smooth(clamp((t - T.mariA - 0.7) / 0.5))) })}</g>`; }
     else if (mari.mode === 'run') { const mx = t < T.pushA + 1.6 ? 150 : 170; mariG = `<g transform="translate(${f(mx)},${f(1413 + 4 * Math.sin(t * 12))}) scale(0.75)">${drawMariRun(t, { talk: 0, speed: 3.3 })}</g>`; }
-    else { const u = ease(clamp((t - (T.policeA - 0.3)) / 1.4)); mariG = `<g transform="translate(${f(lerp(-300, 740, u))},1060) scale(0.85)"><ellipse cx="0" cy="700" rx="150" ry="22" fill="#000" opacity="0.3"/>${drawMari2({ mood: 'worry', t, part: 'body', mouthOpen: 0, hands: 'none', blink: blinkOf(t, 1.3) })}</g>`; }
+    else { const u = ease(clamp((t - (T.policeA - 0.3)) / 1.4)); mariG = `<g transform="translate(${f(lerp(-300, 790, u))},1165) scale(0.7)"><ellipse cx="0" cy="700" rx="150" ry="22" fill="#000" opacity="0.3"/>${drawMari2({ mood: 'worry', t, part: 'body', mouthOpen: 0, hands: 'none', blink: blinkOf(t, 1.3) })}</g>`; }
   }
   let mG = ''; if (sc === 'forest' && t >= T.l4A - 0.4 && t < T.l8A + 0.3) { const ap = ease(clamp((t - (T.l4A - 0.4)) / 0.9)); const Pm = poseClip('idle', t); mG = `<g transform="translate(${f(lerp(1320, 800, ap) - 520 * 0.7)},${f(1650 - 1420 * 0.7)}) scale(0.7)">${renderM(Pm)}</g>`; }
   let mFront = '';
