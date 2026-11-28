@@ -278,19 +278,19 @@ export function part_hand(side, P, pass, only = null) { const sd = side === 'L' 
   if (pass === 'f' && (!only || only.includes('palm'))) s += `<path d="M${W(-18)},30 Q${W(0)},40 ${W(18)},30" stroke="#8f4f2b" stroke-opacity="0.35" stroke-width="3" fill="none"/>`;
   return s; }
 export function part_arm(side, P, pass) { const S = SK['shoulder' + side], E = SK['elbow' + side], Wr = SK['wrist' + side], A = side === 'L' ? P.armL : P.armR;
-  const up = taper(S, E, 56, 44), fo = taper(E, Wr, 44, 34); const fill = 'url(#zSkin)';
-  const cap = pass === 'f' ? `<circle cx="${S[0]}" cy="${S[1] + 4}" r="26" fill="url(#zFace)"/>` : '';
+  const up = taper(S, E, 56, 44), fo = taper(E, Wr, 44, 34); const fill = FIT.on ? 'url(#zBlk)' : 'url(#zSkin)';
+  const cap = pass === 'f' ? `<circle cx="${S[0]}" cy="${S[1] + 4}" r="26" fill="${FIT.on ? 'url(#zBlk)' : 'url(#zFace)'}"/>` : '';
   const brace = `<g transform="translate(${Wr[0]},${Wr[1] - 10})"><ellipse rx="24" ry="8" fill="url(#zGold)" stroke="${OUT}" stroke-width="3.6"/><ellipse cx="0" cy="-2" rx="20" ry="3.4" fill="#fff6b0" opacity="0.6"/></g>`;
   const handG = `<g transform="${rot(A.wrist, Wr)}"><g transform="translate(${Wr[0]},${Wr[1] + 2})">${part_hand(side, P, pass)}</g></g>`;
   const shade = pass === 'f' ? `<path d="${up}" fill="url(#zSkin)" opacity="0.0"/>` : '';
   const elbowShade = pass === 'f' ? `<ellipse cx="${E[0] + (side === 'L' ? -8 : 8)}" cy="${E[1] + 2}" rx="12" ry="9" fill="#8f4f2b" opacity="0.2"/>` : '';
-  return `<g transform="${rot(A.r1, S)}">${seg(up, pass, fill)}${shade}<g transform="${rot(A.r2, E)}">${seg(fo, pass, fill)}${elbowShade}${handG}${pass === 'f' ? brace : ''}</g>${cap}</g>`; }
+  return `<g transform="${rot(A.r1, S)}">${seg(up, pass, fill)}${shade}<g transform="${rot(A.r2, E)}">${seg(fo, pass, fill)}${elbowShade}${handG}${pass === 'f' ? (FIT.on ? `<g transform="translate(${Wr[0]},${Wr[1] - 8})"><rect x="-24" y="-12" width="48" height="22" rx="9" fill="url(#zRib)" stroke="${OUT}" stroke-width="4"/></g>` : brace) : ''}</g>${cap}</g>`; }
 export function arms(P, which) { const sides = which || ['L', 'R']; return sides.map((s) => `<g id="arm_${s}">${part_arm(s, P, 'o')}${part_arm(s, P, 'f')}</g>`).join(''); }
 
 // ================= PIERNAS Y PIES =================
 export function part_leg(side, P, pass) { const H = SK['hip' + side], K = SK['knee' + side], A = SK['ankle' + side], L = side === 'L' ? P.legL : P.legR; const th = taper(H, K, 84, 58), sh = taper(K, A, 56, 34);
   const foot = `<g transform="${rot(L.foot, A)}">${part_foot(side, pass)}</g>`;
-  return `<g transform="${rot(L.r1, H)}">${seg(th, pass, 'url(#zSkin)')}<g transform="${rot(L.r2, K)}">${seg(sh, pass, 'url(#zSkin)')}${pass === 'f' ? `<ellipse cx="${K[0] - 6}" cy="${K[1]}" rx="18" ry="12" fill="#8f4f2b" opacity="0.2"/>` : ''}${foot}</g></g>`; }
+  return `<g transform="${rot(L.r1, H)}">${seg(th, pass, FIT.on ? 'url(#zBlk)' : 'url(#zSkin)')}${fitLegX(side, H, K, A, pass)}<g transform="${rot(L.r2, K)}">${seg(sh, pass, FIT.on ? 'url(#zBlk)' : 'url(#zSkin)')}${pass === 'f' ? `${FIT.on ? '' : `<ellipse cx="${K[0] - 6}" cy="${K[1]}" rx="18" ry="12" fill="#8f4f2b" opacity="0.2"/>`}` : ''}${foot}</g></g>`; }
 export function part_foot(side, pass) { const A = SK['ankle' + side]; const x = A[0], y = A[1]; const body = `M${x - 17},${y - 6} C${x - 22},${y + 40} ${x - 32},${y + 70} ${x - 32},${y + 92} Q${x},${y + 108} ${x + 32},${y + 92} C${x + 32},${y + 70} ${x + 22},${y + 40} ${x + 17},${y - 6}Z`;
   const o = pass === 'o'; let s = `<path d="${body}" fill="${o ? OUT : 'url(#zSkin)'}" ${o ? `stroke="${OUT}" stroke-width="9" stroke-linejoin="round"` : ''}/>`;
   if (!o) { for (let i = 0; i < 5; i++) { const tx = x - 24 + i * 12, ty = y + 100 - Math.abs(i - 2) * 1.5, r = 9 - i * 0.4 * 0 - (i === 4 ? 1.5 : 0); s += `<circle cx="${tx}" cy="${ty}" r="${r}" fill="url(#zSkin)" stroke="${OUT}" stroke-width="3"/><ellipse cx="${tx}" cy="${ty + 2}" rx="4" ry="3" fill="#f08ab8"/>`; }
@@ -353,13 +353,59 @@ export const NECK = { dy: 0, w: 1 };
 const headWrap = (P, inner) => `<g transform="${rot(P.head.rot, SK.neck)} translate(${HEAD_POS[0]},${HEAD_POS[1] + NECK.dy}) scale(${HEAD_SCALE})">${inner}</g>`;
 export const headBack = (P) => headWrap(P, drawLazyHeadBack(oldHeadPose(P)));
 export const headFront = (P) => headWrap(P, drawLazyHeadFront(oldHeadPose(P)));
-export const ALLDEFS = DEFS + oldDefs('e3d');
 
+
+// ================= ROPA CÓMODA NEGRA (FIT): sudadera, bomber, deportivo, chaleco =================
+export const FIT = { on: false, kind: 'hoodie' };
+const FITDEFS = `<defs><linearGradient id="zBlk" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3a3a44"/><stop offset="0.45" stop-color="#1b1b21"/><stop offset="1" stop-color="#09090c"/></linearGradient><linearGradient id="zBlk2" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#101014"/><stop offset="0.5" stop-color="#2a2a32"/><stop offset="1" stop-color="#0c0c10"/></linearGradient><linearGradient id="zRib" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#26262e"/><stop offset="1" stop-color="#0a0a0e"/></linearGradient></defs>`;
+const FS = 'stroke="#12090a" stroke-width="7" stroke-linejoin="round"';
+const fold = (d, o = 0.13) => `<path d="${d}" stroke="#ffffff" stroke-width="3" fill="none" stroke-linecap="round" opacity="${o}"/>`;
+const shadeF = (d, o = 0.35) => `<path d="${d}" stroke="#000" stroke-width="8" fill="none" stroke-linecap="round" opacity="${o}"/>`;
+export function fitTorso(P) { const k = FIT.kind; let o = '';
+  const body = 'M438,472 Q474,456 512,466 Q550,456 586,472 C606,482 612,520 610,580 C612,640 606,700 600,730 Q512,742 424,730 C418,700 412,640 414,580 C412,520 418,482 438,472Z';
+  const slim = 'M440,472 Q476,458 512,468 Q548,458 584,472 C600,484 604,530 598,580 C596,630 592,690 590,722 Q512,732 434,722 C432,690 428,630 426,580 C420,530 424,484 440,472Z';
+  if (k === 'hoodie') {
+    o += `<path d="${body}" fill="url(#zBlk)" ${FS}/><path d="M452,462 Q512,528 572,462 Q566,436 512,432 Q458,436 452,462Z" fill="url(#zBlk2)" ${FS}/><path d="M478,470 Q512,498 546,470" stroke="#000" stroke-width="10" fill="none" opacity="0.5"/>`;
+    o += `<path d="M452,640 Q512,664 572,640 L592,716 Q512,732 432,716Z" fill="url(#zBlk2)" ${FS}/><path d="M492,652 L486,700 M532,652 L538,700" stroke="#000" stroke-width="3" opacity="0.4"/>`;
+    o += `<path d="M498,488 L492,566 M526,488 L532,566" stroke="#d9d9e0" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="492" cy="570" r="5" fill="#9a9aa6"/><circle cx="532" cy="570" r="5" fill="#9a9aa6"/>`;
+    o += `<rect x="420" y="722" width="184" height="22" rx="10" fill="url(#zRib)" ${FS}/>${fold('M440,520 Q450,580 446,640')}${fold('M580,520 Q574,580 580,640', 0.1)}${shadeF('M430,560 Q424,640 430,716')}`;
+  } else if (k === 'bomber') {
+    o += `<path d="${body}" fill="url(#zBlk)" ${FS}/><rect x="430" y="716" width="164" height="28" rx="12" fill="url(#zRib)" ${FS}/><path d="M452,466 Q512,488 572,466 L566,444 Q512,430 458,444Z" fill="url(#zRib)" ${FS}/>`;
+    o += `<path d="M512,486 L512,718" stroke="#c9ccd6" stroke-width="5"/><path d="M512,486 L512,718" stroke="#000" stroke-width="2" stroke-dasharray="3 4" opacity="0.6"/><rect x="505" y="484" width="14" height="18" rx="4" fill="#c9ccd6" stroke="#12090a" stroke-width="3"/>`;
+    o += `<path d="M452,660 L480,700 M572,660 L544,700" stroke="#000" stroke-width="5" opacity="0.5"/>${fold('M436,520 Q446,590 444,650')}${fold('M588,520 Q580,590 584,650', 0.1)}${shadeF('M432,560 Q426,640 432,712')}`;
+  } else if (k === 'sport') {
+    o += `<path d="${slim}" fill="url(#zBlk)" ${FS}/><path d="M470,470 Q512,496 554,470 L552,440 Q512,432 472,440Z" fill="url(#zRib)" ${FS}/>`;
+    o += `<path d="M434,520 C428,600 436,680 438,724 M590,520 C596,600 588,680 586,724" stroke="#cfd2dc" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.85"/><path d="M512,500 L512,716" stroke="#000" stroke-width="2" opacity="0.35"/>`;
+    o += `<rect x="430" y="716" width="164" height="22" rx="10" fill="url(#zRib)" ${FS}/>${fold('M460,520 Q470,600 466,690', 0.12)}${shadeF('M432,560 Q428,640 434,712', 0.3)}`;
+  } else { // chaleco acolchado sobre playera manga larga
+    o += `<path d="${slim}" fill="#16161b" ${FS}/><path d="M468,470 Q512,500 556,470 L552,440 Q512,432 472,440Z" fill="#101014" ${FS}/>`;
+    const vest = 'M440,472 Q470,462 490,474 L500,520 L496,726 Q460,734 434,722 C432,690 428,630 426,580 C420,530 424,486 440,472Z';
+    const vestR = 'M584,472 Q554,462 534,474 L524,520 L528,726 Q564,734 590,722 C592,690 596,630 598,580 C604,530 600,486 584,472Z';
+    o += `<path d="${vest}" fill="url(#zBlk)" ${FS}/><path d="${vestR}" fill="url(#zBlk)" ${FS}/>`;
+    for (const y of [520, 560, 600, 640, 680]) o += `<path d="M430,${y} Q466,${y + 8} 498,${y}" stroke="#000" stroke-width="3" fill="none" opacity="0.5"/><path d="M526,${y} Q560,${y + 8} 594,${y}" stroke="#000" stroke-width="3" fill="none" opacity="0.5"/>${fold('M432,' + (y - 4) + ' Q466,' + (y + 4) + ' 496,' + (y - 4), 0.1)}`;
+    o += `<path d="M498,500 L498,726 M526,500 L526,726" stroke="#c9ccd6" stroke-width="3" opacity="0.7"/>`;
+  }
+  return `<g id="fit_torso">${o}</g>`; }
+export function fitPelvis(P) { const k = FIT.kind; const w = k === 'bomber' ? 92 : 86;
+  let o = `<path d="M${512 - w - 8},698 Q512,718 ${512 + w + 8},698 L${512 + w + 14},796 Q512,822 ${512 - w - 14},796Z" fill="url(#zBlk)" ${FS}/>`;
+  o += `<path d="M436,712 Q512,730 590,712" stroke="#000" stroke-width="5" fill="none" opacity="0.5"/>${k === 'sport' ? '<path d="M512,712 L512,800" stroke="#000" stroke-width="2" opacity="0.35"/>' : ''}`;
+  return `<g id="fit_pelvis">${o}</g>`; }
+const fitLegX = (side, H, K, A, pass) => { if (!FIT.on || pass !== 'f') return ''; const sg = side === 'L' ? -1 : 1; let o = '';
+  const mx = (H[0] + K[0]) / 2, my = (H[1] + K[1]) / 2;
+  if (FIT.kind === 'bomber') { o += `<rect x="${mx - 20 + sg * 6}" y="${my - 14}" width="40" height="50" rx="7" fill="url(#zBlk2)" ${FS.replace('7', '5')}/><path d="M${mx - 20 + sg * 6},${my + 2} H${mx + 20 + sg * 6}" stroke="#000" stroke-width="3" opacity="0.5"/>${fold(`M${mx - 14 + sg * 6},${my - 8} H${mx + 14 + sg * 6}`)}`; }
+  if (FIT.kind === 'sport') { o += `<path d="M${H[0] + sg * 24},${H[1] + 20} L${K[0] + sg * 18},${K[1]} L${A[0] + sg * 12},${A[1] - 20}" stroke="#cfd2dc" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.85"/><rect x="${A[0] - 26}" y="${A[1] - 30}" width="52" height="22" rx="9" fill="url(#zRib)" ${FS.replace('7', '4')}/>`; }
+  o += fold(`M${mx - 8},${my - 30} L${mx - 8},${my + 30}`, 0.1);
+  return o; };
+export const ALLDEFS = DEFS + oldDefs('e3d') + FITDEFS;
 export const PART_FNS = { hair_back: hairBack, hair_front: hairFront, head: part_head, neck: part_neck, torso_chest: part_chest, corset: part_corset, midriff: part_midriff, necklace: part_necklace, skirt_back: part_skirt_back, slit_inner: part_slit_inner, skirt_panel_left: part_skirt_panel, skirt_ruffle: part_skirt_ruffle, skirt_rosette: part_rosette, waistband: part_waistband, legs, arms };
 export function hipsT(P) { return `${mv(P.hips.x, P.hips.y)} ${rot(P.hips.rot, SK.hips)}`; }
 export function chestT(P) { const b = P.chest.breath; return `${rot(P.chest.rot, SK.chest)} translate(512,640) scale(${f1((1 + 0.006 * b) * 1000) / 1000},${f1((1 + 0.012 * b) * 1000) / 1000}) translate(-512,-640)`; }
 export function renderCharacter(P) {
   const HT = hipsT(P), CT = chestT(P);
+  if (FIT.on) return `<g id="lazy2d">
+  <g transform="${HT}">${legs(P)}${fitPelvis(P)}</g>
+  <g transform="${HT} ${CT}">${part_neck(P)}${headBack(P)}${fitTorso(P)}${headFront(P)}</g>
+  <g transform="${HT} ${CT}">${arms(P)}</g></g>`;
   return `<g id="lazy2d">
   <g transform="${HT}">${part_skirt_back(P)}${part_slit_inner(P)}${legs(P)}${part_skirt_panel(P)}${part_skirt_ruffle(P)}${part_rosette(P)}${part_midriff(P)}${part_waistband(P)}</g>
   <g transform="${HT} ${CT}">${part_neck(P)}${headBack(P)}${part_chest(P)}${part_corset(P)}${part_necklace(P)}${headFront(P)}</g>

@@ -1,0 +1,11 @@
+import { Resvg } from '@resvg/resvg-js'; import { writeFileSync, readFileSync } from 'node:fs'; import { execSync } from 'node:child_process';
+import { renderCharacter as rc, defaultPose as dp, ALLDEFS, FIT } from './rig2d/character.mjs'; import { applyDay18Face } from './face_final.mjs'; import { defs } from './lazy_lib.mjs';
+const OPT = [['A · Sudadera y leggings', 'hoodie', 'Capucha, bolsa canguro y leggings negros'], ['B · Bomber y cargo', 'bomber', 'Chamarra con cierre y pantalón cargo'], ['C · Conjunto deportivo', 'sport', 'Top de cuello alto y joggers con rayas'], ['D · Chaleco y leggings', 'vest', 'Chaleco acolchado sobre manga larga']];
+const tiles = [];
+OPT.forEach(([n, k, d], i) => { applyDay18Face(); FIT.on = true; FIT.kind = k;
+  const P = dp(); P.eyes.lookX = 0.1; P.mouth.smile = 0.5; P.mouth.open = 0.03; P.noseStyle = 'D'; P.noseK = 1.35; P.hairOv = { hd: 'twin', tv: 'lowb2', len: 0.7, shine: 1, cp: 1, grow: 1 }; P.hair.t = 1; P.skirt.t = 1;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1536" viewBox="0 0 1024 1536">${defs('e3d')}${ALLDEFS}<rect width="1024" height="1536" fill="#2a1830"/>${rc(P)}</svg>`;
+  writeFileSync(`/tmp/rp_${i}.png`, new Resvg(svg, { fitTo: { mode: 'zoom', value: 1 }, font: { loadSystemFonts: true } }).render().asPng()); FIT.on = false; tiles.push([n, d, readFileSync(`/tmp/rp_${i}.png`)]); });
+const b64 = (b) => 'data:image/png;base64,' + Buffer.from(b).toString('base64'); let body = '';
+tiles.forEach(([n, d, t], i) => { const x = (i % 2) * 560 + 5, y = Math.floor(i / 2) * 900 + 5; body += `<image href="${b64(t)}" x="${x}" y="${y}" width="548" height="822"/><text x="${x + 274}" y="${y + 860}" font-family="Anton" font-size="38" text-anchor="middle" fill="#ffe14d">${n}</text><text x="${x + 274}" y="${y + 890}" font-family="Inter" font-weight="600" font-size="22" text-anchor="middle" fill="#fff">${d}</text>`; });
+writeFileSync('OpcionesRopa20.png', new Resvg(`<svg xmlns="http://www.w3.org/2000/svg" width="1130" height="1810"><rect width="1130" height="1810" fill="#1d1426"/>${body}</svg>`, { font: { loadSystemFonts: true } }).render().asPng());
