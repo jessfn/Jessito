@@ -10,5 +10,5 @@ for p in 0 1 2 3; do (
 done; wait
 ls build/dia20/ch/c*.mp4 | grep -v tmp | sort | sed "s#^#file '$PWD/#; s#\$#'#" > build/dia20/chlist.txt
 ffmpeg -y -loglevel error -f concat -safe 0 -i build/dia20/chlist.txt -c copy build/dia20/video_mudo.mp4
-ffmpeg -y -loglevel error -i build/dia20/video_mudo.mp4 -i build/dia20/audio_final.wav -af loudnorm=I=-14:TP=-1.5:LRA=9 -c:v copy -c:a aac -b:a 192k -shortest build/dia20/build/dia20/LazyDawns_Dia20.mp4
+ffmpeg -y -loglevel error -i build/dia20/video_mudo.mp4 -i build/dia20/audio_final.wav -af loudnorm=I=-14:TP=-1.5:LRA=9 -c:v copy -c:a aac -b:a 192k -shortest build/dia20/LazyDawns_Dia20.mp4
 echo TERMINADO > build/dia20/done.txt
